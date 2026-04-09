@@ -2764,7 +2764,13 @@ body { padding-bottom: 120px; }
     }
 
     // Выход: сохраняем данные текущего юзера, потом чистим экран
-    function logout(){
+    // Event delegation for admin file buttons
+document.addEventListener('click', function(e) {
+  var b = e.target.closest('.js-load-files');
+  if (b) loadUserFiles(b.dataset.uid);
+});
+
+function logout(){
       saveToStorage();
       clearToken();
       resetState();
@@ -3544,7 +3550,13 @@ const list = document.getElementById('epPortfolioList');
           if(btn) btn.disabled = true;
           (async () => {
             try {
-              const { user, profile } = await apiRegister(email, password, role, fullName);
+              // --- Form validation ---
+                if (!firstName && !lastName) { if(btn) btn.disabled = false; alert('Введите имя'); return; }
+                const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRe.test(email)) { if(btn) btn.disabled = false; alert('Некорректный email'); return; }
+                if (!password || password.length < 6) { if(btn) btn.disabled = false; alert('Пароль — минимум 6 символов'); return; }
+                // --- End validation ---
+                const { user, profile } = await apiRegister(email, password, role, fullName);
               state.email = user.email;
               state.roleReg = role === 'employer' ? 'EMPLOYER' : 'EMPLOYEE';
               if(!state.publicId){ state.publicId = 'LOMO-' + String(Math.floor(100000 + Math.random()*900000)); }
@@ -4593,7 +4605,7 @@ const list = document.getElementById('epPortfolioList');
       if(state.roleReg === 'ADMIN'){
         adminFilesHtml = '<div class="pubProfileSection">'
           + '<div class="pubProfileSTitle">Файлы пользователя</div>'
-          + '<button onclick="loadUserFiles(\''+u.id+'\')" style="padding:8px 16px;border-radius:12px;border:1.5px solid #2a7a8a;color:#2a7a8a;background:#f0fdfa;cursor:pointer;font-size:13px;font-weight:600;position:relative;z-index:10;">📂 Просмотреть файлы</button>'
+          + '<button class="js-load-files" data-uid="'+u.id+'" style="padding:8px 16px;border-radius:12px;border:1.5px solid #2a7a8a;color:#2a7a8a;background:#f0fdfa;cursor:pointer;font-size:13px;font-weight:600;position:relative;z-index:10;">📂 Просмотреть файлы</button>'
           + '<div id="userFileslist" style="margin-top:10px;"></div>'
           + '</div>';
       }
