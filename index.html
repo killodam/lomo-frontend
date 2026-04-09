@@ -341,7 +341,7 @@
       position:absolute;
       left:0;
       right:0;
-      bottom: 30px;
+      bottom: 70px;
       display:flex;
       flex-direction:column;
       align-items:center;
@@ -1425,7 +1425,7 @@
     /* ── Public profile screen ── */
     #screenPublicProfile .wrap{ flex-direction:column;align-items:stretch;justify-content:flex-start;overflow-y:auto;padding:0; }
     #screenPublicProfile .profileContent{ max-width:660px;margin:0 auto;padding:20px 16px 60px;width:100%;box-sizing:border-box; }
-    .pubProfileCard{ background:#fff;border-radius:20px;box-shadow:0 2px 16px rgba(0,0,0,.07);overflow:hidden;margin-bottom:16px; }
+    .pubProfileCard{ background:#fff;border-radius:20px;box-shadow:0 2px 16px rgba(0,0,0,.07);overflow:visible;margin-bottom:16px; }
     .pubProfileHead{ display:flex;gap:18px;align-items:flex-start;padding:24px 24px 16px; }
     .pubProfileBody{ padding:0 24px 20px; }
     .pubProfileSection{ border-top:1px solid #f3f4f6;padding:16px 0 4px; }
@@ -4593,7 +4593,7 @@ const list = document.getElementById('epPortfolioList');
       if(state.roleReg === 'ADMIN'){
         adminFilesHtml = '<div class="pubProfileSection">'
           + '<div class="pubProfileSTitle">Файлы пользователя</div>'
-          + '<button onclick="loadUserFiles('+u.id+')" style="padding:8px 16px;border-radius:12px;border:1.5px solid #2a7a8a;color:#2a7a8a;background:#f0fdfa;cursor:pointer;font-size:13px;font-weight:600;">📂 Просмотреть файлы</button>'
+          + '<button onclick="loadUserFiles('+u.id+')" style="padding:8px 16px;border-radius:12px;border:1.5px solid #2a7a8a;color:#2a7a8a;background:#f0fdfa;cursor:pointer;font-size:13px;font-weight:600;position:relative;z-index:10;">📂 Просмотреть файлы</button>'
           + '<div id="userFileslist" style="margin-top:10px;"></div>'
           + '</div>';
       }
