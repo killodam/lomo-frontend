@@ -4593,7 +4593,7 @@ const list = document.getElementById('epPortfolioList');
       if(state.roleReg === 'ADMIN'){
         adminFilesHtml = '<div class="pubProfileSection">'
           + '<div class="pubProfileSTitle">Файлы пользователя</div>'
-          + '<button onclick="loadUserFiles('+u.id+')" style="padding:8px 16px;border-radius:12px;border:1.5px solid #2a7a8a;color:#2a7a8a;background:#f0fdfa;cursor:pointer;font-size:13px;font-weight:600;position:relative;z-index:10;">📂 Просмотреть файлы</button>'
+          + '<button onclick="loadUserFiles(\''+u.id+'\')" style="padding:8px 16px;border-radius:12px;border:1.5px solid #2a7a8a;color:#2a7a8a;background:#f0fdfa;cursor:pointer;font-size:13px;font-weight:600;position:relative;z-index:10;">📂 Просмотреть файлы</button>'
           + '<div id="userFileslist" style="margin-top:10px;"></div>'
           + '</div>';
       }
