@@ -158,17 +158,18 @@
       flex-direction: column;
       align-items:center;
       justify-content:center;
-      gap: 16px;
+      gap: 24px;
       padding: 0 22px;
       text-align:center;
     }
     .authLogo{
-      width: min(340px, 70vw);
+      width: min(280px, 60vw);
       height: auto;
       object-fit: contain;
       user-select:none;
       -webkit-user-drag:none;
-      filter: drop-shadow(0 18px 40px rgba(0,0,0,.10));
+      filter: none;
+      border-radius: 20px;
     }
     .authTagline{
       max-width: min(480px, 88vw);
@@ -1727,13 +1728,13 @@ body { padding-bottom: 120px; }
     <button class="drawerClose" type="button" id="drawerCloseBtn" aria-label="Закрыть меню">×</button>
   </div>
   <nav class="drawerNav">
-    <button type="button" class="drawerItem" data-drawer-open="faq">FAQ</button>
-    <button type="button" class="drawerItem" data-drawer-open="how">Как работает</button>
+        <button type="button" class="drawerItem" data-drawer-open="how">Как работает</button>
     <button type="button" class="drawerItem" data-drawer-open="security">Безопасность и приватность</button>
     <button type="button" class="drawerItem" data-drawer-open="terms">Условия использования</button>
     <button type="button" class="drawerItem" data-drawer-open="privacy">Политика конфиденциальности</button>
     <button type="button" class="drawerItem" data-drawer-open="contacts">Контакты</button>
     <button type="button" class="drawerItem" data-drawer-open="about">О проекте</button>
+<button type="button" class="drawerItem" data-drawer-open="faq">FAQ</button>
   </nav>
   <div class="drawerFoot">
     <div class="drawerHint">Нажмите ESC или кликните вне панели, чтобы закрыть.</div>
