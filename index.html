@@ -32,6 +32,127 @@
       --fade: 260ms;
       --logoMove: 700ms;
     }
+    /* ── FORGOT / VERIFY / RESET PASSWORD ── */
+    .authFlowTitle{
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      color: rgba(0,0,0,.88);
+      text-align:center;
+      margin-bottom: 4px;
+    }
+    .authFlowSub{
+      font-size: 14px;
+      color: rgba(0,0,0,.50);
+      text-align:center;
+      max-width: 340px;
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+    /* 6-digit code cells */
+    .codeInputRow{
+      display:flex;
+      gap: 10px;
+      justify-content:center;
+    }
+    .codeCell{
+      width: 56px;
+      height: 68px;
+      border-radius: 18px;
+      background: #00000008;
+      border: 1.5px solid #00000018;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 26px;
+      font-weight: 700;
+      color: rgba(0,0,0,.88);
+      letter-spacing: 0;
+      transition: border-color 150ms cubic-bezier(0.23,1,0.32,1),
+                  background 150ms cubic-bezier(0.23,1,0.32,1),
+                  transform 150ms cubic-bezier(0.23,1,0.32,1);
+      cursor: text;
+      position: relative;
+      overflow:hidden;
+    }
+    .codeCell input{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      border:0;
+      outline:none;
+      background:transparent;
+      font-size: 26px;
+      font-weight: 700;
+      color: rgba(0,0,0,.88);
+      text-align:center;
+      letter-spacing:0;
+      caret-color: transparent;
+      -webkit-text-fill-color: rgba(0,0,0,.88);
+    }
+    .codeCell.active{
+      border-color: rgba(110,231,255,.55);
+      background: rgba(110,231,255,.08);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(110,231,255,.18);
+    }
+    .codeCell.filled{
+      border-color: rgba(0,0,0,.25);
+      background: #00000010;
+    }
+    .codeCell.error{
+      border-color: rgba(239,68,68,.50) !important;
+      background: rgba(239,68,68,.06) !important;
+      animation: codeShake 320ms cubic-bezier(0.23,1,0.32,1);
+    }
+    @keyframes codeShake{
+      0%,100%{ transform: translateX(0); }
+      20%{ transform: translateX(-6px); }
+      40%{ transform: translateX(6px); }
+      60%{ transform: translateX(-4px); }
+      80%{ transform: translateX(4px); }
+    }
+    .codeError{
+      font-size: 13px;
+      color: #dc2626;
+      text-align:center;
+      font-weight: 600;
+      min-height: 20px;
+      transition: opacity 180ms ease;
+    }
+    .codeError.hidden{ opacity:0; }
+    /* resend hint */
+    .resendHint{
+      font-size: 13px;
+      color: rgba(0,0,0,.45);
+      text-align:center;
+    }
+    .resendHint button{
+      background:none;
+      border:none;
+      color: rgba(0,80,95,.85);
+      font-weight:700;
+      cursor:pointer;
+      padding:0;
+      font-size:13px;
+    }
+    .resendHint button:hover{ text-decoration:underline; }
+    /* password strength bar */
+    .strengthBar{
+      width: var(--inW);
+      height: 4px;
+      border-radius: 999px;
+      background: #00000010;
+      overflow:hidden;
+      margin-top:-4px;
+    }
+    .strengthFill{
+      height:100%;
+      border-radius:999px;
+      width:0;
+      transition: width 300ms cubic-bezier(0.23,1,0.32,1), background 300ms ease;
+    }
     .addExpBtn{display:block;width:100%;padding:11px;margin:4px 0 16px;border:1.5px dashed #2a7a8a;border-radius:12px;background:none;color:#2a7a8a;font-size:14px;font-weight:600;cursor:pointer;text-align:center;transition:background .2s;}
     .addExpBtn:hover{background:#f0fdfa;}
     .workExpEntry{background:#f8fafb;border:1px solid #e2e8f0;border-radius:14px;padding:14px 14px 6px;margin-bottom:10px;position:relative;}
@@ -1909,13 +2030,73 @@ body { padding-bottom: 120px; }
 <section aria-label="Forgot password" class="screen" id="screenForgot">
 <div class="wrap">
 <button aria-label="Back" class="backBtn" data-back="toLoginForm">← Назад</button>
-<div class="centerBlock">
-<div class="sqInput">
-<input autocomplete="off" id="forgotEmail" placeholder="введите почту" type="text"/>
-</div>
+<div class="centerBlock" style="gap:14px">
+  <div class="authFlowTitle">Забыли пароль?</div>
+  <div class="authFlowSub">Введите почту, привязанную к аккаунту — пришлём 6-значный код.</div>
+  <div class="formCol">
+    <div>
+      <div class="sqInput" id="sqInputForgotEmail">
+        <input autocomplete="email" id="forgotEmail" placeholder="your@email.com" type="email"/>
+      </div>
+      <div class="fieldError hidden" id="forgotEmailError">Введите корректный email</div>
+    </div>
+  </div>
 </div>
 <div class="footerArea">
-<button class="accentBtn nextBtn" data-next="fromForgot">далее</button>
+  <button class="accentBtn nextBtn" id="forgotSubmitBtn">Отправить код</button>
+</div>
+</div>
+</section>
+
+<!-- 4D) VERIFY CODE -->
+<section aria-label="Verify code" class="screen" id="screenVerifyCode">
+<div class="wrap">
+<button aria-label="Back" class="backBtn" data-back="toForgot">← Назад</button>
+<div class="centerBlock" style="gap:18px">
+  <div class="authFlowTitle">Введите код</div>
+  <div class="authFlowSub" id="verifyCodeSub">Мы отправили 6-значный код на вашу почту. Код действителен 15 минут.</div>
+  <div class="codeInputRow" id="codeInputRow">
+    <div class="codeCell" data-idx="0"><input id="cc0" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*"/></div>
+    <div class="codeCell" data-idx="1"><input id="cc1" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*"/></div>
+    <div class="codeCell" data-idx="2"><input id="cc2" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*"/></div>
+    <div class="codeCell" data-idx="3"><input id="cc3" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*"/></div>
+    <div class="codeCell" data-idx="4"><input id="cc4" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*"/></div>
+    <div class="codeCell" data-idx="5"><input id="cc5" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*"/></div>
+  </div>
+  <div class="codeError hidden" id="verifyCodeError">Неверный код. Проверьте и попробуйте снова.</div>
+  <div class="resendHint">Не получили? <button id="resendCodeBtn" type="button">Отправить повторно</button></div>
+</div>
+<div class="footerArea">
+  <button class="accentBtn nextBtn" id="verifySubmitBtn">Подтвердить</button>
+</div>
+</div>
+</section>
+
+<!-- 4E) RESET PASSWORD -->
+<section aria-label="Reset password" class="screen" id="screenResetPassword">
+<div class="wrap">
+<button aria-label="Back" class="backBtn" data-back="toVerifyCode">← Назад</button>
+<div class="centerBlock" style="gap:14px">
+  <div class="authFlowTitle">Новый пароль</div>
+  <div class="authFlowSub">Придумайте надёжный пароль — минимум 8 символов.</div>
+  <div class="formCol">
+    <div>
+      <div class="sqInput" id="sqInputNewPassword">
+        <input autocomplete="new-password" id="newPassword" placeholder="новый пароль" type="password"/>
+      </div>
+      <div class="strengthBar"><div class="strengthFill" id="strengthFill"></div></div>
+      <div class="fieldError hidden" id="newPasswordError">Минимум 8 символов</div>
+    </div>
+    <div>
+      <div class="sqInput" id="sqInputConfirmPassword">
+        <input autocomplete="new-password" id="confirmPassword" placeholder="повторите пароль" type="password"/>
+      </div>
+      <div class="fieldError hidden" id="confirmPasswordError">Пароли не совпадают</div>
+    </div>
+  </div>
+</div>
+<div class="footerArea">
+  <button class="accentBtn nextBtn" id="resetSubmitBtn">Сохранить пароль</button>
 </div>
 </div>
 </section>
@@ -2556,6 +2737,20 @@ body { padding-bottom: 120px; }
       return apiFetch('/admin/documents/' + docId + '/reject', { method: 'POST', body: JSON.stringify({ reason }) });
     }
 
+    async function apiForgotPassword(email) {
+      return apiFetch('/auth/forgot-password', {
+        method: 'POST',
+        body: JSON.stringify({ email })
+      });
+    }
+
+    async function apiResetPassword(email, code, newPassword) {
+      return apiFetch('/auth/reset-password', {
+        method: 'POST',
+        body: JSON.stringify({ email, code, newPassword })
+      });
+    }
+
     async function apiGetRequests() {
       return apiFetch('/requests');
     }
@@ -2696,6 +2891,8 @@ body { padding-bottom: 120px; }
       regForm: document.getElementById('screenRegForm'),
       loginForm: document.getElementById('screenLoginForm'),
       forgot: document.getElementById('screenForgot'),
+      verifyCode: document.getElementById('screenVerifyCode'),
+      resetPassword: document.getElementById('screenResetPassword'),
       recruiterPublic: document.getElementById('screenRecruiterPublic'),
       employeePublic: document.getElementById('screenEmployeePublic'),
       myEmployerProfile: document.getElementById('screenMyEmployerProfile'),
@@ -3601,9 +3798,206 @@ const list = document.getElementById('epPortfolioList');
     }
 
     function clearAuthInputs(){
-      ['regFirstName','regLastName','regEmail','regLogin','regPassword','loginEmail','loginPassword','forgotEmail']
+      ['regFirstName','regLastName','regEmail','regLogin','regPassword','loginEmail','loginPassword','forgotEmail','newPassword','confirmPassword']
         .forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+      // clear code cells
+      for(let i=0;i<6;i++){ const cc=document.getElementById('cc'+i); if(cc) cc.value=''; }
+      document.querySelectorAll('.codeCell').forEach(c=>c.classList.remove('filled','active','error'));
     }
+
+    // ── FORGOT PASSWORD FLOW ──────────────────────────────────
+    (function initForgotFlow(){
+      // State for the flow
+      const flowState = { email: '' };
+
+      // ── STEP 1: Send email ───────────────────────────────────
+      const forgotSubmitBtn = document.getElementById('forgotSubmitBtn');
+      forgotSubmitBtn && forgotSubmitBtn.addEventListener('click', async () => {
+        const emailVal = (document.getElementById('forgotEmail')?.value || '').trim();
+        const emailInput = document.getElementById('sqInputForgotEmail');
+        const emailErr = document.getElementById('forgotEmailError');
+        // Validate
+        if(!emailVal || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(emailVal)){
+          emailInput?.classList.add('inputError');
+          emailErr?.classList.remove('hidden');
+          return;
+        }
+        emailInput?.classList.remove('inputError');
+        emailErr?.classList.add('hidden');
+        // Disable button
+        forgotSubmitBtn.disabled = true;
+        forgotSubmitBtn.textContent = 'Отправляем…';
+        try {
+          await apiForgotPassword(emailVal);
+          flowState.email = emailVal;
+          // Update subtitle in verify screen
+          const sub = document.getElementById('verifyCodeSub');
+          if(sub) sub.textContent = `Мы отправили 6-значный код на ${emailVal}. Код действителен 15 минут.`;
+          // Clear code cells
+          for(let i=0;i<6;i++){ const cc=document.getElementById('cc'+i); if(cc) cc.value=''; }
+          document.querySelectorAll('.codeCell').forEach(c=>c.classList.remove('filled','active','error'));
+          document.getElementById('verifyCodeError')?.classList.add('hidden');
+          show('verifyCode');
+          setTimeout(()=>{ document.getElementById('cc0')?.focus(); }, 80);
+        } catch(err) {
+          emailErr.textContent = err.message || 'Произошла ошибка';
+          emailErr?.classList.remove('hidden');
+          emailInput?.classList.add('inputError');
+        } finally {
+          forgotSubmitBtn.disabled = false;
+          forgotSubmitBtn.textContent = 'Отправить код';
+        }
+      });
+
+      // Allow resend
+      document.getElementById('resendCodeBtn')?.addEventListener('click', async () => {
+        if(!flowState.email) { show('forgot'); return; }
+        const btn = document.getElementById('resendCodeBtn');
+        btn.disabled = true;
+        btn.textContent = 'Отправляем…';
+        try {
+          await apiForgotPassword(flowState.email);
+          // Clear cells & error
+          for(let i=0;i<6;i++){ const cc=document.getElementById('cc'+i); if(cc) cc.value=''; }
+          document.querySelectorAll('.codeCell').forEach(c=>c.classList.remove('filled','active','error'));
+          document.getElementById('verifyCodeError')?.classList.add('hidden');
+          setTimeout(()=>{ document.getElementById('cc0')?.focus(); }, 50);
+        } catch(e) {}
+        finally {
+          btn.disabled = false;
+          btn.textContent = 'Отправить повторно';
+        }
+      });
+
+      // ── STEP 2: Code input behaviour ────────────────────────
+      const codeRow = document.getElementById('codeInputRow');
+      if(codeRow){
+        const cells = codeRow.querySelectorAll('.codeCell');
+        const inputs = [...codeRow.querySelectorAll('input')];
+
+        // Focus management
+        inputs.forEach((inp, idx) => {
+          // Click on cell focuses input
+          cells[idx].addEventListener('click', () => inp.focus());
+
+          inp.addEventListener('focus', () => {
+            cells.forEach(c=>c.classList.remove('active'));
+            cells[idx].classList.add('active');
+          });
+          inp.addEventListener('blur', () => {
+            cells[idx].classList.remove('active');
+          });
+
+          inp.addEventListener('keydown', (e) => {
+            if(e.key === 'Backspace'){
+              if(inp.value === '' && idx > 0){ inputs[idx-1].focus(); inputs[idx-1].select(); }
+              else { inp.value = ''; cells[idx].classList.remove('filled'); }
+              e.preventDefault();
+            } else if(e.key === 'ArrowLeft' && idx > 0){
+              inputs[idx-1].focus(); e.preventDefault();
+            } else if(e.key === 'ArrowRight' && idx < 5){
+              inputs[idx+1].focus(); e.preventDefault();
+            } else if(e.key === 'Enter'){
+              document.getElementById('verifySubmitBtn')?.click();
+            }
+          });
+
+          inp.addEventListener('input', (e) => {
+            // Accept only digits
+            let val = inp.value.replace(/\D/g,'');
+            // Handle paste of full code
+            if(val.length > 1){
+              [...val.slice(0,6)].forEach((ch,i)=>{
+                if(inputs[i]){ inputs[i].value=ch; cells[i].classList.add('filled'); }
+              });
+              const nextEmpty = inputs.findIndex(i=>!i.value);
+              (nextEmpty >= 0 ? inputs[nextEmpty] : inputs[5]).focus();
+              return;
+            }
+            inp.value = val;
+            if(val){ cells[idx].classList.add('filled'); if(idx<5) inputs[idx+1].focus(); }
+            else { cells[idx].classList.remove('filled'); }
+          });
+        });
+      }
+
+      // ── STEP 2: Verify code submit ───────────────────────────
+      document.getElementById('verifySubmitBtn')?.addEventListener('click', async () => {
+        const code = [...document.querySelectorAll('.codeCell input')].map(i=>i.value).join('');
+        const errEl = document.getElementById('verifyCodeError');
+        if(code.length < 6){
+          document.querySelectorAll('.codeCell').forEach(c=>c.classList.add('error'));
+          errEl?.classList.remove('hidden');
+          errEl.textContent = 'Введите все 6 цифр кода.';
+          return;
+        }
+        // Store validated code, go to reset screen
+        flowState.code = code;
+        errEl?.classList.add('hidden');
+        document.querySelectorAll('.codeCell').forEach(c=>c.classList.remove('error'));
+        // Pre-clear reset fields
+        const np = document.getElementById('newPassword');
+        const cp = document.getElementById('confirmPassword');
+        if(np) np.value='';
+        if(cp) cp.value='';
+        document.getElementById('strengthFill') && (document.getElementById('strengthFill').style.width='0');
+        show('resetPassword');
+        setTimeout(()=>{ document.getElementById('newPassword')?.focus(); }, 80);
+      });
+
+      // ── STEP 3: Password strength indicator ─────────────────
+      document.getElementById('newPassword')?.addEventListener('input', () => {
+        const val = document.getElementById('newPassword').value;
+        const fill = document.getElementById('strengthFill');
+        if(!fill) return;
+        let score = 0;
+        if(val.length >= 8) score++;
+        if(val.length >= 12) score++;
+        if(/[A-Z]/.test(val)) score++;
+        if(/[0-9]/.test(val)) score++;
+        if(/[^a-zA-Z0-9]/.test(val)) score++;
+        const pct = Math.min(100, score * 22);
+        fill.style.width = pct + '%';
+        fill.style.background = score <= 1 ? '#ef4444' : score <= 2 ? '#f59e0b' : score <= 3 ? '#84cc16' : '#22c55e';
+      });
+
+      // ── STEP 3: Save new password ────────────────────────────
+      document.getElementById('resetSubmitBtn')?.addEventListener('click', async () => {
+        const np = (document.getElementById('newPassword')?.value || '');
+        const cp = (document.getElementById('confirmPassword')?.value || '');
+        const npInput = document.getElementById('sqInputNewPassword');
+        const cpInput = document.getElementById('sqInputConfirmPassword');
+        const npErr = document.getElementById('newPasswordError');
+        const cpErr = document.getElementById('confirmPasswordError');
+        let ok = true;
+        if(np.length < 8){
+          npInput?.classList.add('inputError'); npErr?.classList.remove('hidden'); ok=false;
+        } else { npInput?.classList.remove('inputError'); npErr?.classList.add('hidden'); }
+        if(np !== cp){
+          cpInput?.classList.add('inputError'); cpErr?.classList.remove('hidden'); ok=false;
+        } else { cpInput?.classList.remove('inputError'); cpErr?.classList.add('hidden'); }
+        if(!ok) return;
+        const btn = document.getElementById('resetSubmitBtn');
+        btn.disabled = true;
+        btn.textContent = 'Сохраняем…';
+        try {
+          await apiResetPassword(flowState.email, flowState.code, np);
+          // Success!
+          doneTextEl.textContent = 'Пароль успешно изменён';
+          state.prevFromDone = 'loginForm';
+          show('done');
+        } catch(err) {
+          // Code was wrong after all — go back to verify
+          const errEl = document.getElementById('verifyCodeError');
+          if(errEl){ errEl.textContent = err.message || 'Неверный или устаревший код.'; errEl.classList.remove('hidden'); }
+          document.querySelectorAll('.codeCell').forEach(c=>c.classList.add('error'));
+          show('verifyCode');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Сохранить пароль';
+        }
+      });
+    })();
 
     // Consent listeners
     ['consentTerms','consentPd','consentRole'].forEach(id => {
@@ -3952,6 +4346,10 @@ const list = document.getElementById('epPortfolioList');
         }
 
         if(route === 'toForgot'){
+          // Clear forgot form
+          const fe = document.getElementById('forgotEmail'); if(fe) fe.value='';
+          document.getElementById('sqInputForgotEmail')?.classList.remove('inputError');
+          document.getElementById('forgotEmailError')?.classList.add('hidden');
           show('forgot');
           return;
         }
@@ -3960,13 +4358,6 @@ const list = document.getElementById('epPortfolioList');
         if(route === 'toEmployerSearch')   { showEmployerDashboard(); return; }
         if(route === 'toEmployerDashboard'){ showEmployerDashboard(); return; }
         if(route === 'toEmployeeDashboard'){ showEmployeeDashboard(); return; }
-
-        if(route === 'fromForgot'){
-          doneTextEl.textContent = 'YOUR NEW PASSWORD HAS BEEN SENT TO YOUR EMAIL';
-          state.prevFromDone = 'forgot';
-          show('done');
-          return;
-        }
 
         if(route === 'toDashboard'){
           const role = state.roleReg || 'EMPLOYEE';
@@ -3992,6 +4383,8 @@ const list = document.getElementById('epPortfolioList');
         if(where === 'toAuth'){ clearAuthInputs(); show('auth'); return; }
         if(where === 'toRoleReg'){ show('roleReg'); return; }
         if(where === 'toLoginForm'){ show('loginForm'); return; }
+        if(where === 'toForgot'){ show('forgot'); return; }
+        if(where === 'toVerifyCode'){ show('verifyCode'); return; }
         if(where === 'toPrevFromDone'){ show(state.prevFromDone || 'auth'); return; }
         if(where === 'toRecruiterPublic'){ renderRecruiterPublic(); show('recruiterPublic'); return; }
         if(where === 'toEmployeePublic'){ renderEmployeePublic(); show('employeePublic'); return; }
@@ -4009,6 +4402,8 @@ const list = document.getElementById('epPortfolioList');
       if(screens.myEmployerProfile?.classList.contains('active')){ renderRecruiterPublic(); show('recruiterPublic'); return; }
       if(screens.myEmployeeProfile?.classList.contains('active')){ renderEmployeePublic(); show('employeePublic'); return; }
       if(screens.recruiterPublic?.classList.contains('active') || screens.employeePublic?.classList.contains('active')){ show('auth'); return; }
+      if(screens.resetPassword?.classList.contains('active')){ show('verifyCode'); return; }
+      if(screens.verifyCode?.classList.contains('active')){ show('forgot'); return; }
       if(screens.forgot?.classList.contains('active')){ show('loginForm'); return; }
       if(screens.regForm?.classList.contains('active')){ show('roleReg'); return; }
       if(screens.roleReg?.classList.contains('active')){ show('auth'); return; }
