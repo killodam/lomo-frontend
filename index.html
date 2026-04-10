@@ -5,13 +5,11 @@
 <meta content="width=device-width, initial-scale=1" name="viewport"/>
 <title>LOMO</title>
 <style>
-    @import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap");
-
     :root{
       --bg:#ffffff;
       --label:#111111cc;
       --placeholder:#11111166;
-      --copyright:#111111a5;
+      --copyright:#1111115
       --sqFill:#00000010;
       --sqBorder:#00000018;
       --sqHoverFill:#00000014;
@@ -1849,887 +1847,6 @@
       }
     }
 
-    /* V4 EDITORIAL LUXURY THEME */
-    :root{
-      --bg:#080808;
-      --label:rgba(245,241,232,.96);
-      --placeholder:rgba(245,241,232,.36);
-      --copyright:rgba(245,241,232,.44);
-      --sqFill:rgba(255,255,255,.03);
-      --sqBorder:rgba(255,255,255,.09);
-      --sqHoverFill:rgba(255,255,255,.05);
-      --sqHoverBorder:rgba(255,255,255,.16);
-      --backFill:rgba(255,255,255,.035);
-      --backBorder:rgba(255,255,255,.1);
-      --accentFill:#f5f1e8;
-      --accentBorder:#f5f1e8;
-      --accentText:#090909;
-      --accentHoverFill:#ffffff;
-      --accentHoverBorder:#ffffff;
-      --line:rgba(255,255,255,.08);
-      --line-strong:rgba(255,255,255,.16);
-      --surface-0:#0d0d0d;
-      --surface-1:#111111;
-      --surface-2:#151515;
-      --surface-3:#1a1a1a;
-      --surface-shadow:0 28px 90px rgba(0,0,0,.46);
-      --text-soft:rgba(245,241,232,.72);
-      --text-dim:rgba(245,241,232,.46);
-    }
-    html{
-      background:#080808;
-    }
-    body{
-      position:relative;
-      background:
-        radial-gradient(1200px 720px at 8% 0%, rgba(255,255,255,.06), transparent 52%),
-        radial-gradient(900px 560px at 92% 10%, rgba(255,255,255,.035), transparent 48%),
-        radial-gradient(1000px 760px at 50% 100%, rgba(255,255,255,.04), transparent 58%),
-        linear-gradient(180deg, #090909 0%, #060606 100%) !important;
-      color:var(--label);
-      font-family:"Manrope", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
-    }
-    body::before{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      background:
-        linear-gradient(90deg, rgba(255,255,255,.045) 0, rgba(255,255,255,.045) 1px, transparent 1px, transparent calc(50% - 1px), rgba(255,255,255,.035) calc(50% - 1px), rgba(255,255,255,.035) calc(50% + 1px), transparent calc(50% + 1px)),
-        linear-gradient(180deg, rgba(255,255,255,.015), transparent 22%, transparent 78%, rgba(255,255,255,.015));
-      opacity:.3;
-      z-index:0;
-    }
-    body::after{
-      content:"";
-      position:fixed;
-      inset:0;
-      pointer-events:none;
-      background:
-        radial-gradient(circle at center, transparent 0 58%, rgba(255,255,255,.03) 100%);
-      mix-blend-mode:screen;
-      opacity:.35;
-      z-index:0;
-    }
-    .stage,
-    .screen,
-    .wrap,
-    .modalOverlay,
-    .drawer,
-    .drawerOverlay{
-      position:relative;
-      z-index:1;
-    }
-    .screen{
-      background:transparent !important;
-    }
-    .wrap{
-      padding:40px 24px 148px;
-    }
-    .centerBlock{
-      width:min(100%, 1080px);
-    }
-    .sqText,
-    .authFlowTitle,
-    .authTagline,
-    .pageTitle,
-    .sectionTitle,
-    .profileName,
-    .doneText,
-    .modalTitle,
-    .feedName,
-    .scName,
-    .empCompName,
-    .empCompanyName,
-    .authFlowTitle{
-      font-family:"Space Grotesk", "Manrope", sans-serif !important;
-    }
-    .sqText{
-      color:var(--label) !important;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-    }
-    .sqSubtext,
-    .authFlowSub,
-    .authBenefit,
-    .profileMeta,
-    .profileSub,
-    .miniHint,
-    .fieldError,
-    .codeError,
-    .resendHint,
-    .drawerHint,
-    .pageSubtitle,
-    .sectionSubtitle{
-      color:var(--text-soft) !important;
-    }
-    #screenAuth .wrap,
-    #screenRoleReg .wrap,
-    #screenRegForm .wrap,
-    #screenLoginForm .wrap,
-    #screenForgot .wrap,
-    #screenVerifyCode .wrap,
-    #screenResetPassword .wrap{
-      justify-content:center;
-    }
-    .authTopRight{
-      top:30px;
-      right:30px;
-      gap:12px;
-    }
-    .authHero{
-      width:min(660px, 92vw);
-      min-height:min(72vh, 760px);
-      align-items:flex-start;
-      justify-content:flex-end;
-      text-align:left;
-      gap:28px;
-      padding:56px 52px 48px;
-      border-radius:34px;
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.06) 0%, rgba(255,255,255,.025) 24%, rgba(255,255,255,.02) 100%);
-      border:1px solid rgba(255,255,255,.1);
-      box-shadow:var(--surface-shadow);
-      overflow:hidden;
-    }
-    .authHero::before{
-      content:"LOMO";
-      position:absolute;
-      top:28px;
-      right:28px;
-      font-family:"Space Grotesk", sans-serif;
-      font-size:clamp(72px, 12vw, 140px);
-      line-height:.82;
-      letter-spacing:-.08em;
-      color:rgba(255,255,255,.05);
-      pointer-events:none;
-    }
-    .authHero::after{
-      content:"CAREER TRUST LAYER";
-      position:absolute;
-      left:52px;
-      top:38px;
-      font-size:11px;
-      letter-spacing:.32em;
-      color:rgba(245,241,232,.38);
-      font-weight:700;
-      text-transform:uppercase;
-    }
-    .authLogo{
-      width:min(250px, 52vw);
-      margin-top:auto;
-      filter:drop-shadow(0 24px 40px rgba(0,0,0,.38));
-    }
-    .authTagline{
-      max-width:10ch;
-      margin:0;
-      font-size:clamp(34px, 5vw, 64px);
-      line-height:.94;
-      letter-spacing:-.06em;
-      color:var(--label) !important;
-    }
-    .authBenefits{
-      max-width:100%;
-      gap:12px;
-    }
-    .authBenefit{
-      width:min(100%, 420px);
-      gap:12px;
-      padding:14px 16px;
-      border-radius:18px;
-      border:1px solid rgba(255,255,255,.08);
-      background:rgba(255,255,255,.025);
-      font-size:14px;
-      line-height:1.45;
-    }
-    .authBenefit span:first-child{
-      width:24px;
-      height:24px;
-      border-radius:999px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      background:var(--accentFill);
-      color:#090909 !important;
-      font-weight:800;
-      margin-top:0;
-    }
-    #authLoggedIn{
-      background:rgba(255,255,255,.045) !important;
-      border:1px solid rgba(255,255,255,.1) !important;
-      border-radius:20px !important;
-      box-shadow:0 24px 60px rgba(0,0,0,.28);
-      color:var(--label) !important;
-      backdrop-filter:blur(16px);
-    }
-    #authLoggedIn .sqText{
-      text-transform:none;
-      letter-spacing:.04em;
-      font-size:13px;
-    }
-    .logoMark,
-    .authPill,
-    .pillBtn,
-    .ghostBtn,
-    .backBtn,
-    .backBtnInline,
-    .burgerBtn,
-    .drawerClose,
-    .modalClose{
-      color:var(--label) !important;
-      background:rgba(255,255,255,.035) !important;
-      border:1px solid rgba(255,255,255,.11) !important;
-      box-shadow:none !important;
-      backdrop-filter:blur(16px);
-    }
-    .authPill .sqText{
-      color:var(--label) !important;
-      font-size:12px;
-      letter-spacing:.16em;
-    }
-    .logoMark{
-      letter-spacing:.18em;
-      background:rgba(255,255,255,.025) !important;
-    }
-    .burgerBtn span{
-      background:rgba(245,241,232,.82);
-    }
-    .sqBtn,
-    .candidateCard,
-    .feedCard,
-    .socialCard,
-    .adminCard,
-    .adminQueueItem,
-    .demoStep,
-    .faqItem,
-    .profileCard,
-    .profileCard.premium,
-    .miniCard,
-    .achRow,
-    .consentBox,
-    .pubProfileCard,
-    .onboardingBanner,
-    .modalCard,
-    .drawer{
-      background:
-        linear-gradient(180deg, rgba(255,255,255,.05) 0%, rgba(255,255,255,.02) 100%) !important;
-      border:1px solid rgba(255,255,255,.09) !important;
-      color:var(--label) !important;
-      box-shadow:var(--surface-shadow) !important;
-      backdrop-filter:blur(18px);
-    }
-    .sqBtn{
-      border-radius:28px !important;
-      overflow:hidden;
-    }
-    .sqBtn:hover,
-    .pillBtn:hover,
-    .backBtn:hover,
-    .backBtnInline:hover,
-    .drawerItem:hover,
-    .candidateCard:hover,
-    .feedCard:hover,
-    .socialCard:hover,
-    .adminBtn:hover{
-      background:rgba(255,255,255,.06) !important;
-      border-color:rgba(255,255,255,.18) !important;
-      transform:translateY(-2px);
-      box-shadow:0 18px 48px rgba(0,0,0,.28) !important;
-    }
-    .sqBtn.selected{
-      background:rgba(255,255,255,.075) !important;
-      border-color:rgba(245,241,232,.28) !important;
-      box-shadow:0 24px 64px rgba(0,0,0,.36) !important;
-    }
-    .accentBtn{
-      background:var(--accentFill) !important;
-      border-color:var(--accentBorder) !important;
-      color:var(--accentText) !important;
-      box-shadow:0 16px 40px rgba(0,0,0,.28);
-      text-transform:uppercase;
-      letter-spacing:.14em;
-      font-family:"Space Grotesk", "Manrope", sans-serif;
-    }
-    .accentBtn:hover{
-      background:var(--accentHoverFill) !important;
-      border-color:var(--accentHoverBorder) !important;
-      transform:translateY(-2px);
-    }
-    .accentBtn:disabled{
-      opacity:.34;
-    }
-    .sqInput,
-    #feedSearchInput,
-    #empSearchName,
-    #adminCandSearch,
-    #adminEmpSearch,
-    .searchInput,
-    .rejectInput,
-    select#empSearchVerified{
-      background:rgba(255,255,255,.035) !important;
-      border:1px solid rgba(255,255,255,.1) !important;
-      color:var(--label) !important;
-      border-radius:22px !important;
-      box-shadow:none !important;
-      backdrop-filter:blur(16px);
-    }
-    .sqInput input,
-    #feedSearchInput,
-    #empSearchName,
-    #adminCandSearch,
-    #adminEmpSearch,
-    .searchInput,
-    .rejectInput,
-    select#empSearchVerified{
-      color:var(--label) !important;
-      font-family:"Manrope", sans-serif !important;
-    }
-    .sqInput input::placeholder,
-    #feedSearchInput::placeholder,
-    #empSearchName::placeholder,
-    #adminCandSearch::placeholder,
-    #adminEmpSearch::placeholder{
-      color:var(--placeholder) !important;
-    }
-    .sqInput:focus-within,
-    #feedSearchInput:focus,
-    #empSearchName:focus,
-    #adminCandSearch:focus,
-    #adminEmpSearch:focus,
-    select#empSearchVerified:focus,
-    .searchInput:focus{
-      background:rgba(255,255,255,.055) !important;
-      border-color:rgba(245,241,232,.22) !important;
-    }
-    .fieldError,
-    .codeError,
-    .consentError{
-      color:#f49a9a !important;
-    }
-    .strengthBar,
-    .progressBar{
-      background:rgba(255,255,255,.08) !important;
-    }
-    .strengthFill,
-    .progressFill{
-      background:linear-gradient(90deg, rgba(245,241,232,.72), rgba(255,255,255,.98)) !important;
-    }
-    .consentTitle,
-    .blockTitle,
-    .pubProfileSTitle,
-    .hintTop,
-    .sectionSubtitle,
-    .pageSubtitle{
-      text-transform:uppercase;
-      letter-spacing:.18em;
-      font-size:11px !important;
-      color:var(--text-dim) !important;
-    }
-    .profileCard,
-    .profileCard.premium{
-      width:min(980px, 92vw);
-      border-radius:32px;
-      padding:28px;
-    }
-    .profileHead,
-    .modalTop{
-      border-bottom:1px solid rgba(255,255,255,.08);
-    }
-    .miniCard,
-    .achRow,
-    .jobRow{
-      border-radius:22px !important;
-    }
-    .miniLabel,
-    .miniValue,
-    .achTitle,
-    .jobTitle,
-    .profileAbout,
-    .miniHint,
-    .achMeta,
-    .jobMeta,
-    .scSub,
-    .scAbout,
-    .demoStepTitle,
-    .modalBody,
-    .consentText{
-      color:var(--text-soft) !important;
-    }
-    .profileName,
-    .feedName,
-    .scName{
-      color:var(--label) !important;
-      letter-spacing:-.04em;
-    }
-    .statusTag,
-    .chip,
-    .badge,
-    .badge.ghost,
-    .feedTag,
-    .scRoleTag,
-    .scVerBadge,
-    .demoStatus,
-    .candidateBadge,
-    .levelBadge,
-    .tag,
-    .statusChip{
-      background:rgba(255,255,255,.045) !important;
-      border:1px solid rgba(255,255,255,.1) !important;
-      color:var(--label) !important;
-      box-shadow:none !important;
-    }
-    .statusTag.ok,
-    .chip.ok,
-    .feedTag.verified,
-    .feedTag.ok,
-    .badge.ok,
-    .scVerBadge,
-    .candidateBadge.ok,
-    .demoStatus.ok,
-    .levelBadge.l3{
-      background:rgba(245,241,232,.08) !important;
-      border-color:rgba(245,241,232,.18) !important;
-      color:var(--label) !important;
-    }
-    .statusTag.warn,
-    .chip.warn,
-    .feedTag.pending,
-    .feedTag.warn,
-    .demoStatus.warn,
-    .candidateBadge.warn,
-    .levelBadge.l1{
-      background:rgba(255,255,255,.035) !important;
-      border-color:rgba(255,255,255,.12) !important;
-      color:var(--text-soft) !important;
-    }
-    .statusTag.bad,
-    .chip.bad,
-    .demoStatus.bad,
-    .adminBtn.danger{
-      background:rgba(146,64,64,.12) !important;
-      border-color:rgba(223,108,108,.22) !important;
-      color:#f3b2b2 !important;
-    }
-    .badge{
-      letter-spacing:.08em;
-      text-transform:uppercase;
-    }
-    .pillBtn.soft,
-    .miniLink,
-    .adminBtn.ok,
-    .demoBtn.primary{
-      background:var(--accentFill) !important;
-      border-color:var(--accentFill) !important;
-      color:#090909 !important;
-      font-weight:700;
-      box-shadow:none !important;
-    }
-    .miniLink:hover,
-    .adminBtn.ok:hover,
-    .demoBtn.primary:hover{
-      background:#ffffff !important;
-      border-color:#ffffff !important;
-      color:#090909 !important;
-    }
-    .adminBtn,
-    .demoBtn,
-    .filterChip{
-      background:rgba(255,255,255,.04) !important;
-      border:1px solid rgba(255,255,255,.11) !important;
-      color:var(--label) !important;
-      border-radius:999px;
-    }
-    .topBar.stickyTop,
-    .stickyTop{
-      background:rgba(8,8,8,.88) !important;
-      border-bottom:1px solid rgba(255,255,255,.08) !important;
-      box-shadow:0 18px 40px rgba(0,0,0,.3) !important;
-      backdrop-filter:blur(18px);
-    }
-    .drawerOverlay{
-      background:rgba(0,0,0,.74);
-    }
-    .drawer{
-      width:340px;
-      background:rgba(10,10,10,.94) !important;
-      border-right:1px solid rgba(255,255,255,.08) !important;
-    }
-    .drawerHead,
-    .drawerFoot{
-      border-color:rgba(255,255,255,.08);
-    }
-    .drawerBrand{
-      font-family:"Space Grotesk", sans-serif;
-      color:var(--label);
-      letter-spacing:.24em;
-    }
-    .drawerItem{
-      background:rgba(255,255,255,.03) !important;
-      border:1px solid rgba(255,255,255,.08) !important;
-      color:var(--label) !important;
-      border-radius:18px;
-      font-size:13px;
-      letter-spacing:.04em;
-      text-transform:uppercase;
-    }
-    .modalOverlay{
-      background:rgba(0,0,0,.72);
-    }
-    .modalCard{
-      width:min(840px, 94vw);
-      border-radius:28px;
-      background:rgba(12,12,12,.94) !important;
-    }
-    .modalTitle,
-    .modalBody h4,
-    .legalModal h3{
-      color:var(--label) !important;
-    }
-    .modalBody,
-    .legalModal p,
-    .faqA{
-      color:var(--text-soft) !important;
-    }
-    .faqItem{
-      background:rgba(255,255,255,.025) !important;
-      border-radius:20px;
-    }
-    .dropZone{
-      background:rgba(255,255,255,.025) !important;
-      border-color:rgba(255,255,255,.14) !important;
-      color:var(--text-soft) !important;
-      border-radius:18px;
-    }
-    .dropZone:hover,
-    .dropZone--over{
-      background:rgba(255,255,255,.05) !important;
-      border-color:rgba(245,241,232,.2) !important;
-    }
-    .addExpBtn{
-      border:1px dashed rgba(255,255,255,.16) !important;
-      background:rgba(255,255,255,.025) !important;
-      color:var(--label) !important;
-      border-radius:18px !important;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-      font-size:11px !important;
-      font-weight:700 !important;
-    }
-    .addExpBtn:hover{
-      background:rgba(255,255,255,.05) !important;
-    }
-    .workExpEntry{
-      background:rgba(255,255,255,.03) !important;
-      border:1px solid rgba(255,255,255,.09) !important;
-      border-radius:20px !important;
-    }
-    .removeExpBtn{
-      color:rgba(245,241,232,.48) !important;
-    }
-    .removeExpBtn:hover{
-      color:#f3b2b2 !important;
-    }
-    .scJobLine,
-    .scExpItem,
-    .scExpRole,
-    .scExpPeriod{
-      color:var(--text-soft) !important;
-    }
-    .uniDropdown{
-      background:rgba(14,14,14,.98) !important;
-      border:1px solid rgba(255,255,255,.1) !important;
-      box-shadow:0 24px 60px rgba(0,0,0,.4) !important;
-      border-radius:18px !important;
-      overflow:hidden;
-    }
-    .uniOption{
-      color:var(--label) !important;
-      border-bottom:1px solid rgba(255,255,255,.06) !important;
-    }
-    .uniOption:hover,
-    .uniOption:focus{
-      background:rgba(255,255,255,.05) !important;
-    }
-    .uniOption.add-custom,
-    .uniOption.addOwn{
-      color:var(--label) !important;
-      opacity:.82;
-    }
-    .regStep{
-      border-color:rgba(255,255,255,.12);
-      color:rgba(245,241,232,.4);
-      background:rgba(255,255,255,.02);
-    }
-    .regStep.active,
-    .regStep.done{
-      background:var(--accentFill) !important;
-      border-color:var(--accentFill) !important;
-      color:#090909 !important;
-    }
-    .regLine{
-      background:rgba(255,255,255,.08);
-    }
-    .codeCell{
-      background:rgba(255,255,255,.03);
-      border:1px solid rgba(255,255,255,.12);
-      color:var(--label);
-      border-radius:20px;
-      box-shadow:none;
-    }
-    .codeCell input{
-      color:var(--label);
-      -webkit-text-fill-color:var(--label);
-    }
-    .codeCell.active{
-      background:rgba(255,255,255,.06);
-      border-color:rgba(245,241,232,.24);
-      box-shadow:0 16px 32px rgba(0,0,0,.24);
-    }
-    .pageIntro{
-      display:flex;
-      flex-direction:column;
-      gap:8px;
-      margin-bottom:18px;
-    }
-    .pageTitle,
-    .sectionTitle{
-      font-size:clamp(28px, 4vw, 40px) !important;
-      line-height:.96;
-      letter-spacing:-.06em !important;
-      color:var(--label) !important;
-      margin:0;
-    }
-    .pageSubtitle,
-    .sectionSubtitle{
-      max-width:620px;
-    }
-    .sectionHeader{
-      display:flex;
-      justify-content:space-between;
-      align-items:flex-start;
-      gap:16px;
-      margin-bottom:18px;
-    }
-    .pageSearchRow{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-bottom:16px;
-    }
-    .pageSearchInput,
-    .pageFilterSelect{
-      min-height:52px;
-    }
-    .pageFilterSelect option{
-      background:#111;
-      color:#f5f1e8;
-    }
-    .adminModeBadge{
-      display:inline-flex;
-      align-items:center;
-      padding:4px 12px;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.12);
-      background:rgba(255,255,255,.045);
-      color:var(--label);
-      font-size:11px;
-      font-weight:700;
-      letter-spacing:.18em;
-      text-transform:uppercase;
-    }
-    .adminTabBtn{
-      background:rgba(255,255,255,.03) !important;
-      border:1px solid rgba(255,255,255,.1) !important;
-      color:var(--text-soft) !important;
-      border-radius:999px !important;
-      font-size:12px !important;
-      font-weight:700 !important;
-      letter-spacing:.08em;
-      text-transform:uppercase;
-    }
-    .adminTabBtn.active{
-      background:var(--accentFill) !important;
-      border-color:var(--accentFill) !important;
-      color:#090909 !important;
-    }
-    .socialCard,
-    .candidateCard,
-    .feedCard{
-      border-radius:24px !important;
-      padding:20px 22px !important;
-    }
-    .feedAvatar,
-    .feedAva,
-    .candidateAvatar,
-    .adminAvatar{
-      background:linear-gradient(135deg, #262626, #1b1b1b) !important;
-      color:var(--label) !important;
-      border:1px solid rgba(255,255,255,.12);
-    }
-    .scRoleTag.candidate,
-    .scRoleTag.employer{
-      background:rgba(255,255,255,.04) !important;
-      border:1px solid rgba(255,255,255,.12) !important;
-      color:var(--text-soft) !important;
-    }
-    .scProject,
-    .empSkill,
-    .empSkillTag,
-    .pubTag,
-    .pubTagHiring{
-      background:rgba(255,255,255,.045) !important;
-      border:1px solid rgba(255,255,255,.11) !important;
-      color:var(--label) !important;
-    }
-    .empCover,
-    .empCoverBanner{
-      background:linear-gradient(135deg, rgba(255,255,255,.12), rgba(255,255,255,.03) 42%, rgba(0,0,0,.18) 100%) !important;
-    }
-    .empLogoBox{
-      background:#101010 !important;
-      border-color:#141414 !important;
-      box-shadow:0 20px 40px rgba(0,0,0,.32) !important;
-      color:var(--label) !important;
-    }
-    .empLogoInitials,
-    .empStatNum,
-    .empStatN{
-      color:var(--label) !important;
-    }
-    .empTagline,
-    .empStatLabel,
-    .empStatL,
-    .candidateMeta,
-    .adminQueueDoc,
-    .adminCardDoc{
-      color:var(--text-soft) !important;
-    }
-    .pubProfileCard{
-      border-radius:30px;
-      overflow:hidden;
-    }
-    .pubProfileSection,
-    .empSection{
-      border-top:1px solid rgba(255,255,255,.08) !important;
-    }
-    .pubProfileHead,
-    .pubProfileBody,
-    .empHdr{
-      color:var(--label);
-    }
-    .pubVerChip,
-    .pubVerChip.pending{
-      background:rgba(255,255,255,.045) !important;
-      border:1px solid rgba(255,255,255,.11) !important;
-      color:var(--label) !important;
-    }
-    .verifyTooltip,
-    .privacyToggle,
-    .projectItem{
-      background:rgba(255,255,255,.035) !important;
-      border:1px solid rgba(255,255,255,.09) !important;
-      color:var(--text-soft) !important;
-    }
-    .privacyToggle label,
-    .progressLabel,
-    .onboardingText,
-    .verifyTooltip,
-    .filterChip{
-      color:var(--text-soft) !important;
-    }
-    .onboardingBanner{
-      align-items:center;
-      gap:16px;
-    }
-    .onboardingIcon{
-      min-width:64px;
-      height:32px;
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      border-radius:999px;
-      border:1px solid rgba(255,255,255,.1);
-      background:rgba(255,255,255,.05);
-      color:var(--label);
-      font-size:10px;
-      font-weight:800;
-      letter-spacing:.22em;
-      text-transform:uppercase;
-    }
-    .onboardingDismiss,
-    .consentLinks{
-      color:var(--label) !important;
-      opacity:.78;
-    }
-    .doneCheck{
-      background:rgba(245,241,232,.08) !important;
-      border:1px solid rgba(245,241,232,.18) !important;
-      color:var(--label);
-    }
-    .copyright{
-      background:linear-gradient(180deg, rgba(8,8,8,.06), rgba(8,8,8,.92));
-      color:var(--copyright);
-      border-top:1px solid rgba(255,255,255,.06);
-      backdrop-filter:blur(18px);
-    }
-    @media (max-width: 980px){
-      .authHero{
-        min-height:auto;
-        padding:96px 28px 32px;
-        border-radius:28px;
-      }
-      .authHero::before{
-        font-size:84px;
-        top:18px;
-        right:18px;
-      }
-      .authHero::after{
-        left:28px;
-        top:24px;
-      }
-      .authTagline{
-        max-width:12ch;
-      }
-      .profileCard,
-      .profileCard.premium{
-        padding:22px;
-        border-radius:28px;
-      }
-      .sectionHeader{
-        flex-direction:column;
-        align-items:stretch;
-      }
-    }
-    @media (max-width: 768px){
-      .wrap{
-        padding:28px 16px 124px;
-      }
-      .authTopRight{
-        top:16px;
-        right:16px;
-      }
-      .authHero{
-        width:100%;
-      }
-      .pageTitle,
-      .sectionTitle{
-        font-size:28px !important;
-      }
-      .topBar.stickyTop,
-      .stickyTop{
-        padding-left:14px !important;
-        padding-right:14px !important;
-      }
-      .socialCard,
-      .candidateCard,
-      .feedCard{
-        padding:16px !important;
-      }
-      .drawer{
-        width:min(92vw, 360px);
-      }
-    }
-
 body { padding-bottom: 120px; }
     </style>
 </head>
@@ -2791,9 +1908,9 @@ body { padding-bottom: 120px; }
     </div>
     <!-- Shown when logged in — appears below hero -->
     <div id="authLoggedIn" style="display:none;margin:12px auto 0;justify-content:center;background:rgba(38,110,120,.07);border:1.5px solid rgba(38,110,120,.2);border-radius:16px;padding:10px 18px;align-items:center;gap:10px;white-space:nowrap;">
-      <span style="font-size:13px;color:rgba(245,241,232,.72);font-weight:600;">Вы уже в системе</span>
+      <span style="font-size:13px;color:#2a7a8a;font-weight:600;">Вы уже в системе</span>
       <button type="button" class="sqBtn sm" id="authSearchBtn" onclick="goToSearch()" style="font-size:12px;padding:5px 12px;">
-        <div class="sqText">Продолжить</div>
+        <div class="sqText">🔍 Продолжить</div>
       </button>
       <button type="button" onclick="logout();show('auth');" style="font-size:11px;color:#888;background:none;border:none;cursor:pointer;text-decoration:underline;">Выйти</button>
     </div>
@@ -2992,7 +2109,7 @@ body { padding-bottom: 120px; }
         <button type="button" class="logoMarkBtn" data-next="toEmployerSearch"><span class="logoMark">LOMO</span></button>
       </div></div>
       <div class="topRight" style="display:flex;gap:6px;">
-        <button type="button" class="pillBtn" data-next="toEmployerSearch">Поиск</button>
+        <button type="button" class="pillBtn" data-next="toEmployerSearch">🔍 Поиск</button>
         <button type="button" class="pillBtn" data-next="toEmployerProfile">Редактировать</button>
       </div>
     </div>
@@ -3158,7 +2275,7 @@ body { padding-bottom: 120px; }
 </div>
 <div class="blockTitle">Опыт работы</div>
 <div class="formCol" id="workExpList"></div>
-<button type="button" class="addExpBtn" onclick="addWorkExp()">Добавить место работы</button>
+<button type="button" class="addExpBtn" onclick="addWorkExp()">+ Добавить место работы</button>
 <div class="blockTitle">Портфолио (файлы/фото)</div>
           <div class="miniCard">
             <div class="miniTop">
@@ -3226,7 +2343,7 @@ body { padding-bottom: 120px; }
         <button type="button" class="logoMarkBtn" data-next="toCandidateFeed"><span class="logoMark">LOMO</span></button>
       </div></div>
       <div class="topRight" style="display:flex;gap:6px;">
-        <button type="button" class="pillBtn" data-next="toCandidateFeed">Лента</button>
+        <button type="button" class="pillBtn" data-next="toCandidateFeed">🏠 Лента</button>
         <button type="button" class="pillBtn" data-next="toEmployeeProfile">Редактировать</button>
       </div>
     </div>
@@ -3251,7 +2368,7 @@ body { padding-bottom: 120px; }
             <div class="progressHints" id="epProgressHints"></div>
           </div>
           <div class="onboardingBanner" id="epOnboardBanner">
-            <span class="onboardingIcon">LOMO</span>
+            <span class="onboardingIcon">💡</span>
             <div>
               <div class="onboardingText" id="epOnboardText">Добавьте данные профиля → загрузите документы → отправьте на проверку</div>
               <span class="onboardingDismiss" onclick="document.getElementById('epOnboardBanner').style.display='none'">Скрыть подсказку</span>
@@ -3265,7 +2382,7 @@ body { padding-bottom: 120px; }
           <div class="profileAbout" id="epVacancies">—</div>
           <div class="blockTitle" style="display:flex;align-items:center;justify-content:space-between;">
             Подтверждения
-            <button type="button" onclick="openVerifyLevelModal()" style="font-size:11px;color:rgba(245,241,232,.72);background:none;border:none;cursor:pointer;text-decoration:underline;padding:0;">Что значит подтверждено?</button>
+            <button type="button" onclick="openVerifyLevelModal()" style="font-size:11px;color:#2a7a8a;background:none;border:none;cursor:pointer;text-decoration:underline;padding:0;">Что значит подтверждено?</button>
           </div>
           <div class="achList">
             <div class="achRow"><div><div class="achTitle">Образование</div><div class="achMeta">Статус виден всем · файлы — по запросу</div><div id="epEduReject" class="rejectReason hidden"></div></div><span class="chip ghost" id="epEduStatusChip">не загружено</span></div>
@@ -3310,11 +2427,11 @@ body { padding-bottom: 120px; }
       </div>
     </div>
     <div class="centerBlock" style="padding-top:20px;max-width:660px;">
-      <div class="pageIntro">
-        <div class="pageTitle">Лента LOMO</div>
-        <div class="pageSubtitle">Люди и компании платформы · верификация документов</div>
+      <div style="margin-bottom:16px;">
+        <div style="font-size:22px;font-weight:800;color:#1a1a1a;letter-spacing:-.3px;">Лента LOMO</div>
+        <div style="font-size:13px;color:#999;margin-top:3px;">Люди и компании платформы · верификация документов</div>
       </div>
-      <input id="feedSearchInput" class="pageSearchInput" type="text" placeholder="Имя, университет, навык, город..." oninput="filterFeed()" style="width:100%;margin-bottom:16px;padding:11px 16px;border:1.5px solid #343434;border-radius:14px;font-size:14px;outline:none;box-sizing:border-box;transition:border .15s;" onfocus="this.style.borderColor='rgba(245,241,232,.28)'" onblur="this.style.borderColor='#343434'">
+      <input id="feedSearchInput" type="text" placeholder="🔍  Имя, университет, навык, город..." oninput="filterFeed()" style="width:100%;margin-bottom:16px;padding:11px 16px;border:1.5px solid #e5e7eb;border-radius:14px;font-size:14px;outline:none;box-sizing:border-box;transition:border .15s;" onfocus="this.style.borderColor='#2a7a8a'" onblur="this.style.borderColor='#e5e7eb'">
       <div id="candidateFeedList" style="display:flex;flex-direction:column;gap:10px;">
         <div style="text-align:center;padding:32px;color:#888;">Загрузка...</div>
       </div>
@@ -3336,15 +2453,15 @@ body { padding-bottom: 120px; }
       </div>
     </div>
     <div class="centerBlock" style="padding-top:20px;max-width:760px;">
-      <div class="pageIntro">
-        <div class="pageTitle">Поиск кандидатов</div>
-        <div class="pageSubtitle">Верифицированные профили · документы проверены LOMO</div>
+      <div style="margin-bottom:16px;">
+        <div style="font-size:22px;font-weight:800;color:#1a1a1a;letter-spacing:-.3px;">Поиск кандидатов</div>
+        <div style="font-size:13px;color:#999;margin-top:3px;">Верифицированные профили · документы проверены LOMO</div>
       </div>
-      <div class="pageSearchRow">
-        <input id="empSearchName" class="pageSearchInput" type="text" placeholder="Имя, навык, вакансия, город..." oninput="filterEmployerSearch()" style="flex:1;min-width:200px;padding:11px 16px;border:1.5px solid #343434;border-radius:14px;font-size:14px;outline:none;box-sizing:border-box;transition:border .15s;" onfocus="this.style.borderColor='rgba(245,241,232,.28)'" onblur="this.style.borderColor='#343434'">
-        <select id="empSearchVerified" class="pageFilterSelect" onchange="filterEmployerSearch()" style="padding:11px 16px;border:1.5px solid #343434;border-radius:14px;font-size:13px;background:#111;outline:none;cursor:pointer;color:#f5f1e8;">
+      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
+        <input id="empSearchName" type="text" placeholder="🔍  Имя, навык, вакансия, город..." oninput="filterEmployerSearch()" style="flex:1;min-width:200px;padding:11px 16px;border:1.5px solid #e5e7eb;border-radius:14px;font-size:14px;outline:none;box-sizing:border-box;transition:border .15s;" onfocus="this.style.borderColor='#2a7a8a'" onblur="this.style.borderColor='#e5e7eb'">
+        <select id="empSearchVerified" onchange="filterEmployerSearch()" style="padding:11px 16px;border:1.5px solid #e5e7eb;border-radius:14px;font-size:13px;background:#fff;outline:none;cursor:pointer;color:#555;">
           <option value="">Все кандидаты</option>
-          <option value="verified">Верифицированные</option>
+          <option value="verified">✓ Верифицированные</option>
         </select>
       </div>
       <div id="employerCandidateList" style="display:flex;flex-direction:column;gap:10px;">
@@ -3360,13 +2477,13 @@ body { padding-bottom: 120px; }
     <div class="topBar stickyTop" style="padding:0 16px;">
       <div class="topLeft" style="display:flex;align-items:center;gap:10px;">
         <span class="logoMark" style="font-size:18px;">LOMO</span>
-        <span class="adminModeBadge">ADMIN</span>
+        <span style="font-size:11px;background:#fee2e2;color:#991b1b;padding:2px 10px;border-radius:20px;font-weight:700;letter-spacing:.3px;">ADMIN</span>
       </div>
       <div class="topRight" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
-        <button class="adminTabBtn active" id="adminTabDocs" onclick="switchAdminTab('docs')">Документы</button>
-        <button class="adminTabBtn" id="adminTabCandidates" onclick="switchAdminTab('candidates')">Кандидаты</button>
-        <button class="adminTabBtn" id="adminTabEmployers" onclick="switchAdminTab('employers')">Компании</button>
-        <button class="adminTabBtn" id="adminTabUsers" onclick="switchAdminTab('users')">Юзеры</button>
+        <button class="adminTabBtn active" id="adminTabDocs" onclick="switchAdminTab('docs')">📋 Документы</button>
+        <button class="adminTabBtn" id="adminTabCandidates" onclick="switchAdminTab('candidates')">👥 Кандидаты</button>
+        <button class="adminTabBtn" id="adminTabEmployers" onclick="switchAdminTab('employers')">🏢 Компании</button>
+        <button class="adminTabBtn" id="adminTabUsers" onclick="switchAdminTab('users')">⚙️ Юзеры</button>
         <button type="button" class="sqBtn sm ghostBtn" onclick="logout();show('auth');" style="font-size:12px;">Выйти</button>
       </div>
     </div>
@@ -3374,20 +2491,20 @@ body { padding-bottom: 120px; }
 
       <!-- TAB: Documents queue -->
       <div id="adminTabPanelDocs">
-        <div class="sectionHeader">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
           <div>
-            <div class="sectionTitle">Очередь проверок</div>
-            <div class="sectionSubtitle">Документы, ожидающие верификации</div>
+            <div style="font-size:18px;font-weight:700;color:#1a1a1a;">Очередь проверок</div>
+            <div style="font-size:13px;color:#666;margin-top:2px;">Документы, ожидающие верификации</div>
           </div>
-          <button class="pillBtn" onclick="loadAdminQueue()">Обновить</button>
+          <button class="pillBtn" onclick="loadAdminQueue()">↻ Обновить</button>
         </div>
         <div id="adminQueueList"><div style="text-align:center;padding:32px;color:#888;">Загрузка...</div></div>
       </div>
 
       <!-- TAB: Candidates feed -->
       <div id="adminTabPanelCandidates" style="display:none;">
-        <div class="sectionHeader">
-          <div class="sectionTitle">Все кандидаты</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div style="font-size:18px;font-weight:700;color:#1a1a1a;">Все кандидаты</div>
           <input id="adminCandSearch" type="text" placeholder="Поиск..." oninput="filterAdminCandidates()" class="sqInput" style="width:220px;">
         </div>
         <div id="adminCandidateList"><div style="text-align:center;padding:32px;color:#888;">Загрузка...</div></div>
@@ -3395,8 +2512,8 @@ body { padding-bottom: 120px; }
 
       <!-- TAB: Employers feed -->
       <div id="adminTabPanelEmployers" style="display:none;">
-        <div class="sectionHeader">
-          <div class="sectionTitle">Все работодатели</div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+          <div style="font-size:18px;font-weight:700;color:#1a1a1a;">Все работодатели</div>
           <input id="adminEmpSearch" type="text" placeholder="Поиск..." oninput="filterAdminEmployers()" class="sqInput" style="width:220px;">
         </div>
         <div id="adminEmployerList"><div style="text-align:center;padding:32px;color:#888;">Загрузка...</div></div>
@@ -3404,7 +2521,7 @@ body { padding-bottom: 120px; }
 
       <!-- TAB: All users -->
       <div id="adminTabPanelUsers" style="display:none;">
-        <div class="sectionTitle" style="margin-bottom:16px;">Все пользователи</div>
+        <div style="font-size:18px;font-weight:700;color:#1a1a1a;margin-bottom:16px;">Все пользователи</div>
         <div id="adminUsersList"><div style="text-align:center;padding:16px;color:#888;">Загрузка...</div></div>
       </div>
 
@@ -3440,18 +2557,18 @@ body { padding-bottom: 120px; }
       <div style="display:flex;flex-direction:column;gap:10px;margin:12px 0;">
         <div style="padding:10px 14px;border-radius:12px;border:1px solid rgba(245,158,11,.2);background:rgba(245,158,11,.07);">
           <span class="levelBadge l1">L1 — Базовый</span>
-          <p style="margin:6px 0 0;font-size:13px;color:rgba(245,241,232,.72);">Документ загружен и проверен вручную модератором. Формат, дата, название организации соответствуют заявленным данным.</p>
+          <p style="margin:6px 0 0;font-size:13px;color:#555;">Документ загружен и проверен вручную модератором. Формат, дата, название организации соответствуют заявленным данным.</p>
         </div>
         <div style="padding:10px 14px;border-radius:12px;border:1px solid rgba(38,110,120,.2);background:rgba(38,110,120,.07);">
           <span class="levelBadge l2">L2 — Стандартный</span>
-          <p style="margin:6px 0 0;font-size:13px;color:rgba(245,241,232,.72);">Дополнительно — проверка через открытые источники (сайт ВУЗа, реестры компаний) или запрос в организацию.</p>
+          <p style="margin:6px 0 0;font-size:13px;color:#555;">Дополнительно — проверка через открытые источники (сайт ВУЗа, реестры компаний) или запрос в организацию.</p>
         </div>
         <div style="padding:10px 14px;border-radius:12px;border:1px solid rgba(34,197,94,.2);background:rgba(34,197,94,.07);">
           <span class="levelBadge l3">L3 — Строгий</span>
-          <p style="margin:6px 0 0;font-size:13px;color:rgba(245,241,232,.72);">Подтверждение от организации-источника (официальный ответ / API). Высший уровень доверия.</p>
+          <p style="margin:6px 0 0;font-size:13px;color:#555;">Подтверждение от организации-источника (официальный ответ / API). Высший уровень доверия.</p>
         </div>
       </div>
-      <p style="font-size:12px;color:rgba(245,241,232,.46);border-top:1px solid rgba(255,255,255,.08);padding-top:10px;margin-top:4px;">LOMO не несёт ответственности за профессиональные качества кандидата. Верификация подтверждает только достоверность представленных документов.</p>
+      <p style="font-size:12px;color:#888;border-top:1px solid #eee;padding-top:10px;margin-top:4px;">LOMO не несёт ответственности за профессиональные качества кандидата. Верификация подтверждает только достоверность представленных документов.</p>
     </div>
   </div>
 </div>
@@ -3483,11 +2600,11 @@ body { padding-bottom: 120px; }
 </section>
 
 <!-- USER PROFILE MODAL -->
-<div id="userProfileModal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.72);overflow-y:auto;padding:20px 16px;" onclick="if(event.target===this)closeUserProfile()">
-  <div style="max-width:560px;margin:0 auto;background:rgba(12,12,12,.96);border-radius:24px;overflow:hidden;box-shadow:0 28px 90px rgba(0,0,0,.42);border:1px solid rgba(255,255,255,.08);backdrop-filter:blur(18px);">
-    <div id="userProfileContent" style="padding:24px;color:#f5f1e8;"></div>
+<div id="userProfileModal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.45);overflow-y:auto;padding:20px 16px;" onclick="if(event.target===this)closeUserProfile()">
+  <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.2);">
+    <div id="userProfileContent" style="padding:24px;"></div>
     <div style="padding:0 24px 20px;display:flex;gap:8px;">
-      <button onclick="closeUserProfile()" style="flex:1;padding:10px;border-radius:999px;border:1px solid rgba(255,255,255,.12);background:rgba(255,255,255,.04);color:#f5f1e8;cursor:pointer;font-size:13px;font-weight:600;">Закрыть</button>
+      <button onclick="closeUserProfile()" style="flex:1;padding:10px;border-radius:12px;border:1.5px solid #e5e7eb;background:#f9fafb;cursor:pointer;font-size:13px;font-weight:600;">Закрыть</button>
     </div>
   </div>
 </div>
@@ -4086,11 +3203,11 @@ function logout(){
           var btn = document.getElementById('authSearchBtn');
           if(btn){
             if(state.roleReg){
-              btn.querySelector('.sqText').textContent = state.roleReg === 'EMPLOYER' ? 'Поиск кандидатов' : 'Открыть ленту';
+              btn.querySelector('.sqText').textContent = state.roleReg === 'EMPLOYER' ? '🔍 Поиск кандидатов' : '🔍 Открыть ленту';
             } else if(getToken()){
               // Load role silently
               tryAutoLogin().then(function(u){
-                if(u && btn) btn.querySelector('.sqText').textContent = state.roleReg === 'EMPLOYER' ? 'Поиск кандидатов' : 'Открыть ленту';
+                if(u && btn) btn.querySelector('.sqText').textContent = state.roleReg === 'EMPLOYER' ? '🔍 Поиск кандидатов' : '🔍 Открыть ленту';
               }).catch(function(){});
             }
           }
@@ -5410,7 +4527,7 @@ const list = document.getElementById('epPortfolioList');
           <p>LOMO подтверждает факт предоставленных документов, но не несёт ответственности за достоверность самих сведений в случае предоставления поддельных материалов.</p>
           <h3>5. Изменение условий</h3>
           <p>LOMO вправе изменять данные условия, уведомив пользователей за 14 дней до вступления в силу.</p>
-          <p style="font-size:11px;color:rgba(245,241,232,.42);margin-top:16px;">Актуальная версия: март 2026. Документ является демо-образцом для прототипа.</p>
+          <p style="font-size:11px;color:#999;margin-top:16px;">Актуальная версия: март 2026. Документ является демо-образцом для прототипа.</p>
         `;
       } else {
         title.textContent = 'Политика конфиденциальности';
@@ -5425,7 +4542,7 @@ const list = document.getElementById('epPortfolioList');
           <p>Пользователь вправе запросить удаление своего аккаунта и всех связанных данных. Запрос обрабатывается в течение 30 дней.</p>
           <h3>5. Cookies</h3>
           <p>LOMO использует только функциональные cookies. Рекламные и аналитические трекеры не используются без явного согласия.</p>
-          <p style="font-size:11px;color:rgba(245,241,232,.42);margin-top:16px;">Актуальная версия: март 2026. Документ является демо-образцом для прототипа.</p>
+          <p style="font-size:11px;color:#999;margin-top:16px;">Актуальная версия: март 2026. Документ является демо-образцом для прототипа.</p>
         `;
       }
       el.classList.add('open');
@@ -5539,8 +4656,8 @@ const list = document.getElementById('epPortfolioList');
           if(item.id){
             var btnView = document.createElement('button');
             btnView.className = 'adminBtn';
-            btnView.textContent = 'Просмотреть';
-            btnView.style.cssText = 'background:rgba(255,255,255,.045);color:#f5f1e8;border:1px solid rgba(255,255,255,.12);';
+            btnView.textContent = '👁 Просмотреть';
+            btnView.style.cssText = 'background:#e0f2fe;color:#0369a1;border:1px solid #bae6fd;';
             btnView.addEventListener('click', (function(id, fileName){ return function(){
               openSecureDocument(id, fileName).catch(function(err){ showToast('Ошибка: ' + err.message); });
             }; })(item.id, item.file_name));
@@ -5583,20 +4700,20 @@ const list = document.getElementById('epPortfolioList');
         el.innerHTML = '';
         var table = document.createElement('table');
         table.style.cssText = 'width:100%;border-collapse:collapse;font-size:13px;';
-        table.innerHTML = '<thead><tr style="border-bottom:1px solid rgba(255,255,255,.08);">' +
-          '<th style="text-align:left;padding:6px 8px;color:rgba(245,241,232,.48);">Email</th>' +
-          '<th style="text-align:left;padding:6px 8px;color:rgba(245,241,232,.48);">Имя / Компания</th>' +
-          '<th style="text-align:left;padding:6px 8px;color:rgba(245,241,232,.48);">Роль</th>' +
-          '<th style="text-align:left;padding:6px 8px;color:rgba(245,241,232,.48);">Действия</th>' +
+        table.innerHTML = '<thead><tr style="border-bottom:1px solid rgba(38,110,120,.15);">' +
+          '<th style="text-align:left;padding:6px 8px;color:#666;">Email</th>' +
+          '<th style="text-align:left;padding:6px 8px;color:#666;">Имя / Компания</th>' +
+          '<th style="text-align:left;padding:6px 8px;color:#666;">Роль</th>' +
+          '<th style="text-align:left;padding:6px 8px;color:#666;">Действия</th>' +
           '</tr></thead>';
         var tbody = document.createElement('tbody');
         users.forEach(function(u){
           var tr = document.createElement('tr');
-          tr.style.borderBottom = '1px solid rgba(255,255,255,.06)';
+          tr.style.borderBottom = '1px solid rgba(0,0,0,.05)';
           tr.innerHTML =
             '<td style="padding:8px;">' + escapeHtml(u.email) + '</td>' +
             '<td style="padding:8px;">' + escapeHtml(u.full_name||u.company||'—') + '</td>' +
-            '<td style="padding:8px;"><span style="padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;background:rgba(255,255,255,.045);border:1px solid rgba(255,255,255,.1);color:#f5f1e8;">' + escapeHtml(u.role) + '</span></td>' +
+            '<td style="padding:8px;"><span style="padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(38,110,120,.10);color:#1a5c68;">' + escapeHtml(u.role) + '</span></td>' +
             '<td style="padding:8px;" id="uactions_'+u.id+'"></td>';
           var td = tr.querySelector('#uactions_'+u.id);
           if(u.role !== 'admin'){
@@ -5895,7 +5012,7 @@ const list = document.getElementById('epPortfolioList');
       });
       var custom = document.createElement('div');
       custom.className = 'uniOption add-custom';
-      custom.textContent = 'Добавить вариант: «' + query + '»';
+      custom.textContent = '➕ Добавить: «' + query + '»';
       custom.addEventListener('click', function(){ selectUni(query); });
       dd.appendChild(custom);
       dd.classList.add('open');
@@ -5943,7 +5060,7 @@ const list = document.getElementById('epPortfolioList');
       if(!el) return;
       // Exclude self
       var filtered = list.filter(function(u){ return String(u.id) !== String(state.userId); });
-      if(!filtered.length){ el.innerHTML = '<div style="padding:40px;text-align:center;color:#888;font-size:14px;">Пока никого нет — скоро появятся люди</div>'; return; }
+      if(!filtered.length){ el.innerHTML = '<div style="padding:40px;text-align:center;color:#aaa;font-size:14px;">👥 Пока никого нет — скоро появятся люди</div>'; return; }
       el.innerHTML = filtered.map(function(u){
         return buildSocialCard(u);
       }).join('');
@@ -5955,9 +5072,9 @@ const list = document.getElementById('epPortfolioList');
       Object.keys(statuses).forEach(function(k){
         var s = statuses[k];
         if(s === 'verified') tags.push('<span class="feedTag verified">✓ ' + labels[k] + '</span>');
-        else if(s === 'pending') tags.push('<span class="feedTag pending">На проверке · ' + labels[k] + '</span>');
+        else if(s === 'pending') tags.push('<span class="feedTag pending">⏳ ' + labels[k] + '</span>');
       });
-      if(!tags.length) tags.push('<span class="feedTag" style="background:rgba(255,255,255,.035);color:rgba(245,241,232,.5);border-color:rgba(255,255,255,.1);">Заполняется</span>');
+      if(!tags.length) tags.push('<span class="feedTag" style="background:#f5f5f5;color:#999;border-color:#e5e7eb;">Заполняется</span>');
       return tags.join('');
     }
 
@@ -5966,7 +5083,7 @@ const list = document.getElementById('epPortfolioList');
       var name      = escHtml(u.full_name || (isEmployer ? u.company : '') || u.email || '?');
       var rawName   = name.replace(/&[^;]+;/g,'');
       var initials  = rawName.split(' ').map(function(s){return s[0]||'';}).join('').slice(0,2).toUpperCase() || '?';
-      var avatarBg  = isEmployer ? 'background:linear-gradient(135deg,#232323,#111111)' : 'background:linear-gradient(135deg,#2d2d2d,#151515)';
+      var avatarBg  = isEmployer ? 'background:linear-gradient(135deg,#0f4c5c,#2a7a8a)' : 'background:linear-gradient(135deg,#2a7a8a,#38b2ac)';
       var avatarRadius = isEmployer ? '14px' : '50%';
 
       // Verification
@@ -5974,13 +5091,13 @@ const list = document.getElementById('epPortfolioList');
       var verCount  = verStatuses.filter(function(s){return s==='verified';}).length;
       var pendCount = verStatuses.filter(function(s){return s==='pending';}).length;
       var verBadge  = verCount > 0
-        ? '<span class="scVerBadge">LOMO ' + verCount + '</span>'
-        : (pendCount > 0 ? '<span class="scVerBadge pending">На проверке</span>' : '');
+        ? '<span class="scVerBadge">✓ LOMO ' + verCount + '</span>'
+        : (pendCount > 0 ? '<span class="scVerBadge pending">⏳ Проверяется</span>' : '');
 
       // Role tag
       var roleTag = isEmployer
-        ? '<span class="scRoleTag employer">Работодатель</span>'
-        : '<span class="scRoleTag candidate">Кандидат</span>';
+        ? '<span class="scRoleTag employer">🏢 Работодатель</span>'
+        : '<span class="scRoleTag candidate">👤 Кандидат</span>';
 
       // Subtitle line
       var subParts = isEmployer
@@ -5989,9 +5106,9 @@ const list = document.getElementById('epPortfolioList');
       var subLine = subParts.length ? '<div class="scSub">'+escHtml(subParts.join(' · '))+'</div>' : '';
       var jobLine='';
       if(!isEmployer&&u.current_job&&u.current_job!=='Не работаю'){
-        jobLine='<div class="scJobLine">Текущее место · '+escHtml(u.current_job+(u.job_title?' · '+u.job_title:''))+'</div>';
+        jobLine='<div class="scJobLine">💼 '+escHtml(u.current_job+(u.job_title?' · '+u.job_title:''))+'</div>';
       } else if(!isEmployer&&u.current_job==='Не работаю'){
-        jobLine='<div class="scJobLine" style="color:rgba(245,241,232,.46);font-size:12px">В поиске работы</div>';
+        jobLine='<div class="scJobLine" style="color:#bbb;font-size:12px">В поиске работы</div>';
       }
       var workExpLine='';
       if(!isEmployer&&u.work_exp&&u.work_exp.length){
@@ -6009,10 +5126,10 @@ const list = document.getElementById('epPortfolioList');
       var extraLines = '';
       if(isEmployer){
       var safeWebsite = safeHttpUrl(u.website);
-      if(safeWebsite) extraLines += '<div class="scSub" style="margin-top:4px;">Сайт · <a href="'+escHtml(safeWebsite)+'" target="_blank" rel="noopener noreferrer" style="color:inherit;text-decoration:none;border-bottom:1px solid rgba(245,241,232,.18);">'+escHtml(u.website)+'</a></div>';
+      if(safeWebsite) extraLines += '<div class="scSub" style="margin-top:4px;">🌐 <a href="'+escHtml(safeWebsite)+'" target="_blank" rel="noopener noreferrer" style="color:#2a7a8a;text-decoration:none;">'+escHtml(u.website)+'</a></div>';
         if(u.needed){
           var needed = u.needed.split(',').map(function(s){return s.trim();}).filter(Boolean).slice(0,4);
-          if(needed.length) extraLines += '<div class="scChipRow" style="margin-top:8px;"><span style="font-size:11px;color:rgba(245,241,232,.46);margin-right:4px;">Ищем:</span>'
+          if(needed.length) extraLines += '<div class="scChipRow" style="margin-top:8px;"><span style="font-size:11px;color:#999;margin-right:4px;">Ищем:</span>'
             + needed.map(function(n){return '<span class="scProject hiring">'+escHtml(n)+'</span>';}).join('')+'</div>';
         }
       }
@@ -6029,7 +5146,7 @@ const list = document.getElementById('epPortfolioList');
           + verifiedItems.map(function(v){return '<span class="scVerItem">✓ '+v+'</span>';}).join('')+'</div>';
         if(u.vacancies){
           var vacs = u.vacancies.split(',').map(function(s){return s.trim();}).filter(Boolean).slice(0,3);
-          if(vacs.length) detailLines += '<div class="scChipRow" style="margin-top:4px;"><span style="font-size:11px;color:rgba(245,241,232,.46);margin-right:4px;">Ищу:</span>'
+          if(vacs.length) detailLines += '<div class="scChipRow" style="margin-top:4px;"><span style="font-size:11px;color:#999;margin-right:4px;">Ищу:</span>'
             + vacs.map(function(v){return '<span class="scProject">'+escHtml(v)+'</span>';}).join('')+'</div>';
         }
       }
@@ -6038,7 +5155,7 @@ const list = document.getElementById('epPortfolioList');
       var projectsLine = '';
       if(isEmployer && u.active_projects){
         var projs = u.active_projects.split(';').map(function(s){return s.trim();}).filter(Boolean).slice(0,3);
-        if(projs.length) projectsLine = '<div class="scChipRow" style="margin-top:4px;"><span style="font-size:11px;color:rgba(245,241,232,.46);margin-right:4px;">Проекты:</span>'
+        if(projs.length) projectsLine = '<div class="scChipRow" style="margin-top:4px;"><span style="font-size:11px;color:#999;margin-right:4px;">Проекты:</span>'
           + projs.map(function(p){return '<span class="scProject">'+escHtml(p)+'</span>';}).join('')+'</div>';
       }
 
@@ -6252,27 +5369,27 @@ const list = document.getElementById('epPortfolioList');
       var isEmployer = u.role === 'employer';
       var name = escHtml(u.full_name || (isEmployer ? u.company : '') || u.email || '—');
       var initials = name.replace(/&[^;]+;/g,'').split(' ').map(function(s){return s[0]||'';}).join('').slice(0,2).toUpperCase()||'?';
-      var avatarBg = isEmployer ? 'background:linear-gradient(135deg,#232323,#111111)' : 'background:linear-gradient(135deg,#2d2d2d,#151515)';
+      var avatarBg = isEmployer ? 'background:linear-gradient(135deg,#0f4c5c,#2a7a8a)' : 'background:linear-gradient(135deg,#2a7a8a,#38b2ac)';
       var avatarRadius = isEmployer ? '14px' : '50%';
       var profileAvatarSrc = safeImageUrl(u.avatar_url);
       var avatarHtml = profileAvatarSrc
         ? '<img src="'+escHtml(profileAvatarSrc)+'" style="width:72px;height:72px;border-radius:'+avatarRadius+';object-fit:cover;box-shadow:0 2px 10px rgba(0,0,0,.15);">'
         : '<div style="width:72px;height:72px;border-radius:'+avatarRadius+';'+avatarBg+';color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.15);">'+initials+'</div>';
       var verLabels = {edu_status:'Образование',work_status:'Опыт работы',course_status:'Курсы',pass_status:'Паспорт',cv_status:'CV'};
-      var verifiedChips = Object.keys(verLabels).filter(function(k){return u[k]==='verified';}).map(function(k){return '<span style="font-size:12px;background:rgba(245,241,232,.08);color:#f5f1e8;border:1px solid rgba(245,241,232,.18);padding:3px 10px;border-radius:20px;">Подтверждено · '+verLabels[k]+'</span>';}).join('');
-      var pendingChips = Object.keys(verLabels).filter(function(k){return u[k]==='pending';}).map(function(k){return '<span style="font-size:12px;background:rgba(255,255,255,.04);color:#f5f1e8;border:1px solid rgba(255,255,255,.1);padding:3px 10px;border-radius:20px;">В проверке · '+verLabels[k]+'</span>';}).join('');
+      var verifiedChips = Object.keys(verLabels).filter(function(k){return u[k]==='verified';}).map(function(k){return '<span style="font-size:12px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;padding:3px 10px;border-radius:20px;">✓ '+verLabels[k]+'</span>';}).join('');
+      var pendingChips = Object.keys(verLabels).filter(function(k){return u[k]==='pending';}).map(function(k){return '<span style="font-size:12px;background:#fffbeb;color:#d97706;border:1px solid #fde68a;padding:3px 10px;border-radius:20px;">⏳ '+verLabels[k]+'</span>';}).join('');
       var infoRows = '';
       if(!isEmployer){
-        if(u.edu_place) infoRows += '<div style="font-size:13px;color:rgba(245,241,232,.72);margin-bottom:4px;">Образование · '+escHtml(u.edu_place+(u.edu_year?' · '+u.edu_year:''))+'</div>';
-        if(u.vacancies) infoRows += '<div style="font-size:13px;color:rgba(245,241,232,.92);margin-bottom:4px;">Ищу роли · '+escHtml(u.vacancies)+'</div>';
+        if(u.edu_place) infoRows += '<div style="font-size:13px;color:#555;margin-bottom:4px;">🎓 '+escHtml(u.edu_place+(u.edu_year?' · '+u.edu_year:''))+'</div>';
+        if(u.vacancies) infoRows += '<div style="font-size:13px;color:#2a7a8a;margin-bottom:4px;">🔍 Ищу: '+escHtml(u.vacancies)+'</div>';
       } else {
-        if(u.industry) infoRows += '<div style="font-size:13px;color:rgba(245,241,232,.72);margin-bottom:4px;">Сфера · '+escHtml(u.industry)+'</div>';
+        if(u.industry) infoRows += '<div style="font-size:13px;color:#555;margin-bottom:4px;">🏭 '+escHtml(u.industry)+'</div>';
         var publicWebsite = safeHttpUrl(u.website);
-        if(publicWebsite) infoRows += '<div style="font-size:13px;margin-bottom:4px;color:rgba(245,241,232,.72);">Сайт · <a href="'+escHtml(publicWebsite)+'" target="_blank" rel="noopener noreferrer" style="color:inherit;border-bottom:1px solid rgba(245,241,232,.18);text-decoration:none;">'+escHtml(u.website)+'</a></div>';
-        if(u.needed) infoRows += '<div style="font-size:13px;color:rgba(245,241,232,.92);margin-bottom:4px;">Ищем · '+escHtml(u.needed)+'</div>';
-        if(u.active_projects) infoRows += '<div style="font-size:13px;color:rgba(245,241,232,.72);margin-bottom:4px;">Проекты · '+escHtml(u.active_projects.replace(/;/g,', '))+'</div>';
+        if(publicWebsite) infoRows += '<div style="font-size:13px;margin-bottom:4px;">🌐 <a href="'+escHtml(publicWebsite)+'" target="_blank" rel="noopener noreferrer" style="color:#2a7a8a;">'+escHtml(u.website)+'</a></div>';
+        if(u.needed) infoRows += '<div style="font-size:13px;color:#3b82f6;margin-bottom:4px;">👥 Ищем: '+escHtml(u.needed)+'</div>';
+        if(u.active_projects) infoRows += '<div style="font-size:13px;color:#555;margin-bottom:4px;">📌 Проекты: '+escHtml(u.active_projects.replace(/;/g,', '))+'</div>';
       }
-      if(u.location) infoRows += '<div style="font-size:13px;color:rgba(245,241,232,.56);margin-bottom:4px;">Локация · '+escHtml(u.location)+'</div>';
+      if(u.location) infoRows += '<div style="font-size:13px;color:#888;margin-bottom:4px;">📍 '+escHtml(u.location)+'</div>';
       // Admin sees files
       var verCount = [u.edu_status,u.work_status,u.course_status,u.pass_status,u.cv_status].filter(function(s){return s==='verified';}).length;
       var content = document.getElementById('pubProfileContent');
@@ -6289,7 +5406,7 @@ const list = document.getElementById('epPortfolioList');
       if(state.roleReg === 'ADMIN'){
         adminFilesHtml = '<div class="pubProfileSection">'
           + '<div class="pubProfileSTitle">Файлы пользователя</div>'
-          + '<button class="js-load-files" data-uid="'+u.id+'" style="padding:8px 16px;border-radius:999px;border:1px solid rgba(255,255,255,.14);color:#f5f1e8;background:rgba(255,255,255,.04);cursor:pointer;font-size:13px;font-weight:600;position:relative;z-index:10;">Просмотреть файлы</button>'
+          + '<button class="js-load-files" data-uid="'+u.id+'" style="padding:8px 16px;border-radius:12px;border:1.5px solid #2a7a8a;color:#2a7a8a;background:#f0fdfa;cursor:pointer;font-size:13px;font-weight:600;position:relative;z-index:10;">📂 Просмотреть файлы</button>'
           + '<div id="userFileslist" style="margin-top:10px;"></div>'
           + '</div>';
       }
@@ -6299,14 +5416,14 @@ const list = document.getElementById('epPortfolioList');
           + '<div class="pubProfileHead">'
             + avatarHtml
             + '<div style="flex:1;min-width:0;">'
-              + '<div style="font-size:22px;font-weight:800;color:#f5f1e8;margin-bottom:4px;">'+name+'</div>'
-              + '<span style="font-size:12px;padding:3px 10px;border-radius:20px;font-weight:600;background:rgba(255,255,255,.06);color:#f5f1e8;border:1px solid rgba(255,255,255,.1);">'+(isEmployer?'Работодатель':'Кандидат')+'</span>'
-              + (verCount > 0 ? ' <span class="scVerBadge">LOMO '+verCount+'</span>' : '')
+              + '<div style="font-size:22px;font-weight:800;color:#1a1a1a;margin-bottom:4px;">'+name+'</div>'
+              + '<span style="font-size:12px;padding:3px 10px;border-radius:20px;font-weight:600;'+(isEmployer?'background:#f0fdfa;color:#2a7a8a;border:1px solid #d1fae5;':'background:#eff6ff;color:#3b82f6;border:1px solid #bfdbfe;')+'">'+(isEmployer?'🏢 Работодатель':'👤 Кандидат')+'</span>'
+              + (verCount > 0 ? ' <span class="scVerBadge">✓ LOMO '+verCount+'</span>' : '')
             + '</div>'
           + '</div>'
           + '<div class="pubProfileBody">'
             + (infoRows ? '<div style="margin-bottom:14px;">'+infoRows+'</div>' : '')
-            + (u.about ? '<div class="pubProfileSection"><div class="pubProfileSTitle">О себе</div><div style="font-size:14px;color:rgba(245,241,232,.78);line-height:1.6;">'+escHtml(u.about)+'</div></div>' : '')
+            + (u.about ? '<div class="pubProfileSection"><div class="pubProfileSTitle">О себе</div><div style="font-size:14px;color:#444;line-height:1.6;">'+escHtml(u.about)+'</div></div>' : '')
             + ((verifiedChips||pendingChips) ? '<div class="pubProfileSection"><div class="pubProfileSTitle">Верификация документов</div><div>'+verifiedChips+pendingChips+'</div></div>' : '')
             + publicCvHtml
             + employerAccessHtml
@@ -6325,12 +5442,12 @@ const list = document.getElementById('epPortfolioList');
     function loadUserFiles(userId){
       var el = document.getElementById('userFileslist');
       if(!el) return;
-      el.innerHTML = '<div style="font-size:12px;color:rgba(245,241,232,.48);">Загрузка...</div>';
+      el.innerHTML = '<div style="font-size:12px;color:#888;">Загрузка...</div>';
       apiFetch('/admin/users/'+userId+'/files').then(function(files){
-        if(!files||!files.length){ el.innerHTML='<div style="font-size:12px;color:rgba(245,241,232,.42);">Файлов нет</div>'; return; }
+        if(!files||!files.length){ el.innerHTML='<div style="font-size:12px;color:#aaa;">Файлов нет</div>'; return; }
         el.innerHTML = files.map(function(f){
           return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'
-            + '<span style="font-size:12px;color:rgba(245,241,232,.72);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escHtml(f.file_name||'файл')+'</span>'
+            + '<span style="font-size:12px;color:#555;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escHtml(f.file_name||'файл')+'</span>'
             + '<button type="button" class="miniLink" data-open-doc="'+escHtml(f.id)+'" data-file-name="'+escHtml(f.file_name||'файл')+'">Открыть</button>'
             + '</div>';
         }).join('');
