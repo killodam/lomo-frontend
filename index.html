@@ -3809,6 +3809,38 @@ const list = document.getElementById('epPortfolioList');
     (function initForgotFlow(){
       // State for the flow
       const flowState = { email: '' };
+      function getForgotFlowErrorText(err){
+        const msg = safeErrorText(err);
+        if(msg === 'Not found' || /API error 404|404/.test(msg)){
+          return 'Сервис восстановления пароля сейчас обновляется. Попробуйте через пару минут.';
+        }
+        if(/Too many reset requests|Too many requests/i.test(msg)){
+          return 'Слишком много попыток. Попробуйте чуть позже.';
+        }
+        if(/valid email/i.test(msg)){
+          return 'Введите корректный email';
+        }
+        return 'Не удалось отправить код. Попробуйте позже.';
+      }
+      function getResetFlowErrorText(err){
+        const msg = safeErrorText(err);
+        if(msg === 'Not found' || /API error 404|404/.test(msg)){
+          return 'Сервис смены пароля сейчас обновляется. Попробуйте через пару минут.';
+        }
+        if(/Too many invalid code attempts/i.test(msg)){
+          return 'Слишком много неверных попыток. Запросите новый код.';
+        }
+        if(/Too many reset attempts|Too many requests/i.test(msg)){
+          return 'Слишком много попыток. Попробуйте чуть позже.';
+        }
+        if(/Code expired/i.test(msg)){
+          return 'Срок действия кода истёк. Запросите новый код.';
+        }
+        if(/Invalid or expired code/i.test(msg)){
+          return 'Неверный или устаревший код.';
+        }
+        return 'Не удалось изменить пароль. Попробуйте позже.';
+      }
 
       // ── STEP 1: Send email ───────────────────────────────────
       const forgotSubmitBtn = document.getElementById('forgotSubmitBtn');
@@ -3840,7 +3872,7 @@ const list = document.getElementById('epPortfolioList');
           show('verifyCode');
           setTimeout(()=>{ document.getElementById('cc0')?.focus(); }, 80);
         } catch(err) {
-          emailErr.textContent = err.message || 'Произошла ошибка';
+          emailErr.textContent = getForgotFlowErrorText(err);
           emailErr?.classList.remove('hidden');
           emailInput?.classList.add('inputError');
         } finally {
@@ -3989,7 +4021,7 @@ const list = document.getElementById('epPortfolioList');
         } catch(err) {
           // Code was wrong after all — go back to verify
           const errEl = document.getElementById('verifyCodeError');
-          if(errEl){ errEl.textContent = err.message || 'Неверный или устаревший код.'; errEl.classList.remove('hidden'); }
+          if(errEl){ errEl.textContent = getResetFlowErrorText(err); errEl.classList.remove('hidden'); }
           document.querySelectorAll('.codeCell').forEach(c=>c.classList.add('error'));
           show('verifyCode');
         } finally {
