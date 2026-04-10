@@ -4260,7 +4260,7 @@ const list = document.getElementById('epPortfolioList');
         });
       }).catch(function(e){
         var el = document.getElementById('adminQueueList');
-        if(el) el.innerHTML = '<div style="color:#991b1b;padding:16px;">Ошибка загрузки: ' + e.message + '</div>';
+        if(el) el.innerHTML = '<div style="color:#991b1b;padding:16px;">Ошибка загрузки: ' + escapeHtml(safeErrorText(e)) + '</div>';
       });
     }
 
@@ -4312,7 +4312,7 @@ const list = document.getElementById('epPortfolioList');
         el.appendChild(table);
       }).catch(function(e){
         var el = document.getElementById('adminUsersList');
-        if(el) el.innerHTML = '<div style="color:#991b1b;padding:8px;">Ошибка: ' + e.message + '</div>';
+        if(el) el.innerHTML = '<div style="color:#991b1b;padding:8px;">Ошибка: ' + escapeHtml(safeErrorText(e)) + '</div>';
       });
     }
 
@@ -4615,7 +4615,7 @@ const list = document.getElementById('epPortfolioList');
         _feedData = list || [];
         renderFeedList(_feedData);
       }).catch(function(e){
-        if(el) el.innerHTML = '<div style="padding:20px;color:#991b1b;">Ошибка: ' + e.message + '</div>';
+        if(el) el.innerHTML = '<div style="padding:20px;color:#991b1b;">Ошибка: ' + escHtml(safeErrorText(e)) + '</div>';
       });
     }
     function filterFeed(){
@@ -4698,7 +4698,8 @@ const list = document.getElementById('epPortfolioList');
       // For employers: website + "Ищем" tags
       var extraLines = '';
       if(isEmployer){
-        if(u.website) extraLines += '<div class="scSub" style="margin-top:4px;">🌐 <a href="'+escHtml(u.website)+'" target="_blank" style="color:#2a7a8a;text-decoration:none;">'+escHtml(u.website)+'</a></div>';
+      var safeWebsite = safeHttpUrl(u.website);
+      if(safeWebsite) extraLines += '<div class="scSub" style="margin-top:4px;">🌐 <a href="'+escHtml(safeWebsite)+'" target="_blank" rel="noopener noreferrer" style="color:#2a7a8a;text-decoration:none;">'+escHtml(u.website)+'</a></div>';
         if(u.needed){
           var needed = u.needed.split(',').map(function(s){return s.trim();}).filter(Boolean).slice(0,4);
           if(needed.length) extraLines += '<div class="scChipRow" style="margin-top:8px;"><span style="font-size:11px;color:#999;margin-right:4px;">Ищем:</span>'
@@ -4734,9 +4735,10 @@ const list = document.getElementById('epPortfolioList');
       var hasBody = aboutSnip || jobLine || workExpLine || extraLines || detailLines || projectsLine;
 
       var avatarHtml;
-      if(u.avatar_url){
+      var avatarSrc = safeImageUrl(u.avatar_url);
+      if(avatarSrc){
         avatarHtml = '<div style="width:54px;height:54px;flex-shrink:0;border-radius:'+avatarRadius+';overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.15);">'
-          + '<img src="'+escHtml(u.avatar_url)+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">'  
+          + '<img src="'+escHtml(avatarSrc)+'" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">'  
           + '</div>';
       } else {
         avatarHtml = '<div style="width:54px;height:54px;font-size:19px;font-weight:700;flex-shrink:0;border-radius:'+avatarRadius+';'+avatarBg+';color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.15);">'+initials+'</div>';
@@ -4769,7 +4771,7 @@ const list = document.getElementById('epPortfolioList');
         _empSearchData = list || [];
         renderEmployerSearch(_empSearchData);
       }).catch(function(e){
-        if(el) el.innerHTML = '<div style="padding:20px;color:#991b1b;">Ошибка: ' + e.message + '</div>';
+        if(el) el.innerHTML = '<div style="padding:20px;color:#991b1b;">Ошибка: ' + escHtml(safeErrorText(e)) + '</div>';
       });
     }
     function filterEmployerSearch(){
@@ -4900,6 +4902,23 @@ const list = document.getElementById('epPortfolioList');
     if(verifyLevelModalEl) verifyLevelModalEl.addEventListener('click', (e)=>{ if(e.target===verifyLevelModalEl){ verifyLevelModalEl.classList.remove('open'); verifyLevelModalEl.setAttribute('aria-hidden','true'); } });
 
     function escHtml(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+    function safeErrorText(err){ return (err && err.message) ? String(err.message) : String(err || 'Неизвестная ошибка'); }
+    function safeHttpUrl(value){
+      var src = String(value || '').trim();
+      if(!src) return '';
+      try{
+        var parsed = new URL(src, location.origin);
+        var isLocal = parsed.protocol === 'http:' && (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1');
+        if(parsed.protocol === 'https:' || isLocal) return parsed.href;
+      }catch(e){}
+      return '';
+    }
+    function safeImageUrl(value){
+      var src = String(value || '').trim();
+      if(!src) return '';
+      if(/^data:image\/(?:png|jpeg|jpg|webp|gif);base64,[a-z0-9+/=\s]+$/i.test(src)) return src;
+      return safeHttpUrl(src);
+    }
 
     // Track where we came from to go back
     var _profileFromScreen = 'auth';
@@ -4925,8 +4944,9 @@ const list = document.getElementById('epPortfolioList');
       var initials = name.replace(/&[^;]+;/g,'').split(' ').map(function(s){return s[0]||'';}).join('').slice(0,2).toUpperCase()||'?';
       var avatarBg = isEmployer ? 'background:linear-gradient(135deg,#0f4c5c,#2a7a8a)' : 'background:linear-gradient(135deg,#2a7a8a,#38b2ac)';
       var avatarRadius = isEmployer ? '14px' : '50%';
-      var avatarHtml = u.avatar_url
-        ? '<img src="'+escHtml(u.avatar_url)+'" style="width:72px;height:72px;border-radius:'+avatarRadius+';object-fit:cover;box-shadow:0 2px 10px rgba(0,0,0,.15);">'
+      var profileAvatarSrc = safeImageUrl(u.avatar_url);
+      var avatarHtml = profileAvatarSrc
+        ? '<img src="'+escHtml(profileAvatarSrc)+'" style="width:72px;height:72px;border-radius:'+avatarRadius+';object-fit:cover;box-shadow:0 2px 10px rgba(0,0,0,.15);">'
         : '<div style="width:72px;height:72px;border-radius:'+avatarRadius+';'+avatarBg+';color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.15);">'+initials+'</div>';
       var verLabels = {edu_status:'Образование',work_status:'Опыт работы',course_status:'Курсы',pass_status:'Паспорт',cv_status:'CV'};
       var verifiedChips = Object.keys(verLabels).filter(function(k){return u[k]==='verified';}).map(function(k){return '<span style="font-size:12px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;padding:3px 10px;border-radius:20px;">✓ '+verLabels[k]+'</span>';}).join('');
@@ -4937,7 +4957,8 @@ const list = document.getElementById('epPortfolioList');
         if(u.vacancies) infoRows += '<div style="font-size:13px;color:#2a7a8a;margin-bottom:4px;">🔍 Ищу: '+escHtml(u.vacancies)+'</div>';
       } else {
         if(u.industry) infoRows += '<div style="font-size:13px;color:#555;margin-bottom:4px;">🏭 '+escHtml(u.industry)+'</div>';
-        if(u.website) infoRows += '<div style="font-size:13px;margin-bottom:4px;">🌐 <a href="'+escHtml(u.website)+'" target="_blank" style="color:#2a7a8a;">'+escHtml(u.website)+'</a></div>';
+        var publicWebsite = safeHttpUrl(u.website);
+        if(publicWebsite) infoRows += '<div style="font-size:13px;margin-bottom:4px;">🌐 <a href="'+escHtml(publicWebsite)+'" target="_blank" rel="noopener noreferrer" style="color:#2a7a8a;">'+escHtml(u.website)+'</a></div>';
         if(u.needed) infoRows += '<div style="font-size:13px;color:#3b82f6;margin-bottom:4px;">👥 Ищем: '+escHtml(u.needed)+'</div>';
         if(u.active_projects) infoRows += '<div style="font-size:13px;color:#555;margin-bottom:4px;">📌 Проекты: '+escHtml(u.active_projects.replace(/;/g,', '))+'</div>';
       }
@@ -5003,7 +5024,7 @@ const list = document.getElementById('epPortfolioList');
             + '<button type="button" class="miniLink" data-open-doc="'+escHtml(f.id)+'" data-file-name="'+escHtml(f.file_name||'файл')+'">Открыть</button>'
             + '</div>';
         }).join('');
-      }).catch(function(e){ el.innerHTML='<div style="font-size:12px;color:#991b1b;">'+e.message+'</div>'; });
+      }).catch(function(e){ el.innerHTML='<div style="font-size:12px;color:#991b1b;">'+escHtml(safeErrorText(e))+'</div>'; });
     }
 
 </script>
