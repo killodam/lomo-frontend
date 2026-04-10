@@ -7,18 +7,6 @@
 <style>
     :root{
       --bg:#ffffff;
-      var jobLine='';
-      if(!isEmployer&&u.current_job&&u.current_job!=='Не работаю'){
-        jobLine='<div class="scJobLine">💼 '+escHtml(u.current_job+(u.job_title?' · '+u.job_title:''))+'</div>';
-      } else if(!isEmployer&&u.current_job==='Не работаю'){
-        jobLine='<div class="scJobLine" style="color:#bbb;font-size:12px">В поиске работы</div>';
-      }
-      var workExpLine='';
-      if(!isEmployer&&u.work_exp&&u.work_exp.length){
-        workExpLine='<div class="scWorkExp">'+u.work_exp.slice(0,2).map(function(e){
-          return '<div class="scExpItem"><span class="scExpCo">'+escHtml(e.company||'')+'</span>'+(e.role?' <span class="scExpRole">· '+escHtml(e.role)+'</span>':'')+(e.period?' <span class="scExpPeriod">'+escHtml(e.period)+'</span>':'')+'</div>';
-        }).join('')+'</div>';
-      }
       --label:#111111cc;
       --placeholder:#11111166;
       --copyright:#1111115
@@ -4408,6 +4396,18 @@ const list = document.getElementById('epPortfolioList');
         ? [u.industry, u.location].filter(Boolean)
         : [u.edu_place, u.edu_year, u.location].filter(Boolean);
       var subLine = subParts.length ? '<div class="scSub">'+escHtml(subParts.join(' · '))+'</div>' : '';
+      var jobLine='';
+      if(!isEmployer&&u.current_job&&u.current_job!=='Не работаю'){
+        jobLine='<div class="scJobLine">💼 '+escHtml(u.current_job+(u.job_title?' · '+u.job_title:''))+'</div>';
+      } else if(!isEmployer&&u.current_job==='Не работаю'){
+        jobLine='<div class="scJobLine" style="color:#bbb;font-size:12px">В поиске работы</div>';
+      }
+      var workExpLine='';
+      if(!isEmployer&&u.work_exp&&u.work_exp.length){
+        workExpLine='<div class="scWorkExp">'+u.work_exp.slice(0,2).map(function(e){
+          return '<div class="scExpItem"><span class="scExpCo">'+escHtml(e.company||'')+'</span>'+(e.role?' <span class="scExpRole">· '+escHtml(e.role)+'</span>':'')+(e.period?' <span class="scExpPeriod">'+escHtml(e.period)+'</span>':'')+'</div>';
+        }).join('')+'</div>';
+      }
 
       // About
       var aboutSnip = u.about
