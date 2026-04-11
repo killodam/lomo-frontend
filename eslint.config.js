@@ -1,0 +1,45 @@
+module.exports = [
+  {
+    ignores: [
+      'quality/node_modules/**',
+      'quality/playwright-report/**',
+      'quality/test-results/**',
+    ],
+  },
+  {
+    files: ['scripts/**/*.js', 'config.js'],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: 'script',
+      globals: {
+        alert: 'readonly',
+        Blob: 'readonly',
+        clearTimeout: 'readonly',
+        confirm: 'readonly',
+        console: 'readonly',
+        document: 'readonly',
+        Event: 'readonly',
+        fetch: 'readonly',
+        FileReader: 'readonly',
+        FormData: 'readonly',
+        localStorage: 'readonly',
+        location: 'readonly',
+        navigator: 'readonly',
+        prompt: 'readonly',
+        sessionStorage: 'readonly',
+        setTimeout: 'readonly',
+        URL: 'readonly',
+        window: 'readonly',
+      },
+    },
+    rules: {
+      'no-constant-binary-expression': 'error',
+      'no-debugger': 'error',
+      'no-dupe-keys': 'error',
+      'no-redeclare': 'error',
+      'no-self-assign': 'error',
+      'no-unreachable': 'error',
+      'no-unsafe-optional-chaining': 'error',
+    },
+  },
+];

@@ -1,0 +1,15 @@
+{
+  "name": "lomo-frontend-quality",
+  "private": true,
+  "scripts": {
+    "lint": "cd .. && ./quality/node_modules/.bin/eslint --config ./eslint.config.js scripts/*.js config.js",
+    "test:smoke": "playwright test --config ./playwright.config.js",
+    "test": "npm run lint && npm run test:smoke"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.54.2",
+    "eslint": "^9.24.0",
+    "globals": "^16.0.0",
+    "http-server": "^14.1.1"
+  }
+}
