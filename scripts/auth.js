@@ -446,11 +446,11 @@ function logoutAllSessions() {
           (async () => {
             try {
               // --- Form validation ---
-                if (!firstName && !lastName) { if(btn) btn.disabled = false; alert('Введите имя'); return; }
+                if (!firstName && !lastName) { if(btn) btn.disabled = false; showToast('Введите имя'); return; }
                 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-                if (!emailRe.test(email)) { if(btn) btn.disabled = false; alert('Некорректный email'); return; }
-                if (login && !/^[a-z0-9._-]{3,32}$/.test(login)) { if(btn) btn.disabled = false; alert('Логин: 3-32 символа, только a-z, 0-9, точка, _ или -'); return; }
-                if (!password || password.length < 6) { if(btn) btn.disabled = false; alert('Пароль — минимум 6 символов'); return; }
+                if (!emailRe.test(email)) { if(btn) btn.disabled = false; showToast('Некорректный email'); return; }
+                if (login && !/^[a-z0-9._-]{3,32}$/.test(login)) { if(btn) btn.disabled = false; showToast('Логин: 3-32 символа, только a-z, 0-9, точка, _ или -'); return; }
+                if (!password || password.length < 8) { if(btn) btn.disabled = false; showToast('Пароль — минимум 8 символов'); return; }
                 // --- End validation ---
                 const { user, profile } = await apiRegister(email, password, role, fullName, login);
               state.email = user.email;

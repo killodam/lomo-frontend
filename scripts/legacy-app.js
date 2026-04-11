@@ -248,7 +248,7 @@ const list = document.getElementById('epPortfolioList');
       if(email){ window.location.href = 'mailto:' + email; return; }
       const phone = (state.employer.phone || '').trim();
       if(phone){ window.location.href = 'tel:' + phone.replace(/\s/g,''); return; }
-      alert('Добавьте Telegram, корпоративную почту или телефон в профиле компании.');
+      showToast('Добавьте Telegram, корпоративную почту или телефон в профиле компании.');
     }
 
     function publicProfileUrl(){
@@ -266,7 +266,7 @@ const list = document.getElementById('epPortfolioList');
 
     function openMail(){
       const email = (state.email || '').trim();
-      if(!email){ alert('Почта не указана'); return; }
+      if(!email){ showToast('Почта не указана'); return; }
       window.location.href = 'mailto:' + email;
     }
 
@@ -314,7 +314,7 @@ const list = document.getElementById('epPortfolioList');
       try{
         await downloadProof(state.employee?.proofs?.cv, 'CV');
       } catch(err){
-        alert(err.message);
+        showToast(err.message);
       }
     }
 
@@ -328,7 +328,7 @@ const list = document.getElementById('epPortfolioList');
       try{
         await downloadProof(state.employer?.proofs?.cv, 'CV');
       } catch(err){
-        alert(err.message);
+        showToast(err.message);
       }
     }
 
@@ -682,6 +682,77 @@ const list = document.getElementById('epPortfolioList');
       el.setAttribute('aria-hidden','false');
     }
 
+    function bindUiAction(id, eventName, handler){
+      const el = document.getElementById(id);
+      if(el) el.addEventListener(eventName, handler);
+    }
+
+    function bindStaticUiActions(){
+      bindUiAction('authSearchBtn', 'click', function(){ goToSearch(); });
+      bindUiAction('authLogoutAllBtn', 'click', function(){ logoutAllSessions(); show('auth'); });
+      bindUiAction('authLogoutBtn', 'click', function(){ logout(); show('auth'); });
+      bindUiAction('employerLogoutAllBtn', 'click', function(){ logoutAllSessions(); show('auth'); });
+      bindUiAction('employeeLogoutAllBtn', 'click', function(){ logoutAllSessions(); show('auth'); });
+      bindUiAction('adminLogoutBtn', 'click', function(){ logout(); show('auth'); });
+      bindUiAction('addWorkExpBtn', 'click', function(){ addWorkExp(); });
+      bindUiAction('cvPublicToggle', 'change', function(){ updateCvPrivacy(); });
+      bindUiAction('epOnboardDismiss', 'click', function(){
+        const banner = document.getElementById('epOnboardBanner');
+        if(banner) banner.style.display = 'none';
+      });
+      bindUiAction('verifyLevelInfoBtn', 'click', function(){ openVerifyLevelModal(); });
+      bindUiAction('refreshAdminQueueBtn', 'click', function(){ loadAdminQueue(); });
+      bindUiAction('pubProfileBackBtn', 'click', function(){ closePublicProfile(); });
+      bindUiAction('userProfileCloseBtn', 'click', function(){ closeUserProfile(); });
+
+      const eduInput = document.getElementById('mpCEduPlace');
+      if(eduInput){ eduInput.addEventListener('input', function(){ filterUniList(eduInput.value); }); }
+
+      const currentJobInput = document.getElementById('mpCCurrentJob');
+      if(currentJobInput){ currentJobInput.addEventListener('input', function(){ filterJobList(currentJobInput.value); }); }
+
+      const feedSearchInput = document.getElementById('feedSearchInput');
+      if(feedSearchInput){ feedSearchInput.addEventListener('input', function(){ debouncedFilterFeed(); }); }
+
+      const employerSearchInput = document.getElementById('empSearchName');
+      if(employerSearchInput){ employerSearchInput.addEventListener('input', function(){ debouncedFilterEmployerSearch(); }); }
+
+      const employerVerified = document.getElementById('empSearchVerified');
+      if(employerVerified){ employerVerified.addEventListener('change', function(){ filterEmployerSearch(); }); }
+
+      const adminCandSearch = document.getElementById('adminCandSearch');
+      if(adminCandSearch){ adminCandSearch.addEventListener('input', function(){ debouncedFilterAdminCandidates(); }); }
+
+      const adminEmpSearch = document.getElementById('adminEmpSearch');
+      if(adminEmpSearch){ adminEmpSearch.addEventListener('input', function(){ debouncedFilterAdminEmployers(); }); }
+
+      const adminUserSearch = document.getElementById('adminUserSearch');
+      if(adminUserSearch){ adminUserSearch.addEventListener('input', function(){ loadAdminUsers(1); }); }
+
+      document.querySelectorAll('[data-legal-link]').forEach(function(link){
+        link.addEventListener('click', function(){
+          openLegalModal(link.getAttribute('data-legal-link'));
+        });
+      });
+
+      document.querySelectorAll('.js-toggle-drawer').forEach(function(button){
+        button.addEventListener('click', function(){ toggleDrawer(); });
+      });
+
+      document.querySelectorAll('[data-admin-tab]').forEach(function(button){
+        button.addEventListener('click', function(){
+          switchAdminTab(button.getAttribute('data-admin-tab'));
+        });
+      });
+
+      const userProfileModal = document.getElementById('userProfileModal');
+      if(userProfileModal){
+        userProfileModal.addEventListener('click', function(e){
+          if(e.target === userProfileModal) closeUserProfile();
+        });
+      }
+    }
+
     // ====== REAL ADMIN PANEL ======
     function showEmployerDashboard(){
       loadEmployerSearch();
@@ -723,3 +794,5 @@ const list = document.getElementById('epPortfolioList');
     const verifyLevelCloseEl = document.getElementById('verifyLevelClose');
     if(verifyLevelCloseEl) verifyLevelCloseEl.addEventListener('click', ()=>{ verifyLevelModalEl.classList.remove('open'); verifyLevelModalEl.setAttribute('aria-hidden','true'); });
     if(verifyLevelModalEl) verifyLevelModalEl.addEventListener('click', (e)=>{ if(e.target===verifyLevelModalEl){ verifyLevelModalEl.classList.remove('open'); verifyLevelModalEl.setAttribute('aria-hidden','true'); } });
+
+    bindStaticUiActions();

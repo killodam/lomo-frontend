@@ -141,7 +141,7 @@ function loadAdminQueue(page) {
               (item.file_name ? ' · ' + escapeHtml(item.file_name) : '') +
             '</div>' +
           '</div>' +
-          '<span class="demoStatus warn">На рассмотрении</span>' +
+          '<span class="statusBadge warn">На рассмотрении</span>' +
         '</div>' +
         '<div class="adminActions">' +
           '<input class="rejectInput" id="rInput_' + item.id + '" placeholder="Причина отказа"/>' +

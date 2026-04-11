@@ -48,7 +48,6 @@ function setToken() {
 }
 
 function clearToken() {
-  localStorage.removeItem('lomo_token');
   document.cookie = `${encodeURIComponent(CSRF_COOKIE_NAME)}=; Max-Age=0; path=/; SameSite=Lax`;
 }
 
@@ -316,7 +315,6 @@ async function tryAutoLogin() {
   try {
     const { user, profile, achievements } = await apiMe();
     applyProfileToState(user, profile, achievements);
-    localStorage.removeItem('lomo_token');
     saveToStorage();
     return user;
   } catch {
