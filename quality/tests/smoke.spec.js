@@ -261,10 +261,74 @@ test('mobile registration role step stays readable and actionable', async ({ pag
   expect(secondBox.y).toBeGreaterThan(firstBox.y + 20);
   expect(secondBox.y + secondBox.height).toBeLessThan(844);
 
-  await firstChoice.click();
+  await firstChoice.dispatchEvent('touchend');
   await expect(nextButton).toBeEnabled();
 
   const nextBox = await nextButton.boundingBox();
   expect(nextBox).not.toBeNull();
   expect(nextBox.y + nextBox.height).toBeLessThan(844);
+});
+
+test('mobile candidate feed avoids horizontal overflow after login', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'emp-1', email: 'candidate@example.com', login: 'candidate', role: 'candidate' },
+          profile: { full_name: 'Иван Кандидат', location: 'Москва', edu_place: 'МГУ', vacancies: 'Product Designer' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([
+          {
+            id: 'cand-2',
+            role: 'candidate',
+            full_name: 'Анна Петрова',
+            location: 'Санкт-Петербург',
+            edu_place: 'ИТМО',
+            vacancies: 'Designer',
+            about: 'Хочу работать в сильной команде и развиваться в продукте.',
+          },
+        ], 1, 12, 1)),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.fill('#loginEmail', 'candidate@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await expect(page.locator('#screenCandidateFeed')).toHaveClass(/active/);
+  await expect(page.locator('#candidateFeedList')).toContainText('Анна Петрова');
+
+  const metrics = await page.evaluate(() => ({
+    innerWidth: window.innerWidth,
+    docWidth: document.documentElement.scrollWidth,
+    bodyWidth: document.body.scrollWidth,
+    activeWidth: document.querySelector('.screen.active')?.scrollWidth || 0,
+  }));
+
+  expect(metrics.docWidth).toBeLessThanOrEqual(metrics.innerWidth + 1);
+  expect(metrics.bodyWidth).toBeLessThanOrEqual(metrics.innerWidth + 1);
+  expect(metrics.activeWidth).toBeLessThanOrEqual(metrics.innerWidth + 1);
 });

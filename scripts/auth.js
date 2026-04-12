@@ -262,6 +262,38 @@ function logoutAllSessions() {
       if(btn && state.roleReg) btn.disabled = false;
     });
 
+    function handlePickSelection(pick){
+      if(!pick) return;
+      const kind = pick.dataset.pick;
+      const value = pick.dataset.value;
+      if(kind === 'auth'){
+        state.auth = value;
+        pickInGroup('authChoices', value);
+        setTimeout(() => {
+          if(value === 'REGISTRATION') show('roleReg');
+          else show('loginForm');
+        }, 150);
+      }
+      if(kind === 'roleReg'){
+        state.roleReg = value;
+        pickInGroup('roleChoices', value);
+        try{ updateConsentRoleText(); clearConsentError(); }catch(e){}
+        const btn = document.getElementById('btnRoleNext');
+        if(btn) btn.disabled = false;
+      }
+    }
+
+    document.querySelectorAll('[data-pick]').forEach((pickEl) => {
+      pickEl.addEventListener('click', (e) => {
+        e.preventDefault();
+        handlePickSelection(pickEl);
+      });
+      pickEl.addEventListener('touchend', (e) => {
+        if(e.cancelable) e.preventDefault();
+        handlePickSelection(pickEl);
+      }, { passive: false });
+    });
+
     // Start button
     startBtn.addEventListener('click', () => {
       logoWrap.classList.add('animUp');
@@ -390,28 +422,6 @@ function logoutAllSessions() {
         setText('mpCAvatarHint','Фото не выбрано');
         renderEmployeePublic();
         refreshEmployeeCVButton();
-        return;
-      }
-
-      const pick = e.target.closest('[data-pick]');
-      if(pick){
-        const kind = pick.dataset.pick;
-        const value = pick.dataset.value;
-        if(kind === 'auth'){
-          state.auth = value;
-          pickInGroup('authChoices', value);
-          setTimeout(() => {
-            if(value === 'REGISTRATION') show('roleReg');
-            else show('loginForm');
-          }, 150);
-        }
-        if(kind === 'roleReg'){
-          state.roleReg = value;
-          pickInGroup('roleChoices', value);
-          try{ updateConsentRoleText(); clearConsentError(); }catch(e){}
-          const btn = document.getElementById('btnRoleNext');
-          if(btn) btn.disabled = false;
-        }
         return;
       }
 
