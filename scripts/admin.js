@@ -11,6 +11,30 @@ var adminCandidateState = { page: 1, pageSize: 12, total: 0, totalPages: 0, sear
 var adminEmployerState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '' };
 var adminUsersState = { page: 1, pageSize: 20, total: 0, totalPages: 0, search: '' };
 
+function recoverAuthFlowOnProtectedError(err, options) {
+  var message = safeErrorText(err);
+  if (!/Authentication required/i.test(message)) return false;
+
+  clearToken();
+  resetState();
+  resetDisplay();
+
+  if (options && options.listId) {
+    var listEl = document.getElementById(options.listId);
+    if (listEl) {
+      listEl.innerHTML = '<div style="padding:20px;color:#991b1b;">Сессия завершилась. Войдите снова.</div>';
+    }
+  }
+
+  if (options && options.pagerId) {
+    renderPager(options.pagerId, { total: 0 }, function () {}, { label: options.label || 'элементов' });
+  }
+
+  showToast('Сессия завершилась. Войдите снова.');
+  show('auth');
+  return true;
+}
+
 function normalizePaginatedResponse(result) {
   if (Array.isArray(result)) {
     return {
@@ -727,6 +751,11 @@ function loadCandidateFeed(page) {
     renderFeedList(_feedData);
     renderPager('candidateFeedPager', feedState, loadCandidateFeed, { label: 'профилей' });
   }).catch(function (err) {
+    if (recoverAuthFlowOnProtectedError(err, {
+      listId: 'candidateFeedList',
+      pagerId: 'candidateFeedPager',
+      label: 'профилей',
+    })) return;
     el.innerHTML = '<div style="padding:20px;color:#991b1b;">Ошибка: ' + escHtml(safeErrorText(err)) + '</div>';
     renderPager('candidateFeedPager', { total: 0 }, function () {}, { label: 'профилей' });
   });
@@ -776,6 +805,11 @@ function loadEmployerSearch(page) {
     renderEmployerSearch(_empSearchData);
     renderPager('employerCandidatePager', employerSearchState, loadEmployerSearch, { label: 'кандидатов' });
   }).catch(function (err) {
+    if (recoverAuthFlowOnProtectedError(err, {
+      listId: 'employerCandidateList',
+      pagerId: 'employerCandidatePager',
+      label: 'кандидатов',
+    })) return;
     el.innerHTML = '<div style="padding:20px;color:#991b1b;">Ошибка: ' + escHtml(safeErrorText(err)) + '</div>';
     renderPager('employerCandidatePager', { total: 0 }, function () {}, { label: 'кандидатов' });
   });
@@ -818,6 +852,11 @@ function loadAdminCandidates(page) {
     renderAdminCandidates(_adminFeedData);
     renderPager('adminCandidatePager', adminCandidateState, loadAdminCandidates, { label: 'кандидатов' });
   }).catch(function (err) {
+    if (recoverAuthFlowOnProtectedError(err, {
+      listId: 'adminCandidateList',
+      pagerId: 'adminCandidatePager',
+      label: 'кандидатов',
+    })) return;
     el.innerHTML = '<div style="padding:20px;color:#991b1b;">Ошибка: ' + escHtml(safeErrorText(err)) + '</div>';
     renderPager('adminCandidatePager', { total: 0 }, function () {}, { label: 'кандидатов' });
   });
@@ -844,6 +883,11 @@ function loadAdminEmployers(page) {
     renderAdminEmployers(_adminAllUsers);
     renderPager('adminEmployerPager', adminEmployerState, loadAdminEmployers, { label: 'компаний' });
   }).catch(function (err) {
+    if (recoverAuthFlowOnProtectedError(err, {
+      listId: 'adminEmployerList',
+      pagerId: 'adminEmployerPager',
+      label: 'компаний',
+    })) return;
     el.innerHTML = '<div style="padding:20px;color:#991b1b;">Ошибка: ' + escHtml(safeErrorText(err)) + '</div>';
     renderPager('adminEmployerPager', { total: 0 }, function () {}, { label: 'компаний' });
   });

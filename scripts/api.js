@@ -1,5 +1,16 @@
-const API_BASE = (window.LOMO_CONFIG?.API_BASE || 'https://lomo-backend-hergg.amvera.io/api').replace(/\/+$/, '');
-const BACKEND_BASE = API_BASE.replace('/api', '');
+const DEFAULT_API_BASE = (() => {
+  const host = window.location.hostname || '';
+  const isLocalHost = host === 'localhost' || host === '127.0.0.1';
+  const isLocalFile = window.location.protocol === 'file:';
+  return (isLocalHost || isLocalFile)
+    ? 'https://lomo-backend-hergg.amvera.io/api'
+    : '/api';
+})();
+
+const API_BASE = (window.LOMO_CONFIG?.API_BASE || DEFAULT_API_BASE).replace(/\/+$/, '');
+const BACKEND_BASE = API_BASE.startsWith('http')
+  ? API_BASE.replace(/\/api$/, '')
+  : window.location.origin;
 const CSRF_COOKIE_NAME = window.LOMO_CONFIG?.CSRF_COOKIE_NAME || 'lomo_csrf';
 
 const DOC_TYPE_LABELS = {

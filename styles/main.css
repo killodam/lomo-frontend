@@ -2,7 +2,7 @@
       --bg:#ffffff;
       --label:#111111cc;
       --placeholder:#11111166;
-      --copyright:#1111115
+      --copyright:#11111155;
       --sqFill:#00000010;
       --sqBorder:#00000018;
       --sqHoverFill:#00000014;
@@ -160,7 +160,7 @@
     .scExpPeriod{color:#aaa;font-size:11px;margin-left:4px;}
 
     *{ box-sizing:border-box; }
-    html, body{ height:100%; }
+    html, body{ height:100%; min-height:100%; }
     body{
       margin:0;
       background:
@@ -171,11 +171,12 @@
       font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
                    "Segoe UI", Roboto, Arial, sans-serif;
       overflow:hidden;
+      min-height:100svh;
     }
 
     .hidden { display: none !important; }
 
-    .stage{ position:relative; width:100%; height:100%; }
+    .stage{ position:relative; width:100%; height:100%; min-height:100svh; }
 
     .screen{
       position:absolute;
@@ -1741,6 +1742,152 @@
         width: 85vw;
       }
 
+      #screenAuth .wrap,
+      #screenRoleReg .wrap,
+      #screenLoginForm .wrap,
+      #screenForgot .wrap,
+      #screenVerifyCode .wrap,
+      #screenResetPassword .wrap,
+      #screenRegForm .wrap {
+        align-items: flex-start;
+        justify-content: flex-start;
+        height: auto;
+        min-height: 100%;
+        overflow-y: auto;
+        gap: 18px;
+        padding-left: 18px;
+        padding-right: 18px;
+        padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+      }
+
+      #screenAuth .wrap {
+        padding-top: calc(72px + env(safe-area-inset-top, 0px));
+      }
+
+      #screenRoleReg .wrap,
+      #screenLoginForm .wrap,
+      #screenForgot .wrap,
+      #screenVerifyCode .wrap,
+      #screenResetPassword .wrap,
+      #screenRegForm .wrap {
+        padding-top: calc(74px + env(safe-area-inset-top, 0px));
+      }
+
+      #screenRoleReg .centerBlock,
+      #screenLoginForm .centerBlock,
+      #screenForgot .centerBlock,
+      #screenVerifyCode .centerBlock,
+      #screenResetPassword .centerBlock,
+      #screenRegForm .centerBlock {
+        width: 100%;
+        justify-content: flex-start;
+        flex: 0 0 auto;
+        gap: 18px;
+      }
+
+      #screenAuth .authHero {
+        width: 100%;
+        max-width: 420px;
+        margin: 0 auto;
+        padding: 0 4px;
+        gap: 16px;
+      }
+
+      #screenAuth .authTopRight,
+      #authLoggedIn,
+      #screenAuth .authBenefits,
+      #screenForgot .formCol,
+      #screenLoginForm .formCol,
+      #screenResetPassword .formCol {
+        width: min(100%, 420px);
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      #screenAuth .authLogo {
+        width: min(220px, 58vw);
+      }
+
+      .choiceRow {
+        flex-direction: column;
+        gap: 12px;
+        width: min(100%, 420px);
+      }
+
+      #roleChoices .sqBtn {
+        width: 100%;
+        min-height: 92px;
+        height: auto;
+        padding: 20px 16px;
+      }
+
+      #roleChoices .sqText {
+        font-size: clamp(18px, 5.3vw, 22px);
+      }
+
+      #roleChoices .sqSubtext {
+        font-size: 13px;
+      }
+
+      #screenRoleReg .footerArea,
+      #screenLoginForm .footerArea,
+      #screenForgot .footerArea,
+      #screenVerifyCode .footerArea,
+      #screenResetPassword .footerArea,
+      #screenRegForm .footerArea {
+        position: static;
+        left: auto;
+        right: auto;
+        bottom: auto;
+        width: 100%;
+        margin-top: 10px;
+        padding: 0;
+        background: transparent;
+        box-shadow: none;
+        backdrop-filter: none;
+      }
+
+      #screenRoleReg .nextBtn,
+      #screenLoginForm .nextBtn,
+      #screenForgot .nextBtn,
+      #screenVerifyCode .nextBtn,
+      #screenResetPassword .nextBtn,
+      #screenRegForm .nextBtn {
+        width: min(100%, 320px);
+        min-height: 48px;
+      }
+
+      .authFlowSub,
+      .authFlowTitle {
+        width: min(100%, 420px);
+      }
+
+      .codeInputRow {
+        gap: 8px;
+        width: min(100%, 420px);
+      }
+
+      .codeCell {
+        width: 48px;
+        height: 60px;
+        border-radius: 16px;
+      }
+
+      .codeCell input {
+        font-size: 24px;
+      }
+
+      .backBtn {
+        left: 16px;
+        top: calc(14px + env(safe-area-inset-top, 0px));
+        z-index: 6;
+      }
+
+      .copyright {
+        font-size: 11px;
+        padding-bottom: calc(6px + env(safe-area-inset-bottom, 0px));
+      }
+
       .topBar {
         padding: 12px 16px;
         flex-wrap: wrap;
@@ -1829,6 +1976,17 @@
     }
 
     @media (max-width: 480px) {
+      #screenAuth .wrap,
+      #screenRoleReg .wrap,
+      #screenLoginForm .wrap,
+      #screenForgot .wrap,
+      #screenVerifyCode .wrap,
+      #screenResetPassword .wrap,
+      #screenRegForm .wrap {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
       .topBar h2 {
         font-size: 18px;
       }
@@ -1836,6 +1994,34 @@
       .sqBtn {
         font-size: 14px;
         padding: 12px 20px;
+      }
+
+      #roleChoices .sqBtn {
+        min-height: 84px;
+        padding: 18px 14px;
+      }
+
+      .authTagline {
+        font-size: 14px;
+      }
+
+      .authBenefit,
+      .authFlowSub {
+        font-size: 13px;
+      }
+
+      .codeInputRow {
+        gap: 6px;
+      }
+
+      .codeCell {
+        width: 44px;
+        height: 54px;
+        border-radius: 14px;
+      }
+
+      .codeCell input {
+        font-size: 22px;
       }
 
       .socialCard {

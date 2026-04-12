@@ -238,3 +238,33 @@ test('admin dashboard loads queue and users with server-side search', async ({ p
   await page.fill('#adminUserSearch', 'founder');
   await expect.poll(() => userSearch).toBe('founder');
 });
+
+test('mobile registration role step stays readable and actionable', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+
+  await page.goto('/');
+  await page.click('#startBtn');
+  await page.click('[data-pick="auth"][data-value="REGISTRATION"]');
+
+  await expect(page.locator('#screenRoleReg')).toHaveClass(/active/);
+
+  const firstChoice = page.locator('#roleChoices .sqBtn').nth(0);
+  const secondChoice = page.locator('#roleChoices .sqBtn').nth(1);
+  const nextButton = page.locator('#btnRoleNext');
+
+  const firstBox = await firstChoice.boundingBox();
+  const secondBox = await secondChoice.boundingBox();
+
+  expect(firstBox).not.toBeNull();
+  expect(secondBox).not.toBeNull();
+  expect(Math.abs(firstBox.x - secondBox.x)).toBeLessThan(8);
+  expect(secondBox.y).toBeGreaterThan(firstBox.y + 20);
+  expect(secondBox.y + secondBox.height).toBeLessThan(844);
+
+  await firstChoice.click();
+  await expect(nextButton).toBeEnabled();
+
+  const nextBox = await nextButton.boundingBox();
+  expect(nextBox).not.toBeNull();
+  expect(nextBox.y + nextBox.height).toBeLessThan(844);
+});
