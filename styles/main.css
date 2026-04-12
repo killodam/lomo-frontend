@@ -726,6 +726,19 @@
       align-items:flex-start;
       min-width: 160px;
     }
+    .avatarEditActions{
+      display:flex;
+      flex-wrap:wrap;
+      gap:8px;
+      align-items:center;
+    }
+    .avatarEditActions .pillBtn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-height:40px;
+      text-align:center;
+    }
 
     .fileHidden{ display:none; }
 
@@ -1936,6 +1949,78 @@
         max-width: 100%;
       }
 
+      .profileCard{
+        width:min(100%, calc(100vw - 24px));
+        padding:16px;
+        border-radius:20px;
+      }
+
+      .profileHead{
+        gap:14px;
+        padding-bottom:10px;
+        margin-bottom:10px;
+      }
+
+      .avatarCircle{
+        width:72px;
+        height:72px;
+      }
+
+      .avatarCircle.lg{
+        width:92px;
+        height:92px;
+      }
+
+      .profileName{
+        font-size:18px;
+        line-height:1.15;
+      }
+
+      .profileMeta,
+      .profileSub,
+      .profileAbout,
+      .miniValue{
+        font-size:13px;
+        line-height:1.45;
+      }
+
+      .badgeRow{
+        gap:6px;
+      }
+
+      .badge,
+      .chip{
+        font-size:11px;
+        padding:6px 9px;
+      }
+
+      .hintTop{
+        font-size:11px;
+        line-height:1.35;
+      }
+
+      .avatarEdit{
+        width:100%;
+        align-items:center;
+        gap:10px;
+      }
+
+      .avatarEditActions{
+        width:100%;
+        justify-content:center;
+      }
+
+      .avatarEditActions .pillBtn{
+        flex:1 1 140px;
+        min-width:0;
+      }
+
+      .avatarEdit .miniHint{
+        width:100%;
+        margin:0;
+        text-align:center;
+      }
+
       .authFlowSub,
       .authFlowTitle {
         width: min(100%, 420px);
@@ -1963,14 +2048,15 @@
       }
 
       .copyright {
-        font-size: 11px;
+        font-size: 10px;
         left: 12px;
         right: 12px;
         width: auto;
-        padding: 6px 10px calc(8px + env(safe-area-inset-bottom, 0px));
-        background: rgba(250,250,250,.84);
+        padding: 5px 10px calc(8px + env(safe-area-inset-bottom, 0px));
+        background: rgba(250,250,250,.72);
         border-radius: 16px 16px 0 0;
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(8px);
+        opacity:.72;
       }
 
       .topBar {
@@ -2079,6 +2165,29 @@
       .sqBtn {
         font-size: 14px;
         padding: 12px 20px;
+      }
+
+      .topBar{
+        width:calc(100vw - 20px);
+        gap:10px;
+      }
+
+      .profileCard{
+        width:calc(100vw - 16px);
+        padding:14px;
+      }
+
+      .avatarEdit{
+        align-items:flex-start;
+      }
+
+      .avatarEditActions{
+        justify-content:flex-start;
+      }
+
+      .avatarEditActions .pillBtn{
+        width:100%;
+        flex:1 1 100%;
       }
 
       #roleChoices .sqBtn {

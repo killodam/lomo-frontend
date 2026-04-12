@@ -132,7 +132,7 @@
   <div class="sqInput" id="sqInputRegEmail"><input autocomplete="off" id="regEmail" placeholder="почта" type="email"/></div>
   <div class="fieldError hidden" id="regEmailError">Введите корректный email</div>
 </div>
-<div class="sqInput"><input autocomplete="off" id="regLogin" placeholder="логин" type="text"/></div>
+<div class="sqInput"><input autocomplete="username" autocapitalize="none" spellcheck="false" id="regLogin" placeholder="логин" type="text"/></div>
 <div>
   <div class="sqInput"><input autocomplete="off" id="regPassword" placeholder="пароль" type="password"/></div>
   <div class="strengthBar"><div class="strengthFill" id="strengthFill"></div></div>
@@ -171,8 +171,8 @@
 <div class="centerBlock">
 <div class="formCol">
 <div>
-  <div class="sqInput" id="sqInputLoginEmail"><input autocomplete="off" id="loginEmail" placeholder="логин или почта" type="text"/></div>
-  <div class="fieldError hidden" id="loginEmailError">Введите корректный email</div>
+  <div class="sqInput" id="sqInputLoginEmail"><input autocomplete="username" autocapitalize="none" spellcheck="false" id="loginEmail" placeholder="логин или почта" type="text"/></div>
+  <div class="fieldError hidden" id="loginEmailError">Введите корректный email или логин</div>
 </div>
 <div class="sqInput"><input autocomplete="off" id="loginPassword" placeholder="пароль" type="password"/></div>
 <button class="accentBtn linkBtn" data-next="toForgot">забыли пароль?</button>
@@ -328,8 +328,10 @@
         <div class="profileHead">
           <div class="avatarEdit">
             <div class="avatarCircle lg"><img id="mpEAvatarImg" class="avatarImg" alt="avatar"/></div>
-            <label class="pillBtn soft">Загрузить логотип<input id="mpEAvatar" class="fileHidden" type="file" accept="image/*"/></label>
-            <button type="button" class="pillBtn" id="btnRemoveEAvatar">Удалить</button>
+            <div class="avatarEditActions">
+              <label class="pillBtn soft">Загрузить логотип<input id="mpEAvatar" class="fileHidden" type="file" accept="image/*"/></label>
+              <button type="button" class="pillBtn" id="btnRemoveEAvatar">Удалить</button>
+            </div>
             <div class="miniHint" id="mpEAvatarHint">Логотип не выбран</div>
           </div>
           <div class="headText">
@@ -398,8 +400,10 @@
         <div class="profileHead">
           <div class="avatarEdit">
             <div class="avatarCircle lg"><img id="mpCAvatarImg" class="avatarImg" alt="avatar"/></div>
-            <label class="pillBtn soft">Загрузить фото<input id="mpCAvatar" class="fileHidden" type="file" accept="image/*"/></label>
-            <button type="button" class="pillBtn" id="btnRemoveCAvatar">Удалить фото</button>
+            <div class="avatarEditActions">
+              <label class="pillBtn soft">Загрузить фото<input id="mpCAvatar" class="fileHidden" type="file" accept="image/*"/></label>
+              <button type="button" class="pillBtn" id="btnRemoveCAvatar">Удалить фото</button>
+            </div>
             <div class="miniHint" id="mpCAvatarHint">Фото не выбрано</div>
           </div>
           <div class="headText">

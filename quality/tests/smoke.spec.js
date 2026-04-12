@@ -332,3 +332,45 @@ test('mobile candidate feed avoids horizontal overflow after login', async ({ pa
   expect(metrics.bodyWidth).toBeLessThanOrEqual(metrics.innerWidth + 1);
   expect(metrics.activeWidth).toBeLessThanOrEqual(metrics.innerWidth + 1);
 });
+
+test('existing account can log in by username without email validation error', async ({ page }) => {
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      const body = JSON.parse(request.postData() || '{}');
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'cand-existing', email: 'existing@example.com', login: body.email, role: 'candidate' },
+          profile: { full_name: 'Существующий Пользователь', location: 'Москва', edu_place: 'ВШЭ', vacancies: 'Analyst' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([], 1, 12, 0)),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.fill('#loginEmail', 'existing.user');
+  await page.locator('#loginPassword').focus();
+  await expect(page.locator('#loginEmailError')).toHaveClass(/hidden/);
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+  await expect(page.locator('#screenCandidateFeed')).toHaveClass(/active/);
+});

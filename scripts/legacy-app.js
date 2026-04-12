@@ -71,14 +71,18 @@
     }
 
     // Inline validation
-    function wireEmailValidation(inputId, wrapId, errorId){
+    function wireEmailValidation(inputId, wrapId, errorId, options = {}){
       const inp = document.getElementById(inputId);
       const wrap = document.getElementById(wrapId);
       const err = document.getElementById(errorId);
       if(!inp || !wrap || !err) return;
+      const allowLogin = !!options.allowLogin;
+      const emailRe = /.+@.+\..+/;
+      const loginRe = /^[a-z0-9._-]{3,32}$/i;
       inp.addEventListener('blur', () => {
         const val = inp.value.trim();
-        if(val && !/.+@.+\..+/.test(val)){
+        const isValid = !val || emailRe.test(val) || (allowLogin && loginRe.test(val));
+        if(!isValid){
           wrap.classList.add('inputError');
           err.classList.remove('hidden');
         }
@@ -89,7 +93,7 @@
       });
     }
     wireEmailValidation('regEmail', 'sqInputRegEmail', 'regEmailError');
-    wireEmailValidation('loginEmail', 'sqInputLoginEmail', 'loginEmailError');
+    wireEmailValidation('loginEmail', 'sqInputLoginEmail', 'loginEmailError', { allowLogin: true });
 
     // Render public profiles
     function applyChip(elId, status){
