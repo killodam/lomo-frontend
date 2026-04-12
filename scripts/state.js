@@ -10,6 +10,12 @@ const state = {
   login: '',
   userId: '',
   publicId: '',
+  connections: {
+    accepted: [],
+    incoming: [],
+    outgoing: [],
+    counts: { accepted: 0, incoming: 0, outgoing: 0 },
+  },
   employer: {
     fullName: '',
     title: 'HR Manager',
@@ -221,6 +227,12 @@ function resetState() {
   state.roleReg = null;
   state.auth = null;
   state.publicId = '';
+  state.connections = {
+    accepted: [],
+    incoming: [],
+    outgoing: [],
+    counts: { accepted: 0, incoming: 0, outgoing: 0 },
+  };
   state.employer = {
     fullName: '',
     title: 'HR Manager',

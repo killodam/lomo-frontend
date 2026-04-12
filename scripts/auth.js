@@ -411,6 +411,20 @@ function deleteOwnAccount(password) {
         requestDocumentAccess(requestDocBtn.dataset.candidateId, requestDocBtn.dataset.requestDoc);
         return;
       }
+      const connectionActionBtn = e.target.closest('[data-connection-action]');
+      if(connectionActionBtn){
+        handleConnectionAction(
+          connectionActionBtn.dataset.connectionAction,
+          connectionActionBtn.dataset.connectionId || '',
+          connectionActionBtn.dataset.targetUserId || ''
+        );
+        return;
+      }
+      const openConnectionProfileBtn = e.target.closest('[data-open-connection-profile]');
+      if(openConnectionProfileBtn){
+        _openProfileById(openConnectionProfileBtn.dataset.openConnectionProfile);
+        return;
+      }
       const approveReqBtn = e.target.closest('[data-approve-request]');
       if(approveReqBtn){
         handleRequestDecision(approveReqBtn.dataset.approveRequest, 'approve');

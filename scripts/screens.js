@@ -57,7 +57,8 @@ function show(key) {
   }
   if (key === 'loginForm') clearScreenInputs('loginForm');
   if (key === 'auth') updateAuthButtons();
-  if (key === 'employeePublic') { updateProfileProgress(); loadIncomingRequests(); }
+  if (key === 'employeePublic') { updateProfileProgress(); loadIncomingRequests(); loadOwnConnections(); }
+  if (key === 'recruiterPublic') loadOwnConnections();
   if (key === 'adminQueue') { loadAdminQueue(); loadAdminUsers(); switchAdminTab('docs'); }
   if (key === 'candidateFeed') loadCandidateFeed();
   if (key === 'employerSearch') loadEmployerSearch();

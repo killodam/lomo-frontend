@@ -3,6 +3,7 @@ var _feedData = [];
 var _empSearchData = [];
 var _adminFeedData = [];
 var _adminAllUsers = [];
+var _connectionsData = { accepted: [], incoming: [], outgoing: [], counts: { accepted: 0, incoming: 0, outgoing: 0 } };
 
 var feedState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '' };
 var employerSearchState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '', verified: '' };
@@ -116,6 +117,201 @@ function renderPager(targetId, pagerState, onNavigate, options) {
 
 function queueEmptyState(text) {
   return '<div style="text-align:center;padding:24px;color:#888;font-size:14px;">' + escapeHtml(text) + '</div>';
+}
+
+function upsertConnectionUser(item) {
+  if (!item || !item.user_id) return;
+  _userCache[String(item.user_id)] = {
+    id: item.user_id,
+    role: item.role,
+    public_id: item.public_id,
+    full_name: item.full_name,
+    company: item.company,
+    avatar_url: item.avatar_url,
+    location: item.location,
+    industry: item.industry,
+    current_job: item.current_job,
+    job_title: item.job_title,
+  };
+}
+
+function connectionDisplayName(item) {
+  return escapeHtml(item.full_name || item.company || 'Пользователь LOMO');
+}
+
+function connectionRoleLabel(item) {
+  return item.role === 'employer'
+    ? (item.company || item.industry || 'Работодатель')
+    : (item.current_job || item.job_title || item.location || 'Кандидат');
+}
+
+function renderConnectionsInto(prefix, data) {
+  var accepted = Array.isArray(data?.accepted) ? data.accepted : [];
+  var incoming = Array.isArray(data?.incoming) ? data.incoming : [];
+  var outgoing = Array.isArray(data?.outgoing) ? data.outgoing : [];
+  var counts = data?.counts || { accepted: accepted.length, incoming: incoming.length, outgoing: outgoing.length };
+
+  setText(prefix + 'ConnectionsCount', String(counts.accepted || 0));
+  setText(prefix + 'ConnectionsIncoming', String(counts.incoming || 0));
+  setText(prefix + 'ConnectionsOutgoing', String(counts.outgoing || 0));
+
+  var listEl = document.getElementById(prefix + 'ConnectionsList');
+  if (!listEl) return;
+
+  accepted.forEach(upsertConnectionUser);
+  incoming.forEach(upsertConnectionUser);
+  outgoing.forEach(upsertConnectionUser);
+
+  var sections = [];
+  if (incoming.length) {
+    sections.push(
+      '<div class="networkGroup">' +
+        '<div class="networkGroupTitle">Входящие запросы</div>' +
+        incoming.map(function (item) {
+          return '<div class="networkRow">' +
+            '<div class="networkInfo">' +
+              '<div class="networkName">' + connectionDisplayName(item) + '</div>' +
+              '<div class="networkMeta">' + escapeHtml(connectionRoleLabel(item)) + '</div>' +
+            '</div>' +
+            '<div class="networkActions">' +
+              '<button type="button" class="miniLink" data-open-connection-profile="' + escapeHtml(item.user_id) + '">Профиль</button>' +
+              '<button type="button" class="miniLink" data-connection-action="accept" data-connection-id="' + escapeHtml(item.id) + '" data-target-user-id="' + escapeHtml(item.user_id) + '">Принять</button>' +
+              '<button type="button" class="miniLink" data-connection-action="reject" data-connection-id="' + escapeHtml(item.id) + '" data-target-user-id="' + escapeHtml(item.user_id) + '">Отклонить</button>' +
+            '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>'
+    );
+  }
+
+  if (accepted.length) {
+    sections.push(
+      '<div class="networkGroup">' +
+        '<div class="networkGroupTitle">Мои контакты</div>' +
+        accepted.slice(0, 8).map(function (item) {
+          return '<div class="networkRow">' +
+            '<div class="networkInfo">' +
+              '<div class="networkName">' + connectionDisplayName(item) + '</div>' +
+              '<div class="networkMeta">' + escapeHtml(connectionRoleLabel(item)) + '</div>' +
+            '</div>' +
+            '<div class="networkActions">' +
+              '<button type="button" class="miniLink" data-open-connection-profile="' + escapeHtml(item.user_id) + '">Профиль</button>' +
+              '<button type="button" class="miniLink" data-connection-action="remove" data-connection-id="' + escapeHtml(item.id) + '" data-target-user-id="' + escapeHtml(item.user_id) + '">Удалить</button>' +
+            '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>'
+    );
+  }
+
+  if (outgoing.length) {
+    sections.push(
+      '<div class="networkGroup">' +
+        '<div class="networkGroupTitle">Ожидают подтверждения</div>' +
+        outgoing.map(function (item) {
+          return '<div class="networkRow">' +
+            '<div class="networkInfo">' +
+              '<div class="networkName">' + connectionDisplayName(item) + '</div>' +
+              '<div class="networkMeta">' + escapeHtml(connectionRoleLabel(item)) + '</div>' +
+            '</div>' +
+            '<div class="networkActions">' +
+              '<button type="button" class="miniLink" data-open-connection-profile="' + escapeHtml(item.user_id) + '">Профиль</button>' +
+              '<button type="button" class="miniLink" data-connection-action="remove" data-connection-id="' + escapeHtml(item.id) + '" data-target-user-id="' + escapeHtml(item.user_id) + '">Отменить</button>' +
+            '</div>' +
+          '</div>';
+        }).join('') +
+      '</div>'
+    );
+  }
+
+  listEl.innerHTML = sections.length ? sections.join('') : '<div class="miniHint">Контактов и запросов пока нет</div>';
+}
+
+function loadOwnConnections() {
+  if (!getToken() || state.roleReg === 'ADMIN') return;
+  apiGetConnections().then(function (data) {
+    _connectionsData = data || _connectionsData;
+    if (state.roleReg === 'EMPLOYER') renderConnectionsInto('rp', _connectionsData);
+    else renderConnectionsInto('ep', _connectionsData);
+  }).catch(function (err) {
+    var targetId = state.roleReg === 'EMPLOYER' ? 'rpConnectionsList' : 'epConnectionsList';
+    var listEl = document.getElementById(targetId);
+    if (listEl) listEl.innerHTML = '<div class="miniHint" style="color:#991b1b;">Ошибка: ' + escapeHtml(safeErrorText(err)) + '</div>';
+  });
+}
+
+function renderPublicConnectionPanel(targetUserId, statusData) {
+  var box = document.getElementById('pubConnectionPanel');
+  if (!box) return;
+
+  var relation = statusData?.relation || 'none';
+  var connectionId = statusData?.connectionId || '';
+  var count = Number(statusData?.connections_count || 0);
+  var buttonsHtml = '';
+  var hint = count ? 'В сети LOMO: ' + count + ' контакт(ов)' : 'Это может стать полезным профессиональным контактом в LOMO.';
+
+  if (relation === 'connected') {
+    buttonsHtml =
+      '<button type="button" class="pillBtn" disabled>Уже в контактах</button>' +
+      '<button type="button" class="pillBtn" data-connection-action="remove" data-connection-id="' + escapeHtml(connectionId) + '" data-target-user-id="' + escapeHtml(targetUserId) + '">Удалить из контактов</button>';
+  } else if (relation === 'incoming') {
+    buttonsHtml =
+      '<button type="button" class="pillBtn" data-connection-action="accept" data-connection-id="' + escapeHtml(connectionId) + '" data-target-user-id="' + escapeHtml(targetUserId) + '">Принять запрос</button>' +
+      '<button type="button" class="pillBtn" data-connection-action="reject" data-connection-id="' + escapeHtml(connectionId) + '" data-target-user-id="' + escapeHtml(targetUserId) + '">Отклонить</button>';
+  } else if (relation === 'outgoing') {
+    buttonsHtml =
+      '<button type="button" class="pillBtn" disabled>Запрос отправлен</button>' +
+      '<button type="button" class="pillBtn" data-connection-action="remove" data-connection-id="' + escapeHtml(connectionId) + '" data-target-user-id="' + escapeHtml(targetUserId) + '">Отменить</button>';
+  } else if (relation === 'unavailable') {
+    buttonsHtml = '<button type="button" class="pillBtn" disabled>Контакты недоступны</button>';
+  } else {
+    buttonsHtml = '<button type="button" class="pillBtn" data-connection-action="send" data-target-user-id="' + escapeHtml(targetUserId) + '">Добавить в контакты</button>';
+  }
+
+  box.innerHTML =
+    '<div class="pubProfileSTitle">Контакты LOMO</div>' +
+    '<div class="networkHint">' + escapeHtml(hint) + '</div>' +
+    '<div class="networkInlineActions">' + buttonsHtml + '</div>';
+}
+
+function loadPublicConnectionPanel(targetUserId) {
+  var box = document.getElementById('pubConnectionPanel');
+  if (!box || !targetUserId || !getToken() || state.roleReg === 'ADMIN') return;
+  box.innerHTML = '<div class="miniHint">Загрузка контактов...</div>';
+  apiGetConnectionStatus(targetUserId).then(function (statusData) {
+    renderPublicConnectionPanel(targetUserId, statusData);
+  }).catch(function (err) {
+    box.innerHTML = '<div class="miniHint" style="color:#991b1b;">Ошибка: ' + escapeHtml(safeErrorText(err)) + '</div>';
+  });
+}
+
+function refreshConnectionViews(targetUserId) {
+  loadOwnConnections();
+  if (targetUserId && String(targetUserId) === String(_activePublicProfileUserId)) {
+    loadPublicConnectionPanel(targetUserId);
+  }
+}
+
+function handleConnectionAction(action, connectionId, targetUserId) {
+  var request;
+  if (action === 'send') request = apiSendConnectionRequest(targetUserId);
+  if (action === 'accept') request = apiAcceptConnection(connectionId);
+  if (action === 'reject') request = apiRejectConnection(connectionId);
+  if (action === 'remove') request = apiRemoveConnection(connectionId);
+  if (!request) return Promise.resolve();
+
+  return request.then(function (result) {
+    if (action === 'send' && result?.autoAccepted) showToast('Контакт подтверждён');
+    else if (action === 'send') showToast('Запрос в контакты отправлен');
+    else if (action === 'accept') showToast('Контакт добавлен');
+    else if (action === 'reject') showToast('Запрос отклонён');
+    else if (action === 'remove') showToast('Контакт обновлён');
+    refreshConnectionViews(targetUserId);
+    return result;
+  }).catch(function (err) {
+    showToast('Ошибка: ' + err.message);
+    throw err;
+  });
 }
 
 function loadAdminQueue(page) {

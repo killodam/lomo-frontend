@@ -227,6 +227,33 @@ async function apiGetRequests() {
   return apiFetch('/requests');
 }
 
+async function apiGetConnections() {
+  return apiFetch('/connections');
+}
+
+async function apiGetConnectionStatus(userId) {
+  return apiFetch('/connections/status/' + encodeURIComponent(userId));
+}
+
+async function apiSendConnectionRequest(target_user_id) {
+  return apiFetch('/connections', {
+    method: 'POST',
+    body: JSON.stringify({ target_user_id }),
+  });
+}
+
+async function apiAcceptConnection(connectionId) {
+  return apiFetch('/connections/' + encodeURIComponent(connectionId) + '/accept', { method: 'POST' });
+}
+
+async function apiRejectConnection(connectionId) {
+  return apiFetch('/connections/' + encodeURIComponent(connectionId) + '/reject', { method: 'POST' });
+}
+
+async function apiRemoveConnection(connectionId) {
+  return apiFetch('/connections/' + encodeURIComponent(connectionId), { method: 'DELETE' });
+}
+
 async function apiSendRequest(candidate_id, document_type) {
   return apiFetch('/requests', {
     method: 'POST',

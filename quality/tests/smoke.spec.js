@@ -163,6 +163,113 @@ test('employer can request document access from public profile', async ({ page }
   await expect(page.locator('#pubAccessPanel')).toContainText('Запрос отправлен: Образование');
 });
 
+test('user can send connection request from public profile', async ({ page }) => {
+  let connectionSent = false;
+
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'cand-1', email: 'candidate@example.com', login: 'candidate', role: 'candidate' },
+          profile: { full_name: 'Иван Кандидат', location: 'Москва', edu_place: 'МГУ', vacancies: 'Designer' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([
+          {
+            id: 'emp-44',
+            role: 'employer',
+            public_id: 'LOMO-EMP00044',
+            full_name: 'Алина HR',
+            company: 'LOMO Labs',
+            industry: 'Tech',
+            location: 'Москва',
+          },
+        ], 1, 12, 1)),
+      });
+    }
+
+    if (url.pathname.endsWith('/public/profile/LOMO-EMP00044')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'emp-44',
+          role: 'employer',
+          public_id: 'LOMO-EMP00044',
+          full_name: 'Алина HR',
+          company: 'LOMO Labs',
+          industry: 'Tech',
+          location: 'Москва',
+          about: 'Нанимаем сильных специалистов',
+          connections_count: 3,
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/connections/status/emp-44')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(connectionSent
+          ? { relation: 'outgoing', connectionId: 'conn-1', status: 'pending', connections_count: 3 }
+          : { relation: 'none', connectionId: null, status: null, connections_count: 3 }),
+      });
+    }
+
+    if (url.pathname.endsWith('/connections') && request.method() === 'POST') {
+      connectionSent = true;
+      return route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true, relation: 'outgoing', connectionId: 'conn-1', status: 'pending' }),
+      });
+    }
+
+    if (url.pathname.endsWith('/connections')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ accepted: [], incoming: [], outgoing: [], counts: { accepted: 0, incoming: 0, outgoing: 0 } }),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.evaluate(() => { document.cookie = 'lomo_csrf=test-suite; path=/'; });
+  await page.fill('#loginEmail', 'candidate@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  const firstFeedCard = page.locator('#candidateFeedList .socialCard').first();
+  await expect(firstFeedCard).toBeVisible();
+  await expect(firstFeedCard).toContainText('Алина HR');
+  await page.click('#candidateFeedList .socialCard');
+  await expect(page.locator('#screenPublicProfile')).toHaveClass(/active/);
+  await expect(page.locator('#pubConnectionPanel')).toContainText('Добавить в контакты');
+
+  await page.click('[data-connection-action="send"]');
+  await expect.poll(() => connectionSent).toBe(true);
+  await expect(page.locator('#pubConnectionPanel')).toContainText('Запрос отправлен');
+});
+
 test('admin dashboard loads queue and users with server-side search', async ({ page }) => {
   let userSearch = '';
 
