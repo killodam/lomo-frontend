@@ -16,6 +16,18 @@ function logoutAllSessions() {
   clearAuthInputs();
 }
 
+function deleteOwnAccount(password) {
+  const userId = state.userId;
+  return apiDeleteAccount(password).then(function (result) {
+    clearUserStorage(userId);
+    clearToken();
+    resetState();
+    resetDisplay();
+    clearAuthInputs();
+    return result;
+  });
+}
+
     function clearAuthInputs(){
       ['regFirstName','regLastName','regEmail','regLogin','regPassword','loginEmail','loginPassword','forgotEmail','newPassword','confirmPassword']
         .forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
@@ -597,6 +609,36 @@ function logoutAllSessions() {
         if(route === 'toAuthFromProfile'){
           logout();
           show('auth');
+          return;
+        }
+
+        if(route === 'deleteOwnAccount'){
+          var isEmployer = screens.myEmployerProfile?.classList.contains('active');
+          var passwordInput = document.getElementById(isEmployer ? 'deleteAccountPasswordE' : 'deleteAccountPasswordC');
+          var password = (passwordInput?.value || '').trim();
+          if(!password){
+            showToast('Введите пароль для подтверждения');
+            passwordInput?.focus();
+            return;
+          }
+          if(!confirm('Удалить аккаунт без возможности восстановления? Это действие необратимо.')) return;
+          var deleteBtn = next;
+          deleteBtn.disabled = true;
+          var initialLabel = deleteBtn.textContent;
+          deleteBtn.textContent = 'Удаляем...';
+          deleteOwnAccount(password).then(function () {
+            if(passwordInput) passwordInput.value = '';
+            show('auth');
+            showToast('Аккаунт удалён');
+          }).catch(function (err) {
+            if(passwordInput) passwordInput.value = '';
+            if(/Invalid password/i.test(err.message || '')) showToast('Неверный пароль');
+            else if(/Admin account self-delete is disabled/i.test(err.message || '')) showToast('Самоудаление аккаунта администратора отключено');
+            else showToast('Ошибка: ' + err.message);
+          }).finally(function () {
+            deleteBtn.disabled = false;
+            deleteBtn.textContent = initialLabel;
+          });
           return;
         }
 

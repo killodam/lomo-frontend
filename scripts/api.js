@@ -151,6 +151,13 @@ async function apiLogoutAll() {
   return apiFetch('/auth/logout-all', { method: 'POST' });
 }
 
+async function apiDeleteAccount(password) {
+  return apiFetch('/auth/account', {
+    method: 'DELETE',
+    body: JSON.stringify({ password }),
+  });
+}
+
 async function apiMe() {
   return apiFetch('/auth/me');
 }

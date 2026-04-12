@@ -161,6 +161,13 @@ function loadUserStorage(userId) {
   }
 }
 
+function clearUserStorage(userId) {
+  if (!userId) return;
+  try {
+    getAppStorage().removeItem(getUserStorageKey(userId));
+  } catch (error) {}
+}
+
 function mergeLocalState(userId) {
   const saved = loadUserStorage(userId);
   const employerFields = ['fullName', 'title', 'company', 'foundedYear', 'location', 'industry', 'products', 'activeProjects', 'neededSpecialists', 'about', 'website'];
