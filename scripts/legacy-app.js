@@ -102,7 +102,7 @@
       });
     }
     wireEmailValidation('regEmail', 'sqInputRegEmail', 'regEmailError');
-    wireEmailValidation('loginEmail', 'sqInputLoginEmail', 'loginEmailError');
+    wireEmailValidation('loginEmail', 'sqInputLoginEmail', 'loginEmailError', {allowLogin: true});
 
     // Render public profiles
     function applyChip(elId, status){
