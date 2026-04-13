@@ -16,6 +16,14 @@ async function openLogin(page) {
   await page.click('[data-pick="auth"][data-value="LOGIN"]');
 }
 
+test('pwa shell exposes manifest and registers service worker', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('link[rel="manifest"]')).toHaveAttribute('href', './manifest.webmanifest');
+  await expect.poll(async () => page.evaluate(() => {
+    return !!(window.LOMO_RUNTIME && window.LOMO_RUNTIME.isServiceWorkerRegistered && window.LOMO_RUNTIME.isServiceWorkerRegistered());
+  })).toBe(true);
+});
+
 test('candidate login opens feed and paginates server-side', async ({ page }) => {
   let requestedPage = '1';
 

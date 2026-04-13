@@ -1,0 +1,570 @@
+function applyChip(elId, status) {
+  const el = document.getElementById(elId);
+  if (!el) return;
+  const safeStatus = (status || '').toLowerCase();
+  el.classList.remove('warn', 'bad', 'ok', 'ghost');
+  if (safeStatus.includes('подтверж')) {
+    el.classList.add('ok');
+    el.textContent = 'подтверждено';
+  } else if (safeStatus.includes('рассмотр') || safeStatus.includes('провер')) {
+    el.classList.add('warn');
+    el.textContent = 'на рассмотрении';
+  } else if (safeStatus.includes('отклон')) {
+    el.classList.add('bad');
+    el.textContent = 'отклонено';
+  } else if (safeStatus.includes('не загруж')) {
+    el.classList.add('ghost');
+    el.textContent = 'не загружено';
+  } else {
+    el.classList.add('ghost');
+    el.textContent = status || '—';
+  }
+}
+
+function renderRecruiterPublic() {
+  const p = state.employer;
+  setText('rpCompanyName', p.company || 'Название компании');
+  setText('rpName', (p.fullName || '—').trim());
+  setText('rpTitle', (p.title || 'HR Manager').trim());
+  setText('rpIndustry', p.industry || 'Сфера деятельности');
+  setText('rpCorpEmail', p.corpEmail || p.email || state.email || '—');
+  setText('rpAbout', p.about || '—');
+  setText('rpFoundedYear', p.foundedYear || '—');
+  setText('rpLocation', p.location || '—');
+  setText('rpWebsite', p.website || '—');
+
+  const productsEl = document.getElementById('rpProducts');
+  const productsTitleEl = document.getElementById('rpProductsTitle');
+  if (productsEl && productsTitleEl) {
+    if (p.products) {
+      productsEl.textContent = p.products;
+      productsEl.style.display = '';
+      productsTitleEl.style.display = '';
+    } else {
+      productsEl.style.display = 'none';
+      productsTitleEl.style.display = 'none';
+    }
+  }
+
+  const projectsList = document.getElementById('rpProjectsList');
+  const projectsTitle = document.getElementById('rpProjectsTitle');
+  if (projectsList) {
+    projectsList.innerHTML = '';
+    const projects = (p.activeProjects || '').split(';').map(function (value) { return value.trim(); }).filter(Boolean);
+    if (projects.length) {
+      if (projectsTitle) projectsTitle.style.display = '';
+      projects.forEach(function (project) {
+        const el = document.createElement('div');
+        el.className = 'projectItem';
+        el.innerHTML = '<div class="projectDot"></div>' + escapeHtml(project);
+        projectsList.appendChild(el);
+      });
+    } else if (projectsTitle) {
+      projectsTitle.style.display = 'none';
+    }
+  }
+
+  const tagsEl = document.getElementById('rpNeededTags');
+  const tagsTitle = document.getElementById('rpNeededTitle');
+  if (tagsEl) {
+    tagsEl.innerHTML = '';
+    const tags = (p.neededSpecialists || '').split(',').map(function (value) { return value.trim(); }).filter(Boolean);
+    if (tags.length) {
+      if (tagsTitle) tagsTitle.style.display = '';
+      tags.forEach(function (tag) {
+        const el = document.createElement('span');
+        el.className = 'tag';
+        el.textContent = tag;
+        tagsEl.appendChild(el);
+      });
+    } else if (tagsTitle) {
+      tagsTitle.style.display = 'none';
+    }
+  }
+
+  applyChip('rpCompanyDocChip', p.proofs?.companyDoc?.status);
+  setAvatar('rpAvatarImg', p.avatarDataUrl);
+}
+
+function renderEmployeePublic() {
+  const p = state.employee;
+  setText('epName', (p.fullName || 'Имя Фамилия').trim());
+  setText('epCity', (p.city || '').trim());
+  setText('epEduPlace', (p.eduPlace || '—').trim() || '—');
+  setText('epEduYear', (p.eduYear || '—').trim() || '—');
+  setText('epVacancies', (p.vacancies || '—').trim() || '—');
+  setText('epEmail', (state.email || p.email || 'email@example.com').trim());
+  setText('epTg', p.telegram ? (p.telegram.startsWith('@') ? p.telegram : '@' + p.telegram) : '—');
+
+  const phoneEl = document.getElementById('epPhone');
+  if (phoneEl) {
+    if (p.phone) {
+      phoneEl.textContent = p.phone;
+      phoneEl.style.display = '';
+    } else {
+      phoneEl.style.display = 'none';
+    }
+  }
+
+  const aboutSec = document.getElementById('epAboutSection');
+  if (aboutSec) aboutSec.style.display = p.about ? '' : 'none';
+  const aboutEl = document.getElementById('epAbout');
+  if (aboutEl && p.about) aboutEl.textContent = p.about;
+
+  applyChip('epEduStatusChip', p.proofs?.education?.status);
+  applyChip('epWorkStatusChip', p.proofs?.work?.status);
+  applyChip('epCourseStatusChip', p.proofs?.courses?.status);
+  applyChip('epPassStatusChip', p.proofs?.passport?.status);
+
+  const list = document.getElementById('epPortfolioList');
+  if (list) {
+    list.innerHTML = '';
+    if (p.portfolio && p.portfolio.length) {
+      p.portfolio.forEach(function (item, idx) {
+        const row = document.createElement('div');
+        row.className = 'achRow';
+        row.innerHTML = '<div><div class="achTitle">' + escapeHtml(item.name || ('Файл ' + (idx + 1))) + '</div><div class="achMeta">Публичный файл · можно скачать</div></div><button type="button" class="miniLink" data-download="employee:portfolio:' + idx + '">Скачать</button>';
+        list.appendChild(row);
+      });
+    } else {
+      const hint = document.createElement('div');
+      hint.className = 'miniHint';
+      hint.textContent = '—';
+      list.appendChild(hint);
+    }
+  }
+
+  setText('epCvHint', p.proofs?.cv?.fileName ? ('Файл: ' + p.proofs.cv.fileName) : '—');
+  setAvatar('epAvatarImg', p.avatarDataUrl);
+  refreshEmployeeCVButton();
+
+  const rejectMap = { edu: 'education', work: 'work', course: 'courses', pass: 'passport' };
+  Object.entries(rejectMap).forEach(function ([prefix, key]) {
+    const el = document.getElementById('ep' + prefix.charAt(0).toUpperCase() + prefix.slice(1) + 'Reject');
+    if (!el) return;
+    const proof = p.proofs?.[key];
+    if (proof?.rejectReason && proof?.status === 'отклонено') {
+      el.innerHTML = '<div class="rejectReasonLabel">Причина отказа</div>' + escapeHtml(proof.rejectReason);
+      el.classList.remove('hidden');
+    } else {
+      el.classList.add('hidden');
+    }
+  });
+
+  const cvHintEl = document.getElementById('epCvHint');
+  const cvDownBtn = document.getElementById('btnDownloadCV');
+  if (!p.cvPublic) {
+    if (cvHintEl) cvHintEl.textContent = 'Скрыто · доступ по запросу';
+    if (cvDownBtn) cvDownBtn.classList.add('hidden');
+  } else if (cvDownBtn && (p.proofs?.cv?.docId || p.proofs?.cv?.url)) {
+    cvDownBtn.classList.remove('hidden');
+  }
+}
+
+function escapeHtml(value) {
+  return String(value || '').replace(/[&<>\"']/g, function (char) {
+    return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', '\'': '&#39;' })[char];
+  });
+}
+
+function setText(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.textContent = value;
+}
+
+function setAvatar(imgId, dataUrl) {
+  const img = document.getElementById(imgId);
+  if (!img) return;
+  if (dataUrl) {
+    img.src = dataUrl;
+    img.style.display = 'block';
+  } else {
+    img.removeAttribute('src');
+    img.style.display = 'none';
+  }
+}
+
+function normalizeTg(tg) {
+  if (!tg) return '';
+  let value = tg.trim();
+  if (!value) return '';
+  if (value.startsWith('@')) value = value.slice(1);
+  value = value.replace(/^https?:\/\/(www\.)?t\.me\//i, '');
+  return value;
+}
+
+function openEmployerContact() {
+  const tg = normalizeTg(state.employer.telegram);
+  if (tg) {
+    window.open('https://t.me/' + encodeURIComponent(tg), '_blank');
+    return;
+  }
+  const email = (state.employer.corpEmail || state.employer.email || state.email || '').trim();
+  if (email) {
+    window.location.href = 'mailto:' + email;
+    return;
+  }
+  const phone = (state.employer.phone || '').trim();
+  if (phone) {
+    window.location.href = 'tel:' + phone.replace(/\s/g, '');
+    return;
+  }
+  showToast('Добавьте Telegram, корпоративную почту или телефон в профиле компании.');
+}
+
+function publicProfileUrl() {
+  return publicProfileUrlForId(state.publicId || 'LOMO-00000000');
+}
+
+async function copyToClipboard(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    showToast('Ссылка скопирована');
+  } catch (error) {
+    prompt('Скопируй ссылку:', text);
+  }
+}
+
+function openMail() {
+  const email = (state.email || '').trim();
+  if (!email) {
+    showToast('Почта не указана');
+    return;
+  }
+  window.location.href = 'mailto:' + email;
+}
+
+async function openSecureDocument(docId, fileName) {
+  if (!docId) throw new Error('Файл недоступен');
+  const popup = window.open('', '_blank');
+  try {
+    const blob = await apiFetchBlob('/files/' + encodeURIComponent(docId));
+    const url = URL.createObjectURL(blob);
+    if (popup) popup.location = url;
+    else window.open(url, '_blank');
+    setTimeout(function () {
+      try {
+        URL.revokeObjectURL(url);
+      } catch (error) {}
+    }, 60000);
+  } catch (error) {
+    if (popup) popup.close();
+    throw error;
+  }
+}
+
+async function downloadSecureDocument(docId, fileName) {
+  if (!docId) throw new Error('Файл недоступен');
+  const blob = await apiFetchBlob('/files/' + encodeURIComponent(docId));
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = fileName || 'document';
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(function () {
+    try {
+      URL.revokeObjectURL(url);
+    } catch (error) {}
+  }, 1000);
+}
+
+async function downloadProof(proof, fallbackName) {
+  if (proof?.url) {
+    const a = document.createElement('a');
+    a.href = proof.url;
+    a.download = proof.fileName || fallbackName || 'document';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    return;
+  }
+  if (proof?.docId) {
+    return downloadSecureDocument(proof.docId, proof.fileName || fallbackName || 'document');
+  }
+  throw new Error('Файл не загружен');
+}
+
+async function downloadEmployeeCV() {
+  try {
+    await downloadProof(state.employee?.proofs?.cv, 'CV');
+  } catch (error) {
+    showToast(error.message);
+  }
+}
+
+function refreshEmployeeCVButton() {
+  const btn = document.getElementById('btnDownloadCV');
+  if (!btn) return;
+  if (state.employee?.proofs?.cv?.url || state.employee?.proofs?.cv?.docId) btn.classList.remove('hidden');
+  else btn.classList.add('hidden');
+}
+
+async function downloadRecruiterCV() {
+  try {
+    await downloadProof(state.employer?.proofs?.cv, 'CV');
+  } catch (error) {
+    showToast(error.message);
+  }
+}
+
+function refreshRecruiterCVButton() {}
+
+function hydrateEmployerForm() {
+  const p = state.employer;
+  setVal('mpEFullName', p.fullName);
+  setVal('mpETitle', p.title);
+  setVal('mpECompany', p.company);
+  setVal('mpEFoundedYear', p.foundedYear);
+  setVal('mpELocation', p.location);
+  setVal('mpEIndustry', p.industry);
+  setVal('mpEProducts', p.products);
+  setVal('mpEWebsite', p.website);
+  setVal('mpEAbout', p.about);
+  setVal('mpEProjects', p.activeProjects);
+  setVal('mpENeeded', p.neededSpecialists);
+  setVal('mpEEmail', state.email || p.email);
+  setVal('mpECorpEmail', p.corpEmail);
+  setVal('mpEPhone', p.phone);
+  setVal('mpETelegram', p.telegram);
+  setAvatar('mpEAvatarImg', p.avatarDataUrl);
+  setText('mpEAvatarHint', p.avatarDataUrl ? 'Логотип выбран' : 'Логотип не выбран');
+  setStatusTag('companyDocStatusE', p.proofs?.companyDoc?.status || 'не загружено');
+  setText('companyDocHintE', p.proofs?.companyDoc?.fileName ? ('Прикреплено: ' + p.proofs.companyDoc.fileName) : 'Файл не выбран');
+}
+
+function hydrateEmployeeForm() {
+  const p = state.employee;
+  setVal('mpCFullName', p.fullName);
+  setVal('mpCCity', p.city);
+  setVal('mpCPhone', p.phone);
+  setVal('mpCAbout', p.about);
+  setVal('mpCEduPlace', p.eduPlace);
+  setVal('mpCEduYear', p.eduYear);
+  setVal('mpCVacancies', p.vacancies);
+  setVal('mpCCurrentJob', p.current_job);
+  setVal('mpCJobTitle', p.job_title);
+  var workList = document.getElementById('workExpList');
+  if (workList) workList.innerHTML = '';
+  if (p.work_exp && p.work_exp.length) setTimeout(function () { loadWorkExpData(p.work_exp); }, 50);
+  setVal('mpCEmail', state.email || p.email);
+  setVal('mpCTelegram', p.telegram);
+  setAvatar('mpCAvatarImg', p.avatarDataUrl);
+  setText('mpCAvatarHint', p.avatarDataUrl ? 'Фото выбрано' : 'Фото не выбрано');
+  setStatusTag('cvStatusC', p.proofs?.cv?.status || 'не загружено');
+  setText('cvHintC', p.proofs?.cv?.fileName ? ('Прикреплено: ' + p.proofs.cv.fileName) : 'Файл не выбран');
+  setStatusTag('eduStatusC', p.proofs?.education?.status || 'не загружено');
+  setText('eduHintC', p.proofs?.education?.fileName ? ('Прикреплено: ' + p.proofs.education.fileName) : 'Файл не выбран');
+  setStatusTag('workStatusC', p.proofs?.work?.status || 'не загружено');
+  setText('workHintC', p.proofs?.work?.fileName ? ('Прикреплено: ' + p.proofs.work.fileName) : 'Файл не выбран');
+  setStatusTag('courseStatusC', p.proofs?.courses?.status || 'не загружено');
+  setText('courseHintC', p.proofs?.courses?.fileName ? ('Прикреплено: ' + p.proofs.courses.fileName) : 'Файл не выбран');
+  setStatusTag('passStatusC', p.proofs?.passport?.status || 'не загружено');
+  setText('passHintC', p.proofs?.passport?.fileName ? ('Прикреплено: ' + p.proofs.passport.fileName) : 'Файл не выбран');
+  const has = p.portfolio && p.portfolio.length;
+  setText('portHintC', has ? ('Прикреплено: ' + p.portfolio.length + ' файл(ов)') : 'Файлы не выбраны');
+  setStatusTag('portStatusC', has ? 'на рассмотрении' : 'не загружено');
+}
+
+function setVal(id, value) {
+  const el = document.getElementById(id);
+  if (el) el.value = value || '';
+}
+
+function setStatusTag(id, status) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = status;
+  el.classList.remove('ok', 'warn', 'bad', 'ghost');
+  const safeStatus = (status || '').toLowerCase();
+  if (safeStatus.includes('подтверж')) el.classList.add('ok');
+  else if (safeStatus.includes('рассмотр') || safeStatus.includes('провер')) el.classList.add('warn');
+  else if (safeStatus.includes('отклон')) el.classList.add('bad');
+  else el.classList.add('ghost');
+}
+
+function wireProofs() {
+  const bindings = [
+    { role: 'employer', key: 'companyDoc', input: 'fileCompanyDocE', hint: 'companyDocHintE', status: 'companyDocStatusE' },
+    { role: 'employee', key: 'education', input: 'fileEduC', hint: 'eduHintC', status: 'eduStatusC' },
+    { role: 'employee', key: 'work', input: 'fileWorkC', hint: 'workHintC', status: 'workStatusC' },
+    { role: 'employee', key: 'courses', input: 'fileCourseC', hint: 'courseHintC', status: 'courseStatusC' },
+    { role: 'employee', key: 'passport', input: 'filePassC', hint: 'passHintC', status: 'passStatusC' },
+    { role: 'employee', key: 'cv', input: 'fileCVC', hint: 'cvHintC', status: 'cvStatusC' },
+  ];
+
+  bindings.forEach(function (binding) {
+    const inp = document.getElementById(binding.input);
+    if (!inp) return;
+    if (!inp.dataset.proofBound) {
+      inp.dataset.proofBound = '1';
+      inp.addEventListener('change', function () {
+        const file = inp.files && inp.files[0];
+        const name = file ? file.name : '';
+        const proof = state[binding.role].proofs[binding.key];
+        if (!proof) return;
+
+        if (proof.url) {
+          try {
+            URL.revokeObjectURL(proof.url);
+          } catch (error) {}
+        }
+        proof.fileName = name;
+        proof.status = name ? 'на рассмотрении' : 'не загружено';
+        proof.url = name && file ? URL.createObjectURL(file) : '';
+        proof.rejectReason = '';
+
+        const hintEl = document.getElementById(binding.hint);
+        if (hintEl) hintEl.textContent = name ? 'Загрузка...' : 'Файл не выбран';
+        setStatusTag(binding.status, proof.status);
+
+        if (binding.role === 'employer') renderRecruiterPublic();
+        if (binding.role === 'employee') renderEmployeePublic();
+        refreshEmployeeCVButton();
+        saveToStorage();
+
+        if (name && file && getToken()) {
+          (async function () {
+            try {
+              const uploaded = await apiUploadFile(file);
+              const apiType = proofKeyToApiType(binding.key);
+              let achId = proof.achievementId;
+              if (!achId) {
+                const ach = await apiCreateAchievement(apiType, DOC_TYPE_LABELS[apiType] || apiType, '');
+                achId = ach.id;
+                proof.achievementId = achId;
+              }
+              const doc = await apiAttachDocument(achId, uploaded.fileUrl, uploaded.fileName);
+              proof.docId = doc?.id || proof.docId;
+              if (hintEl) hintEl.textContent = 'Прикреплено: ' + uploaded.fileName;
+              showToast('Файл загружен ✓ — на рассмотрении');
+              saveToStorage();
+            } catch (error) {
+              if (hintEl) hintEl.textContent = 'Прикреплено: ' + name + ' (локально)';
+              showToast('Файл загружен локально');
+            }
+          })();
+        } else {
+          if (hintEl && name) hintEl.textContent = 'Прикреплено: ' + name;
+          if (name) showToast('Файл загружен ✓');
+        }
+      });
+    }
+
+    const proof = state[binding.role].proofs[binding.key];
+    const curName = proof && proof.fileName;
+    const hintEl = document.getElementById(binding.hint);
+    if (hintEl) hintEl.textContent = curName ? ('Прикреплено: ' + curName) : 'Файл не выбран';
+    if (proof) setStatusTag(binding.status, proof.status);
+  });
+}
+
+function wireDropZones() {
+  const zones = [
+    { zoneId: 'dropZoneCompanyDocE', inputId: 'fileCompanyDocE' },
+    { zoneId: 'dropZoneEduC', inputId: 'fileEduC' },
+    { zoneId: 'dropZoneWorkC', inputId: 'fileWorkC' },
+    { zoneId: 'dropZoneCourseC', inputId: 'fileCourseC' },
+    { zoneId: 'dropZonePassC', inputId: 'filePassC' },
+    { zoneId: 'dropZoneCVC', inputId: 'fileCVC' },
+    { zoneId: 'dropZonePortfolio', inputId: 'filePortfolioC' },
+  ];
+
+  zones.forEach(function ({ zoneId, inputId }) {
+    const zone = document.getElementById(zoneId);
+    const inp = document.getElementById(inputId);
+    if (!zone || !inp) return;
+    zone.addEventListener('click', function () { inp.click(); });
+    zone.addEventListener('dragover', function (event) {
+      event.preventDefault();
+      zone.classList.add('dropZone--over');
+    });
+    zone.addEventListener('dragleave', function () {
+      zone.classList.remove('dropZone--over');
+    });
+    zone.addEventListener('drop', function (event) {
+      event.preventDefault();
+      zone.classList.remove('dropZone--over');
+      if (event.dataTransfer.files && event.dataTransfer.files.length) {
+        inp.files = event.dataTransfer.files;
+        inp.dispatchEvent(new Event('change'));
+      }
+    });
+  });
+}
+
+(function wirePortfolio() {
+  const inp = document.getElementById('filePortfolioC');
+  if (!inp) return;
+  inp.addEventListener('change', function () {
+    const files = inp.files ? Array.from(inp.files) : [];
+    (state.employee.portfolio || []).forEach(function (item) {
+      try {
+        if (item.url) URL.revokeObjectURL(item.url);
+      } catch (error) {}
+    });
+    state.employee.portfolio = files.map(function (file) {
+      return { name: file.name, url: URL.createObjectURL(file) };
+    });
+    const hint = document.getElementById('portHintC');
+    if (hint) hint.textContent = files.length ? ('Прикреплено: ' + files.length + ' файл(ов)') : 'Файлы не выбраны';
+    setStatusTag('portStatusC', files.length ? 'на рассмотрении' : 'не загружено');
+    renderEmployeePublic();
+    if (files.length) showToast('Файл загружен ✓');
+  });
+})();
+
+function wireAvatar(inputId, hintId, imgId, target) {
+  const input = document.getElementById(inputId);
+  if (!input) return;
+  input.addEventListener('change', function () {
+    const file = input.files && input.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function () {
+      const dataUrl = String(reader.result || '');
+      if (target === 'employer') state.employer.avatarDataUrl = dataUrl;
+      if (target === 'employee') state.employee.avatarDataUrl = dataUrl;
+      setAvatar(imgId, dataUrl);
+      setText(hintId, 'Фото выбрано: ' + file.name);
+      if (target === 'employer') renderRecruiterPublic();
+      if (target === 'employee') renderEmployeePublic();
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function pickInGroup(groupId, value) {
+  const wrap = document.getElementById(groupId);
+  if (!wrap) return;
+  wrap.querySelectorAll('.sqBtn').forEach(function (button) {
+    button.classList.remove('selected');
+  });
+  const chosen = Array.from(wrap.querySelectorAll('.sqBtn')).find(function (button) {
+    return button.dataset.value === value;
+  });
+  if (chosen) chosen.classList.add('selected');
+}
+
+function debounce(fn, wait) {
+  let timer = null;
+  return function () {
+    const ctx = this;
+    const args = arguments;
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      fn.apply(ctx, args);
+    }, wait);
+  };
+}
+
+const _debouncedFilterFeed = debounce(filterFeed, 120);
+const _debouncedFilterEmployerSearch = debounce(filterEmployerSearch, 120);
+const _debouncedFilterAdminCandidates = debounce(filterAdminCandidates, 120);
+const _debouncedFilterAdminEmployers = debounce(filterAdminEmployers, 120);
+
+function debouncedFilterFeed() { _debouncedFilterFeed(); }
+function debouncedFilterEmployerSearch() { _debouncedFilterEmployerSearch(); }
+function debouncedFilterAdminCandidates() { _debouncedFilterAdminCandidates(); }
+function debouncedFilterAdminEmployers() { _debouncedFilterAdminEmployers(); }

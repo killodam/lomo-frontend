@@ -16,6 +16,11 @@ const state = {
     outgoing: [],
     counts: { accepted: 0, incoming: 0, outgoing: 0 },
   },
+  chat: {
+    conversations: [],
+    activeConversationId: '',
+    messagesByConversation: {},
+  },
   employer: {
     fullName: '',
     title: 'HR Manager',
@@ -232,6 +237,11 @@ function resetState() {
     incoming: [],
     outgoing: [],
     counts: { accepted: 0, incoming: 0, outgoing: 0 },
+  };
+  state.chat = {
+    conversations: [],
+    activeConversationId: '',
+    messagesByConversation: {},
   };
   state.employer = {
     fullName: '',

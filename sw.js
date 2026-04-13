@@ -1,0 +1,78 @@
+const STATIC_CACHE = 'lomo-static-v1';
+const OFFLINE_URL = '/offline.html';
+const PRECACHE_URLS = [
+  '/',
+  '/index.html',
+  '/config.js',
+  '/manifest.webmanifest',
+  OFFLINE_URL,
+  '/styles/main.css',
+  '/scripts/api.js',
+  '/scripts/state.js',
+  '/scripts/screens.js',
+  '/scripts/auth.js',
+  '/scripts/admin.js',
+  '/scripts/public-profile.js',
+  '/scripts/runtime.js',
+  '/scripts/legacy-auth-ui.js',
+  '/scripts/legacy-profile-runtime.js',
+  '/scripts/legacy-shell.js',
+  '/scripts/legacy-app.js',
+  '/icons/icon-192.png',
+  '/icons/icon-512.png',
+  '/icons/icon-maskable-512.png',
+  '/icons/app-icon.svg',
+  '/icons/app-maskable.svg',
+];
+
+self.addEventListener('install', (event) => {
+  event.waitUntil(
+    caches.open(STATIC_CACHE).then((cache) => cache.addAll(PRECACHE_URLS)).then(() => self.skipWaiting())
+  );
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys()
+      .then((keys) => Promise.all(keys.filter((key) => key !== STATIC_CACHE).map((key) => caches.delete(key))))
+      .then(() => self.clients.claim())
+  );
+});
+
+self.addEventListener('fetch', (event) => {
+  const request = event.request;
+  if (request.method !== 'GET') return;
+
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+  if (url.pathname.startsWith('/api/')) return;
+
+  if (request.mode === 'navigate') {
+    event.respondWith(
+      fetch(request)
+        .then((response) => {
+          const responseClone = response.clone();
+          caches.open(STATIC_CACHE).then((cache) => cache.put('/index.html', responseClone)).catch(() => {});
+          return response;
+        })
+        .catch(async () => {
+          const cache = await caches.open(STATIC_CACHE);
+          return (await cache.match(OFFLINE_URL)) || (await cache.match('/index.html'));
+        })
+    );
+    return;
+  }
+
+  event.respondWith(
+    caches.match(request).then((cached) => {
+      const networkFetch = fetch(request)
+        .then((response) => {
+          const responseClone = response.clone();
+          caches.open(STATIC_CACHE).then((cache) => cache.put(request, responseClone)).catch(() => {});
+          return response;
+        })
+        .catch(() => cached);
+      return cached || networkFetch;
+    })
+  );
+});

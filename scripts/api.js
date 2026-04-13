@@ -261,6 +261,28 @@ async function apiSendRequest(candidate_id, document_type) {
   });
 }
 
+async function apiGetChatConversations(params = {}) {
+  return apiFetch('/chat/conversations' + buildQuery(params));
+}
+
+async function apiStartChatConversation(participant_user_id) {
+  return apiFetch('/chat/conversations', {
+    method: 'POST',
+    body: JSON.stringify({ participant_user_id }),
+  });
+}
+
+async function apiGetChatMessages(conversationId, params = {}) {
+  return apiFetch('/chat/conversations/' + encodeURIComponent(conversationId) + '/messages' + buildQuery(params));
+}
+
+async function apiSendChatMessage(conversationId, body) {
+  return apiFetch('/chat/conversations/' + encodeURIComponent(conversationId) + '/messages', {
+    method: 'POST',
+    body: JSON.stringify({ body }),
+  });
+}
+
 async function apiApproveRequest(id) {
   return apiFetch('/requests/' + id + '/approve', { method: 'POST' });
 }
