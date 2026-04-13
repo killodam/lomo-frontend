@@ -449,6 +449,9 @@
       padding: 0 18px;
       transition: border-color 140ms ease, background 140ms ease;
     }
+    .sqInput.passwordField{
+      gap: 10px;
+    }
     .sqInput input{
       width:100%;
       height:100%;
@@ -459,6 +462,27 @@
       font-weight: 500;
       letter-spacing: 0.01em;
       color: var(--label);
+    }
+    .passwordToggle{
+      flex: 0 0 auto;
+      border: 0;
+      background: transparent;
+      color: var(--placeholder);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      padding: 0;
+      transition: color 140ms ease, opacity 140ms ease;
+    }
+    .passwordToggle:hover,
+    .passwordToggle:focus-visible{
+      color: var(--label);
+      outline: none;
+    }
+    .passwordToggle[aria-pressed="true"]{
+      color: var(--accent);
     }
     .sqInput input::placeholder{
       color: var(--placeholder);

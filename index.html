@@ -133,12 +133,18 @@
   <div class="fieldError hidden" id="regEmailError">Введите корректный email</div>
 </div>
 <div>
-  <div class="sqInput"><input autocomplete="new-password" id="regPassword" placeholder="пароль" type="password"/></div>
+  <div class="sqInput passwordField">
+    <input autocomplete="new-password" id="regPassword" placeholder="пароль" type="password"/>
+    <button type="button" class="passwordToggle" data-password-toggle="regPassword" aria-label="Показать пароль" aria-pressed="false">Показать</button>
+  </div>
   <div class="strengthBar"><div class="strengthFill" id="strengthFill"></div></div>
   <div class="strengthLabel" id="strengthLabel"></div>
 </div>
 <div>
-  <div class="sqInput"><input autocomplete="new-password" id="regPasswordConfirm" placeholder="повторите пароль" type="password"/></div>
+  <div class="sqInput passwordField">
+    <input autocomplete="new-password" id="regPasswordConfirm" placeholder="повторите пароль" type="password"/>
+    <button type="button" class="passwordToggle" data-password-toggle="regPasswordConfirm" aria-label="Показать пароль" aria-pressed="false">Показать</button>
+  </div>
   <div class="fieldError hidden" id="regPasswordConfirmError">Пароли не совпадают</div>
 </div>
 </div>
@@ -177,7 +183,10 @@
   <div class="sqInput" id="sqInputLoginEmail"><input autocomplete="email" autocapitalize="none" spellcheck="false" id="loginEmail" placeholder="почта" type="email"/></div>
   <div class="fieldError hidden" id="loginEmailError">Введите корректный email</div>
 </div>
-<div class="sqInput"><input autocomplete="current-password" id="loginPassword" placeholder="пароль" type="password"/></div>
+<div class="sqInput passwordField">
+  <input autocomplete="current-password" id="loginPassword" placeholder="пароль" type="password"/>
+  <button type="button" class="passwordToggle" data-password-toggle="loginPassword" aria-label="Показать пароль" aria-pressed="false">Показать</button>
+</div>
 <button class="accentBtn linkBtn" data-next="toForgot">забыли пароль?</button>
 </div>
 </div>
@@ -242,15 +251,17 @@
   <div class="authFlowSub">Придумайте надёжный пароль — минимум 8 символов.</div>
   <div class="formCol">
     <div>
-      <div class="sqInput" id="sqInputNewPassword">
+      <div class="sqInput passwordField" id="sqInputNewPassword">
         <input autocomplete="new-password" id="newPassword" placeholder="новый пароль" type="password"/>
+        <button type="button" class="passwordToggle" data-password-toggle="newPassword" aria-label="Показать пароль" aria-pressed="false">Показать</button>
       </div>
       <div class="strengthBar"><div class="strengthFill" id="strengthFill"></div></div>
       <div class="fieldError hidden" id="newPasswordError">Минимум 8 символов</div>
     </div>
     <div>
-      <div class="sqInput" id="sqInputConfirmPassword">
+      <div class="sqInput passwordField" id="sqInputConfirmPassword">
         <input autocomplete="new-password" id="confirmPassword" placeholder="повторите пароль" type="password"/>
+        <button type="button" class="passwordToggle" data-password-toggle="confirmPassword" aria-label="Показать пароль" aria-pressed="false">Показать</button>
       </div>
       <div class="fieldError hidden" id="confirmPasswordError">Пароли не совпадают</div>
     </div>
