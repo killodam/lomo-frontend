@@ -125,10 +125,10 @@ async function apiFetchBlob(path, opts = {}) {
   return response.blob();
 }
 
-async function apiRegister(email, password, role, name, login) {
+async function apiRegister(email, password, role, name) {
   const data = await apiFetch('/auth/register', {
     method: 'POST',
-    body: JSON.stringify({ email, password, role, name, login }),
+    body: JSON.stringify({ email, password, role, name }),
   });
   setToken();
   return data;

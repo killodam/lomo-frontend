@@ -29,7 +29,7 @@ function deleteOwnAccount(password) {
 }
 
     function clearAuthInputs(){
-      ['regFirstName','regLastName','regEmail','regLogin','regPassword','loginEmail','loginPassword','forgotEmail','newPassword','confirmPassword']
+      ['regFirstName','regLastName','regEmail','regPassword','regPasswordConfirm','loginEmail','loginPassword','forgotEmail','newPassword','confirmPassword']
         .forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
       // clear code cells
       for(let i=0;i<6;i++){ const cc=document.getElementById('cc'+i); if(cc) cc.value=''; }
@@ -281,10 +281,8 @@ function deleteOwnAccount(password) {
       if(kind === 'auth'){
         state.auth = value;
         pickInGroup('authChoices', value);
-        setTimeout(() => {
-          if(value === 'REGISTRATION') show('roleReg');
-          else show('loginForm');
-        }, 150);
+        if(value === 'REGISTRATION') show('roleReg');
+        else show('loginForm');
       }
       if(kind === 'roleReg'){
         state.roleReg = value;
@@ -474,8 +472,8 @@ function deleteOwnAccount(password) {
           const lastName  = (document.getElementById('regLastName')?.value  || '').trim();
           const fullName  = [firstName, lastName].filter(Boolean).join(' ');
           const email    = (document.getElementById('regEmail')?.value    || '').trim();
-          const login    = (document.getElementById('regLogin')?.value    || '').trim().toLowerCase();
           const password = (document.getElementById('regPassword')?.value || '').trim();
+          const passwordConfirm = (document.getElementById('regPasswordConfirm')?.value || '').trim();
           const role     = (state.roleReg || 'EMPLOYEE') === 'EMPLOYER' ? 'employer' : 'candidate';
           const btn = document.getElementById('btnRegNext');
           if(btn) btn.disabled = true;
@@ -485,12 +483,19 @@ function deleteOwnAccount(password) {
                 if (!firstName && !lastName) { if(btn) btn.disabled = false; showToast('Введите имя'); return; }
                 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailRe.test(email)) { if(btn) btn.disabled = false; showToast('Некорректный email'); return; }
-                if (login && !/^[a-z0-9._-]{3,32}$/.test(login)) { if(btn) btn.disabled = false; showToast('Логин: 3-32 символа, только a-z, 0-9, точка, _ или -'); return; }
                 if (!password || password.length < 8) { if(btn) btn.disabled = false; showToast('Пароль — минимум 8 символов'); return; }
+                const confirmError = document.getElementById('regPasswordConfirmError');
+                if(confirmError) confirmError.classList.add('hidden');
+                if (password !== passwordConfirm) {
+                  if(confirmError) confirmError.classList.remove('hidden');
+                  if(btn) btn.disabled = false;
+                  showToast('Пароли не совпадают');
+                  return;
+                }
                 // --- End validation ---
-                const { user, profile } = await apiRegister(email, password, role, fullName, login);
+                const { user, profile } = await apiRegister(email, password, role, fullName);
               state.email = user.email;
-              state.login = user.login || login || '';
+              state.login = user.login || '';
               state.roleReg = role === 'employer' ? 'EMPLOYER' : 'EMPLOYEE';
               applyProfileToState(user, profile, []);
               saveToStorage();
@@ -510,12 +515,18 @@ function deleteOwnAccount(password) {
         }
 
         if(route === 'fromLoginForm'){
-          const loginEmail = (document.getElementById('loginEmail')?.value    || '').trim();
+          const loginEmail = (document.getElementById('loginEmail')?.value    || '').trim().toLowerCase();
           const loginPwd   = (document.getElementById('loginPassword')?.value || '').trim();
           const loginBtn   = document.querySelector('#screenLoginForm .accentBtn.nextBtn');
           if(loginBtn) loginBtn.disabled = true;
           (async () => {
             try {
+              const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+              if (!emailRe.test(loginEmail)) {
+                showToast('Введите корректный email');
+                if(loginBtn) loginBtn.disabled = false;
+                return;
+              }
               const { user, profile, achievements } = await apiLogin(loginEmail, loginPwd);
               applyProfileToState(user, profile, achievements || []);
               saveToStorage();

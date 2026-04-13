@@ -58,6 +58,8 @@
         const val = regPasswordEl.value;
         const fill = document.getElementById('strengthFill');
         const label = document.getElementById('strengthLabel');
+        const confirmErr = document.getElementById('regPasswordConfirmError');
+        if(confirmErr) confirmErr.classList.add('hidden');
         if(!fill || !label) return;
         if(!val){ fill.style.width='0'; fill.style.background=''; label.textContent=''; return; }
         let score = 0;
@@ -67,6 +69,13 @@
         if(score === 1){ fill.style.width='33%'; fill.style.background='#ef4444'; label.textContent='Слабый'; label.style.color='#ef4444'; }
         else if(score === 2){ fill.style.width='66%'; fill.style.background='#f59e0b'; label.textContent='Средний'; label.style.color='#f59e0b'; }
         else if(score === 3){ fill.style.width='100%'; fill.style.background='#22c55e'; label.textContent='Надёжный'; label.style.color='#22c55e'; }
+      });
+    }
+    const regPasswordConfirmEl = document.getElementById('regPasswordConfirm');
+    if(regPasswordConfirmEl){
+      regPasswordConfirmEl.addEventListener('input', () => {
+        const confirmErr = document.getElementById('regPasswordConfirmError');
+        if(confirmErr) confirmErr.classList.add('hidden');
       });
     }
 
@@ -93,7 +102,7 @@
       });
     }
     wireEmailValidation('regEmail', 'sqInputRegEmail', 'regEmailError');
-    wireEmailValidation('loginEmail', 'sqInputLoginEmail', 'loginEmailError', { allowLogin: true });
+    wireEmailValidation('loginEmail', 'sqInputLoginEmail', 'loginEmailError');
 
     // Render public profiles
     function applyChip(elId, status){

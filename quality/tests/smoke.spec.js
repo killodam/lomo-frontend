@@ -440,7 +440,7 @@ test('mobile candidate feed avoids horizontal overflow after login', async ({ pa
   expect(metrics.activeWidth).toBeLessThanOrEqual(metrics.innerWidth + 1);
 });
 
-test('existing account can log in by username without email validation error', async ({ page }) => {
+test('existing account can log in by email without validation error', async ({ page }) => {
   await page.route('**/api/**', async (route) => {
     const request = route.request();
     const url = new URL(request.url());
@@ -451,7 +451,7 @@ test('existing account can log in by username without email validation error', a
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify({
-          user: { id: 'cand-existing', email: 'existing@example.com', login: body.email, role: 'candidate' },
+          user: { id: 'cand-existing', email: 'existing@example.com', login: 'existing.user', role: 'candidate' },
           profile: { full_name: 'Существующий Пользователь', location: 'Москва', edu_place: 'ВШЭ', vacancies: 'Analyst' },
           achievements: [],
         }),
@@ -474,7 +474,7 @@ test('existing account can log in by username without email validation error', a
   });
 
   await openLogin(page);
-  await page.fill('#loginEmail', 'existing.user');
+  await page.fill('#loginEmail', 'existing@example.com');
   await page.locator('#loginPassword').focus();
   await expect(page.locator('#loginEmailError')).toHaveClass(/hidden/);
   await page.fill('#loginPassword', 'secret123');

@@ -48,8 +48,8 @@ function show(key) {
   if (!screens[key]) return;
   screens[key].classList.add('active');
   try { screens[key].scrollTop = 0; } catch (error) {}
-  closeDrawer();
-  closeModal();
+  if (typeof closeDrawer === 'function') closeDrawer();
+  if (typeof closeModal === 'function') closeModal();
   if (key === 'regForm') {
     clearScreenInputs('regForm');
     updateConsentRoleText();
