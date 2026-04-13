@@ -79,6 +79,27 @@
       });
     }
 
+    function syncPasswordToggle(button, input){
+      if(!button || !input) return;
+      const visible = input.type === 'text';
+      button.textContent = visible ? 'Скрыть' : 'Показать';
+      button.setAttribute('aria-pressed', visible ? 'true' : 'false');
+      button.setAttribute('aria-label', visible ? 'Скрыть пароль' : 'Показать пароль');
+    }
+
+    document.querySelectorAll('[data-password-toggle]').forEach((button) => {
+      const input = document.getElementById(button.getAttribute('data-password-toggle'));
+      if(!input) return;
+      syncPasswordToggle(button, input);
+      button.addEventListener('click', () => {
+        input.type = input.type === 'password' ? 'text' : 'password';
+        syncPasswordToggle(button, input);
+        try { input.focus({ preventScroll: true }); } catch(e) { input.focus(); }
+        const len = input.value.length;
+        try { input.setSelectionRange(len, len); } catch(e) {}
+      });
+    });
+
     // Inline validation
     function wireEmailValidation(inputId, wrapId, errorId, options = {}){
       const inp = document.getElementById(inputId);
