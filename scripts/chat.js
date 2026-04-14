@@ -1,5 +1,5 @@
 (function initChatUi() {
-  var POLL_INTERVAL_MS = 12000;
+  var POLL_INTERVAL_MS = 4000;
   var chatState = {
     previousScreen: 'auth',
     pollingTimer: null,
@@ -10,6 +10,7 @@
   var elements = {
     shell: document.getElementById('chatShell'),
     sidebarMeta: document.getElementById('chatSidebarMeta'),
+    autoBadge: document.getElementById('chatAutoBadge'),
     list: document.getElementById('chatConversationList'),
     empty: document.getElementById('chatEmptyState'),
     messages: document.getElementById('chatMessageList'),
@@ -137,6 +138,26 @@
   function setThreadVisibility(isVisible) {
     if (!elements.shell) return;
     elements.shell.classList.toggle('chatThreadVisible', !!isVisible);
+  }
+
+  function updateAutoBadge(text, tone) {
+    if (!elements.autoBadge) return;
+    elements.autoBadge.textContent = text || 'Авто';
+    elements.autoBadge.style.background = tone === 'error'
+      ? '#fef2f2'
+      : tone === 'busy'
+        ? '#fff8eb'
+        : '#eef8fa';
+    elements.autoBadge.style.color = tone === 'error'
+      ? '#b91c1c'
+      : tone === 'busy'
+        ? '#b45309'
+        : '#1f6a75';
+    elements.autoBadge.style.borderColor = tone === 'error'
+      ? 'rgba(185,28,28,.16)'
+      : tone === 'busy'
+        ? 'rgba(180,83,9,.16)'
+        : 'rgba(42,122,138,.18)';
   }
 
   function renderConversationList() {
@@ -283,12 +304,18 @@
       }
 
       renderConversationList();
-      renderPager('chatConversationPager', chatState.conversationPager, function (page) {
-        loadConversations({ page: page, silent: false });
-      }, { label: 'чатов' });
+      if ((chatState.conversationPager.totalPages || 0) > 1) {
+        renderPager('chatConversationPager', chatState.conversationPager, function (page) {
+          loadConversations({ page: page, silent: false });
+        }, { label: 'чатов' });
+      } else {
+        var pagerEl = document.getElementById('chatConversationPager');
+        if (pagerEl) pagerEl.innerHTML = '';
+      }
 
       if (state.chat.activeConversationId) await loadMessages(state.chat.activeConversationId, { silent: true });
       else renderThread();
+      updateAutoBadge('Авто', 'ok');
       return state.chat.conversations;
     } catch (err) {
       if (handleProtectedError(err)) return [];
@@ -296,6 +323,7 @@
         elements.list.innerHTML = '<div class="miniHint" style="color:#991b1b;">Ошибка: ' + escapeHtml(safeErrorText(err)) + '</div>';
       }
       renderPager('chatConversationPager', { total: 0 }, function () {}, { label: 'чатов' });
+      updateAutoBadge('Ошибка', 'error');
       throw err;
     }
   }
@@ -439,6 +467,7 @@
     chatState.pollingTimer = window.setInterval(function () {
       if (chatState.pollingInFlight || !isChatActive() || document.hidden) return;
       chatState.pollingInFlight = true;
+      updateAutoBadge('Синхр.', 'busy');
       loadConversations({ silent: true }).catch(function () {}).finally(function () {
         chatState.pollingInFlight = false;
       });
@@ -466,6 +495,24 @@
     stopPolling();
   }
 
+  window.addEventListener('focus', function () {
+    if (!isChatActive() || chatState.pollingInFlight) return;
+    chatState.pollingInFlight = true;
+    updateAutoBadge('Синхр.', 'busy');
+    loadConversations({ silent: true }).catch(function () {}).finally(function () {
+      chatState.pollingInFlight = false;
+    });
+  });
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden || !isChatActive() || chatState.pollingInFlight) return;
+    chatState.pollingInFlight = true;
+    updateAutoBadge('Синхр.', 'busy');
+    loadConversations({ silent: true }).catch(function () {}).finally(function () {
+      chatState.pollingInFlight = false;
+    });
+  });
+
   if (elements.list) {
     elements.list.addEventListener('click', function (event) {
       var button = event.target.closest('[data-chat-conversation-id]');
@@ -489,6 +536,7 @@
 
   if (elements.refreshBtn) {
     elements.refreshBtn.addEventListener('click', function () {
+      updateAutoBadge('Синхр.', 'busy');
       loadConversations({ silent: false }).catch(function () {});
     });
   }
@@ -528,4 +576,6 @@
     goBack: goBack,
     handleScreenChange: handleScreenChange,
   };
+
+  updateAutoBadge('Авто', 'ok');
 })();

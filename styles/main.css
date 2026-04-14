@@ -2365,7 +2365,7 @@ body { padding-bottom: 0; }
   border: 1px solid #e8edf2;
   border-radius: 22px;
   box-shadow: 0 6px 30px rgba(18, 28, 45, 0.06);
-  min-height: 640px;
+  min-height: 560px;
 }
 
 .chatSidebar{
@@ -2382,6 +2382,13 @@ body { padding-bottom: 0; }
   margin-bottom: 14px;
 }
 
+.chatSidebarActions{
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 0 0 auto;
+}
+
 .chatSidebarTitle{
   font-size: 20px;
   font-weight: 800;
@@ -2396,11 +2403,26 @@ body { padding-bottom: 0; }
   line-height: 1.45;
 }
 
+.chatAutoBadge{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  background: #eef8fa;
+  border: 1px solid rgba(42,122,138,.18);
+  color: #1f6a75;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .2px;
+}
+
 .chatConversationList{
   display: flex;
   flex-direction: column;
   gap: 10px;
   min-height: 220px;
+  margin-bottom: 8px;
 }
 
 .chatConversationEmpty{
@@ -2462,6 +2484,7 @@ body { padding-bottom: 0; }
 .chatConversationBody{
   min-width: 0;
   flex: 1;
+  overflow: hidden;
 }
 
 .chatConversationTop{
@@ -2560,6 +2583,7 @@ body { padding-bottom: 0; }
 
 .chatThreadActions{
   flex: 0 0 auto;
+  align-self: center;
 }
 
 .chatEmptyState,
@@ -2670,6 +2694,10 @@ body { padding-bottom: 0; }
   gap: 12px;
 }
 
+#chatConversationPager:empty{
+  display: none;
+}
+
 .chatSendBtn{
   min-width: 132px;
 }
@@ -2702,6 +2730,11 @@ body { padding-bottom: 0; }
     justify-content: center;
     min-width: 88px;
   }
+
+  .chatSidebarHead,
+  .chatThreadHead{
+    gap: 10px;
+  }
 }
 
 @media (max-width: 640px) {
@@ -2713,6 +2746,15 @@ body { padding-bottom: 0; }
   .chatThread{
     border-radius: 18px;
     padding: 14px;
+  }
+
+  .chatSidebarHead{
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .chatSidebarActions{
+    justify-content: space-between;
   }
 
   .chatConversationItem{
@@ -2731,6 +2773,10 @@ body { padding-bottom: 0; }
 
   .chatConversationTime{
     font-size: 10px;
+  }
+
+  .chatThreadHead{
+    flex-wrap: wrap;
   }
 
   .chatBubble{
