@@ -196,6 +196,7 @@ function renderConnectionsInto(prefix, data) {
             '</div>' +
             '<div class="networkActions">' +
               '<button type="button" class="miniLink" data-open-connection-profile="' + escapeHtml(item.user_id) + '">Профиль</button>' +
+              '<button type="button" class="miniLink" data-open-chat-user="' + escapeHtml(item.user_id) + '">Чат</button>' +
               '<button type="button" class="miniLink" data-connection-action="remove" data-connection-id="' + escapeHtml(item.id) + '" data-target-user-id="' + escapeHtml(item.user_id) + '">Удалить</button>' +
             '</div>' +
           '</div>';
@@ -253,6 +254,7 @@ function renderPublicConnectionPanel(targetUserId, statusData) {
   if (relation === 'connected') {
     buttonsHtml =
       '<button type="button" class="pillBtn" disabled>Уже в контактах</button>' +
+      '<button type="button" class="pillBtn" data-open-chat-user="' + escapeHtml(targetUserId) + '">Написать</button>' +
       '<button type="button" class="pillBtn" data-connection-action="remove" data-connection-id="' + escapeHtml(connectionId) + '" data-target-user-id="' + escapeHtml(targetUserId) + '">Удалить из контактов</button>';
   } else if (relation === 'incoming') {
     buttonsHtml =
@@ -601,10 +603,15 @@ function renderEmployerAccessPanel(candidateId, requests, files) {
         '</div>';
       }).join('')
     : '<div class="miniHint">Пока нет файлов с одобренным доступом</div>';
+  var canChat = (files && files.length) || (requests || []).some(function (req) { return req.status === 'approved'; });
+  var chatActionHtml = canChat
+    ? '<div style="display:flex;justify-content:flex-end;margin-bottom:10px;"><button type="button" class="pillBtn" data-open-chat-user="' + escapeHtml(candidateId) + '">Написать кандидату</button></div>'
+    : '';
 
   box.innerHTML =
     '<div class="pubProfileSection">' +
       '<div class="pubProfileSTitle">Доступ к документам</div>' +
+      chatActionHtml +
       '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">' + buttons + '</div>' +
       filesHtml +
     '</div>';

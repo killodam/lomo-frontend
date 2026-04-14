@@ -423,6 +423,13 @@ function deleteOwnAccount(password) {
         _openProfileById(openConnectionProfileBtn.dataset.openConnectionProfile);
         return;
       }
+      const openChatUserBtn = e.target.closest('[data-open-chat-user]');
+      if(openChatUserBtn){
+        if(window.LOMO_CHAT_UI && typeof window.LOMO_CHAT_UI.openWithUser === 'function'){
+          window.LOMO_CHAT_UI.openWithUser(openChatUserBtn.dataset.openChatUser);
+        }
+        return;
+      }
       const approveReqBtn = e.target.closest('[data-approve-request]');
       if(approveReqBtn){
         handleRequestDecision(approveReqBtn.dataset.approveRequest, 'approve');
@@ -686,6 +693,12 @@ function deleteOwnAccount(password) {
         if(route === 'toEmployerSearch')   { showEmployerDashboard(); return; }
         if(route === 'toEmployerDashboard'){ showEmployerDashboard(); return; }
         if(route === 'toEmployeeDashboard'){ showEmployeeDashboard(); return; }
+        if(route === 'toChatHub'){
+          if(window.LOMO_CHAT_UI && typeof window.LOMO_CHAT_UI.openHub === 'function'){
+            window.LOMO_CHAT_UI.openHub();
+          }
+          return;
+        }
 
         if(route === 'toDashboard'){
           const role = state.roleReg || 'EMPLOYEE';
@@ -729,6 +742,7 @@ function deleteOwnAccount(password) {
       if(e.key !== 'Escape') return;
       if(screens.myEmployerProfile?.classList.contains('active')){ renderRecruiterPublic(); show('recruiterPublic'); return; }
       if(screens.myEmployeeProfile?.classList.contains('active')){ renderEmployeePublic(); show('employeePublic'); return; }
+      if(screens.chat?.classList.contains('active') && window.LOMO_CHAT_UI && typeof window.LOMO_CHAT_UI.goBack === 'function'){ window.LOMO_CHAT_UI.goBack(); return; }
       if(screens.recruiterPublic?.classList.contains('active') || screens.employeePublic?.classList.contains('active')){ show('auth'); return; }
       if(screens.resetPassword?.classList.contains('active')){ show('verifyCode'); return; }
       if(screens.verifyCode?.classList.contains('active')){ show('forgot'); return; }

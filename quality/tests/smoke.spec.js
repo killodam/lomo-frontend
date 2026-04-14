@@ -278,6 +278,185 @@ test('user can send connection request from public profile', async ({ page }) =>
   await expect(page.locator('#pubConnectionPanel')).toContainText('Запрос отправлен');
 });
 
+test('connected users can open chat from public profile and send a message', async ({ page }) => {
+  let chatStarted = false;
+  let sentMessage = '';
+
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'cand-1', email: 'candidate@example.com', role: 'candidate' },
+          profile: { full_name: 'Иван Кандидат', location: 'Москва', edu_place: 'МГУ', vacancies: 'Designer' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([
+          {
+            id: 'emp-44',
+            role: 'employer',
+            public_id: 'LOMO-EMP00044',
+            full_name: 'Алина HR',
+            company: 'LOMO Labs',
+            industry: 'Tech',
+            location: 'Москва',
+          },
+        ], 1, 12, 1)),
+      });
+    }
+
+    if (url.pathname.endsWith('/public/profile/LOMO-EMP00044')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'emp-44',
+          role: 'employer',
+          public_id: 'LOMO-EMP00044',
+          full_name: 'Алина HR',
+          company: 'LOMO Labs',
+          industry: 'Tech',
+          location: 'Москва',
+          about: 'Нанимаем сильных специалистов',
+          connections_count: 12,
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/connections/status/emp-44')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          relation: 'connected',
+          connectionId: 'conn-44',
+          status: 'accepted',
+          connections_count: 12,
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/connections')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ accepted: [], incoming: [], outgoing: [], counts: { accepted: 0, incoming: 0, outgoing: 0 } }),
+      });
+    }
+
+    if (url.pathname.endsWith('/chat/conversations') && request.method() === 'POST') {
+      chatStarted = true;
+      return route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          created: true,
+          conversation: {
+            id: 'chat-1',
+            kind: 'direct',
+            created_at: '2026-04-14T10:00:00.000Z',
+            last_message_at: '2026-04-14T10:00:00.000Z',
+            participant: {
+              id: 'emp-44',
+              role: 'employer',
+              public_id: 'LOMO-EMP00044',
+              full_name: 'Алина HR',
+              company: 'LOMO Labs',
+              location: 'Москва',
+              industry: 'Tech',
+            },
+          },
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/chat/conversations') && request.method() === 'GET') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([
+          {
+            id: 'chat-1',
+            kind: 'direct',
+            participant_user_id: 'emp-44',
+            participant_role: 'employer',
+            public_id: 'LOMO-EMP00044',
+            full_name: 'Алина HR',
+            company: 'LOMO Labs',
+            location: 'Москва',
+            industry: 'Tech',
+            last_message_body: sentMessage || '',
+            last_message_created_at: '2026-04-14T10:01:00.000Z',
+            unread_count: 0,
+          },
+        ], 1, 20, 1)),
+      });
+    }
+
+    if (url.pathname.endsWith('/chat/conversations/chat-1/messages') && request.method() === 'GET') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([], 1, 30, 0)),
+      });
+    }
+
+    if (url.pathname.endsWith('/chat/conversations/chat-1/messages') && request.method() === 'POST') {
+      const body = JSON.parse(request.postData() || '{}');
+      sentMessage = body.body;
+      return route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'msg-1',
+          conversation_id: 'chat-1',
+          author_user_id: 'cand-1',
+          body: body.body,
+          created_at: '2026-04-14T10:01:00.000Z',
+          edited_at: null,
+        }),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.evaluate(() => { document.cookie = 'lomo_csrf=test-suite; path=/'; });
+  await page.fill('#loginEmail', 'candidate@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await page.click('#candidateFeedList .socialCard');
+  await expect(page.locator('#screenPublicProfile')).toHaveClass(/active/);
+  await expect(page.locator('#pubConnectionPanel')).toContainText('Написать');
+
+  await page.click('[data-open-chat-user="emp-44"]');
+  await expect.poll(() => chatStarted).toBe(true);
+  await expect(page.locator('#screenChat')).toHaveClass(/active/);
+  await expect(page.locator('#chatThreadTitle')).toContainText('Алина HR');
+
+  await page.fill('#chatMessageInput', 'Добрый день!');
+  await page.click('#chatSendBtn');
+  await expect.poll(() => sentMessage).toBe('Добрый день!');
+  await expect(page.locator('#chatMessageList')).toContainText('Добрый день!');
+});
+
 test('admin dashboard loads queue and users with server-side search', async ({ page }) => {
   let userSearch = '';
 

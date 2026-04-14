@@ -24,6 +24,7 @@ const screens = {
   adminQueue: document.getElementById('screenAdminQueue'),
   candidateFeed: document.getElementById('screenCandidateFeed'),
   employerSearch: document.getElementById('screenEmployerSearch'),
+  chat: document.getElementById('screenChat'),
   publicProfile: document.getElementById('screenPublicProfile'),
 };
 
@@ -63,6 +64,9 @@ function show(key) {
   if (key === 'candidateFeed') loadCandidateFeed();
   if (key === 'employerSearch') loadEmployerSearch();
   if (key === 'myEmployeeProfile') hydrateCvPrivacy();
+  if (window.LOMO_CHAT_UI && typeof window.LOMO_CHAT_UI.handleScreenChange === 'function') {
+    window.LOMO_CHAT_UI.handleScreenChange(key);
+  }
 }
 
 function updateAuthButtons() {

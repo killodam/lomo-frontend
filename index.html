@@ -286,8 +286,9 @@
       <div class="topLeft"><div class="miniBrand">
         <button type="button" class="logoMarkBtn" data-next="toEmployerSearch"><span class="logoMark">LOMO</span></button>
       </div></div>
-      <div class="topRight" style="display:flex;gap:6px;">
+      <div class="topRight" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
         <button type="button" class="pillBtn" data-next="toEmployerSearch">🔍 Поиск</button>
+        <button type="button" class="pillBtn" data-next="toChatHub">Чаты</button>
         <button type="button" class="pillBtn" data-next="toEmployerProfile">Редактировать</button>
       </div>
     </div>
@@ -334,6 +335,7 @@
           <div class="achList" id="rpConnectionsList"><div class="miniHint">Контактов пока нет</div></div>
           <div class="actionsRow">
             <button type="button" class="accentBtn pillCTA" id="rpContactBtn">Написать</button>
+            <button type="button" class="sqBtn sm" data-next="toChatHub">Чаты</button>
             <button type="button" class="sqBtn sm" id="employerLogoutAllBtn">Выйти везде</button>
             <button type="button" class="sqBtn sm ghostBtn" data-next="toAuthFromProfile">Выйти</button>
           </div>
@@ -548,8 +550,9 @@
       <div class="topLeft"><div class="miniBrand">
         <button type="button" class="logoMarkBtn" data-next="toCandidateFeed"><span class="logoMark">LOMO</span></button>
       </div></div>
-      <div class="topRight" style="display:flex;gap:6px;">
+      <div class="topRight" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
         <button type="button" class="pillBtn" data-next="toCandidateFeed">🏠 Лента</button>
+        <button type="button" class="pillBtn" data-next="toChatHub">Чаты</button>
         <button type="button" class="pillBtn" data-next="toEmployeeProfile">Редактировать</button>
       </div>
     </div>
@@ -618,6 +621,7 @@
             <div class="miniHint">Контактов пока нет</div>
           </div>
           <div class="actionsRow">
+            <button type="button" class="sqBtn sm" data-next="toChatHub">Чаты</button>
             <button type="button" class="sqBtn sm" id="btnShareProfile">Поделиться профилем</button>
             <button type="button" class="sqBtn sm" id="btnContactData">Контактные данные</button>
             <button type="button" class="sqBtn sm" id="employeeLogoutAllBtn">Выйти везде</button>
@@ -637,7 +641,8 @@
         <button aria-label="Menu" class="burgerBtn feedBurger js-toggle-drawer"><span></span><span></span><span></span></button>
         <span class="logoMark" style="font-size:18px;letter-spacing:1px;">LOMO</span>
       </div>
-      <div class="topRight" style="display:flex;gap:8px;align-items:center;">
+      <div class="topRight" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
+        <button type="button" class="pillBtn" data-next="toChatHub" style="font-size:13px;font-weight:600;">Чаты</button>
         <button type="button" class="pillBtn" data-next="toEmployeeProfile" style="font-size:13px;font-weight:600;">Мой профиль</button>
         <button type="button" class="sqBtn sm ghostBtn" data-next="toAuthFromProfile" style="font-size:13px;">Выйти</button>
       </div>
@@ -664,7 +669,8 @@
         <button aria-label="Menu" class="burgerBtn feedBurger js-toggle-drawer"><span></span><span></span><span></span></button>
         <span class="logoMark" style="font-size:18px;letter-spacing:1px;">LOMO</span>
       </div>
-      <div class="topRight" style="display:flex;gap:8px;align-items:center;">
+      <div class="topRight" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
+        <button type="button" class="pillBtn" data-next="toChatHub" style="font-size:13px;font-weight:600;">Чаты</button>
         <button type="button" class="pillBtn" data-next="toEmployerProfile" style="font-size:13px;font-weight:600;">Профиль компании</button>
         <button type="button" class="sqBtn sm ghostBtn" data-next="toAuthFromProfile" style="font-size:13px;">Выйти</button>
       </div>
@@ -685,6 +691,63 @@
         <div style="text-align:center;padding:32px;color:#888;">Загрузка...</div>
       </div>
       <div id="employerCandidatePager" class="pager"></div>
+    </div>
+  </div>
+</section>
+
+<!-- CHAT -->
+<section id="screenChat" class="screen" aria-label="Чаты LOMO">
+  <div class="wrap profileWrap">
+    <div class="topBar stickyTop" style="padding:0 16px;">
+      <div class="topLeft" style="display:flex;align-items:center;gap:10px;">
+        <button type="button" class="backBtnInline" id="chatReturnBtn">← Назад</button>
+        <span class="logoMark" style="font-size:18px;letter-spacing:1px;">LOMO</span>
+      </div>
+      <div class="topRight" style="display:flex;gap:8px;align-items:center;">
+        <button type="button" class="pillBtn" id="chatRefreshBtn" style="font-size:13px;font-weight:600;">Обновить</button>
+      </div>
+    </div>
+    <div class="centerBlock chatCenterBlock">
+      <div class="chatShell" id="chatShell">
+        <aside class="chatSidebar" id="chatSidebar">
+          <div class="chatSidebarHead">
+            <div>
+              <div class="chatSidebarTitle">Чаты LOMO</div>
+              <div class="chatSidebarMeta" id="chatSidebarMeta">Здесь будут диалоги с вашими контактами и подтверждёнными связями.</div>
+            </div>
+          </div>
+          <div class="chatConversationList" id="chatConversationList">
+            <div class="miniHint">Загрузка диалогов...</div>
+          </div>
+          <div id="chatConversationPager" class="pager"></div>
+        </aside>
+        <section class="chatThread" id="chatThread">
+          <div class="chatThreadHead">
+            <button type="button" class="miniLink chatThreadBack" id="chatBackToListBtn">← К списку</button>
+            <div class="chatThreadTitleWrap">
+              <div class="chatThreadTitle" id="chatThreadTitle">Выберите диалог</div>
+              <div class="chatThreadMeta" id="chatThreadMeta">После подключения или одобренного доступа здесь можно продолжить разговор.</div>
+            </div>
+            <div class="chatThreadActions">
+              <button type="button" class="miniLink hidden" id="chatOpenProfileBtn">Профиль</button>
+            </div>
+          </div>
+          <div class="chatEmptyState" id="chatEmptyState">
+            <div class="chatEmptyTitle">Пока без активного диалога</div>
+            <div class="chatEmptyText">Откройте контакт, нажмите «Написать» и начните общение прямо внутри LOMO.</div>
+          </div>
+          <div class="chatMessageList hidden" id="chatMessageList"></div>
+          <form class="chatComposer hidden" id="chatComposer">
+            <label class="chatComposerField" for="chatMessageInput">
+              <textarea id="chatMessageInput" rows="3" maxlength="2000" placeholder="Напишите сообщение"></textarea>
+            </label>
+            <div class="chatComposerFooter">
+              <div class="miniHint" id="chatComposerHint">Сообщения видны только участникам диалога.</div>
+              <button type="submit" class="accentBtn nextBtn chatSendBtn" id="chatSendBtn">Отправить</button>
+            </div>
+          </form>
+        </section>
+      </div>
     </div>
   </div>
 </section>

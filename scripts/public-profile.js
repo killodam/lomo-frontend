@@ -117,6 +117,19 @@
           + '</div>'
         + '</div>';
 
+      _userCache[String(u.id)] = Object.assign({}, _userCache[String(u.id)] || {}, {
+        id: u.id,
+        role: u.role,
+        public_id: u.public_id,
+        full_name: u.full_name,
+        company: u.company,
+        avatar_url: u.avatar_url,
+        location: u.location,
+        industry: u.industry,
+        current_job: u.current_job,
+        job_title: u.job_title,
+      });
+
       show('publicProfile');
       if(canConnect) loadPublicConnectionPanel(u.id);
       if(canEmployerRequest) loadEmployerAccessPanel(u.id);
