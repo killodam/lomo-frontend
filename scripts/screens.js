@@ -31,10 +31,10 @@ const screens = {
 const logoWrap = document.getElementById('logoWrap');
 const mainLogoImg = document.querySelector('#screenLogo .logo');
 const authLogoImg = document.getElementById('authLogoImg');
-const BRAND_LOGO_SRC = './icons/lomo-wordmark.png';
 
-if (mainLogoImg) mainLogoImg.src = BRAND_LOGO_SRC;
-if (authLogoImg) authLogoImg.src = BRAND_LOGO_SRC;
+if (authLogoImg && mainLogoImg && !authLogoImg.getAttribute('src')) {
+  authLogoImg.src = mainLogoImg.src;
+}
 
 function clearScreenInputs(key) {
   if (!screens[key]) return;
