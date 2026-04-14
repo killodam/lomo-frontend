@@ -55,12 +55,7 @@
     <!-- Nav -->
     <nav class="ldNav">
       <div class="ldNavLogo">
-        <svg width="28" height="32" viewBox="0 0 50 56" fill="none" aria-hidden="true">
-          <path d="M5 54 Q5 4 25 4 Q45 4 45 54" stroke="#0e0f0f" stroke-width="5.5" stroke-linecap="round" fill="none"/>
-          <path d="M12 54 Q12 12 25 12 Q38 12 38 54" stroke="#0e0f0f" stroke-width="5.5" stroke-linecap="round" fill="none"/>
-          <path d="M19 54 Q19 20 25 20 Q31 20 31 54" stroke="#0e0f0f" stroke-width="5.5" stroke-linecap="round" fill="none"/>
-          <path d="M24 54 Q24 28 25 28 Q26 28 26 54" stroke="#0e0f0f" stroke-width="5.5" stroke-linecap="round" fill="none"/>
-        </svg>
+        <img id="ldNavLogoImg" class="ldNavLogoImg" alt="LOMO" width="28" height="28">
         <span class="ldNavWord">LOMO</span>
       </div>
       <div class="ldNavActions">
@@ -73,12 +68,11 @@
     <!-- Hero -->
     <div class="ldHero">
       <div>
-        <div class="ldPill"><span class="ldPillDot"></span>Верификация карьерных данных · СНГ</div>
+        <div class="ldPill"><span class="ldPillDot"></span>Верификация карьерных данных</div>
         <h1 class="ldH1">Ваш профиль.<br><span>Подтверждённый.</span></h1>
         <p class="ldSub">Загрузите документы один раз — работодатели сами найдут вас. Образование и опыт, подкреплённые реальными доказательствами.</p>
         <div class="ldBtns">
           <button id="landingRegBtn2" class="ldBtnPrimary">Зарегистрироваться</button>
-          <button id="landingLoginBtn2" class="ldBtnOutline">Войти в аккаунт</button>
         </div>
       </div>
 
@@ -236,7 +230,7 @@
 <!-- 3) ROLE -->
 <section aria-label="Employer/Employee" class="screen" id="screenRoleReg">
 <div class="wrap">
-<button aria-label="Back" class="backBtn" data-back="toAuth">← Назад</button>
+<button aria-label="Back" class="backBtn" data-back="toLanding">← Назад</button>
 <div class="centerBlock">
 <div class="regProgress" id="regProgressRole">
   <span class="regStep active">1</span>
@@ -323,7 +317,7 @@
 <!-- 4B) LOGIN FORM -->
 <section aria-label="Log in form" class="screen" id="screenLoginForm">
 <div class="wrap">
-<button aria-label="Back" class="backBtn" data-back="toAuth">← Назад</button>
+<button aria-label="Back" class="backBtn" data-back="toLanding">← Назад</button>
 <div class="centerBlock">
 <div class="formCol">
 <div>

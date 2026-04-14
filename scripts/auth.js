@@ -733,6 +733,7 @@ function deleteOwnAccount(password) {
       if(back){
         const where = back.dataset.back;
         if(where === 'toLogo'){ clearAuthInputs(); show('logo'); setTimeout(resetLogo, 10); return; }
+        if(where === 'toLanding'){ clearAuthInputs(); show('landing'); return; }
         if(where === 'toAuth'){ clearAuthInputs(); show('auth'); return; }
         if(where === 'toRoleReg'){ show('roleReg'); return; }
         if(where === 'toLoginForm'){ show('loginForm'); return; }

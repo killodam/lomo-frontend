@@ -37,6 +37,11 @@ if (authLogoImg && mainLogoImg && !authLogoImg.getAttribute('src')) {
   authLogoImg.src = mainLogoImg.src;
 }
 
+const ldNavLogoImg = document.getElementById('ldNavLogoImg');
+if (ldNavLogoImg && mainLogoImg) {
+  ldNavLogoImg.src = mainLogoImg.src;
+}
+
 function clearScreenInputs(key) {
   if (!screens[key]) return;
   screens[key].querySelectorAll('input, textarea').forEach((element) => {

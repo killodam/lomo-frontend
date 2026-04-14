@@ -162,7 +162,7 @@ function bindStaticUiActions() {
 
   // Landing page buttons
   bindUiAction('landingLoginBtn', 'click', function () { show('loginForm'); });
-  bindUiAction('landingLoginBtn2', 'click', function () { show('loginForm'); });
+  bindUiAction('landingLoginBtn2', 'click', function () { show('loginForm'); }); // kept for safety
   bindUiAction('landingRegBtn', 'click', function () { show('roleReg'); });
   bindUiAction('landingRegBtn2', 'click', function () { show('roleReg'); });
   bindUiAction('landingRegCandidate', 'click', function () { state.roleReg = 'EMPLOYEE'; show('regForm'); });
