@@ -282,125 +282,428 @@
     #screenAuth .wrap{
       padding: 28px 18px 84px;
       overflow-y: auto;
-      justify-content: center;
+      justify-content: flex-start;
+    }
+    #screenAuth{
+      background: #f8f8f6;
+    }
+    .authLandingWrap{
+      align-items: stretch !important;
+    }
+    .authLandingShell{
+      width: min(1040px, 100%);
+      margin: 0 auto;
+      display:flex;
+      flex-direction:column;
+      gap: 40px;
+    }
+    .authLandingNav{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 16px;
+      width: 100%;
+      padding: 6px 0 0;
+    }
+    .authLandingBrand{
+      display:flex;
+      align-items:center;
+      flex-shrink: 0;
+    }
+    .authNavLogo{
+      display:block;
+      width: min(168px, 38vw);
+      height: auto;
+      object-fit: contain;
+      user-select:none;
+      -webkit-user-drag:none;
+    }
+    .authLandingNavRight{
+      display:flex;
+      align-items:center;
+      justify-content:flex-end;
+      gap: 10px;
+      flex: 1 1 auto;
+      min-width: 0;
     }
     .authTopRight{
-      order: 2;
-      position: static;
       display:flex;
-      flex-wrap: wrap;
-      justify-content:center;
-      gap: 12px;
-      width: min(460px, 92vw);
-      margin: 8px auto 0;
+      align-items:center;
+      justify-content:flex-end;
+      gap: 10px;
+      margin: 0;
       z-index: 3;
+      flex-wrap: wrap;
     }
-    .authPill{
-      flex: 1 1 190px;
-      min-height: 58px;
-      max-width: 224px;
-      padding: 14px 18px;
-      box-shadow: 0 10px 22px rgba(0,0,0,.06);
-      background: rgba(255,255,255,.88);
-      border: 1px solid rgba(0,0,0,.14);
+    .authNavAction{
+      width: auto;
+      height: auto;
+      min-height: 0;
+      padding: 9px 22px;
+      border-radius: 999px;
+      box-shadow: none;
+      background: transparent;
+      border: 1.5px solid rgba(0,0,0,.13);
+      flex: 0 0 auto;
     }
-    .authPill .sqText{
+    .authNavAction .sqText{
       font-size: 14px;
-      letter-spacing: .04em;
-      font-weight: 700;
-      color: rgba(0,0,0,.78);
+      letter-spacing: -.01em;
+      font-weight: 600;
+      color: #0e0f0f;
+      text-transform: none;
+    }
+    .authNavActionGhost{
+      background: transparent;
+    }
+    .authNavActionDark{
+      background: #0e0f0f;
+      border-color: #0e0f0f;
+      box-shadow: 0 8px 24px rgba(14,15,15,.12);
+    }
+    .authNavActionDark .sqText{
+      color: #ffffff;
+    }
+    .authBurgerInline{
+      position: static !important;
+      inset: auto !important;
+      width: 44px;
+      height: 44px;
+      border-radius: 999px;
+      padding: 0;
+      background: rgba(255,255,255,.82);
+      border: 1.5px solid rgba(0,0,0,.12);
+      box-shadow: none;
+      flex-shrink: 0;
+    }
+    .authLandingHero{
+      display:grid;
+      grid-template-columns: minmax(0, 1fr) minmax(320px, 460px);
+      align-items:center;
+      gap: 56px;
+      width: 100%;
     }
     .authHero{
-      order: 1;
       display:flex;
       flex-direction: column;
-      align-items:center;
+      align-items:flex-start;
       justify-content:center;
-      gap: 20px;
-      padding: 0 22px;
-      text-align:center;
+      gap: 22px;
+      padding: 0;
+      text-align:left;
     }
     .authEyebrow{
       display:inline-flex;
       align-items:center;
-      justify-content:center;
-      padding: 6px 14px;
+      justify-content:flex-start;
+      gap: 7px;
+      padding: 5px 13px;
       border-radius: 999px;
-      border: 1px solid rgba(38,110,120,.20);
-      background: rgba(38,110,120,.08);
-      color: rgba(26,92,104,.92);
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: .08em;
-      text-transform: uppercase;
+      border: 1px solid rgba(38,110,120,.26);
+      background: rgba(38,110,120,.13);
+      color: #1a5c68;
+      font-size: 12.5px;
+      font-weight: 600;
+      letter-spacing: .03em;
     }
-    .authLogo{
-      width: min(340px, 64vw);
-      height: min(286px, 54vw);
-      object-fit: cover;
-      object-position:center 56%;
-      user-select:none;
-      -webkit-user-drag:none;
-      filter: none;
-      border-radius: 0;
+    .authEyebrowDot{
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #26707a;
+    }
+    .authHeadline{
+      margin: 0;
+      font-size: clamp(42px, 6vw, 50px);
+      font-weight: 750;
+      line-height: 1.06;
+      letter-spacing: -2px;
+      color: #0e0f0f;
+    }
+    .authHeadline span{
+      color: #1a5c68;
     }
     .authTagline{
-      max-width: min(480px, 88vw);
-      font-size: 22px;
-      line-height: 1.15;
-      color: rgba(14,15,15,.92);
-      font-weight: 780;
-      letter-spacing: -.04em;
-    }
-    .authBenefits{
-      max-width: min(460px, 88vw);
-      display:flex;
-      flex-direction:column;
-      gap: 8px;
-      text-align:left;
-    }
-    .authBenefit{
-      font-size: 14px;
-      line-height: 1.4;
-      color: rgba(0,0,0,.62);
+      max-width: 380px;
+      font-size: 16.5px;
+      line-height: 1.65;
+      color: #616161;
       font-weight: 400;
+      letter-spacing: normal;
+    }
+    .authHeroChoices{
       display:flex;
-      gap: 8px;
-      align-items:flex-start;
+      gap: 11px;
+      flex-wrap: wrap;
+      width: 100%;
     }
-    .authBenefit span:first-child{
-      color: rgba(34,197,94,.9);
-      font-weight: 700;
-      flex-shrink:0;
+    .authHeroBtn{
+      padding: 14px 30px;
+      border-radius: 999px;
+      border: 1.5px solid rgba(0,0,0,.13);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Arial, sans-serif;
+      font-size: 15px;
+      font-weight: 650;
+      letter-spacing: .01em;
+      cursor:pointer;
+      transition: all .25s ease;
     }
-    #authLoggedIn{
-      order: 3;
-      margin: 16px auto 0 !important;
-      justify-content: center;
+    .authHeroBtn:hover{
+      transform: translateY(-1px);
+    }
+    .authHeroBtnPrimary{
+      border-color: #0e0f0f;
+      background: #0e0f0f;
+      color: #ffffff;
+      box-shadow: 0 14px 32px rgba(14,15,15,.12);
+    }
+    .authHeroBtnPrimary:hover{
+      background: #1a5c68;
+      border-color: #1a5c68;
+    }
+    .authHeroBtnGhost{
+      background: transparent;
+      color: #0e0f0f;
+    }
+    .authHeroBtnGhost:hover{
+      border-color: rgba(38,110,120,.26);
+      color: #1a5c68;
+      background: rgba(38,110,120,.07);
+    }
+    .authLoggedIn{
+      display:none;
+      margin: 6px 0 0;
+      justify-content: flex-start;
       align-items: center;
       flex-wrap: wrap;
-      text-align: center;
-      width: min(460px, 92vw);
-      white-space: normal !important;
+      gap: 10px;
+      width: 100%;
+      max-width: 520px;
+      padding: 10px 18px;
+      border-radius: 16px;
+      border: 1.5px solid rgba(38,110,120,.20);
+      background: rgba(38,110,120,.07);
+    }
+    .authLoggedInText{
+      font-size: 13px;
+      color: #2a7a8a;
+      font-weight: 600;
+    }
+    .authSearchBtn{
+      width: auto;
+      height: auto;
+      min-height: 0;
+      padding: 7px 14px;
+      border-radius: 999px;
+      background: #0e0f0f;
+      border: 1px solid #0e0f0f;
+      box-shadow: none;
+    }
+    .authSearchBtn .sqText{
+      font-size: 12px;
+      color: #ffffff;
+      letter-spacing: .01em;
+      text-transform: none;
+    }
+    .authInlineLink{
+      font-size: 11px;
+      color: #666666;
+      background:none;
+      border:none;
+      cursor:pointer;
+      text-decoration:underline;
+      padding:0;
+    }
+    .authInlineLink:last-child{
+      color: #888888;
+    }
+    .authPreview{
+      display:flex;
+      flex-direction:column;
+      gap: 14px;
+    }
+    .authPreviewCardMain{
+      background: #ffffff;
+      border-radius: 30px;
+      border: 1px solid rgba(0,0,0,.075);
+      padding: 24px;
+      transition: transform .3s ease, box-shadow .3s ease;
+    }
+    .authPreviewCardMain:hover{
+      transform: translateY(-3px);
+      box-shadow: 0 16px 48px rgba(38,110,120,.10);
+    }
+    .authPreviewTop{
+      display:flex;
+      align-items:flex-start;
+      gap: 15px;
+      margin-bottom: 18px;
+    }
+    .authPreviewAvatar{
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 17px;
+      font-weight: 650;
+      background: rgba(38,110,120,.13);
+      color: #1a5c68;
+      border: 2px solid rgba(38,110,120,.26);
+    }
+    .authPreviewName{
+      font-size: 17px;
+      font-weight: 650;
+      letter-spacing: -.2px;
+      margin-bottom: 6px;
+      color: #0e0f0f;
+    }
+    .authPreviewBadge{
+      display:inline-flex;
+      align-items:center;
+      gap: 4px;
+      background: rgba(38,110,120,.13);
+      color: #1a5c68;
+      font-size: 11.5px;
+      font-weight: 650;
+      padding: 3px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(38,110,120,.26);
+    }
+    .authPreviewDetails{
+      display:flex;
+      flex-direction:column;
+      gap: 6px;
+      margin-bottom: 18px;
+      font-size: 13.5px;
+      color: #616161;
+    }
+    .authPreviewDetail{
+      display:flex;
+      align-items:center;
+      gap: 9px;
+    }
+    .authPreviewIcon{
+      font-size: 14px;
+      width: 18px;
+      text-align:center;
+      flex-shrink: 0;
+    }
+    .authPreviewChips{
+      display:flex;
+      gap: 7px;
+      flex-wrap: wrap;
+    }
+    .authPreviewChip{
+      padding: 5px 13px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+    .authPreviewChipOk{
+      background: rgba(38,110,120,.07);
+      color: #1a5c68;
+      border: 1px solid rgba(38,110,120,.26);
+    }
+    .authPreviewRow{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .authPreviewMiniCard{
+      background: #ffffff;
+      border-radius: 20px;
+      border: 1px solid rgba(0,0,0,.075);
+      padding: 14px 16px;
+      display:flex;
+      align-items:center;
+      gap: 11px;
+    }
+    .authPreviewMiniAvatar{
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 12px;
+      font-weight: 650;
+      background: rgba(0,0,0,.05);
+      color: #616161;
+    }
+    .authPreviewMiniName{
+      font-size: 13.5px;
+      font-weight: 600;
+      margin-bottom: 2px;
+      color: #0e0f0f;
+    }
+    .authPreviewMiniSub{
+      font-size: 11.5px;
+      color: #a0a0a0;
+    }
+
+    @media (max-width: 920px){
+      .authLandingHero{
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+      .authPreview{
+        width: min(100%, 520px);
+      }
+    }
+
+    @media (max-width: 760px){
+      #screenAuth .wrap{
+        padding-top: 18px;
+      }
+      .authLandingShell{
+        gap: 28px;
+      }
+      .authLandingNav{
+        gap: 12px;
+      }
+      .authNavLogo{
+        width: min(138px, 44vw);
+      }
+      .authTopRight{
+        gap: 8px;
+      }
+      .authHeadline{
+        font-size: clamp(34px, 12vw, 42px);
+        letter-spacing: -1.5px;
+      }
+      .authTagline{
+        font-size: 15px;
+        max-width: 100%;
+      }
+      .authHeroChoices{
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .authHeroBtn{
+        width: 100%;
+      }
+      .authPreview{
+        display:none;
+      }
     }
 
     @media (max-width: 520px){
-      #screenAuth .wrap{ padding-top: 22px; }
-      .authTopRight{ gap: 10px; width: min(92vw, 420px); }
-      .authPill{
-        flex-basis: 100%;
-        max-width: none;
-        min-height: 54px;
-        padding: 12px 16px;
+      .authLandingNav{
+        align-items:flex-start;
       }
-      .authPill .sqText{ font-size: 13px; }
-      .authEyebrow{ font-size: 11px; }
-      .authLogo{
-        width:min(260px, 66vw);
-        height:min(218px, 55vw);
+      .authLandingNavRight{
+        flex: 0 0 auto;
       }
-      .authTagline{ font-size: 17px; }
-      .authBenefit{ font-size: 13px; }
+      .authEyebrow{
+        font-size: 11px;
+      }
+      .authLoggedIn{
+        align-items:flex-start;
+      }
     }
 
     .choiceRow{
@@ -1548,10 +1851,10 @@
     .sqBtn.selected{ background:rgba(124,58,237,.12) !important; border-color:rgba(38,110,120,.32) !important; box-shadow:0 8px 20px rgba(124,58,237,.12) !important; }
     .sqText{ color:#1e1b4b !important; }
     .sqSubtext{ color:#1f6978 !important; opacity:1 !important; }
-    .authPill{ background:rgba(255,255,255,.85) !important; border-color:rgba(38,110,120,.18) !important; box-shadow:0 8px 24px rgba(38,110,120,.08) !important; }
-    .authPill .sqText{ color:#134050 !important; }
+    .authNavActionGhost{ background:rgba(255,255,255,.85) !important; border-color:rgba(38,110,120,.18) !important; box-shadow:0 8px 24px rgba(38,110,120,.08) !important; }
+    .authNavActionGhost .sqText{ color:#134050 !important; }
+    .authNavActionDark{ box-shadow:0 12px 28px rgba(14,15,15,.14) !important; }
     .authTagline{ color:#0e0f0f !important; }
-    .authBenefit span:first-child{ color:#2a7a8a !important; }
     .backBtn,.backBtnInline{ border-color:rgba(38,110,120,.18) !important; background:rgba(235,248,250,.85) !important; color:#1a5c68 !important; }
     .profileCard.premium{ background:rgba(255,255,255,.82) !important; border:1px solid rgba(38,110,120,.13) !important; box-shadow:0 20px 60px rgba(38,110,120,.08) !important; backdrop-filter:blur(12px) !important; }
     .profileCard.premium::before{ content:''; display:block; height:3px; border-radius:999px; background:linear-gradient(90deg,#3a9aaa,#3a8a9a); margin-bottom:18px; }
@@ -1946,7 +2249,7 @@
       }
 
       #screenAuth .wrap {
-        padding-top: calc(72px + env(safe-area-inset-top, 0px));
+        padding-top: calc(20px + env(safe-area-inset-top, 0px));
       }
 
       #screenRoleReg .wrap,
@@ -1981,9 +2284,13 @@
         gap: 16px;
       }
 
+      #screenAuth .authLandingShell,
+      #screenAuth .authLandingHero,
+      #screenAuth .authHero,
+      #screenAuth .authPreview,
       #screenAuth .authTopRight,
+      #screenAuth .authHeroChoices,
       #authLoggedIn,
-      #screenAuth .authBenefits,
       #screenForgot .formCol,
       #screenLoginForm .formCol,
       #screenResetPassword .formCol {
@@ -1992,15 +2299,14 @@
         margin-right: auto;
       }
 
-      #screenAuth .authLogo {
-        width: min(240px, 60vw);
-        height: min(198px, 52vw);
-      }
-
       .choiceRow {
         flex-direction: column;
         gap: 12px;
         width: min(100%, 420px);
+      }
+
+      .authSearchBtn {
+        width: auto;
       }
 
       #roleChoices .sqBtn {
@@ -2325,7 +2631,7 @@
         font-size: 14px;
       }
 
-      .authBenefit,
+      .authHeroBtn,
       .authFlowSub {
         font-size: 13px;
       }
