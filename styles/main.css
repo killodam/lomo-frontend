@@ -213,6 +213,7 @@
     #screenMyEmployerProfile.screen,
     #screenMyEmployeeProfile.screen,
     #screenAdminQueue.screen,
+    #screenChat.screen,
     #screenPublicProfile.screen{
       align-items:flex-start;
       justify-content:flex-start;
@@ -1192,7 +1193,8 @@
     }
     #screenCandidateFeed .wrap,
     #screenEmployerSearch .wrap,
-    #screenAdminQueue .wrap {
+    #screenAdminQueue .wrap,
+    #screenChat .wrap {
       flex-direction: column;
       align-items: stretch;
       justify-content: flex-start;
@@ -1221,6 +1223,13 @@
       padding: 20px 16px 60px;
       width: 100%;
       max-width: 720px;
+      margin: 0 auto;
+      box-sizing: border-box;
+    }
+    #screenChat .centerBlock{
+      padding: 20px 16px 60px;
+      width: 100%;
+      max-width: 1040px;
       margin: 0 auto;
       box-sizing: border-box;
     }
@@ -1888,6 +1897,7 @@
       #screenCandidateFeed,
       #screenEmployerSearch,
       #screenAdminQueue,
+      #screenChat,
       #screenPublicProfile,
       #screenRecruiterPublic,
       #screenEmployeePublic,
@@ -1899,6 +1909,7 @@
       #screenCandidateFeed .wrap,
       #screenEmployerSearch .wrap,
       #screenAdminQueue .wrap,
+      #screenChat .wrap,
       #screenPublicProfile .wrap,
       #screenRecruiterPublic .wrap,
       #screenEmployeePublic .wrap,
