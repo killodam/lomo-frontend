@@ -58,87 +58,38 @@
 
 <!-- 2) AUTH CHOICE -->
 <section aria-label="Registration/Log in" class="screen" id="screenAuth">
-  <div class="wrap authLandingWrap">
-    <div class="authLandingShell">
-      <div class="authLandingNav">
-        <div class="authLandingBrand">
-          <img alt="LOMO" class="authNavLogo" decoding="async" src="./icons/lomo-wordmark.png"/>
-        </div>
-        <div class="authLandingNavRight">
-          <div class="authTopRight" id="authChoices">
-            <button type="button" class="sqBtn sm authNavAction authNavActionGhost" data-pick="auth" data-value="LOGIN" title="Вход">
-              <div class="sqText">Войти</div>
-            </button>
-            <button type="button" class="sqBtn sm authNavAction authNavActionDark" data-pick="auth" data-value="REGISTRATION" title="Регистрация">
-              <div class="sqText">Регистрация</div>
-            </button>
-          </div>
-          <button aria-label="Меню" class="burgerBtn authBurgerInline" id="authBurger"><span></span><span></span><span></span></button>
-        </div>
+  <div class="wrap">
+    <button aria-label="Menu" class="burgerBtn" id="authBurger"><span></span><span></span><span></span></button>
+
+    <div class="authTopRight" id="authChoices">
+      <div class="sqBtn sm authPill" data-pick="auth" data-value="REGISTRATION" title="Регистрация">
+        <div class="sqText">РЕГИСТРАЦИЯ</div>
       </div>
-
-      <div class="authLandingHero">
-        <div class="authHero">
-          <div class="authEyebrow">
-            <span class="authEyebrowDot"></span>
-            <span>Верификация карьерных данных</span>
-          </div>
-          <h1 class="authHeadline">Ваш профиль.<br/><span>Подтверждённый.</span></h1>
-          <div class="authTagline">Загрузите документы один раз — работодатели сами найдут вас. Образование и опыт, подкреплённые реальными доказательствами.</div>
-          <div class="authHeroChoices" id="authHeroChoices">
-            <button type="button" class="authHeroBtn authHeroBtnPrimary" data-pick="auth" data-value="REGISTRATION">Зарегистрироваться</button>
-            <button type="button" class="authHeroBtn authHeroBtnGhost" data-pick="auth" data-value="LOGIN">Войти в аккаунт</button>
-          </div>
-          <div id="authLoggedIn" class="authLoggedIn">
-            <span class="authLoggedInText">Вы уже в системе</span>
-            <button type="button" class="sqBtn sm authSearchBtn" id="authSearchBtn">
-              <div class="sqText">Продолжить</div>
-            </button>
-            <button type="button" id="authLogoutAllBtn" class="authInlineLink">Выйти везде</button>
-            <button type="button" id="authLogoutBtn" class="authInlineLink">Выйти</button>
-          </div>
-        </div>
-
-        <div class="authPreview" aria-hidden="true">
-          <div class="authPreviewCard authPreviewCardMain">
-            <div class="authPreviewTop">
-              <div class="authPreviewAvatar">АВ</div>
-              <div class="authPreviewTopText">
-                <div class="authPreviewName">Алексей Волков</div>
-                <span class="authPreviewBadge">✓ LOMO 3</span>
-              </div>
-            </div>
-            <div class="authPreviewDetails">
-              <div class="authPreviewDetail"><span class="authPreviewIcon">🎓</span><span>МГУ им. Ломоносова · 2021</span></div>
-              <div class="authPreviewDetail"><span class="authPreviewIcon">📍</span><span>Москва</span></div>
-              <div class="authPreviewDetail"><span class="authPreviewIcon">💼</span><span>Яндекс · Product Manager</span></div>
-            </div>
-            <div class="authPreviewChips">
-              <span class="authPreviewChip authPreviewChipOk">✓ Образование</span>
-              <span class="authPreviewChip authPreviewChipOk">✓ Опыт работы</span>
-              <span class="authPreviewChip authPreviewChipOk">✓ CV</span>
-            </div>
-          </div>
-
-          <div class="authPreviewRow">
-            <div class="authPreviewMiniCard">
-              <div class="authPreviewMiniAvatar">МТ</div>
-              <div>
-                <div class="authPreviewMiniName">Марина Тихова</div>
-                <div class="authPreviewMiniSub">✓ LOMO 2 · ВШЭ</div>
-              </div>
-            </div>
-            <div class="authPreviewMiniCard">
-              <div class="authPreviewMiniAvatar">ДП</div>
-              <div>
-                <div class="authPreviewMiniName">Данила Петров</div>
-                <div class="authPreviewMiniSub">✓ LOMO 1 · Уфа</div>
-              </div>
-            </div>
-          </div>
-        </div>
+      <div class="sqBtn sm authPill" data-pick="auth" data-value="LOGIN" title="Вход">
+        <div class="sqText">ВХОД</div>
       </div>
     </div>
+    <!-- Shown when logged in — appears below hero -->
+    <div id="authLoggedIn" style="display:none;margin:12px auto 0;justify-content:center;background:rgba(38,110,120,.07);border:1.5px solid rgba(38,110,120,.2);border-radius:16px;padding:10px 18px;align-items:center;gap:10px;white-space:nowrap;">
+      <span style="font-size:13px;color:#2a7a8a;font-weight:600;">Вы уже в системе</span>
+      <button type="button" class="sqBtn sm" id="authSearchBtn" style="font-size:12px;padding:5px 12px;">
+        <div class="sqText">🔍 Продолжить</div>
+      </button>
+      <button type="button" id="authLogoutAllBtn" style="font-size:11px;color:#666;background:none;border:none;cursor:pointer;text-decoration:underline;">Выйти везде</button>
+      <button type="button" id="authLogoutBtn" style="font-size:11px;color:#888;background:none;border:none;cursor:pointer;text-decoration:underline;">Выйти</button>
+    </div>
+
+    <div class="authHero">
+      <div class="authEyebrow">Верификация карьерных данных</div>
+      <img alt="LOMO" class="authLogo" id="authLogoImg" decoding="async" src="./icons/lomo-wordmark.png"/>
+      <div class="authTagline">Карьерные данные, которым доверяют</div>
+      <div class="authBenefits">
+        <div class="authBenefit"><span>✓</span><span>Образование и опыт — подтверждены документами</span></div>
+        <div class="authBenefit"><span>✓</span><span>Работодатели видят факты, а не слова</span></div>
+        <div class="authBenefit"><span>✓</span><span>Один профиль — для всех откликов и переговоров</span></div>
+      </div>
+    </div>
+
   </div>
 </section>
 

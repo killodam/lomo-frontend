@@ -72,22 +72,19 @@ function show(key) {
 function updateAuthButtons() {
   var loggedIn = !!getToken();
   var choices = document.getElementById('authChoices');
-  var heroChoices = document.getElementById('authHeroChoices');
   var loggedDiv = document.getElementById('authLoggedIn');
-  if (choices) choices.style.display = loggedIn ? 'none' : '';
-  if (heroChoices) heroChoices.style.display = loggedIn ? 'none' : '';
+  if (choices) choices.style.display = '';
   if (loggedDiv) {
     loggedDiv.style.display = loggedIn ? 'flex' : 'none';
     if (loggedIn) {
       var btn = document.getElementById('authSearchBtn');
       if (btn) {
-        var btnLabel = btn.querySelector('.sqText');
         if (state.roleReg) {
-          if (btnLabel) btnLabel.textContent = state.roleReg === 'EMPLOYER' ? 'Поиск кандидатов' : 'Открыть ленту';
+          btn.querySelector('.sqText').textContent = state.roleReg === 'EMPLOYER' ? 'Поиск кандидатов' : 'Открыть ленту';
         } else {
           tryAutoLogin().then(function (user) {
-            if (user && btnLabel) {
-              btnLabel.textContent = state.roleReg === 'EMPLOYER' ? 'Поиск кандидатов' : 'Открыть ленту';
+            if (user && btn) {
+              btn.querySelector('.sqText').textContent = state.roleReg === 'EMPLOYER' ? 'Поиск кандидатов' : 'Открыть ленту';
             }
           }).catch(function () {});
         }
