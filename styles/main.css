@@ -2359,14 +2359,14 @@ body { padding-bottom: 0; }
 }
 
 .chatCenterBlock{
-  max-width: 1040px;
-  padding-top: 20px;
+  max-width: 980px;
+  padding-top: 10px;
 }
 
 .chatShell{
   display: grid;
-  grid-template-columns: 320px minmax(0, 1fr);
-  gap: 16px;
+  grid-template-columns: 292px minmax(0, 1fr);
+  gap: 12px;
   align-items: stretch;
 }
 
@@ -2374,13 +2374,13 @@ body { padding-bottom: 0; }
 .chatThread{
   background: #fff;
   border: 1px solid #e8edf2;
-  border-radius: 22px;
-  box-shadow: 0 6px 30px rgba(18, 28, 45, 0.06);
-  min-height: 560px;
+  border-radius: 20px;
+  box-shadow: 0 6px 24px rgba(18, 28, 45, 0.05);
+  min-height: 500px;
 }
 
 .chatSidebar{
-  padding: 18px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
 }
@@ -2390,26 +2390,26 @@ body { padding-bottom: 0; }
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  margin-bottom: 14px;
+  margin-bottom: 12px;
 }
 
 .chatSidebarActions{
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex: 0 0 auto;
 }
 
 .chatSidebarTitle{
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 800;
   color: #1a1a1a;
   letter-spacing: -0.3px;
 }
 
 .chatSidebarMeta{
-  margin-top: 4px;
-  font-size: 12px;
+  margin-top: 3px;
+  font-size: 11px;
   color: #6b7280;
   line-height: 1.45;
 }
@@ -2418,12 +2418,12 @@ body { padding-bottom: 0; }
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 6px 10px;
+  padding: 5px 9px;
   border-radius: 999px;
   background: #eef8fa;
   border: 1px solid rgba(42,122,138,.18);
   color: #1f6a75;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
   letter-spacing: .2px;
 }
@@ -2431,9 +2431,9 @@ body { padding-bottom: 0; }
 .chatConversationList{
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  min-height: 220px;
-  margin-bottom: 8px;
+  gap: 8px;
+  min-height: 180px;
+  margin-bottom: 6px;
 }
 
 .chatConversationEmpty{
@@ -2450,11 +2450,11 @@ body { padding-bottom: 0; }
   width: 100%;
   border: 1px solid #e8edf2;
   background: #fcfdff;
-  border-radius: 18px;
+  border-radius: 16px;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 14px;
+  gap: 10px;
+  padding: 11px 12px;
   cursor: pointer;
   text-align: left;
   transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease, background .18s ease;
@@ -2472,9 +2472,9 @@ body { padding-bottom: 0; }
 }
 
 .chatConversationAvatar{
-  width: 46px;
-  height: 46px;
-  border-radius: 14px;
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
   background: linear-gradient(135deg, #266e78, #89bcc6);
   color: #fff;
   display: flex;
@@ -2507,7 +2507,7 @@ body { padding-bottom: 0; }
 
 .chatConversationName{
   min-width: 0;
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 800;
   color: #1a1a1a;
   white-space: nowrap;
@@ -2517,13 +2517,13 @@ body { padding-bottom: 0; }
 
 .chatConversationTime{
   flex: 0 0 auto;
-  font-size: 11px;
+  font-size: 10px;
   color: #8b95a7;
 }
 
 .chatConversationMeta{
-  margin-top: 3px;
-  font-size: 12px;
+  margin-top: 2px;
+  font-size: 11px;
   color: #6b7280;
   white-space: nowrap;
   overflow: hidden;
@@ -2531,8 +2531,8 @@ body { padding-bottom: 0; }
 }
 
 .chatConversationPreview{
-  margin-top: 6px;
-  font-size: 13px;
+  margin-top: 5px;
+  font-size: 12px;
   color: #374151;
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -2543,18 +2543,18 @@ body { padding-bottom: 0; }
 
 .chatUnreadBadge{
   flex: 0 0 auto;
-  min-width: 24px;
-  padding: 4px 7px;
+  min-width: 22px;
+  padding: 3px 7px;
   border-radius: 999px;
   background: #266e78;
   color: #fff;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
   text-align: center;
 }
 
 .chatThread{
-  padding: 18px;
+  padding: 16px;
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -2565,7 +2565,7 @@ body { padding-bottom: 0; }
   align-items: flex-start;
   justify-content: space-between;
   gap: 12px;
-  padding-bottom: 14px;
+  padding-bottom: 12px;
   border-bottom: 1px solid #eef2f7;
 }
 
@@ -2579,15 +2579,15 @@ body { padding-bottom: 0; }
 }
 
 .chatThreadTitle{
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 800;
   color: #1a1a1a;
   letter-spacing: -0.3px;
 }
 
 .chatThreadMeta{
-  margin-top: 4px;
-  font-size: 12px;
+  margin-top: 3px;
+  font-size: 11px;
   color: #6b7280;
   line-height: 1.45;
 }
@@ -2600,7 +2600,7 @@ body { padding-bottom: 0; }
 .chatEmptyState,
 .chatThreadPlaceholder{
   margin: auto 0;
-  padding: 28px;
+  padding: 24px;
   border-radius: 18px;
   background: #fafbfd;
   border: 1px dashed #d5dce5;
@@ -2623,11 +2623,11 @@ body { padding-bottom: 0; }
 .chatMessageList{
   flex: 1;
   overflow: auto;
-  padding: 16px 2px 6px;
+  padding: 14px 2px 4px;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  min-height: 300px;
+  gap: 8px;
+  min-height: 260px;
 }
 
 .chatBubbleRow{
@@ -2640,8 +2640,8 @@ body { padding-bottom: 0; }
 
 .chatBubble{
   max-width: min(78%, 540px);
-  padding: 12px 14px;
-  border-radius: 18px;
+  padding: 10px 12px;
+  border-radius: 16px;
   background: #f5f7fb;
   border: 1px solid #e6ebf2;
   box-shadow: 0 4px 18px rgba(23, 35, 58, 0.04);
@@ -2654,22 +2654,36 @@ body { padding-bottom: 0; }
 
 .chatBubbleText{
   color: #1f2937;
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.55;
   white-space: pre-wrap;
   word-break: break-word;
 }
 
 .chatBubbleMeta{
-  margin-top: 8px;
-  font-size: 11px;
+  margin-top: 6px;
+  font-size: 10px;
   color: #8b95a7;
   text-align: right;
 }
 
+.chatNewMessagesBtn{
+  align-self: center;
+  margin: 6px 0 0;
+  border: 1px solid rgba(38,110,120,.18);
+  background: rgba(235,248,250,.92);
+  color: #1a5c68;
+  border-radius: 999px;
+  padding: 8px 14px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 10px 24px rgba(38,110,120,.08);
+}
+
 .chatComposer{
-  margin-top: 12px;
-  padding-top: 14px;
+  margin-top: 10px;
+  padding-top: 12px;
   border-top: 1px solid #eef2f7;
 }
 
@@ -2679,7 +2693,7 @@ body { padding-bottom: 0; }
 
 .chatComposer textarea{
   width: 100%;
-  min-height: 104px;
+  min-height: 92px;
   resize: vertical;
   border: 1.5px solid #d8e2eb;
   border-radius: 18px;
@@ -2698,7 +2712,7 @@ body { padding-bottom: 0; }
 }
 
 .chatComposerFooter{
-  margin-top: 10px;
+  margin-top: 8px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -2710,7 +2724,31 @@ body { padding-bottom: 0; }
 }
 
 .chatSendBtn{
-  min-width: 132px;
+  min-width: 124px;
+}
+
+.chatNavUnreadBadge{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  margin-left: 6px;
+  border-radius: 999px;
+  background: #266e78;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  line-height: 1;
+}
+
+[data-next="toChatHub"]{
+  position: relative;
+}
+
+[data-next="toChatHub"].hasChatUnread{
+  border-color: rgba(38,110,120,.32);
 }
 
 @media (max-width: 900px) {

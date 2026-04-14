@@ -1,10 +1,22 @@
 (function initChatUi() {
-  var POLL_INTERVAL_MS = 4000;
+  var FALLBACK_POLL_INTERVAL_MS = 12000;
+  var SOCKET_RECONNECT_BASE_MS = 1500;
+  var SOCKET_RECONNECT_MAX_MS = 10000;
+  var NEW_MESSAGE_THRESHOLD_PX = 96;
+
   var chatState = {
     previousScreen: 'auth',
     pollingTimer: null,
     pollingInFlight: false,
     conversationPager: { page: 1, pageSize: 20, total: 0, totalPages: 0 },
+    socket: null,
+    socketMode: 'idle',
+    reconnectTimer: null,
+    reconnectAttempts: 0,
+    syncTimer: null,
+    renderedMetaByConversation: {},
+    lastRenderedConversationId: '',
+    newestWhileAwayCount: 0,
   };
 
   var elements = {
@@ -14,6 +26,7 @@
     list: document.getElementById('chatConversationList'),
     empty: document.getElementById('chatEmptyState'),
     messages: document.getElementById('chatMessageList'),
+    newMessagesBtn: document.getElementById('chatNewMessagesBtn'),
     composer: document.getElementById('chatComposer'),
     composerHint: document.getElementById('chatComposerHint'),
     input: document.getElementById('chatMessageInput'),
@@ -26,15 +39,19 @@
     openProfileBtn: document.getElementById('chatOpenProfileBtn'),
   };
 
+  function shouldEnableChat() {
+    return !!getToken() && state.roleReg !== 'ADMIN';
+  }
+
+  function isChatActive() {
+    return !!(screens.chat && screens.chat.classList.contains('active'));
+  }
+
   function rememberReturnScreen() {
     var activeKey = Object.keys(screens || {}).find(function (key) {
       return screens[key] && screens[key].classList.contains('active') && key !== 'chat';
     });
     if (activeKey) chatState.previousScreen = activeKey;
-  }
-
-  function isChatActive() {
-    return !!(screens.chat && screens.chat.classList.contains('active'));
   }
 
   function participantName(conversation) {
@@ -135,6 +152,39 @@
     }) || null;
   }
 
+  function computeUnreadTotal() {
+    return (state.chat.conversations || []).reduce(function (sum, conversation) {
+      return sum + Number(conversation.unread_count || 0);
+    }, 0);
+  }
+
+  function ensureHeaderChatBadge(button) {
+    if (!button) return null;
+    var badge = button.querySelector('.chatNavUnreadBadge');
+    if (badge) return badge;
+    badge = document.createElement('span');
+    badge.className = 'chatNavUnreadBadge hidden';
+    button.appendChild(badge);
+    return badge;
+  }
+
+  function renderHeaderUnreadBadges() {
+    var unreadTotal = computeUnreadTotal();
+    document.querySelectorAll('[data-next="toChatHub"]').forEach(function (button) {
+      var badge = ensureHeaderChatBadge(button);
+      if (!badge) return;
+      if (unreadTotal > 0) {
+        badge.textContent = unreadTotal > 99 ? '99+' : String(unreadTotal);
+        badge.classList.remove('hidden');
+        button.classList.add('hasChatUnread');
+      } else {
+        badge.textContent = '';
+        badge.classList.add('hidden');
+        button.classList.remove('hasChatUnread');
+      }
+    });
+  }
+
   function setThreadVisibility(isVisible) {
     if (!elements.shell) return;
     elements.shell.classList.toggle('chatThreadVisible', !!isVisible);
@@ -142,37 +192,74 @@
 
   function updateAutoBadge(text, tone) {
     if (!elements.autoBadge) return;
+    var palette = {
+      error: { bg: '#fef2f2', color: '#b91c1c', border: 'rgba(185,28,28,.16)' },
+      busy: { bg: '#fff8eb', color: '#b45309', border: 'rgba(180,83,9,.16)' },
+      live: { bg: '#ecfdf5', color: '#047857', border: 'rgba(4,120,87,.18)' },
+      fallback: { bg: '#eff6ff', color: '#1d4ed8', border: 'rgba(29,78,216,.14)' },
+      ok: { bg: '#eef8fa', color: '#1f6a75', border: 'rgba(42,122,138,.18)' },
+    };
+    var style = palette[tone] || palette.ok;
     elements.autoBadge.textContent = text || 'Авто';
-    elements.autoBadge.style.background = tone === 'error'
-      ? '#fef2f2'
-      : tone === 'busy'
-        ? '#fff8eb'
-        : '#eef8fa';
-    elements.autoBadge.style.color = tone === 'error'
-      ? '#b91c1c'
-      : tone === 'busy'
-        ? '#b45309'
-        : '#1f6a75';
-    elements.autoBadge.style.borderColor = tone === 'error'
-      ? 'rgba(185,28,28,.16)'
-      : tone === 'busy'
-        ? 'rgba(180,83,9,.16)'
-        : 'rgba(42,122,138,.18)';
+    elements.autoBadge.style.background = style.bg;
+    elements.autoBadge.style.color = style.color;
+    elements.autoBadge.style.borderColor = style.border;
+  }
+
+  function resetNewMessagesIndicator() {
+    chatState.newestWhileAwayCount = 0;
+    if (elements.newMessagesBtn) {
+      elements.newMessagesBtn.classList.add('hidden');
+      elements.newMessagesBtn.textContent = 'Новые сообщения ↓';
+    }
+  }
+
+  function showNewMessagesIndicator(count) {
+    if (!elements.newMessagesBtn) return;
+    chatState.newestWhileAwayCount = Math.max(chatState.newestWhileAwayCount, Number(count || 1));
+    elements.newMessagesBtn.textContent = chatState.newestWhileAwayCount > 1
+      ? 'Новых сообщений: ' + chatState.newestWhileAwayCount + ' ↓'
+      : 'Новое сообщение ↓';
+    elements.newMessagesBtn.classList.remove('hidden');
+  }
+
+  function scrollMessagesToBottom(behavior) {
+    if (!elements.messages) return;
+    elements.messages.scrollTo({
+      top: elements.messages.scrollHeight,
+      behavior: behavior || 'auto',
+    });
+    resetNewMessagesIndicator();
+  }
+
+  function isNearBottom() {
+    if (!elements.messages) return true;
+    var delta = elements.messages.scrollHeight - elements.messages.scrollTop - elements.messages.clientHeight;
+    return delta <= NEW_MESSAGE_THRESHOLD_PX;
+  }
+
+  function preserveScroll(previousOffsetFromBottom) {
+    if (!elements.messages) return;
+    var nextTop = Math.max(0, elements.messages.scrollHeight - previousOffsetFromBottom);
+    elements.messages.scrollTop = nextTop;
   }
 
   function renderConversationList() {
     if (!elements.list) return;
     var conversations = Array.isArray(state.chat.conversations) ? state.chat.conversations : [];
+    var unreadTotal = computeUnreadTotal();
+
     if (!conversations.length) {
       elements.list.innerHTML = '<div class="chatConversationEmpty">Контакты появятся здесь, как только вы начнёте первый диалог.</div>';
       if (elements.sidebarMeta) {
         elements.sidebarMeta.textContent = 'Пока без диалогов. Напишите контакту из профиля или после одобренного доступа.';
       }
+      renderHeaderUnreadBadges();
       return;
     }
 
     if (elements.sidebarMeta) {
-      elements.sidebarMeta.textContent = 'Всего диалогов: ' + conversations.length;
+      elements.sidebarMeta.textContent = 'Диалогов: ' + conversations.length + (unreadTotal ? ' • новых: ' + unreadTotal : '');
     }
 
     elements.list.innerHTML = conversations.map(function (conversation) {
@@ -199,12 +286,17 @@
         '</button>'
       );
     }).join('');
+
+    renderHeaderUnreadBadges();
   }
 
-  function renderThread() {
+  function renderThread(options) {
+    options = options || {};
     if (!elements.empty || !elements.messages || !elements.composer || !elements.title || !elements.meta || !elements.openProfileBtn) return;
     var activeConversation = findConversation(state.chat.activeConversationId);
     if (!activeConversation) {
+      chatState.lastRenderedConversationId = '';
+      resetNewMessagesIndicator();
       elements.title.textContent = 'Выберите диалог';
       elements.meta.textContent = 'После подключения или одобренного доступа здесь можно продолжить разговор.';
       elements.empty.classList.remove('hidden');
@@ -215,9 +307,14 @@
       return;
     }
 
-    var messages = Array.isArray(state.chat.messagesByConversation[String(activeConversation.id)])
-      ? state.chat.messagesByConversation[String(activeConversation.id)]
+    var conversationId = String(activeConversation.id || '');
+    var messages = Array.isArray(state.chat.messagesByConversation[conversationId])
+      ? state.chat.messagesByConversation[conversationId]
       : [];
+    var conversationChanged = chatState.lastRenderedConversationId !== conversationId;
+    var renderedMeta = chatState.renderedMetaByConversation[conversationId] || { count: 0, lastId: '' };
+    var previousOffsetFromBottom = elements.messages.scrollHeight - elements.messages.scrollTop;
+    var shouldStickToBottom = options.forceScrollBottom || conversationChanged || !renderedMeta.count || isNearBottom();
 
     elements.title.textContent = participantName(activeConversation);
     elements.meta.textContent = participantMeta(activeConversation) || 'Диалог внутри платформы LOMO';
@@ -234,8 +331,11 @@
     }
 
     if (!messages.length) {
+      resetNewMessagesIndicator();
       elements.messages.innerHTML = '<div class="chatThreadPlaceholder">Диалог создан. Напишите первое сообщение.</div>';
       setThreadVisibility(true);
+      chatState.lastRenderedConversationId = conversationId;
+      chatState.renderedMetaByConversation[conversationId] = { count: 0, lastId: '' };
       return;
     }
 
@@ -250,8 +350,22 @@
         '</div>'
       );
     }).join('');
-    elements.messages.scrollTop = elements.messages.scrollHeight;
+
+    if (shouldStickToBottom) {
+      scrollMessagesToBottom(options.smooth ? 'smooth' : 'auto');
+    } else {
+      preserveScroll(previousOffsetFromBottom);
+      var nextCount = messages.length;
+      var delta = Math.max(0, nextCount - renderedMeta.count);
+      if (delta > 0) showNewMessagesIndicator(delta);
+    }
+
     setThreadVisibility(true);
+    chatState.lastRenderedConversationId = conversationId;
+    chatState.renderedMetaByConversation[conversationId] = {
+      count: messages.length,
+      lastId: messages[messages.length - 1] ? String(messages[messages.length - 1].id || '') : '',
+    };
   }
 
   function mergeConversation(conversation) {
@@ -276,10 +390,15 @@
   }
 
   async function loadConversations(options) {
-    if (!getToken() || state.roleReg === 'ADMIN') return [];
+    if (!shouldEnableChat()) {
+      state.chat.conversations = [];
+      renderConversationList();
+      renderThread();
+      return [];
+    }
 
     options = options || {};
-    if (!options.silent && elements.list) {
+    if (!options.silent && isChatActive() && elements.list) {
       elements.list.innerHTML = '<div class="miniHint">Загрузка диалогов...</div>';
     }
 
@@ -313,13 +432,27 @@
         if (pagerEl) pagerEl.innerHTML = '';
       }
 
-      if (state.chat.activeConversationId) await loadMessages(state.chat.activeConversationId, { silent: true });
-      else renderThread();
-      updateAutoBadge('Авто', 'ok');
+      if (state.chat.activeConversationId && isChatActive()) {
+        await loadMessages(state.chat.activeConversationId, {
+          silent: true,
+          reason: options.reason,
+          smooth: options.reason === 'message-created',
+        });
+      } else if (isChatActive()) {
+        renderThread();
+      }
+
+      if (chatState.socket && chatState.socket.readyState === window.WebSocket.OPEN) {
+        updateAutoBadge('Live', 'live');
+      } else if (chatState.socketMode === 'fallback') {
+        updateAutoBadge('Авто', 'fallback');
+      } else {
+        updateAutoBadge('Авто', 'ok');
+      }
       return state.chat.conversations;
     } catch (err) {
       if (handleProtectedError(err)) return [];
-      if (elements.list) {
+      if (!options.silent && elements.list && isChatActive()) {
         elements.list.innerHTML = '<div class="miniHint" style="color:#991b1b;">Ошибка: ' + escapeHtml(safeErrorText(err)) + '</div>';
       }
       renderPager('chatConversationPager', { total: 0 }, function () {}, { label: 'чатов' });
@@ -335,7 +468,7 @@
     }
 
     options = options || {};
-    if (!options.silent && elements.messages) {
+    if (!options.silent && isChatActive() && elements.messages) {
       elements.empty.classList.add('hidden');
       elements.messages.classList.remove('hidden');
       elements.messages.innerHTML = '<div class="chatThreadPlaceholder">Загрузка сообщений...</div>';
@@ -349,11 +482,16 @@
       var activeConversation = findConversation(conversationId);
       if (activeConversation) activeConversation.unread_count = 0;
       renderConversationList();
-      renderThread();
+      if (isChatActive() && String(state.chat.activeConversationId || '') === String(conversationId || '')) {
+        renderThread({
+          forceScrollBottom: !!options.forceScrollBottom,
+          smooth: !!options.smooth || options.reason === 'message-created',
+        });
+      }
       return state.chat.messagesByConversation[String(conversationId)];
     } catch (err) {
       if (handleProtectedError(err)) return [];
-      if (elements.messages) {
+      if (elements.messages && isChatActive()) {
         elements.messages.innerHTML = '<div class="chatThreadPlaceholder" style="color:#991b1b;">Ошибка загрузки: ' + escapeHtml(safeErrorText(err)) + '</div>';
       }
       throw err;
@@ -363,8 +501,156 @@
   async function selectConversation(conversationId) {
     if (!conversationId) return;
     state.chat.activeConversationId = conversationId;
+    resetNewMessagesIndicator();
     renderConversationList();
-    await loadMessages(conversationId, { silent: false });
+    await loadMessages(conversationId, { silent: false, forceScrollBottom: true });
+  }
+
+  function clearReconnectTimer() {
+    if (!chatState.reconnectTimer) return;
+    window.clearTimeout(chatState.reconnectTimer);
+    chatState.reconnectTimer = null;
+  }
+
+  function stopFallbackPolling() {
+    if (!chatState.pollingTimer) return;
+    window.clearInterval(chatState.pollingTimer);
+    chatState.pollingTimer = null;
+  }
+
+  function startFallbackPolling() {
+    if (chatState.pollingTimer || !shouldEnableChat()) return;
+    chatState.socketMode = 'fallback';
+    updateAutoBadge('Авто', 'fallback');
+    chatState.pollingTimer = window.setInterval(function () {
+      if (chatState.pollingInFlight || !shouldEnableChat() || document.hidden) return;
+      chatState.pollingInFlight = true;
+      loadConversations({ silent: !isChatActive(), reason: 'fallback-poll' }).catch(function () {}).finally(function () {
+        chatState.pollingInFlight = false;
+      });
+    }, FALLBACK_POLL_INTERVAL_MS);
+  }
+
+  function disconnectRealtime() {
+    clearReconnectTimer();
+    stopFallbackPolling();
+    if (chatState.syncTimer) {
+      window.clearTimeout(chatState.syncTimer);
+      chatState.syncTimer = null;
+    }
+    if (chatState.socket) {
+      try {
+        chatState.socket.close();
+      } catch (error) {}
+      chatState.socket = null;
+    }
+    chatState.socketMode = 'idle';
+    updateAutoBadge('Авто', 'ok');
+  }
+
+  function scheduleSocketReconnect() {
+    if (!shouldEnableChat() || chatState.reconnectTimer) return;
+    var delay = Math.min(SOCKET_RECONNECT_MAX_MS, SOCKET_RECONNECT_BASE_MS * Math.max(1, chatState.reconnectAttempts || 1));
+    chatState.reconnectTimer = window.setTimeout(function () {
+      chatState.reconnectTimer = null;
+      ensureRealtimeConnection(true).catch(function () {});
+    }, delay);
+  }
+
+  function scheduleConversationSync(payload) {
+    if (!shouldEnableChat()) return;
+    if (chatState.syncTimer) window.clearTimeout(chatState.syncTimer);
+    chatState.syncTimer = window.setTimeout(function () {
+      chatState.syncTimer = null;
+      if (chatState.pollingInFlight) return;
+      chatState.pollingInFlight = true;
+      loadConversations({ silent: !isChatActive(), reason: payload && payload.reason }).catch(function () {}).finally(function () {
+        chatState.pollingInFlight = false;
+      });
+    }, 150);
+  }
+
+  function handleSocketPayload(raw) {
+    try {
+      var payload = JSON.parse(String(raw || '{}'));
+      if (payload.type === 'chat.ready') {
+        chatState.socketMode = 'realtime';
+        updateAutoBadge('Live', 'live');
+        stopFallbackPolling();
+        return;
+      }
+      if (payload.type === 'chat.pong') return;
+      if (payload.type === 'chat.sync') {
+        scheduleConversationSync(payload);
+      }
+    } catch (error) {
+      updateAutoBadge('Ошибка', 'error');
+    }
+  }
+
+  async function ensureRealtimeConnection(force) {
+    if (!shouldEnableChat()) {
+      disconnectRealtime();
+      renderHeaderUnreadBadges();
+      return;
+    }
+
+    if (chatState.socket && !force) {
+      if (chatState.socket.readyState === window.WebSocket.OPEN || chatState.socket.readyState === window.WebSocket.CONNECTING) {
+        return;
+      }
+    }
+
+    clearReconnectTimer();
+
+    try {
+      updateAutoBadge('Подключаем', 'busy');
+      var ticketPayload = await apiGetChatWsTicket();
+      if (!ticketPayload || !ticketPayload.ticket) {
+        throw new Error('Missing realtime ticket');
+      }
+      var socketUrl = getChatWebSocketUrl(ticketPayload.ticket, ticketPayload.ws_path);
+      var socket = new window.WebSocket(socketUrl);
+      chatState.socket = socket;
+      chatState.socketMode = 'connecting';
+
+      socket.addEventListener('open', function () {
+        if (chatState.socket !== socket) return;
+        chatState.socketMode = 'realtime';
+        chatState.reconnectAttempts = 0;
+        stopFallbackPolling();
+        updateAutoBadge('Live', 'live');
+      });
+
+      socket.addEventListener('message', function (event) {
+        if (chatState.socket !== socket) return;
+        handleSocketPayload(event.data);
+      });
+
+      socket.addEventListener('close', function () {
+        if (chatState.socket === socket) {
+          chatState.socket = null;
+        }
+        chatState.socketMode = 'fallback';
+        chatState.reconnectAttempts += 1;
+        startFallbackPolling();
+        scheduleSocketReconnect();
+      });
+
+      socket.addEventListener('error', function () {
+        if (chatState.socket !== socket) return;
+        chatState.socketMode = 'fallback';
+        updateAutoBadge('Авто', 'fallback');
+      });
+    } catch (error) {
+      chatState.socketMode = 'fallback';
+      chatState.reconnectAttempts += 1;
+      updateAutoBadge('Авто', 'fallback');
+      startFallbackPolling();
+      if (!String(error && error.message || '').includes('Missing realtime ticket')) {
+        scheduleSocketReconnect();
+      }
+    }
   }
 
   async function openHub() {
@@ -385,7 +671,7 @@
       return;
     }
     renderConversationList();
-    renderThread();
+    renderThread({ forceScrollBottom: true });
   }
 
   async function openWithUser(userId) {
@@ -415,8 +701,8 @@
       mergeConversation(conversation);
       state.chat.activeConversationId = conversation.id;
       renderConversationList();
-      await loadMessages(conversation.id, { silent: false });
-      await loadConversations({ silent: true });
+      await loadMessages(conversation.id, { silent: false, forceScrollBottom: true });
+      await loadConversations({ silent: true, reason: 'conversation-open' });
     } catch (err) {
       if (handleProtectedError(err)) return;
       showToast('Чат недоступен: ' + safeErrorText(err));
@@ -447,7 +733,7 @@
       }
       if (elements.input) elements.input.value = '';
       renderConversationList();
-      renderThread();
+      renderThread({ forceScrollBottom: true, smooth: true });
     } catch (err) {
       if (!handleProtectedError(err)) {
         showToast('Не удалось отправить сообщение: ' + safeErrorText(err));
@@ -462,56 +748,68 @@
     show(destination);
   }
 
-  function startPolling() {
-    if (chatState.pollingTimer || !isChatActive()) return;
-    chatState.pollingTimer = window.setInterval(function () {
-      if (chatState.pollingInFlight || !isChatActive() || document.hidden) return;
-      chatState.pollingInFlight = true;
-      updateAutoBadge('Синхр.', 'busy');
-      loadConversations({ silent: true }).catch(function () {}).finally(function () {
-        chatState.pollingInFlight = false;
-      });
-    }, POLL_INTERVAL_MS);
-  }
-
-  function stopPolling() {
-    if (!chatState.pollingTimer) return;
-    window.clearInterval(chatState.pollingTimer);
-    chatState.pollingTimer = null;
-  }
-
   function handleScreenChange(screenKey) {
+    if (!shouldEnableChat()) {
+      disconnectRealtime();
+      renderHeaderUnreadBadges();
+      if (screenKey !== 'chat') setThreadVisibility(false);
+      return;
+    }
+
+    ensureRealtimeConnection(false).catch(function () {});
+
     if (screenKey === 'chat') {
-      startPolling();
       renderConversationList();
-      renderThread();
+      renderThread({ forceScrollBottom: !chatState.lastRenderedConversationId });
       if (!state.chat.conversations.length) {
-        loadConversations({ silent: false }).catch(function () {});
-      } else {
-        loadConversations({ silent: true }).catch(function () {});
+        loadConversations({ silent: false, reason: 'chat-open' }).catch(function () {});
+      } else if (state.chat.activeConversationId && !state.chat.messagesByConversation[String(state.chat.activeConversationId)]) {
+        loadMessages(state.chat.activeConversationId, { silent: false, forceScrollBottom: true }).catch(function () {});
       }
       return;
     }
-    stopPolling();
+
+    setThreadVisibility(false);
+    if (!state.chat.conversations.length) {
+      loadConversations({ silent: true, reason: 'header-sync' }).catch(function () {});
+    } else {
+      renderHeaderUnreadBadges();
+    }
   }
 
   window.addEventListener('focus', function () {
-    if (!isChatActive() || chatState.pollingInFlight) return;
-    chatState.pollingInFlight = true;
-    updateAutoBadge('Синхр.', 'busy');
-    loadConversations({ silent: true }).catch(function () {}).finally(function () {
-      chatState.pollingInFlight = false;
-    });
+    if (!shouldEnableChat()) return;
+    ensureRealtimeConnection(false).catch(function () {});
+    if (!chatState.pollingInFlight) {
+      chatState.pollingInFlight = true;
+      loadConversations({ silent: !isChatActive(), reason: 'focus-sync' }).catch(function () {}).finally(function () {
+        chatState.pollingInFlight = false;
+      });
+    }
   });
 
   document.addEventListener('visibilitychange', function () {
-    if (document.hidden || !isChatActive() || chatState.pollingInFlight) return;
-    chatState.pollingInFlight = true;
-    updateAutoBadge('Синхр.', 'busy');
-    loadConversations({ silent: true }).catch(function () {}).finally(function () {
-      chatState.pollingInFlight = false;
-    });
+    if (document.hidden || !shouldEnableChat()) return;
+    ensureRealtimeConnection(false).catch(function () {});
+    if (!chatState.pollingInFlight) {
+      chatState.pollingInFlight = true;
+      loadConversations({ silent: !isChatActive(), reason: 'visibility-sync' }).catch(function () {}).finally(function () {
+        chatState.pollingInFlight = false;
+      });
+    }
   });
+
+  if (elements.messages) {
+    elements.messages.addEventListener('scroll', function () {
+      if (isNearBottom()) resetNewMessagesIndicator();
+    });
+  }
+
+  if (elements.newMessagesBtn) {
+    elements.newMessagesBtn.addEventListener('click', function () {
+      scrollMessagesToBottom('smooth');
+    });
+  }
 
   if (elements.list) {
     elements.list.addEventListener('click', function (event) {
@@ -536,14 +834,15 @@
 
   if (elements.refreshBtn) {
     elements.refreshBtn.addEventListener('click', function () {
-      updateAutoBadge('Синхр.', 'busy');
-      loadConversations({ silent: false }).catch(function () {});
+      updateAutoBadge(chatState.socketMode === 'realtime' ? 'Live' : 'Синхр.', chatState.socketMode === 'realtime' ? 'live' : 'busy');
+      loadConversations({ silent: false, reason: 'manual-refresh' }).catch(function () {});
     });
   }
 
   if (elements.backToListBtn) {
     elements.backToListBtn.addEventListener('click', function () {
       setThreadVisibility(false);
+      resetNewMessagesIndicator();
     });
   }
 
@@ -577,5 +876,6 @@
     handleScreenChange: handleScreenChange,
   };
 
+  renderHeaderUnreadBadges();
   updateAutoBadge('Авто', 'ok');
 })();

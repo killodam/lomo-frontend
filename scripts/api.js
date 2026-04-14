@@ -11,6 +11,7 @@ const API_BASE = (window.LOMO_CONFIG?.API_BASE || DEFAULT_API_BASE).replace(/\/+
 const BACKEND_BASE = API_BASE.startsWith('http')
   ? API_BASE.replace(/\/api$/, '')
   : window.location.origin;
+const CHAT_WS_BASE = (window.LOMO_CONFIG?.CHAT_WS_BASE || BACKEND_BASE).replace(/\/+$/, '');
 const CSRF_COOKIE_NAME = window.LOMO_CONFIG?.CSRF_COOKIE_NAME || 'lomo_csrf';
 
 const DOC_TYPE_LABELS = {
@@ -265,6 +266,10 @@ async function apiGetChatConversations(params = {}) {
   return apiFetch('/chat/conversations' + buildQuery(params));
 }
 
+async function apiGetChatWsTicket() {
+  return apiFetch('/chat/ws-ticket');
+}
+
 async function apiStartChatConversation(participant_user_id) {
   return apiFetch('/chat/conversations', {
     method: 'POST',
@@ -281,6 +286,13 @@ async function apiSendChatMessage(conversationId, body) {
     method: 'POST',
     body: JSON.stringify({ body }),
   });
+}
+
+function getChatWebSocketUrl(ticket, wsPath) {
+  const base = CHAT_WS_BASE || BACKEND_BASE || window.location.origin;
+  const normalizedPath = String(wsPath || '/ws/chat');
+  const socketBase = base.replace(/^http:/, 'ws:').replace(/^https:/, 'wss:');
+  return socketBase + normalizedPath + '?ticket=' + encodeURIComponent(ticket || '');
 }
 
 async function apiApproveRequest(id) {

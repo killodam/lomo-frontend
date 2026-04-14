@@ -5,10 +5,12 @@
   var defaultApiBase = (isLocalHost || isLocalFile)
     ? 'https://lomo-backend-hergg.amvera.io/api'
     : '/api';
+  var defaultChatWsBase = 'https://lomo-backend-hergg.amvera.io';
 
   window.LOMO_CONFIG = Object.assign(
     {
       API_BASE: defaultApiBase,
+      CHAT_WS_BASE: defaultChatWsBase,
     },
     window.LOMO_CONFIG || {}
   );
