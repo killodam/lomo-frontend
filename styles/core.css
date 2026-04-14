@@ -2,7 +2,6 @@
       --bg:#ffffff;
       --label:#111111cc;
       --placeholder:#11111166;
-      --copyright:#11111155;
       --sqFill:#00000010;
       --sqBorder:#00000018;
       --sqHoverFill:#00000014;
@@ -544,23 +543,6 @@
       padding: 0 18px;
     }
 
-    .copyright{
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      text-align:center;
-      font-size: 12px;
-      letter-spacing: 0.02em;
-      color: var(--copyright);
-      background: transparent;
-      padding: 4px 0 8px;
-      z-index: 10;
-      user-select:none;
-      pointer-events:none;
-      backdrop-filter: none;
-    }
-
     /* ACCENT BUTTONS */
     .accentBtn{
       border-radius: 999px;
@@ -666,4 +648,3 @@
         --gapX: 32px;
       }
     }
-
