@@ -29,6 +29,11 @@ const screens = {
   publicProfile: document.getElementById('screenPublicProfile'),
 };
 
+const legacyEntryScreens = {
+  auth: 'landing',
+  logo: 'landing',
+};
+
 const logoWrap = document.getElementById('logoWrap');
 const mainLogoImg = document.querySelector('#screenLogo .logo');
 const authLogoImg = document.getElementById('authLogoImg');
@@ -50,28 +55,51 @@ function clearScreenInputs(key) {
   });
 }
 
+function resolveScreenKey(key) {
+  return legacyEntryScreens[key] || key;
+}
+
+function setScreenActiveState(screen, isActive) {
+  if (!screen) return;
+  screen.classList.toggle('active', isActive);
+  screen.setAttribute('aria-hidden', isActive ? 'false' : 'true');
+  if (isActive) screen.removeAttribute('inert');
+  else screen.setAttribute('inert', '');
+}
+
+function showEntryScreen(options) {
+  var opts = options || {};
+  if (opts.clearAuth !== false && typeof clearAuthInputs === 'function') clearAuthInputs();
+  if (opts.resetSplash !== false && typeof resetLogo === 'function') resetLogo();
+  show('landing');
+}
+
 function show(key) {
-  Object.values(screens).forEach((screen) => screen && screen.classList.remove('active'));
-  if (!screens[key]) return;
-  screens[key].classList.add('active');
-  try { screens[key].scrollTop = 0; } catch (error) {}
+  var targetKey = resolveScreenKey(key);
+  Object.entries(screens).forEach(function (entry) {
+    var screenKey = entry[0];
+    var screen = entry[1];
+    setScreenActiveState(screen, screenKey === targetKey);
+  });
+  if (!screens[targetKey]) return;
+  try { screens[targetKey].scrollTop = 0; } catch (error) {}
   if (typeof closeDrawer === 'function') closeDrawer();
   if (typeof closeModal === 'function') closeModal();
-  if (key === 'regForm') {
+  if (targetKey === 'regForm') {
     clearScreenInputs('regForm');
     updateConsentRoleText();
     resetConsents();
   }
-  if (key === 'loginForm') clearScreenInputs('loginForm');
-  if (key === 'auth') updateAuthButtons();
-  if (key === 'employeePublic') { updateProfileProgress(); loadIncomingRequests(); loadOwnConnections(); }
-  if (key === 'recruiterPublic') loadOwnConnections();
-  if (key === 'adminQueue') { loadAdminQueue(); loadAdminUsers(); switchAdminTab('docs'); }
-  if (key === 'candidateFeed') loadCandidateFeed();
-  if (key === 'employerSearch') loadEmployerSearch();
-  if (key === 'myEmployeeProfile') hydrateCvPrivacy();
+  if (targetKey === 'loginForm') clearScreenInputs('loginForm');
+  if (targetKey === 'auth') updateAuthButtons();
+  if (targetKey === 'employeePublic') { updateProfileProgress(); loadIncomingRequests(); loadOwnConnections(); }
+  if (targetKey === 'recruiterPublic') loadOwnConnections();
+  if (targetKey === 'adminQueue') { loadAdminQueue(); loadAdminUsers(); switchAdminTab('docs'); }
+  if (targetKey === 'candidateFeed') loadCandidateFeed();
+  if (targetKey === 'employerSearch') loadEmployerSearch();
+  if (targetKey === 'myEmployeeProfile') hydrateCvPrivacy();
   if (window.LOMO_CHAT_UI && typeof window.LOMO_CHAT_UI.handleScreenChange === 'function') {
-    window.LOMO_CHAT_UI.handleScreenChange(key);
+    window.LOMO_CHAT_UI.handleScreenChange(targetKey);
   }
 }
 

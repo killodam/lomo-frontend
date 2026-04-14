@@ -18,7 +18,7 @@
     }
 
     // Track where we came from to go back
-    var _profileFromScreen = 'auth';
+    var _profileFromScreen = 'landing';
     var _activePublicProfileUserId = '';
 
     function _openProfileById(uid){

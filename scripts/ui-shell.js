@@ -47,7 +47,7 @@ function getModalContent(key) {
     terms: { title: 'Условия использования', html: '<ul style="padding-left:18px;margin:0"><li style="margin-bottom:8px">Предоставляйте только достоверные данные.</li><li style="margin-bottom:8px">Запрещено загружать чужие или поддельные документы.</li><li>Нарушение — блокировка аккаунта.</li></ul>' },
     privacy: { title: 'Политика конфиденциальности', html: '<p style="margin:0 0 10px">Собираем минимум данных: имя, email, документы.</p><p style="margin:0 0 10px">Телефон и email не публикуются публично.</p><p style="margin:0">Удаление аккаунта доступно в личном профиле после подтверждения паролем.</p>' },
     contacts: { title: 'Контакты', html: '<p style="margin:0 0 10px">Email: <b>support@lomo.website</b></p><p style="margin:0 0 10px">Telegram: <b>@lomo_support</b></p><p style="margin:0 0 16px">Пн–Пт, 9:00–18:00 МСК</p>' },
-    about: { title: 'О проекте LOMO', html: '<p style="margin:0 0 10px">LOMO — платформа верификации карьерных данных для рынка труда СНГ.</p><p style="margin:0 0 10px">Кандидаты подтверждают образование и опыт документами, работодатели находят проверенных специалистов.</p><p style="margin:0;color:#888;font-size:13px">Запущен в 2024 году. Верификация — 1–2 рабочих дня.</p>' },
+    about: { title: 'О проекте LOMO', html: '<p style="margin:0 0 10px">LOMO — платформа верификации карьерных данных для рынка найма.</p><p style="margin:0 0 10px">Кандидаты подтверждают образование и опыт документами, работодатели находят проверенных специалистов.</p><p style="margin:0;color:#888;font-size:13px">Запущен в 2024 году. Верификация — 1–2 рабочих дня.</p>' },
     faq: { title: 'Частые вопросы', html: '<div class="faqItem"><div class="faqQ">Сколько стоит?</div><div class="faqA">Для кандидатов — бесплатно.</div></div><div class="faqItem"><div class="faqQ">Как долго верификация?</div><div class="faqA">1–2 рабочих дня.</div></div><div class="faqItem"><div class="faqQ">Какие форматы?</div><div class="faqA">PDF, JPG, PNG, DOCX — до 50 МБ.</div></div><div class="faqItem"><div class="faqQ">Видят ли работодатели мои документы?</div><div class="faqA">Нет — только статус ✓ или ✗.</div></div>' },
   };
 
@@ -106,15 +106,20 @@ function bindUiAction(id, eventName, handler) {
   if (el) el.addEventListener(eventName, handler);
 }
 
+function handleLogoutToLanding(action) {
+  action();
+  showEntryScreen();
+}
+
 function bindStaticUiActions() {
   bindUiAction('authSearchBtn', 'click', function () { goToSearch(); });
   bindUiAction('feedMyProfileBtn', 'click', function () { goToMyProfile(); });
   bindUiAction('searchCompanyProfileBtn', 'click', function () { goToMyProfile(); });
-  bindUiAction('authLogoutAllBtn', 'click', function () { logoutAllSessions(); show('auth'); });
-  bindUiAction('authLogoutBtn', 'click', function () { logout(); show('auth'); });
-  bindUiAction('employerLogoutAllBtn', 'click', function () { logoutAllSessions(); show('auth'); });
-  bindUiAction('employeeLogoutAllBtn', 'click', function () { logoutAllSessions(); show('auth'); });
-  bindUiAction('adminLogoutBtn', 'click', function () { logout(); show('auth'); });
+  bindUiAction('authLogoutAllBtn', 'click', function () { handleLogoutToLanding(logoutAllSessions); });
+  bindUiAction('authLogoutBtn', 'click', function () { handleLogoutToLanding(logout); });
+  bindUiAction('employerLogoutAllBtn', 'click', function () { handleLogoutToLanding(logoutAllSessions); });
+  bindUiAction('employeeLogoutAllBtn', 'click', function () { handleLogoutToLanding(logoutAllSessions); });
+  bindUiAction('adminLogoutBtn', 'click', function () { handleLogoutToLanding(logout); });
   bindUiAction('addWorkExpBtn', 'click', function () { addWorkExp(); });
   bindUiAction('cvPublicToggle', 'change', function () { updateCvPrivacy(); });
   bindUiAction('epOnboardDismiss', 'click', function () {
@@ -162,7 +167,6 @@ function bindStaticUiActions() {
 
   // Landing page buttons
   bindUiAction('landingLoginBtn', 'click', function () { show('loginForm'); });
-  bindUiAction('landingLoginBtn2', 'click', function () { show('loginForm'); }); // kept for safety
   bindUiAction('landingRegBtn', 'click', function () { show('roleReg'); });
   bindUiAction('landingRegBtn2', 'click', function () { show('roleReg'); });
   bindUiAction('landingRegCandidate', 'click', function () { state.roleReg = 'EMPLOYEE'; show('regForm'); });
@@ -206,7 +210,10 @@ window.addEventListener('hashchange', initHashRouting);
 if (startBtn) {
   startBtn.addEventListener('click', function () {
     logoWrap.classList.add('animUp');
-    setTimeout(function () { show('auth'); }, 720);
+    setTimeout(function () {
+      show('landing');
+      if (typeof resetLogo === 'function') resetLogo();
+    }, 720);
   });
 }
 

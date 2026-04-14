@@ -32,7 +32,7 @@ function recoverAuthFlowOnProtectedError(err, options) {
   }
 
   showToast('Сессия завершилась. Войдите снова.');
-  show('auth');
+  showEntryScreen();
   return true;
 }
 
@@ -696,7 +696,8 @@ function initHashRouting() {
       openUserProfile(profile);
     }).catch(function () {
       showToast('Профиль не найден');
-      show(getToken() ? (_profileFromScreen || 'auth') : 'auth');
+      if (getToken()) show(_profileFromScreen || 'landing');
+      else showEntryScreen();
     });
   }
 }

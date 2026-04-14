@@ -304,12 +304,6 @@ function deleteOwnAccount(password) {
       }, { passive: false });
     });
 
-    // Start button
-    startBtn.addEventListener('click', () => {
-      logoWrap.classList.add('animUp');
-      setTimeout(() => show('auth'), 720);
-    });
-
     // Main click handler
     document.addEventListener('click', (e) => {
 
@@ -652,7 +646,7 @@ function deleteOwnAccount(password) {
 
         if(route === 'toAuthFromProfile'){
           logout();
-          show('auth');
+          showEntryScreen();
           return;
         }
 
@@ -672,7 +666,7 @@ function deleteOwnAccount(password) {
           deleteBtn.textContent = 'Удаляем...';
           deleteOwnAccount(password).then(function () {
             if(passwordInput) passwordInput.value = '';
-            show('auth');
+            showEntryScreen();
             showToast('Аккаунт удалён');
           }).catch(function (err) {
             if(passwordInput) passwordInput.value = '';
@@ -688,7 +682,7 @@ function deleteOwnAccount(password) {
 
 
         if(route === 'toAuthHome'){
-          show('auth');
+          showEntryScreen();
           return;
         }
 
@@ -732,14 +726,14 @@ function deleteOwnAccount(password) {
       const back = e.target.closest('[data-back]');
       if(back){
         const where = back.dataset.back;
-        if(where === 'toLogo'){ clearAuthInputs(); show('logo'); setTimeout(resetLogo, 10); return; }
-        if(where === 'toLanding'){ clearAuthInputs(); show('landing'); return; }
-        if(where === 'toAuth'){ clearAuthInputs(); show('auth'); return; }
+        if(where === 'toLogo'){ showEntryScreen(); return; }
+        if(where === 'toLanding'){ showEntryScreen(); return; }
+        if(where === 'toAuth'){ showEntryScreen(); return; }
         if(where === 'toRoleReg'){ show('roleReg'); return; }
         if(where === 'toLoginForm'){ show('loginForm'); return; }
         if(where === 'toForgot'){ show('forgot'); return; }
         if(where === 'toVerifyCode'){ show('verifyCode'); return; }
-        if(where === 'toPrevFromDone'){ show(state.prevFromDone || 'auth'); return; }
+        if(where === 'toPrevFromDone'){ show(state.prevFromDone || 'landing'); return; }
         if(where === 'toRecruiterPublic'){ renderRecruiterPublic(); show('recruiterPublic'); return; }
         if(where === 'toEmployeePublic'){ renderEmployeePublic(); show('employeePublic'); return; }
         if(where === 'toEmployerDashboard'){ showEmployerDashboard(); return; }
@@ -756,13 +750,14 @@ function deleteOwnAccount(password) {
       if(screens.myEmployerProfile?.classList.contains('active')){ renderRecruiterPublic(); show('recruiterPublic'); return; }
       if(screens.myEmployeeProfile?.classList.contains('active')){ renderEmployeePublic(); show('employeePublic'); return; }
       if(screens.chat?.classList.contains('active') && window.LOMO_CHAT_UI && typeof window.LOMO_CHAT_UI.goBack === 'function'){ window.LOMO_CHAT_UI.goBack(); return; }
-      if(screens.recruiterPublic?.classList.contains('active') || screens.employeePublic?.classList.contains('active')){ show('auth'); return; }
+      if(screens.recruiterPublic?.classList.contains('active')){ showEmployerDashboard(); return; }
+      if(screens.employeePublic?.classList.contains('active')){ showEmployeeDashboard(); return; }
       if(screens.resetPassword?.classList.contains('active')){ show('verifyCode'); return; }
       if(screens.verifyCode?.classList.contains('active')){ show('forgot'); return; }
       if(screens.forgot?.classList.contains('active')){ show('loginForm'); return; }
       if(screens.regForm?.classList.contains('active')){ show('roleReg'); return; }
-      if(screens.roleReg?.classList.contains('active')){ show('auth'); return; }
-      if(screens.loginForm?.classList.contains('active')){ show('auth'); return; }
+      if(screens.roleReg?.classList.contains('active')){ showEntryScreen(); return; }
+      if(screens.loginForm?.classList.contains('active')){ showEntryScreen(); return; }
       if(screens.auth?.classList.contains('active')){ show('landing'); return; }
     });
 

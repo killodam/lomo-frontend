@@ -656,7 +656,7 @@
   async function openHub() {
     if (!getToken()) {
       showToast('Войдите, чтобы открыть чаты');
-      show('auth');
+      showEntryScreen();
       return;
     }
     if (state.roleReg === 'ADMIN') {
@@ -678,7 +678,7 @@
     if (!userId) return;
     if (!getToken()) {
       showToast('Войдите, чтобы написать пользователю');
-      show('auth');
+      showEntryScreen();
       return;
     }
     if (state.roleReg === 'ADMIN') {
