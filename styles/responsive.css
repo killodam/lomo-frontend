@@ -1,0 +1,520 @@
+    /* === ADAPTIVE / MOBILE === */
+    @media (max-width: 768px) {
+      :root {
+        --btnW: 85vw;
+        --btnH: 100px;
+        --btnRadius: 32px;
+        --inW: 85vw;
+        --inH: 56px;
+        --inRadius: 20px;
+        --gapX: 20px;
+        --gapY: 12px;
+      }
+      
+      body {
+        overflow-x: hidden;
+        min-height: 100dvh;
+      }
+
+      .stage {
+        height: 100dvh;
+        min-height: 100dvh;
+      }
+
+      .screen,
+      .screen.active {
+        min-height: 100dvh;
+      }
+
+      .logo {
+        max-width: 85vw;
+        max-height: 50vh;
+      }
+
+      .sqBtn {
+        min-width: auto;
+        width: 85vw;
+      }
+
+      #screenAuth .wrap,
+      #screenRoleReg .wrap,
+      #screenLoginForm .wrap,
+      #screenForgot .wrap,
+      #screenVerifyCode .wrap,
+      #screenResetPassword .wrap,
+      #screenRegForm .wrap {
+        align-items: flex-start;
+        justify-content: flex-start;
+        height: auto;
+        min-height: 100%;
+        overflow-y: auto;
+        gap: 18px;
+        padding-left: 18px;
+        padding-right: 18px;
+        padding-bottom: calc(28px + env(safe-area-inset-bottom, 0px));
+      }
+
+      #screenCandidateFeed,
+      #screenEmployerSearch,
+      #screenAdminQueue,
+      #screenChat,
+      #screenPublicProfile,
+      #screenRecruiterPublic,
+      #screenEmployeePublic,
+      #screenMyEmployerProfile,
+      #screenMyEmployeeProfile {
+        overflow-x: hidden !important;
+      }
+
+      #screenCandidateFeed .wrap,
+      #screenEmployerSearch .wrap,
+      #screenAdminQueue .wrap,
+      #screenChat .wrap,
+      #screenPublicProfile .wrap,
+      #screenRecruiterPublic .wrap,
+      #screenEmployeePublic .wrap,
+      #screenMyEmployerProfile .wrap,
+      #screenMyEmployeeProfile .wrap {
+        width: 100%;
+        max-width: 100%;
+        min-height: 100%;
+        overflow-x: hidden;
+      }
+
+      #screenAuth .wrap {
+        padding-top: calc(72px + env(safe-area-inset-top, 0px));
+      }
+
+      #screenRoleReg .wrap,
+      #screenLoginForm .wrap,
+      #screenForgot .wrap,
+      #screenVerifyCode .wrap,
+      #screenResetPassword .wrap,
+      #screenRegForm .wrap {
+        padding-top: calc(74px + env(safe-area-inset-top, 0px));
+      }
+
+      #screenRoleReg .centerBlock,
+      #screenLoginForm .centerBlock,
+      #screenForgot .centerBlock,
+      #screenVerifyCode .centerBlock,
+      #screenResetPassword .centerBlock,
+      #screenRegForm .centerBlock {
+        width: 100%;
+        max-width: 420px;
+        margin-left: auto;
+        margin-right: auto;
+        justify-content: flex-start;
+        flex: 0 0 auto;
+        gap: 18px;
+      }
+
+      #screenAuth .authHero {
+        width: 100%;
+        max-width: 420px;
+        margin: 0 auto;
+        padding: 0 4px;
+        gap: 16px;
+      }
+
+      #screenAuth .authTopRight,
+      #authLoggedIn,
+      #screenAuth .authBenefits,
+      #screenForgot .formCol,
+      #screenLoginForm .formCol,
+      #screenResetPassword .formCol {
+        width: min(100%, 420px);
+        margin-left: auto;
+        margin-right: auto;
+      }
+
+      #screenAuth .authLogo {
+        width: min(220px, 58vw);
+      }
+
+      .choiceRow {
+        flex-direction: column;
+        gap: 12px;
+        width: min(100%, 420px);
+      }
+
+      #roleChoices .sqBtn {
+        width: 100%;
+        min-height: 92px;
+        height: auto;
+        padding: 20px 16px;
+      }
+
+      #roleChoices .sqText {
+        font-size: clamp(18px, 5.3vw, 22px);
+      }
+
+      #roleChoices .sqSubtext {
+        font-size: 13px;
+      }
+
+      #screenRoleReg .footerArea,
+      #screenLoginForm .footerArea,
+      #screenForgot .footerArea,
+      #screenVerifyCode .footerArea,
+      #screenResetPassword .footerArea,
+      #screenRegForm .footerArea {
+        position: static;
+        left: auto;
+        right: auto;
+        bottom: auto;
+        width: 100%;
+        margin-top: 10px;
+        padding: 0;
+        background: transparent;
+        box-shadow: none;
+        backdrop-filter: none;
+      }
+
+      #screenRoleReg .nextBtn,
+      #screenLoginForm .nextBtn,
+      #screenForgot .nextBtn,
+      #screenVerifyCode .nextBtn,
+      #screenResetPassword .nextBtn,
+      #screenRegForm .nextBtn {
+        width: min(100%, 320px);
+        min-height: 48px;
+      }
+
+      #screenCandidateFeed .centerBlock,
+      #screenEmployerSearch .centerBlock,
+      #screenAdminQueue .centerBlock,
+      #screenPublicProfile .profileContent {
+        max-width: 100%;
+        padding-bottom: calc(116px + env(safe-area-inset-bottom, 0px));
+      }
+
+      .feedCard,
+      .socialCard,
+      .pubProfileCard {
+        width: 100%;
+        max-width: 100%;
+      }
+
+      .profileCard{
+        width:min(100%, calc(100vw - 24px));
+        padding:16px;
+        border-radius:20px;
+      }
+
+      .profileHead{
+        gap:14px;
+        padding-bottom:10px;
+        margin-bottom:10px;
+      }
+
+      .avatarCircle{
+        width:72px;
+        height:72px;
+      }
+
+      .avatarCircle.lg{
+        width:92px;
+        height:92px;
+      }
+
+      .profileName{
+        font-size:18px;
+        line-height:1.15;
+      }
+
+      .profileMeta,
+      .profileSub,
+      .profileAbout,
+      .miniValue{
+        font-size:13px;
+        line-height:1.45;
+      }
+
+      .badgeRow{
+        gap:6px;
+      }
+
+      .networkStats{
+        grid-template-columns:1fr;
+      }
+
+      .networkRow{
+        flex-direction:column;
+        align-items:flex-start;
+      }
+
+      .networkActions,
+      .networkInlineActions{
+        width:100%;
+      }
+
+      .badge,
+      .chip{
+        font-size:11px;
+        padding:6px 9px;
+      }
+
+      .hintTop{
+        font-size:11px;
+        line-height:1.35;
+      }
+
+      .avatarEdit{
+        width:100%;
+        align-items:center;
+        gap:10px;
+      }
+
+      .avatarEditActions{
+        width:100%;
+        justify-content:center;
+      }
+
+      .avatarEditActions .pillBtn{
+        flex:1 1 140px;
+        min-width:0;
+      }
+
+      .avatarEdit .miniHint{
+        width:100%;
+        margin:0;
+        text-align:center;
+      }
+
+      .authFlowSub,
+      .authFlowTitle {
+        width: min(100%, 420px);
+      }
+
+      .codeInputRow {
+        gap: 8px;
+        width: min(100%, 420px);
+      }
+
+      .codeCell {
+        width: 48px;
+        height: 60px;
+        border-radius: 16px;
+      }
+
+      .codeCell input {
+        font-size: 24px;
+      }
+
+      .backBtn {
+        left: 16px;
+        top: calc(14px + env(safe-area-inset-top, 0px));
+        z-index: 6;
+      }
+
+      .copyright {
+        font-size: 10px;
+        left: 12px;
+        right: 12px;
+        width: auto;
+        padding: 5px 10px calc(8px + env(safe-area-inset-bottom, 0px));
+        background: rgba(250,250,250,.72);
+        border-radius: 16px 16px 0 0;
+        backdrop-filter: blur(8px);
+        opacity:.72;
+      }
+
+      .topBar {
+        padding: 12px 16px;
+        flex-wrap: wrap;
+      }
+
+      .topBar h2 {
+        font-size: 20px;
+      }
+
+      .topBtns {
+        gap: 8px;
+        width: 100%;
+        justify-content: center;
+      }
+
+      .topBtns .sq {
+        flex: 1;
+        min-width: 0;
+        padding: 8px 12px;
+      }
+
+      .feedWrap,
+      .searchWrap,
+      .adminQueueWrap {
+        padding: 16px;
+        max-width: 100%;
+      }
+
+      .socialCard {
+        padding: 14px;
+      }
+
+      .scHead {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 12px;
+      }
+
+      .drawer {
+        width: 90vw;
+        max-width: 320px;
+      }
+
+      .profileWrap {
+        padding: 16px;
+        max-width: 100%;
+      }
+
+      .profGrid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
+
+      .profCard {
+        padding: 16px;
+      }
+
+      input[type="text"],
+      input[type="email"],
+      input[type="tel"],
+      input[type="password"],
+      input[type="url"],
+      textarea {
+        font-size: 16px !important; /* Prevents zoom on iOS */
+      }
+
+      .modal {
+        padding: 20px;
+      }
+
+      .modalCard {
+        max-width: 95vw;
+        max-height: 90vh;
+        padding: 20px;
+      }
+
+      .publicProfileWrap {
+        padding: 16px;
+        max-width: 100%;
+      }
+
+      .searchInput {
+        width: 100%;
+        max-width: none;
+      }
+    }
+
+    @media (max-width: 480px) {
+      #screenAuth .wrap,
+      #screenRoleReg .wrap,
+      #screenLoginForm .wrap,
+      #screenForgot .wrap,
+      #screenVerifyCode .wrap,
+      #screenResetPassword .wrap,
+      #screenRegForm .wrap {
+        padding-left: 14px;
+        padding-right: 14px;
+      }
+
+      .topBar h2 {
+        font-size: 18px;
+      }
+
+      .sqBtn {
+        font-size: 14px;
+        padding: 12px 20px;
+      }
+
+      .topBar{
+        width:calc(100vw - 20px);
+        gap:10px;
+      }
+
+      .profileCard{
+        width:calc(100vw - 16px);
+        padding:14px;
+      }
+
+      .avatarEdit{
+        align-items:flex-start;
+      }
+
+      .avatarEditActions{
+        justify-content:flex-start;
+      }
+
+      .avatarEditActions .pillBtn{
+        width:100%;
+        flex:1 1 100%;
+      }
+
+      #roleChoices .sqBtn {
+        min-height: 84px;
+        padding: 18px 14px;
+      }
+
+      .authTagline {
+        font-size: 14px;
+      }
+
+      .authBenefit,
+      .authFlowSub {
+        font-size: 13px;
+      }
+
+      .codeInputRow {
+        gap: 6px;
+      }
+
+      .codeCell {
+        width: 44px;
+        height: 54px;
+        border-radius: 14px;
+      }
+
+      .codeCell input {
+        font-size: 22px;
+      }
+
+      .socialCard {
+        padding: 12px;
+      }
+
+      .scName {
+        font-size: 15px;
+      }
+
+      .scSub, .scAbout {
+        font-size: 12px;
+      }
+    }
+
+body { padding-bottom: 0; }
+
+.pager { margin-top: 14px; }
+.pagerBar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+.pagerMeta { font-size: 12px; color: #6b7280; }
+.pagerActions { display: flex; align-items: center; gap: 8px; }
+.pagerBtn {
+  padding: 8px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(38, 110, 120, 0.18);
+  background: #fff;
+  color: #155e75;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .15s ease;
+}
+.pagerBtn:hover:not(:disabled) {
+  border-color: rgba(38, 110, 120, 0.35);
+  background: #f0fdfa;
+}
+.pagerBtn:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+

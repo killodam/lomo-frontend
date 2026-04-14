@@ -1,0 +1,669 @@
+    :root{
+      --bg:#ffffff;
+      --label:#111111cc;
+      --placeholder:#11111166;
+      --copyright:#11111155;
+      --sqFill:#00000010;
+      --sqBorder:#00000018;
+      --sqHoverFill:#00000014;
+      --sqHoverBorder:#00000022;
+      --btnW: 310px;
+      --btnH: 132px;
+      --btnRadius: 46px;
+      --inW: 430px;
+      --inH: 70px;
+      --inRadius: 28px;
+      --gapX: 52px;
+      --gapY: 16px;
+      --backFill:#00000008;
+      --backBorder:#00000014;
+      --accentFill: rgba(110,231,255,.22);
+      --accentBorder: rgba(110,231,255,.35);
+      --accentText: rgba(0,80,95,.95);
+      --accentHoverFill: rgba(110,231,255,.28);
+      --accentHoverBorder: rgba(110,231,255,.48);
+      --fade: 260ms;
+      --logoMove: 700ms;
+    }
+    /* ── FORGOT / VERIFY / RESET PASSWORD ── */
+    .authFlowTitle{
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -.02em;
+      color: rgba(0,0,0,.88);
+      text-align:center;
+      margin-bottom: 4px;
+    }
+    .authFlowSub{
+      font-size: 14px;
+      color: rgba(0,0,0,.50);
+      text-align:center;
+      max-width: 340px;
+      line-height: 1.5;
+      margin-bottom: 8px;
+    }
+    /* 6-digit code cells */
+    .codeInputRow{
+      display:flex;
+      gap: 10px;
+      justify-content:center;
+    }
+    .codeCell{
+      width: 56px;
+      height: 68px;
+      border-radius: 18px;
+      background: #00000008;
+      border: 1.5px solid #00000018;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 26px;
+      font-weight: 700;
+      color: rgba(0,0,0,.88);
+      letter-spacing: 0;
+      transition: border-color 150ms cubic-bezier(0.23,1,0.32,1),
+                  background 150ms cubic-bezier(0.23,1,0.32,1),
+                  transform 150ms cubic-bezier(0.23,1,0.32,1);
+      cursor: text;
+      position: relative;
+      overflow:hidden;
+    }
+    .codeCell input{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      border:0;
+      outline:none;
+      background:transparent;
+      font-size: 26px;
+      font-weight: 700;
+      color: rgba(0,0,0,.88);
+      text-align:center;
+      letter-spacing:0;
+      caret-color: transparent;
+      -webkit-text-fill-color: rgba(0,0,0,.88);
+    }
+    .codeCell.active{
+      border-color: rgba(110,231,255,.55);
+      background: rgba(110,231,255,.08);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 20px rgba(110,231,255,.18);
+    }
+    .codeCell.filled{
+      border-color: rgba(0,0,0,.25);
+      background: #00000010;
+    }
+    .codeCell.error{
+      border-color: rgba(239,68,68,.50) !important;
+      background: rgba(239,68,68,.06) !important;
+      animation: codeShake 320ms cubic-bezier(0.23,1,0.32,1);
+    }
+    @keyframes codeShake{
+      0%,100%{ transform: translateX(0); }
+      20%{ transform: translateX(-6px); }
+      40%{ transform: translateX(6px); }
+      60%{ transform: translateX(-4px); }
+      80%{ transform: translateX(4px); }
+    }
+    .codeError{
+      font-size: 13px;
+      color: #dc2626;
+      text-align:center;
+      font-weight: 600;
+      min-height: 20px;
+      transition: opacity 180ms ease;
+    }
+    .codeError.hidden{ opacity:0; }
+    /* resend hint */
+    .resendHint{
+      font-size: 13px;
+      color: rgba(0,0,0,.45);
+      text-align:center;
+    }
+    .resendHint button{
+      background:none;
+      border:none;
+      color: rgba(0,80,95,.85);
+      font-weight:700;
+      cursor:pointer;
+      padding:0;
+      font-size:13px;
+    }
+    .resendHint button:hover{ text-decoration:underline; }
+    /* password strength bar */
+    .strengthBar{
+      width: var(--inW);
+      height: 4px;
+      border-radius: 999px;
+      background: #00000010;
+      overflow:hidden;
+      margin-top:-4px;
+    }
+    .strengthFill{
+      height:100%;
+      border-radius:999px;
+      width:0;
+      transition: width 300ms cubic-bezier(0.23,1,0.32,1), background 300ms ease;
+    }
+    .addExpBtn{display:block;width:100%;padding:11px;margin:4px 0 16px;border:1.5px dashed #2a7a8a;border-radius:12px;background:none;color:#2a7a8a;font-size:14px;font-weight:600;cursor:pointer;text-align:center;transition:background .2s;}
+    .addExpBtn:hover{background:#f0fdfa;}
+    .workExpEntry{background:#f8fafb;border:1px solid #e2e8f0;border-radius:14px;padding:14px 14px 6px;margin-bottom:10px;position:relative;}
+    .workExpEntry .sqInput{margin-bottom:8px;}
+    .removeExpBtn{position:absolute;top:8px;right:10px;background:none;border:none;color:#bbb;font-size:20px;cursor:pointer;line-height:1;padding:0;}
+    .removeExpBtn:hover{color:#e53e3e;}
+    .scJobLine{font-size:13px;color:#2a7a8a;font-weight:500;margin:4px 0 2px;}
+    .scWorkExp{margin-top:6px;border-top:1px solid rgba(38,110,120,.10);padding-top:6px;}
+    .scExpItem{font-size:12px;color:#555;margin-bottom:3px;line-height:1.4;}
+    .scExpCo{font-weight:600;color:#333;}
+    .scExpRole{color:#666;}
+    .scExpPeriod{color:#aaa;font-size:11px;margin-left:4px;}
+
+    *{ box-sizing:border-box; }
+    html, body{ height:100%; min-height:100%; }
+    body{
+      margin:0;
+      background:
+        radial-gradient(1200px 700px at 20% 10%, rgba(110,231,255,.20), transparent 60%),
+        radial-gradient(900px 600px at 85% 18%, rgba(168,85,247,.12), transparent 55%),
+        radial-gradient(900px 650px at 50% 95%, rgba(34,197,94,.10), transparent 60%),
+        #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
+                   "Segoe UI", Roboto, Arial, sans-serif;
+      overflow-x:hidden;
+      overflow-y:hidden;
+      min-height:100svh;
+    }
+
+    .hidden { display: none !important; }
+
+    .stage{
+      position:relative;
+      width:100%;
+      max-width:100vw;
+      height:100%;
+      min-height:100svh;
+      overflow:hidden;
+    }
+
+    .screen{
+      position:absolute;
+      inset:0;
+      width:100%;
+      max-width:100vw;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background: var(--bg);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity var(--fade) ease;
+    }
+    .screen.active{
+      opacity:1;
+      pointer-events:auto;
+      overflow-y:auto;
+      overflow-x:hidden;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+    }
+
+    #screenRecruiterPublic.screen,
+    #screenEmployeePublic.screen,
+    #screenMyEmployerProfile.screen,
+    #screenMyEmployeeProfile.screen,
+    #screenAdminQueue.screen,
+    #screenChat.screen,
+    #screenPublicProfile.screen{
+      align-items:flex-start;
+      justify-content:flex-start;
+      flex-direction:column;
+    }
+
+    .logoWrap{
+      position:absolute;
+      left:50%;
+      top:50%;
+      transform: translate(-50%, -50%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      will-change: transform;
+      z-index: 1;
+    }
+    .logoWrap.animUp{
+      transition: transform var(--logoMove) cubic-bezier(.2,.9,.2,1);
+      transform: translate(-50%, -120%) scale(.88);
+    }
+
+    .logo{
+      max-width: min(72vw, 760px);
+      max-height: min(72vh, 560px);
+      width:auto;
+      height:auto;
+      object-fit: contain;
+      user-select:none;
+      -webkit-user-drag:none;
+      pointer-events:none;
+    }
+
+    .tapLayer{
+      position:absolute;
+      inset:0;
+      border:0;
+      background: transparent;
+      cursor: pointer;
+      z-index: 2;
+    }
+
+    .wrap{
+      width:100%;
+      height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      position:relative;
+      flex-direction:column;
+    }
+
+    .centerBlock{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      gap: 20px;
+    }
+
+    /* AUTH HERO */
+    #screenAuth .wrap{
+      padding: 28px 18px 84px;
+      overflow-y: auto;
+      justify-content: center;
+    }
+    .authTopRight{
+      order: 2;
+      position: static;
+      display:flex;
+      flex-wrap: wrap;
+      justify-content:center;
+      gap: 12px;
+      width: min(460px, 92vw);
+      margin: 8px auto 0;
+      z-index: 3;
+    }
+    .authPill{
+      flex: 1 1 190px;
+      min-height: 58px;
+      max-width: 224px;
+      padding: 14px 18px;
+      box-shadow: 0 10px 22px rgba(0,0,0,.06);
+      background: rgba(255,255,255,.88);
+      border: 1px solid rgba(0,0,0,.14);
+    }
+    .authPill .sqText{
+      font-size: 14px;
+      letter-spacing: .04em;
+      font-weight: 700;
+      color: rgba(0,0,0,.78);
+    }
+    .authHero{
+      order: 1;
+      display:flex;
+      flex-direction: column;
+      align-items:center;
+      justify-content:center;
+      gap: 24px;
+      padding: 0 22px;
+      text-align:center;
+    }
+    .authLogo{
+      width: min(280px, 60vw);
+      height: auto;
+      object-fit: contain;
+      user-select:none;
+      -webkit-user-drag:none;
+      filter: none;
+      border-radius: 20px;
+    }
+    .authTagline{
+      max-width: min(480px, 88vw);
+      font-size: 18px;
+      line-height: 1.3;
+      color: rgba(0,0,0,.82);
+      font-weight: 700;
+      letter-spacing: -.01em;
+    }
+    .authBenefits{
+      max-width: min(460px, 88vw);
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+      text-align:left;
+    }
+    .authBenefit{
+      font-size: 14px;
+      line-height: 1.4;
+      color: rgba(0,0,0,.62);
+      font-weight: 400;
+      display:flex;
+      gap: 8px;
+      align-items:flex-start;
+    }
+    .authBenefit span:first-child{
+      color: rgba(34,197,94,.9);
+      font-weight: 700;
+      flex-shrink:0;
+    }
+    #authLoggedIn{
+      order: 3;
+      margin: 16px auto 0 !important;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      text-align: center;
+      width: min(460px, 92vw);
+      white-space: normal !important;
+    }
+
+    @media (max-width: 520px){
+      #screenAuth .wrap{ padding-top: 22px; }
+      .authTopRight{ gap: 10px; width: min(92vw, 420px); }
+      .authPill{
+        flex-basis: 100%;
+        max-width: none;
+        min-height: 54px;
+        padding: 12px 16px;
+      }
+      .authPill .sqText{ font-size: 13px; }
+      .authTagline{ font-size: 15px; }
+      .authBenefit{ font-size: 13px; }
+    }
+
+    .choiceRow{
+      display:flex;
+      gap: var(--gapX);
+      align-items:center;
+      justify-content:center;
+    }
+
+    .sqBtn{
+      width: var(--btnW);
+      height: var(--btnH);
+      border-radius: var(--btnRadius);
+      background: var(--sqFill);
+      border: 1px solid var(--sqBorder);
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      user-select:none;
+      transition: transform 140ms ease, background 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+    }
+    .sqBtn:hover{
+      transform: translateY(-1px);
+      background: var(--sqHoverFill);
+      border-color: var(--sqHoverBorder);
+    }
+    .sqBtn:active{
+      transform: translateY(0) scale(.995);
+    }
+    .sqBtn.selected{
+      background: #0000001e;
+      border-color: #00000038;
+      box-shadow: 0 10px 22px rgba(0,0,0,.06);
+    }
+
+    .sqText{
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      font-size: 20px;
+      color: var(--label);
+      text-align:center;
+    }
+    .sqSubtext{
+      font-size: 12px;
+      opacity: .6;
+      margin-top: 4px;
+      letter-spacing: .02em;
+      color: var(--label);
+      text-align:center;
+    }
+
+    /* INPUTS */
+    .formCol{
+      display:flex;
+      flex-direction:column;
+      gap: var(--gapY);
+      align-items:center;
+      justify-content:center;
+    }
+
+    .sqInput{
+      width: var(--inW);
+      height: var(--inH);
+      border-radius: var(--inRadius);
+      background: var(--sqFill);
+      border: 1px solid var(--sqBorder);
+      display:flex;
+      align-items:center;
+      padding: 0 18px;
+      transition: border-color 140ms ease, background 140ms ease;
+    }
+    .sqInput.passwordField{
+      gap: 10px;
+    }
+    .sqInput input{
+      width:100%;
+      height:100%;
+      border:0;
+      outline:none;
+      background: transparent;
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: 0.01em;
+      color: var(--label);
+    }
+    .passwordToggle{
+      flex: 0 0 auto;
+      border: 0;
+      background: transparent;
+      color: var(--placeholder);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      cursor: pointer;
+      padding: 0;
+      transition: color 140ms ease, opacity 140ms ease;
+    }
+    .passwordToggle:hover,
+    .passwordToggle:focus-visible{
+      color: var(--label);
+      outline: none;
+    }
+    .passwordToggle[aria-pressed="true"]{
+      color: var(--accent);
+    }
+    .sqInput input::placeholder{
+      color: var(--placeholder);
+      font-weight: 400;
+    }
+    .sqInput:focus-within{
+      background: #00000014;
+      border-color: #00000028;
+    }
+    .sqInput.inputError{
+      border-color: rgba(239,68,68,.5) !important;
+      background: rgba(239,68,68,.05) !important;
+    }
+    .fieldError{
+      font-size: 11px;
+      color: #dc2626;
+      margin-top: 4px;
+      padding-left: 18px;
+      letter-spacing: .01em;
+      width: var(--inW);
+    }
+
+    /* BACK BUTTON */
+    .backBtn{
+      position:absolute;
+      left: 28px;
+      top: 24px;
+      padding: 10px 14px;
+      border-radius: 16px;
+      background: var(--backFill);
+      border: 1px solid var(--backBorder);
+      cursor:pointer;
+      user-select:none;
+      font-weight: 600;
+      letter-spacing: .02em;
+      color: #111111cc;
+      transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+    }
+    .backBtn:hover{
+      background:#0000000c;
+      border-color:#00000020;
+      transform: translateY(-1px);
+    }
+    .backBtn:active{
+      transform: translateY(0) scale(.995);
+    }
+
+    /* FOOTER */
+    .footerArea{
+      position:absolute;
+      left:0;
+      right:0;
+      bottom: 70px;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap: 10px;
+      padding: 0 18px;
+    }
+
+    .copyright{
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      text-align:center;
+      font-size: 12px;
+      letter-spacing: 0.02em;
+      color: var(--copyright);
+      background: transparent;
+      padding: 4px 0 8px;
+      z-index: 10;
+      user-select:none;
+      pointer-events:none;
+      backdrop-filter: none;
+    }
+
+    /* ACCENT BUTTONS */
+    .accentBtn{
+      border-radius: 999px;
+      border: 1px solid var(--accentBorder);
+      background: var(--accentFill);
+      color: var(--accentText);
+      font-weight: 700;
+      letter-spacing: .05em;
+      cursor:pointer;
+      user-select:none;
+      transition: transform 120ms ease, background 120ms ease, border-color 120ms ease;
+    }
+    .accentBtn:hover{
+      background: var(--accentHoverFill);
+      border-color: var(--accentHoverBorder);
+      transform: translateY(-1px);
+    }
+    .accentBtn:active{
+      transform: translateY(0) scale(.995);
+    }
+    .accentBtn:disabled{
+      opacity: .45;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+    }
+    .accentBtn:disabled:hover{
+      background: var(--accentFill);
+      border-color: var(--accentBorder);
+      transform: none;
+    }
+
+    .nextBtn{
+      padding: 12px 22px;
+      font-size: 13px;
+      text-transform:none;
+    }
+
+    .linkBtn{
+      padding: 10px 16px;
+      font-size: 13px;
+      letter-spacing: .02em;
+      text-transform:none;
+    }
+
+    .sqBtn,
+    .accentBtn,
+    .backBtn,
+    .backBtnInline,
+    .burgerBtn,
+    .drawerItem,
+    .drawerClose,
+    .linkBtn{
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* DONE SCREEN */
+    .doneWrap{
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      gap: 20px;
+      text-align:center;
+    }
+    .doneCheck{
+      width: 72px;
+      height: 72px;
+      border-radius: 50%;
+      background: rgba(34,197,94,.14);
+      border: 2px solid rgba(34,197,94,.3);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size: 32px;
+    }
+    .doneText{
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      font-size: 20px;
+      color: var(--label);
+      text-align:center;
+      max-width: 80vw;
+    }
+
+    @media (min-width: 1200px){
+      :root{
+        --btnW: 300px;
+        --btnH: 126px;
+        --gapX: 56px;
+        --inW: 460px;
+        --inH: 72px;
+      }
+      .sqText{ font-size: 21px; }
+      .doneText{ font-size: 22px; }
+      .sqInput input{ font-size: 19px; }
+    }
+
+    @media (max-width: 980px){
+      :root{
+        --inW: min(86vw, 460px);
+        --btnW: min(40vw, 310px);
+        --gapX: 32px;
+      }
+    }
+
