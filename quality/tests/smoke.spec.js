@@ -668,3 +668,52 @@ test('existing account can log in by email without validation error', async ({ p
   await page.click('[data-next="fromLoginForm"]');
   await expect(page.locator('#screenCandidateFeed')).toHaveClass(/active/);
 });
+
+test('candidate feed header profile button opens public profile screen', async ({ page }) => {
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'cand-12', email: 'candidate@example.com', role: 'candidate' },
+          profile: {
+            full_name: 'Иван Кандидат',
+            public_id: 'LOMO-CAND0012',
+            location: 'Москва',
+            edu_place: 'МГУ',
+            vacancies: 'Designer',
+          },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([], 1, 12, 0)),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.evaluate(() => { document.cookie = 'lomo_csrf=test-suite; path=/'; });
+  await page.fill('#loginEmail', 'candidate@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await page.click('#feedMyProfileBtn');
+  await expect(page.locator('#screenEmployeePublic')).toHaveClass(/active/);
+  await expect(page.locator('#epName')).toContainText('Иван Кандидат');
+});

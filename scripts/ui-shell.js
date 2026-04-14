@@ -108,6 +108,8 @@ function bindUiAction(id, eventName, handler) {
 
 function bindStaticUiActions() {
   bindUiAction('authSearchBtn', 'click', function () { goToSearch(); });
+  bindUiAction('feedMyProfileBtn', 'click', function () { goToMyProfile(); });
+  bindUiAction('searchCompanyProfileBtn', 'click', function () { goToMyProfile(); });
   bindUiAction('authLogoutAllBtn', 'click', function () { logoutAllSessions(); show('auth'); });
   bindUiAction('authLogoutBtn', 'click', function () { logout(); show('auth'); });
   bindUiAction('employerLogoutAllBtn', 'click', function () { logoutAllSessions(); show('auth'); });
