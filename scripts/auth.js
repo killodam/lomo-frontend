@@ -762,11 +762,11 @@ function deleteOwnAccount(password) {
       if(screens.regForm?.classList.contains('active')){ show('roleReg'); return; }
       if(screens.roleReg?.classList.contains('active')){ show('auth'); return; }
       if(screens.loginForm?.classList.contains('active')){ show('auth'); return; }
-      if(screens.auth?.classList.contains('active')){ show('logo'); setTimeout(resetLogo, 10); return; }
+      if(screens.auth?.classList.contains('active')){ show('landing'); return; }
     });
 
-    // initial — always show logo, no auto-login ever
-    show('logo');
+    // initial — always show landing, no auto-login ever
+    show('landing');
 
     document.addEventListener('change', (e) => {
       const t = e.target;

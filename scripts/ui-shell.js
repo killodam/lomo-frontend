@@ -160,6 +160,22 @@ function bindStaticUiActions() {
     button.addEventListener('click', function () { toggleDrawer(); });
   });
 
+  // Landing page buttons
+  bindUiAction('landingLoginBtn', 'click', function () { show('loginForm'); });
+  bindUiAction('landingLoginBtn2', 'click', function () { show('loginForm'); });
+  bindUiAction('landingRegBtn', 'click', function () { show('roleReg'); });
+  bindUiAction('landingRegBtn2', 'click', function () { show('roleReg'); });
+  bindUiAction('landingRegCandidate', 'click', function () { state.roleReg = 'EMPLOYEE'; show('regForm'); });
+  bindUiAction('landingRegEmployer', 'click', function () { state.roleReg = 'EMPLOYER'; show('regForm'); });
+
+  // Landing footer info modals
+  document.querySelectorAll('.js-ld-modal').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      var key = btn.getAttribute('data-modal-key');
+      openModal(key);
+    });
+  });
+
   document.querySelectorAll('[data-admin-tab]').forEach(function (button) {
     button.addEventListener('click', function () {
       switchAdminTab(button.getAttribute('data-admin-tab'));

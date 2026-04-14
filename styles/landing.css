@@ -1,0 +1,675 @@
+/* ══════════════════════════════════════════════
+   LOMO — LANDING PAGE STYLES
+   ══════════════════════════════════════════════ */
+
+#screenLanding {
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-direction: column;
+}
+
+.ld {
+  width: 100%;
+  font-family: -apple-system, 'SF Pro Display', 'Segoe UI', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Nav ── */
+.ldNav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 48px;
+  max-width: 1040px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ldNavLogo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: default;
+  user-select: none;
+}
+
+.ldNavWord {
+  font-size: 20px;
+  font-weight: 760;
+  letter-spacing: -0.5px;
+  color: #0e0f0f;
+}
+
+.ldNavActions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.ldBurger {
+  display: none;
+  flex-direction: column;
+  gap: 5px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 8px;
+  border-radius: 10px;
+}
+
+.ldBurger span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #0e0f0f;
+  border-radius: 2px;
+  transition: background 0.2s;
+}
+
+.ldBtnGhost {
+  padding: 9px 22px;
+  border: 1.5px solid rgba(0,0,0,.13);
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 500;
+  background: transparent;
+  color: #0e0f0f;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.ldBtnGhost:hover {
+  border-color: rgba(38,110,120,.35);
+  color: #1a5c68;
+  background: rgba(38,110,120,.07);
+}
+
+.ldBtnDark {
+  padding: 9px 22px;
+  border: none;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 600;
+  background: #0e0f0f;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.ldBtnDark:hover {
+  background: #1a5c68;
+  transform: translateY(-1px);
+}
+
+/* ── Hero ── */
+.ldHero {
+  max-width: 1040px;
+  margin: 28px auto 0;
+  padding: 0 48px 80px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 52px;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.ldPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(38,110,120,.13);
+  color: #1a5c68;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 13px;
+  border-radius: 999px;
+  margin-bottom: 24px;
+  border: 1px solid rgba(38,110,120,.26);
+  letter-spacing: 0.03em;
+  animation: ldFadeUp 0.45s 0.05s ease both;
+}
+
+.ldPillDot {
+  width: 5px;
+  height: 5px;
+  background: #26707a;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.ldH1 {
+  font-size: 48px;
+  font-weight: 760;
+  line-height: 1.06;
+  letter-spacing: -2px;
+  color: #0e0f0f;
+  margin: 0 0 18px;
+  animation: ldFadeUp 0.45s 0.12s ease both;
+}
+
+.ldH1 span {
+  color: #1a5c68;
+}
+
+.ldSub {
+  font-size: 16px;
+  color: #616161;
+  line-height: 1.65;
+  margin: 0 0 32px;
+  max-width: 380px;
+  animation: ldFadeUp 0.45s 0.2s ease both;
+}
+
+.ldBtns {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  animation: ldFadeUp 0.45s 0.28s ease both;
+}
+
+.ldBtnPrimary {
+  padding: 13px 28px;
+  border: none;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 650;
+  background: #0e0f0f;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.25s;
+  letter-spacing: 0.01em;
+  font-family: inherit;
+}
+
+.ldBtnPrimary:hover {
+  background: #1a5c68;
+  transform: translateY(-1px);
+}
+
+.ldBtnOutline {
+  padding: 13px 28px;
+  border: 1.5px solid rgba(0,0,0,.13);
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 500;
+  background: transparent;
+  color: #0e0f0f;
+  cursor: pointer;
+  transition: all 0.25s;
+  font-family: inherit;
+}
+
+.ldBtnOutline:hover {
+  border-color: rgba(38,110,120,.35);
+  color: #1a5c68;
+  background: rgba(38,110,120,.07);
+}
+
+/* ── Hero Visual / Cards ── */
+.ldVisual {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  animation: ldFadeUp 0.55s 0.18s ease both;
+}
+
+.ldCard {
+  background: #fff;
+  border-radius: 28px;
+  border: 1px solid rgba(0,0,0,.08);
+  padding: 22px;
+  transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.ldCard:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 16px 48px rgba(38,110,120,.10);
+}
+
+.ldCardTop {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  margin-bottom: 16px;
+}
+
+.ldAvatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 650;
+  background: rgba(38,110,120,.13);
+  color: #1a5c68;
+  border: 2px solid rgba(38,110,120,.26);
+}
+
+.ldCardName {
+  font-size: 16px;
+  font-weight: 650;
+  letter-spacing: -0.2px;
+  margin: 0 0 5px;
+  color: #0e0f0f;
+}
+
+.ldVerBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: rgba(38,110,120,.13);
+  color: #1a5c68;
+  font-size: 11px;
+  font-weight: 650;
+  padding: 3px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(38,110,120,.26);
+}
+
+.ldDetails {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  margin-bottom: 16px;
+  font-size: 13px;
+  color: #616161;
+}
+
+.ldDetail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ldDetailIco {
+  font-size: 13px;
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.ldChips {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ldChip {
+  padding: 4px 12px;
+  border-radius: 999px;
+  font-size: 11.5px;
+  font-weight: 600;
+  background: rgba(38,110,120,.07);
+  color: #1a5c68;
+  border: 1px solid rgba(38,110,120,.2);
+}
+
+.ldMiniRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.ldMiniCard {
+  background: #fff;
+  border-radius: 18px;
+  border: 1px solid rgba(0,0,0,.08);
+  padding: 12px 14px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ldMiniAv {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 650;
+  background: rgba(0,0,0,.05);
+  color: #616161;
+}
+
+.ldMiniName {
+  font-size: 12.5px;
+  font-weight: 600;
+  margin: 0 0 2px;
+  color: #0e0f0f;
+}
+
+.ldMiniSub {
+  font-size: 11px;
+  color: #a0a0a0;
+}
+
+/* ── Steps ── */
+.ldSteps {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 0 48px 72px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.ldSectionLabel {
+  font-size: 11.5px;
+  font-weight: 650;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #a0a0a0;
+  margin-bottom: 22px;
+}
+
+.ldStepsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+
+.ldStep {
+  background: #fff;
+  border-radius: 20px;
+  border: 1px solid rgba(0,0,0,.08);
+  padding: 24px 20px;
+}
+
+.ldStepNum {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 700;
+  background: rgba(38,110,120,.07);
+  color: #1a5c68;
+  border: 1.5px solid rgba(38,110,120,.26);
+}
+
+.ldStepH {
+  font-size: 15px;
+  font-weight: 650;
+  letter-spacing: -0.2px;
+  margin: 0 0 7px;
+  color: #0e0f0f;
+}
+
+.ldStepP {
+  font-size: 13px;
+  color: #616161;
+  line-height: 1.55;
+  margin: 0;
+}
+
+/* ── Paths ── */
+.ldPaths {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 0 48px 72px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.ldPathsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.ldPath {
+  border-radius: 28px;
+  padding: 32px;
+}
+
+.ldPathLight {
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.08);
+}
+
+.ldPathDark {
+  background: #0e0f0f;
+  color: #fff;
+}
+
+.ldPathTag {
+  display: inline-flex;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 4px 12px;
+  border-radius: 999px;
+  margin-bottom: 16px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.ldPathLight .ldPathTag {
+  background: rgba(38,110,120,.07);
+  color: #1a5c68;
+  border: 1px solid rgba(38,110,120,.2);
+}
+
+.ldPathDark .ldPathTag {
+  background: rgba(255,255,255,.11);
+  color: rgba(255,255,255,.8);
+}
+
+.ldPathH {
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+  margin: 0 0 9px;
+}
+
+.ldPathSub {
+  font-size: 14px;
+  line-height: 1.62;
+  margin: 0 0 20px;
+}
+
+.ldPathLight .ldPathSub {
+  color: #616161;
+}
+
+.ldPathDark .ldPathSub {
+  color: rgba(255,255,255,.6);
+}
+
+.ldPathList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ldPathItem {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 13px;
+}
+
+.ldPathLight .ldPathItem {
+  color: #616161;
+}
+
+.ldPathDark .ldPathItem {
+  color: rgba(255,255,255,.72);
+}
+
+.ldPathCheck {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+}
+
+.ldPathLight .ldPathCheck {
+  background: rgba(38,110,120,.07);
+  color: #1a5c68;
+  border: 1px solid rgba(38,110,120,.2);
+}
+
+.ldPathDark .ldPathCheck {
+  background: rgba(255,255,255,.14);
+  color: rgba(255,255,255,.9);
+}
+
+.ldPathCta {
+  margin-top: 24px;
+}
+
+.ldPathCta button {
+  width: 100%;
+  padding: 12px;
+  border-radius: 999px;
+  font-size: 14px;
+  font-weight: 650;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: none;
+  letter-spacing: 0.01em;
+  font-family: inherit;
+}
+
+.ldPathLight .ldPathCta button {
+  background: #0e0f0f;
+  color: #fff;
+}
+
+.ldPathLight .ldPathCta button:hover {
+  background: #1a5c68;
+}
+
+.ldPathDark .ldPathCta button {
+  background: #fff;
+  color: #0e0f0f;
+}
+
+.ldPathDark .ldPathCta button:hover {
+  opacity: 0.9;
+}
+
+/* ── Footer ── */
+.ldFooter {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 24px 48px 40px;
+  border-top: 1px solid rgba(0,0,0,.075);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.ldFooterCopy {
+  font-size: 12.5px;
+  color: #a0a0a0;
+}
+
+.ldFooterLinks {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.ldFooterLink {
+  font-size: 12.5px;
+  color: #a0a0a0;
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-family: inherit;
+  padding: 0;
+  transition: color 0.2s;
+}
+
+.ldFooterLink:hover {
+  color: #1a5c68;
+}
+
+/* ── Animations ── */
+@keyframes ldFadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Responsive ── */
+@media (max-width: 760px) {
+  .ldNav {
+    padding: 16px 20px;
+  }
+
+  .ldNavActions .ldBtnDark {
+    display: none;
+  }
+
+  .ldBurger {
+    display: flex;
+  }
+
+  .ldHero {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 0 20px 56px;
+    margin-top: 14px;
+  }
+
+  .ldH1 {
+    font-size: 36px;
+    letter-spacing: -1.5px;
+  }
+
+  .ldVisual {
+    display: none;
+  }
+
+  .ldSteps {
+    padding: 0 20px 56px;
+  }
+
+  .ldStepsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .ldPaths {
+    padding: 0 20px 56px;
+  }
+
+  .ldPathsGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .ldFooter {
+    flex-direction: column;
+    gap: 14px;
+    text-align: center;
+    padding: 20px 20px 36px;
+  }
+
+  .ldFooterLinks {
+    justify-content: center;
+  }
+}

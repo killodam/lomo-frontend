@@ -8,6 +8,7 @@ const modalBody = document.getElementById('modalBody');
 const modalCloseBtn = document.getElementById('modalCloseBtn');
 
 const screens = {
+  landing: document.getElementById('screenLanding'),
   logo: document.getElementById('screenLogo'),
   auth: document.getElementById('screenAuth'),
   roleReg: document.getElementById('screenRoleReg'),
