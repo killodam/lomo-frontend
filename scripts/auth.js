@@ -570,6 +570,18 @@ function deleteOwnAccount(password) {
           return;
         }
 
+        if(route === 'toRecruiterPublic'){
+          renderRecruiterPublic();
+          show('recruiterPublic');
+          return;
+        }
+
+        if(route === 'toEmployeePublic'){
+          renderEmployeePublic();
+          show('employeePublic');
+          return;
+        }
+
         if(route === 'saveEmployerProfile'){
           const p = state.employer;
           p.fullName     = (document.getElementById('mpEFullName')?.value    || '').trim();
