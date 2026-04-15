@@ -928,40 +928,132 @@ function buildFeedTags(user) {
 }
 
 // ── BOOKMARKS LOGIC ───────────────────────────────────────
-function _isBookmarked(uid) {
-  const employerId = state.userId || 'anon';
-  const key = `lomo_favs_${employerId}`;
-  const favs = JSON.parse(localStorage.getItem(key) || '{}');
-  return !!favs[uid];
+function getBookmarksStorageKey() {
+  return 'lomo_favs_' + String(state.userId || 'anon');
 }
 
-function toggleBookmark(uid, event) {
-  if (event) event.stopPropagation();
-  const employerId = state.userId || 'anon';
-  const key = `lomo_favs_${employerId}`;
-  const favs = JSON.parse(localStorage.getItem(key) || '{}');
-  
-  if (favs[uid]) {
-    delete favs[uid];
+function readBookmarks() {
+  try {
+    var raw = window.localStorage.getItem(getBookmarksStorageKey());
+    var parsed = raw ? JSON.parse(raw) : {};
+    return parsed && typeof parsed === 'object' ? parsed : {};
+  } catch (error) {
+    return {};
+  }
+}
+
+function writeBookmarks(bookmarks) {
+  try {
+    window.localStorage.setItem(getBookmarksStorageKey(), JSON.stringify(bookmarks || {}));
+    return true;
+  } catch (error) {
+    showToast('Не удалось сохранить избранное', 'error');
+    return false;
+  }
+}
+
+function getBookmarkedUsersList() {
+  var bookmarks = readBookmarks();
+  return Object.keys(bookmarks).map(function (uid) {
+    return bookmarks[uid];
+  }).filter(Boolean);
+}
+
+function buildBookmarkSearchText(user) {
+  var parts = [
+    user && user.full_name,
+    user && user.email,
+    user && user.location,
+    user && user.edu_place,
+    user && user.edu_year,
+    user && user.vacancies,
+    user && user.about,
+    user && user.current_job,
+    user && user.job_title,
+    user && user.company,
+    user && user.industry,
+  ];
+
+  if (Array.isArray(user && user.work_exp)) {
+    user.work_exp.forEach(function (item) {
+      if (!item) return;
+      parts.push(item.company, item.role, item.period, item.desc);
+    });
+  }
+
+  return parts.filter(Boolean).join(' ').toLowerCase();
+}
+
+function filterBookmarkedUsers(list, query) {
+  var normalizedQuery = String(query || '').trim().toLowerCase();
+  if (!normalizedQuery) return list.slice();
+
+  return list.filter(function (user) {
+    return buildBookmarkSearchText(user).indexOf(normalizedQuery) !== -1;
+  });
+}
+
+function syncBookmarkButtons(uid, isActive) {
+  var targetUid = String(uid || '');
+  document.querySelectorAll('.scBookmarkBtn[data-bookmark-uid]').forEach(function (button) {
+    var matches = String(button.getAttribute('data-bookmark-uid') || '') === targetUid;
+    if (!matches) return;
+    button.classList.toggle('active', !!isActive);
+    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    button.setAttribute('title', isActive ? 'Убрать из избранного' : 'Добавить в избранное');
+  });
+}
+
+function _isBookmarked(uid) {
+  var bookmarks = readBookmarks();
+  return !!bookmarks[String(uid || '')];
+}
+
+function toggleBookmark(uid, sourceButton, event) {
+  var targetUid = String(uid || '');
+  var button = sourceButton && sourceButton.nodeType === 1 ? sourceButton : null;
+  var evt = event || (button ? null : sourceButton);
+  var bookmarks;
+  var user;
+  var isActive;
+
+  if (evt && typeof evt.stopPropagation === 'function') evt.stopPropagation();
+  if (!state.userId) {
+    showToast('Войдите в аккаунт, чтобы добавлять избранное', 'error');
+    return false;
+  }
+
+  bookmarks = readBookmarks();
+
+  if (bookmarks[targetUid]) {
+    delete bookmarks[targetUid];
     showToast('Удалено из избранного', 'info');
   } else {
-    const user = _userCache[uid];
+    user = _userCache[targetUid];
     if (user) {
-      favs[uid] = user;
+      bookmarks[targetUid] = user;
       showToast('Добавлено в избранное', 'success');
+    } else {
+      showToast('Не удалось добавить профиль в избранное', 'error');
+      return false;
     }
   }
-  
-  localStorage.setItem(key, JSON.stringify(favs));
-  
-  // Update UI if we are in the favorites view
+
+  if (!writeBookmarks(bookmarks)) return false;
+
+  isActive = !!bookmarks[targetUid];
+  if (button) {
+    button.classList.toggle('active', isActive);
+    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    button.setAttribute('title', isActive ? 'Убрать из избранного' : 'Добавить в избранное');
+  }
+  syncBookmarkButtons(targetUid, isActive);
+
   if (employerSearchState.verified === 'favorites') {
     loadEmployerSearch();
-  } else {
-    // Just toggle the star class
-    const btn = document.querySelector(`.socialCard[data-uid="${uid}"] .scBookmarkBtn`);
-    if (btn) btn.classList.toggle('active');
   }
+
+  return isActive;
 }
 
 
@@ -1078,11 +1170,11 @@ function buildSocialCard(user) {
   var uid = String(user.id || user.email || '?');
   _userCache[uid] = user;
 
-  // Bookmarking button for employers
+  // Bookmarking button for signed-in users
   var bookmarkBtn = '';
-  if (state.roleReg === 'EMPLOYER' || (getToken() && state.userId)) {
-    const activeClass = _isBookmarked(uid) ? ' active' : '';
-    bookmarkBtn = `<button class="scBookmarkBtn${activeClass}" onclick="toggleBookmark('${uid}', event)" title="Добавить в избранное">★</button>`;
+  if (state.userId) {
+    var isBookmarked = _isBookmarked(uid);
+    bookmarkBtn = '<button class="scBookmarkBtn' + (isBookmarked ? ' active' : '') + '" type="button" data-bookmark-uid="' + escHtml(uid) + '" aria-pressed="' + (isBookmarked ? 'true' : 'false') + '" title="' + (isBookmarked ? 'Убрать из избранного' : 'Добавить в избранное') + '" aria-label="' + (isBookmarked ? 'Убрать из избранного' : 'Добавить в избранное') + '">★</button>';
   }
 
   return '<div class="socialCard" data-uid="' + uid + '" style="cursor:pointer;">' +
@@ -1160,25 +1252,26 @@ function loadEmployerSearch(page) {
   if (!document.getElementById(listId)) return;
 
   if (employerSearchState.verified === 'favorites') {
-    const employerId = state.userId || 'anon';
-    const key = `lomo_favs_${employerId}`;
-    const favs = JSON.parse(localStorage.getItem(key) || '{}');
-    let items = Object.values(favs);
-    
-    // Apply search filter if any
-    if (employerSearchState.search) {
-      const q = employerSearchState.search.toLowerCase();
-      items = items.filter(u => 
-        (u.full_name || '').toLowerCase().includes(q) || 
-        (u.current_job || '').toLowerCase().includes(q) ||
-        (u.job_title || '').toLowerCase().includes(q)
-      );
-    }
-    
-    _empSearchData = items;
-    syncPagerState(employerSearchState, { total: items.length, page: 1, pageSize: 1000 });
+    var bookmarkedUsers = filterBookmarkedUsers(getBookmarkedUsersList(), employerSearchState.search);
+    var total = bookmarkedUsers.length;
+    var totalPages = total ? Math.ceil(total / employerSearchState.pageSize) : 0;
+    var safePage = employerSearchState.page || 1;
+    var start;
+
+    if (totalPages && safePage > totalPages) safePage = totalPages;
+    if (!totalPages) safePage = 1;
+
+    employerSearchState.page = safePage;
+    start = (safePage - 1) * employerSearchState.pageSize;
+    _empSearchData = bookmarkedUsers.slice(start, start + employerSearchState.pageSize);
+    syncPagerState(employerSearchState, {
+      total: total,
+      page: safePage,
+      pageSize: employerSearchState.pageSize,
+      totalPages: totalPages,
+    });
     renderEmployerSearch(_empSearchData);
-    renderPager('employerCandidatePager', { total: items.length, page: 1, pageSize: 1000 }, loadEmployerSearch, { label: 'избранных' });
+    renderPager('employerCandidatePager', employerSearchState, loadEmployerSearch, { label: 'избранных' });
     return;
   }
 
@@ -1215,6 +1308,14 @@ function renderEmployerSearch(list) {
   var el = document.getElementById('employerCandidateList');
   if (!el) return;
   if (!list.length) {
+    if (employerSearchState.verified === 'favorites') {
+      renderFeedEmptyState(
+        'employerCandidateList',
+        '★',
+        employerSearchState.search ? 'По этому запросу в избранном никого нет' : 'В избранном пока нет кандидатов'
+      );
+      return;
+    }
     renderFeedEmptyState('employerCandidateList', '👤', 'Нет кандидатов по текущему фильтру');
     return;
   }

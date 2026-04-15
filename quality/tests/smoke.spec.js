@@ -155,6 +155,81 @@ test('candidate login opens feed and paginates server-side', async ({ page }) =>
   await expect.poll(() => requestedPage).toBe('2');
 });
 
+test('candidate can bookmark another user from feed without opening profile', async ({ page }) => {
+  let publicProfileOpened = false;
+
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'cand-1', email: 'candidate@example.com', login: 'candidate', role: 'candidate' },
+          profile: { full_name: 'Иван Кандидат', location: 'Москва', edu_place: 'МГУ', vacancies: 'Product Designer' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([
+          {
+            id: 'cand-2',
+            role: 'candidate',
+            public_id: 'LOMO-CAND00002',
+            full_name: 'Анна Петрова',
+            location: 'Казань',
+            edu_place: 'КФУ',
+            vacancies: 'Data Analyst',
+            about: 'Опытный кандидат',
+          },
+        ], 1, 12, 1)),
+      });
+    }
+
+    if (url.pathname.includes('/public/profile/')) {
+      publicProfileOpened = true;
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({}),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.fill('#loginEmail', 'candidate@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await expect(page.locator('#screenCandidateFeed')).toHaveClass(/active/);
+  await expect(page.locator('#candidateFeedList .scBookmarkBtn')).toHaveCount(1);
+
+  await page.click('#candidateFeedList .scBookmarkBtn');
+
+  await expect(page.locator('#toast')).toContainText('Добавлено в избранное');
+  await expect(page.locator('#candidateFeedList .scBookmarkBtn')).toHaveClass(/active/);
+  await expect(page.locator('#screenCandidateFeed')).toHaveClass(/active/);
+  await expect.poll(() => publicProfileOpened).toBe(false);
+  await expect.poll(async () => page.evaluate(() => {
+    var raw = window.localStorage.getItem('lomo_favs_cand-1') || '{}';
+    var data = JSON.parse(raw);
+    return !!data['cand-2'];
+  })).toBe(true);
+});
+
 test('candidate logout from feed returns to landing', async ({ page }) => {
   let logoutCalled = false;
 
@@ -304,6 +379,86 @@ test('employer can request document access from public profile', async ({ page }
   await page.click('[data-request-doc="education"]');
   await expect.poll(() => requestSent).toBe(true);
   await expect(page.locator('#pubAccessPanel')).toContainText('Запрос отправлен: Образование');
+});
+
+test('employer favorites filter keeps bookmarked candidates and searches locally', async ({ page }) => {
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'company-1', email: 'employer@example.com', login: 'employer', role: 'employer' },
+          profile: { full_name: 'Алина HR', company: 'LOMO Labs', industry: 'Tech', location: 'Москва' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/candidates')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([
+          {
+            id: 'cand-77',
+            role: 'candidate',
+            public_id: 'LOMO-CAND00077',
+            full_name: 'Мария Тестова',
+            location: 'Казань',
+            edu_place: 'ИТМО',
+            vacancies: 'Data Analyst',
+            current_job: 'Tinkoff',
+            job_title: 'Analyst',
+            about: 'Люблю аккуратные системы',
+          },
+          {
+            id: 'cand-88',
+            role: 'candidate',
+            public_id: 'LOMO-CAND00088',
+            full_name: 'Олег Смирнов',
+            location: 'Москва',
+            edu_place: 'МГУ',
+            vacancies: 'Marketing',
+            current_job: 'VK',
+            job_title: 'Marketer',
+            about: 'Растил B2C продукт',
+          },
+        ], 1, 12, 2)),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.fill('#loginEmail', 'employer@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await expect(page.locator('#screenEmployerSearch')).toHaveClass(/active/);
+  await expect(page.locator('#employerCandidateList')).toContainText('Мария Тестова');
+  await expect(page.locator('#employerCandidateList')).toContainText('Олег Смирнов');
+
+  await page.click('#employerCandidateList .socialCard:first-child .scBookmarkBtn');
+  await expect(page.locator('#toast')).toContainText('Добавлено в избранное');
+
+  await page.click('.empFilterChip[data-verified="favorites"]');
+  await expect(page.locator('#employerCandidateList')).toContainText('Мария Тестова');
+  await expect(page.locator('#employerCandidateList')).not.toContainText('Олег Смирнов');
+
+  await page.fill('#empSearchName', 'Казань');
+  await expect(page.locator('#employerCandidateList')).toContainText('Мария Тестова');
+
+  await page.fill('#empSearchName', 'Маркетинг');
+  await expect(page.locator('#employerCandidateList')).toContainText('По этому запросу в избранном никого нет');
 });
 
 test('user can send connection request from public profile', async ({ page }) => {

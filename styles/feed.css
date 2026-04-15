@@ -549,6 +549,13 @@
   color: #f59e0b;
 }
 
+.scBookmarkBtn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(245, 158, 11, 0.18);
+  border-radius: 999px;
+  color: #f59e0b;
+}
+
 .scBookmarkBtn.active {
   color: #f59e0b;
 }

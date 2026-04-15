@@ -300,6 +300,14 @@ function deleteOwnAccount(password) {
 
     // Main click handler
     document.addEventListener('click', (e) => {
+      const bookmarkBtn = e.target.closest('.scBookmarkBtn[data-bookmark-uid]');
+      if(bookmarkBtn){
+        e.preventDefault();
+        if(typeof toggleBookmark === 'function'){
+          toggleBookmark(bookmarkBtn.getAttribute('data-bookmark-uid'), bookmarkBtn, e);
+        }
+        return;
+      }
 
       // Social card click — open profile
       const card = e.target.closest('.socialCard[data-uid]');
