@@ -52,6 +52,11 @@ if (feedHeaderLogoImg && mainLogoImg) {
   feedHeaderLogoImg.src = mainLogoImg.src;
 }
 
+const empSearchLogoImg = document.getElementById('empSearchLogoImg');
+if (empSearchLogoImg && mainLogoImg) {
+  empSearchLogoImg.src = mainLogoImg.src;
+}
+
 function clearScreenInputs(key) {
   if (!screens[key]) return;
   screens[key].querySelectorAll('input, textarea').forEach((element) => {

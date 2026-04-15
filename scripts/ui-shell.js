@@ -146,6 +146,16 @@ function bindStaticUiActions() {
   const employerVerified = document.getElementById('empSearchVerified');
   if (employerVerified) employerVerified.addEventListener('change', function () { filterEmployerSearch(); });
 
+  document.querySelectorAll('.empFilterChip').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      document.querySelectorAll('.empFilterChip').forEach(function (c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+      var sel = document.getElementById('empSearchVerified');
+      if (sel) sel.value = chip.getAttribute('data-verified') || '';
+      filterEmployerSearch();
+    });
+  });
+
   const adminCandSearch = document.getElementById('adminCandSearch');
   if (adminCandSearch) adminCandSearch.addEventListener('input', function () { debouncedFilterAdminCandidates(); });
 

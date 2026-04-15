@@ -447,3 +447,90 @@
   .feedTitle { font-size: 20px; }
   .feedContent { padding: 14px 12px 36px; }
 }
+
+/* ══════════════════════════════════════════════
+   LOMO — EMPLOYER SEARCH STYLES
+   ══════════════════════════════════════════════ */
+
+#screenEmployerSearch {
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-direction: column;
+  background: #f7f8fa;
+}
+
+/* ── Filter chips ── */
+.empFilterChips {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+
+.empFilterChip {
+  padding: 7px 18px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .18s;
+  font-family: inherit;
+  border: 1.5px solid rgba(0,0,0,.10);
+  background: transparent;
+  color: #666;
+  white-space: nowrap;
+}
+
+.empFilterChip:hover {
+  border-color: rgba(38,110,120,.32);
+  color: #1a5c68;
+  background: rgba(38,110,120,.06);
+}
+
+.empFilterChip.active {
+  background: #0e0f0f;
+  color: #fff;
+  border-color: #0e0f0f;
+}
+
+.empFilterChip.active:hover {
+  background: #1a5c68;
+  border-color: #1a5c68;
+}
+
+/* Verified chip keeps teal accent when active */
+.empFilterChip[data-verified="verified"].active {
+  background: rgba(22,163,74,.12);
+  color: #15803d;
+  border-color: rgba(22,163,74,.35);
+}
+
+.empFilterChip[data-verified="verified"].active:hover {
+  background: rgba(22,163,74,.18);
+}
+
+/* ── Employer result list reuses feed card styles ── */
+.empListWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* ── Count badge in search hero ── */
+.empResultCount {
+  font-size: 12px;
+  color: #aaa;
+  margin-top: 14px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
+.empResultCount strong {
+  color: #555;
+  font-weight: 650;
+}
+
+@media (max-width: 640px) {
+  .empFilterChips { gap: 5px; }
+  .empFilterChip { padding: 6px 14px; font-size: 12px; }
+}

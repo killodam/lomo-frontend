@@ -1000,7 +1000,12 @@ function loadEmployerSearch(page) {
 
   var el = document.getElementById('employerCandidateList');
   if (!el) return;
-  el.innerHTML = '<div style="text-align:center;padding:32px;color:#888;">Загрузка...</div>';
+  el.innerHTML = '<div class="feedSkeleton">' + [1,2,3,4].map(function() {
+    return '<div class="feedSkeletonCard"><div class="feedSkeletonHead">' +
+      '<div class="skPulse feedSkAv"></div>' +
+      '<div class="feedSkLines"><div class="skPulse feedSkL1"></div><div class="skPulse feedSkL2"></div></div>' +
+    '</div></div>';
+  }).join('') + '</div>';
 
   apiGetCandidates({
     page: employerSearchState.page,
@@ -1033,7 +1038,7 @@ function renderEmployerSearch(list) {
   var el = document.getElementById('employerCandidateList');
   if (!el) return;
   if (!list.length) {
-    el.innerHTML = '<div style="padding:24px;text-align:center;color:#888;">Нет кандидатов по текущему фильтру</div>';
+    el.innerHTML = '<div class="feedEmptyState"><span class="feedEmptyIco">👤</span><div class="feedEmptyText">Нет кандидатов по текущему фильтру</div></div>';
     return;
   }
   el.innerHTML = list.map(function (candidate) {

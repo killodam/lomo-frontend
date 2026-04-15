@@ -810,34 +810,49 @@
 
 <!-- EMPLOYER SEARCH -->
 <section id="screenEmployerSearch" class="screen" aria-label="Поиск кандидатов">
-  <div class="wrap profileWrap">
-    <div class="topBar stickyTop" style="padding:0 16px;">
-      <div class="topLeft" style="display:flex;align-items:center;gap:10px;">
-        <button aria-label="Menu" class="burgerBtn feedBurger js-toggle-drawer"><span></span><span></span><span></span></button>
+  <div class="feedScreen">
+
+    <header class="feedHeader">
+      <div class="feedHeaderInner">
+        <button class="feedHeaderBurger js-toggle-drawer" aria-label="Меню">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="feedHeaderBrand">
+          <img id="empSearchLogoImg" class="feedHeaderLogoImg" alt="LOMO">
+          <span class="feedHeaderWord">LOMO</span>
+        </div>
+        <nav class="feedHeaderNav">
+          <button type="button" class="feedNavBtn" data-next="toChatHub">Чаты</button>
+          <button type="button" class="feedNavBtn accent" id="searchCompanyProfileBtn">Профиль компании</button>
+          <button type="button" class="feedNavBtn ghost" data-next="toAuthFromProfile">Выйти</button>
+        </nav>
       </div>
-      <div class="topRight" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
-        <button type="button" class="pillBtn" data-next="toChatHub" style="font-size:13px;font-weight:600;">Чаты</button>
-        <button type="button" class="pillBtn" id="searchCompanyProfileBtn" data-next="toRecruiterPublic" style="font-size:13px;font-weight:600;">Профиль компании</button>
-        <button type="button" class="sqBtn sm ghostBtn" data-next="toAuthFromProfile" style="font-size:13px;">Выйти</button>
-      </div>
-    </div>
-    <div class="centerBlock" style="padding-top:20px;max-width:760px;">
-      <div style="margin-bottom:16px;">
-        <div style="font-size:22px;font-weight:800;color:#1a1a1a;letter-spacing:-.3px;">Поиск кандидатов</div>
-        <div style="font-size:13px;color:#999;margin-top:3px;">Верифицированные профили · документы проверены LOMO</div>
-      </div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;">
-        <input id="empSearchName" type="text" placeholder="🔍  Имя, навык, вакансия, город..." style="flex:1;min-width:200px;padding:11px 16px;border:1.5px solid #e5e7eb;border-radius:14px;font-size:14px;outline:none;box-sizing:border-box;transition:border .15s;">
-        <select id="empSearchVerified" style="padding:11px 16px;border:1.5px solid #e5e7eb;border-radius:14px;font-size:13px;background:#fff;outline:none;cursor:pointer;color:#555;">
+    </header>
+
+    <div class="feedSearchHero empSearchHero">
+      <div class="feedSearchHeroInner">
+        <h1 class="feedTitle">Поиск кандидатов</h1>
+        <p class="feedSub">Верифицированные профили · документы проверены LOMO</p>
+        <div class="feedSearchWrap empSearchRow">
+          <svg class="feedSearchIco" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input id="empSearchName" type="text" class="feedSearchInput" placeholder="Имя, навык, вакансия, город...">
+        </div>
+        <div class="empFilterChips">
+          <button class="empFilterChip active" data-verified="" type="button">Все кандидаты</button>
+          <button class="empFilterChip" data-verified="verified" type="button">✓ Верифицированные</button>
+        </div>
+        <select id="empSearchVerified" style="display:none">
           <option value="">Все кандидаты</option>
-          <option value="verified">✓ Верифицированные</option>
+          <option value="verified">Верифицированные</option>
         </select>
       </div>
-      <div id="employerCandidateList" style="display:flex;flex-direction:column;gap:10px;">
-        <div style="text-align:center;padding:32px;color:#888;">Загрузка...</div>
-      </div>
+    </div>
+
+    <div class="feedContent">
+      <div id="employerCandidateList" class="feedListWrap empListWrap"></div>
       <div id="employerCandidatePager" class="pager"></div>
     </div>
+
   </div>
 </section>
 
