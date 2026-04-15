@@ -41,27 +41,11 @@
     refreshBtn: document.getElementById('chatRefreshBtn'),
     backToListBtn: document.getElementById('chatBackToListBtn'),
     openProfileBtn: document.getElementById('chatOpenProfileBtn'),
-    attachBtn: document.getElementById('chatAttachBtn'),
-    fileInput: document.getElementById('chatFileInput'),
-    attachPreview: document.getElementById('chatAttachPreview'),
-    attachName: document.getElementById('chatAttachName'),
-    attachClear: document.getElementById('chatAttachClear'),
     connectionInbox: document.getElementById('chatConnectionInbox'),
   };
 
-  var pendingFile = null;
   var CHAT_ATTACHMENT_TOKEN_RE = /\[\[attachment\|([^\]|]+)\|([^\]]+)\]\]/;
   var CHAT_ATTACHMENT_TOKEN_RE_GLOBAL = /\[\[attachment\|([^\]|]+)\|([^\]]+)\]\]/g;
-  var CHAT_ALLOWED_FILE_EXT_RE = /\.(pdf|doc|docx|png|jpe?g|webp)$/i;
-  var CHAT_IMAGE_EXT_RE = /\.(png|jpe?g|webp)$/i;
-  var CHAT_ALLOWED_FILE_TYPES = {
-    'application/pdf': true,
-    'application/msword': true,
-    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': true,
-    'image/png': true,
-    'image/jpeg': true,
-    'image/webp': true,
-  };
 
   function shouldEnableChat() {
     return !!getToken() && state.roleReg !== 'ADMIN';
@@ -316,14 +300,9 @@
 
   function renderTextWithLinks(text) {
     var escaped = escapeHtml(text || '');
-    return escaped.replace(/((?:https?:\/\/|\/api\/chat\/attachments\/)[^\s<>"]+)/g, function (url) {
+    return escaped.replace(/(https?:\/\/[^\s<>"]+)/g, function (url) {
       return '<a href="' + url + '" target="_blank" rel="noopener noreferrer" class="chatLink">' + url + '</a>';
     });
-  }
-
-  function isImageAttachment(attachment) {
-    if (!attachment) return false;
-    return CHAT_IMAGE_EXT_RE.test(attachment.name || '') || CHAT_IMAGE_EXT_RE.test(attachment.url || '');
   }
 
   function parseAttachment(body) {
@@ -358,85 +337,18 @@
       }).join('');
     }
 
-    if (attachment && attachment.url) {
-      var escapedUrl = escapeHtml(attachment.url);
+    if (attachment) {
       var escapedName = escapeHtml(attachment.name);
-      if (isImageAttachment(attachment)) {
-        html +=
-          '<div class="chatAttachmentBlock">' +
-            '<a href="' + escapedUrl + '" target="_blank" rel="noopener noreferrer" class="chatAttachmentLink chatAttachmentLinkImage">' +
-              '<div class="chatAttachmentImageWrap">' +
-                '<div class="chatImgSkeleton"></div>' +
-                '<img class="chatAttachmentImage" data-src="' + escapedUrl + '" alt="' + escapedName + '" decoding="async">' +
-              '</div>' +
-            '</a>' +
-          '</div>';
-      } else {
-        html +=
-          '<div class="chatAttachmentBlock">' +
-            '<a href="' + escapedUrl + '" target="_blank" rel="noopener noreferrer" class="chatAttachmentLink">' +
-              '<span class="chatAttachment">' +
-                '<span class="chatAttachmentIcon">📎</span>' +
-                '<span class="chatAttachmentLabel">' + escapedName + '</span>' +
-                '<span class="chatAttachmentArrow">↗</span>' +
-              '</span>' +
-            '</a>' +
-          '</div>';
-      }
+      html +=
+        '<div class="chatAttachmentBlock">' +
+          '<span class="chatAttachment chatAttachmentMuted" title="Вложения в чате временно отключены">' +
+            '<span class="chatAttachmentIcon">📎</span>' +
+            '<span class="chatAttachmentLabel"><span class="chatAttachmentTitle">' + escapedName + '</span><span class="chatAttachmentHint">Вложения временно отключены</span></span>' +
+          '</span>' +
+        '</div>';
     }
 
     return html || '<p>Пустое сообщение</p>';
-  }
-
-  function isImageOnlyMessage(body) {
-    var attachment = parseAttachment(body);
-    var text = stripAttachmentToken(body).trim();
-    return !!(attachment && isImageAttachment(attachment) && !text);
-  }
-
-  function loadBubbleImages(container) {
-    if (!container) return;
-    container.querySelectorAll('img.chatAttachmentImage[data-src]').forEach(function (img) {
-      var src = img.getAttribute('data-src');
-      if (!src) return;
-      img.removeAttribute('data-src');
-      var apiPath = src.replace(/^https?:\/\/[^/]+\/api/, '').replace(/^\/api/, '');
-      apiFetchBlob(apiPath)
-        .then(function (blob) {
-          img.src = URL.createObjectURL(blob);
-          var block = img.closest('.chatAttachmentBlock');
-          if (block) block.classList.add('chatImgLoaded');
-        })
-        .catch(function () {
-          var block = img.closest('.chatAttachmentBlock');
-          if (block) block.classList.add('chatImgFailed');
-        });
-    });
-  }
-
-  function buildChatAttachmentUrl(fileUrl) {
-    var match = String(fileUrl || '').trim().match(/\/files\/([^/?#]+)$/);
-    if (!match) return '';
-    var base = String(typeof API_BASE !== 'undefined' ? API_BASE : '/api').replace(/\/+$/, '');
-    return base + '/chat/attachments/' + encodeURIComponent(match[1]);
-  }
-
-  function buildChatAttachmentToken(name, url) {
-    if (!url) return '';
-    return '[[attachment|' + String(name || 'Файл').trim() + '|' + String(url).trim() + ']]';
-  }
-
-  function buildChatMessageBody(text, attachment) {
-    var parts = [];
-    if (text) parts.push(text);
-    if (attachment && attachment.url) parts.push(buildChatAttachmentToken(attachment.name, attachment.url));
-    return parts.join('\n').trim();
-  }
-
-  function isAllowedChatFile(file) {
-    if (!file) return false;
-    if (CHAT_ALLOWED_FILE_TYPES[file.type]) return true;
-    return CHAT_ALLOWED_FILE_EXT_RE.test(file.name || '');
   }
 
   function ensureHeaderChatBadge(button) {
@@ -627,18 +539,15 @@
 
     elements.messages.innerHTML = messages.map(function (message) {
       var mine = String(message.author_user_id) === String(state.userId || '');
-      var imageOnly = isImageOnlyMessage(message.body);
-      var bubbleExtra = (mine ? ' mine' : '') + (imageOnly ? ' chatBubble--media' : '');
       return (
         '<div class="chatBubbleRow' + (mine ? ' mine' : '') + '">' +
-          '<div class="chatBubble' + bubbleExtra + '">' +
+          '<div class="chatBubble' + (mine ? ' mine' : '') + '">' +
             '<div class="chatBubbleText">' + renderMessageBodyHtml(message.body) + '</div>' +
-            '<div class="chatBubbleMeta' + (imageOnly ? ' chatBubbleMeta--overlay' : '') + '">' + escapeHtml(formatChatTime(message.created_at)) + '</div>' +
+            '<div class="chatBubbleMeta">' + escapeHtml(formatChatTime(message.created_at)) + '</div>' +
           '</div>' +
         '</div>'
       );
     }).join('');
-    loadBubbleImages(elements.messages);
 
     if (shouldStickToBottom) {
       scrollMessagesToBottom(options.smooth ? 'smooth' : 'auto');
@@ -1068,43 +977,14 @@
     }
   }
 
-  function clearPendingFile() {
-    pendingFile = null;
-    if (elements.fileInput) elements.fileInput.value = '';
-    if (elements.attachPreview) elements.attachPreview.classList.add('hidden');
-    if (elements.attachName) elements.attachName.textContent = '';
-  }
-
-  function setPendingFile(file) {
-    if (!isAllowedChatFile(file)) {
-      clearPendingFile();
-      showToast('Разрешены PDF, JPG, PNG, WEBP, DOC и DOCX', 'error');
-      return;
-    }
-    pendingFile = file;
-    if (elements.attachName) elements.attachName.textContent = file.name;
-    if (elements.attachPreview) elements.attachPreview.classList.remove('hidden');
-  }
-
   async function sendMessage() {
     var conversationId = state.chat.activeConversationId;
     var text = (elements.input && elements.input.value || '').trim();
-    if (!conversationId || (!text && !pendingFile)) return;
+    if (!conversationId || !text) return;
 
     elements.send.disabled = true;
-    if (elements.attachBtn) elements.attachBtn.disabled = true;
     try {
-      var body = text;
-      if (pendingFile) {
-        var uploadResult = await apiUploadFile(pendingFile);
-        var uploadedFileUrl = uploadResult && (uploadResult.fileUrl || uploadResult.file_url || uploadResult.url || uploadResult.path || '');
-        var attachmentUrl = buildChatAttachmentUrl(uploadedFileUrl);
-        var attachmentName = uploadResult && (uploadResult.fileName || uploadResult.file_name || pendingFile.name || 'Файл');
-        clearPendingFile();
-        body = buildChatMessageBody(text, attachmentUrl ? { name: attachmentName, url: attachmentUrl } : null);
-      }
-      if (!body) return;
-      var message = normalizeMessage(await apiSendChatMessage(conversationId, body));
+      var message = normalizeMessage(await apiSendChatMessage(conversationId, text));
       var bucket = Array.isArray(state.chat.messagesByConversation[String(conversationId)])
         ? state.chat.messagesByConversation[String(conversationId)].slice()
         : [];
@@ -1127,7 +1007,6 @@
       }
     } finally {
       elements.send.disabled = false;
-      if (elements.attachBtn) elements.attachBtn.disabled = false;
     }
   }
 
@@ -1231,25 +1110,6 @@
     elements.composer.addEventListener('submit', function (event) {
       event.preventDefault();
       sendMessage();
-    });
-  }
-
-  if (elements.attachBtn && elements.fileInput) {
-    elements.attachBtn.addEventListener('click', function () {
-      elements.fileInput.click();
-    });
-  }
-
-  if (elements.fileInput) {
-    elements.fileInput.addEventListener('change', function () {
-      var file = elements.fileInput.files && elements.fileInput.files[0];
-      if (file) setPendingFile(file);
-    });
-  }
-
-  if (elements.attachClear) {
-    elements.attachClear.addEventListener('click', function () {
-      clearPendingFile();
     });
   }
 
