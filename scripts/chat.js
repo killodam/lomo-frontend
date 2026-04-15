@@ -37,7 +37,14 @@
     refreshBtn: document.getElementById('chatRefreshBtn'),
     backToListBtn: document.getElementById('chatBackToListBtn'),
     openProfileBtn: document.getElementById('chatOpenProfileBtn'),
+    attachBtn: document.getElementById('chatAttachBtn'),
+    fileInput: document.getElementById('chatFileInput'),
+    attachPreview: document.getElementById('chatAttachPreview'),
+    attachName: document.getElementById('chatAttachName'),
+    attachClear: document.getElementById('chatAttachClear'),
   };
+
+  var pendingFile = null;
 
   function shouldEnableChat() {
     return !!getToken() && state.roleReg !== 'ADMIN';
@@ -344,7 +351,7 @@
       return (
         '<div class="chatBubbleRow' + (mine ? ' mine' : '') + '">' +
           '<div class="chatBubble' + (mine ? ' mine' : '') + '">' +
-            '<div class="chatBubbleText">' + escapeHtml(message.body) + '</div>' +
+            '<div class="chatBubbleText">' + linkifyMessage(message.body) + '</div>' +
             '<div class="chatBubbleMeta">' + escapeHtml(formatChatTime(message.created_at)) + '</div>' +
           '</div>' +
         '</div>'
@@ -711,13 +718,37 @@
     }
   }
 
+  function clearPendingFile() {
+    pendingFile = null;
+    if (elements.fileInput) elements.fileInput.value = '';
+    if (elements.attachPreview) elements.attachPreview.classList.add('hidden');
+    if (elements.attachName) elements.attachName.textContent = '';
+  }
+
+  function setPendingFile(file) {
+    pendingFile = file;
+    if (elements.attachName) elements.attachName.textContent = file.name;
+    if (elements.attachPreview) elements.attachPreview.classList.remove('hidden');
+  }
+
   async function sendMessage() {
     var conversationId = state.chat.activeConversationId;
-    var body = (elements.input && elements.input.value || '').trim();
-    if (!conversationId || !body) return;
+    var text = (elements.input && elements.input.value || '').trim();
+    if (!conversationId || (!text && !pendingFile)) return;
 
     elements.send.disabled = true;
+    if (elements.attachBtn) elements.attachBtn.disabled = true;
     try {
+      var body = text;
+      if (pendingFile) {
+        var uploadResult = await apiUploadFile(pendingFile);
+        var fileUrl = uploadResult && (uploadResult.url || uploadResult.file_url || uploadResult.path || '');
+        if (fileUrl) {
+          body = text ? text + '\n' + fileUrl : fileUrl;
+        }
+        clearPendingFile();
+      }
+      if (!body) return;
       var message = normalizeMessage(await apiSendChatMessage(conversationId, body));
       var bucket = Array.isArray(state.chat.messagesByConversation[String(conversationId)])
         ? state.chat.messagesByConversation[String(conversationId)].slice()
@@ -741,6 +772,7 @@
       }
     } finally {
       elements.send.disabled = false;
+      if (elements.attachBtn) elements.attachBtn.disabled = false;
     }
   }
 
@@ -824,6 +856,25 @@
     elements.composer.addEventListener('submit', function (event) {
       event.preventDefault();
       sendMessage();
+    });
+  }
+
+  if (elements.attachBtn && elements.fileInput) {
+    elements.attachBtn.addEventListener('click', function () {
+      elements.fileInput.click();
+    });
+  }
+
+  if (elements.fileInput) {
+    elements.fileInput.addEventListener('change', function () {
+      var file = elements.fileInput.files && elements.fileInput.files[0];
+      if (file) setPendingFile(file);
+    });
+  }
+
+  if (elements.attachClear) {
+    elements.attachClear.addEventListener('click', function () {
+      clearPendingFile();
     });
   }
 

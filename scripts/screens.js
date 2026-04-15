@@ -26,11 +26,6 @@ const screens = {
   publicProfile: document.getElementById('screenPublicProfile'),
 };
 
-const mainLogoImg = document.querySelector('#screenLogo .logo');
-['authLogoImg', 'ldNavLogoImg', 'feedHeaderLogoImg', 'empSearchLogoImg', 'chatScreenLogoImg'].forEach(function(id) {
-  var el = document.getElementById(id);
-  if (el && mainLogoImg) el.src = mainLogoImg.src;
-});
 
 function clearScreenInputs(key) {
   if (!screens[key]) return;

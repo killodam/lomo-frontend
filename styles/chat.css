@@ -603,6 +603,77 @@
   padding: 0 4px;
 }
 
+.chatAttachBtn {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1.5px solid rgba(0,0,0,.12);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6b7280;
+  flex-shrink: 0;
+  transition: background .15s, border-color .15s, color .15s;
+}
+
+.chatAttachBtn:hover {
+  background: rgba(38,110,120,.08);
+  border-color: rgba(38,110,120,.3);
+  color: #26707a;
+}
+
+.chatAttachBtn:disabled {
+  opacity: .4;
+  cursor: not-allowed;
+}
+
+.chatAttachPreview {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 8px;
+  padding: 5px 10px;
+  background: rgba(38,110,120,.07);
+  border: 1px solid rgba(38,110,120,.18);
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: #26707a;
+}
+
+.chatAttachPreview.hidden { display: none; }
+
+.chatAttachName {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chatAttachClear {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #888;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+  flex-shrink: 0;
+  transition: color .12s;
+}
+
+.chatAttachClear:hover { color: #e53e3e; }
+
+.chatLink {
+  color: inherit;
+  text-decoration: underline;
+  word-break: break-all;
+  opacity: .85;
+}
+
+.chatLink:hover { opacity: 1; }
+
 /* ── Nav unread badge ── */
 .chatNavUnreadBadge {
   display: inline-flex;
