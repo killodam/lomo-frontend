@@ -11,6 +11,7 @@
     {
       API_BASE: defaultApiBase,
       CHAT_WS_BASE: defaultChatWsBase,
+      FEED_AUTO_REFRESH_MS: 30000,
     },
     window.LOMO_CONFIG || {}
   );

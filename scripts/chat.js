@@ -53,6 +53,7 @@
   var CHAT_ATTACHMENT_TOKEN_RE = /\[\[attachment\|([^\]|]+)\|([^\]]+)\]\]/;
   var CHAT_ATTACHMENT_TOKEN_RE_GLOBAL = /\[\[attachment\|([^\]|]+)\|([^\]]+)\]\]/g;
   var CHAT_ALLOWED_FILE_EXT_RE = /\.(pdf|doc|docx|png|jpe?g|webp)$/i;
+  var CHAT_IMAGE_EXT_RE = /\.(png|jpe?g|webp)$/i;
   var CHAT_ALLOWED_FILE_TYPES = {
     'application/pdf': true,
     'application/msword': true,
@@ -320,6 +321,11 @@
     });
   }
 
+  function isImageAttachment(attachment) {
+    if (!attachment) return false;
+    return CHAT_IMAGE_EXT_RE.test(attachment.name || '') || CHAT_IMAGE_EXT_RE.test(attachment.url || '');
+  }
+
   function parseAttachment(body) {
     var match = String(body || '').match(CHAT_ATTACHMENT_TOKEN_RE);
     if (!match) return null;
@@ -353,13 +359,27 @@
     }
 
     if (attachment && attachment.url) {
-      html +=
-        '<div class="chatAttachmentBlock">' +
-          '<a href="' + escapeHtml(attachment.url) + '" target="_blank" rel="noopener noreferrer" class="chatAttachment">' +
-            '<span class="chatAttachmentIcon">📎</span>' +
-            '<span class="chatAttachmentLabel">' + escapeHtml(attachment.name) + '</span>' +
-          '</a>' +
-        '</div>';
+      if (isImageAttachment(attachment)) {
+        html +=
+          '<div class="chatAttachmentBlock">' +
+            '<a href="' + escapeHtml(attachment.url) + '" target="_blank" rel="noopener noreferrer" class="chatAttachmentLink">' +
+              '<div class="chatAttachmentImageWrap">' +
+                '<img class="chatAttachmentImage" src="' + escapeHtml(attachment.url) + '" alt="' + escapeHtml(attachment.name) + '" loading="lazy" decoding="async">' +
+                '<div class="chatAttachmentCaption"><span>🖼</span><span>' + escapeHtml(attachment.name) + '</span></div>' +
+              '</div>' +
+            '</a>' +
+          '</div>';
+      } else {
+        html +=
+          '<div class="chatAttachmentBlock">' +
+            '<a href="' + escapeHtml(attachment.url) + '" target="_blank" rel="noopener noreferrer" class="chatAttachmentLink">' +
+              '<span class="chatAttachment">' +
+                '<span class="chatAttachmentIcon">📎</span>' +
+                '<span class="chatAttachmentLabel">' + escapeHtml(attachment.name) + '</span>' +
+              '</span>' +
+            '</a>' +
+          '</div>';
+      }
     }
 
     return html || '<p>Пустое сообщение</p>';
@@ -368,7 +388,8 @@
   function buildChatAttachmentUrl(fileUrl) {
     var match = String(fileUrl || '').trim().match(/\/files\/([^/?#]+)$/);
     if (!match) return '';
-    return '/api/chat/attachments/' + encodeURIComponent(match[1]);
+    var base = String(typeof API_BASE !== 'undefined' ? API_BASE : '/api').replace(/\/+$/, '');
+    return base + '/chat/attachments/' + encodeURIComponent(match[1]);
   }
 
   function buildChatAttachmentToken(name, url) {

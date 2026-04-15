@@ -657,6 +657,17 @@
   margin-top: 8px;
 }
 
+.chatAttachmentLink {
+  display: inline-block;
+  max-width: 100%;
+  color: inherit;
+  text-decoration: none;
+}
+
+.chatAttachmentLink:hover {
+  text-decoration: none;
+}
+
 .chatAttachment {
   display: inline-flex;
   align-items: center;
@@ -692,6 +703,38 @@
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.chatAttachmentImageWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: min(320px, 100%);
+}
+
+.chatAttachmentImage {
+  display: block;
+  max-width: min(320px, 100%);
+  max-height: 260px;
+  border-radius: 14px;
+  object-fit: cover;
+  background: rgba(0,0,0,.04);
+  border: 1px solid rgba(0,0,0,.07);
+}
+
+.chatBubble.mine .chatAttachmentImage {
+  border-color: rgba(255,255,255,.16);
+}
+
+.chatAttachmentCaption {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 4px;
+  font-size: 11.5px;
+  line-height: 1.4;
+  color: inherit;
+  opacity: .8;
 }
 
 .chatBubbleMeta {

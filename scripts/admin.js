@@ -3,6 +3,8 @@ var _connectionsData = { accepted: [], incoming: [], outgoing: [], counts: { acc
 
 var feedState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '', view: '' };
 var employerSearchState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '', verified: '' };
+var FEED_AUTO_REFRESH_MS = Math.max(10000, Number(window.LOMO_CONFIG && window.LOMO_CONFIG.FEED_AUTO_REFRESH_MS || 30000) || 30000);
+var feedAutoRefreshState = { timer: null, inFlight: false };
 var adminQueueState = { page: 1, pageSize: 20, total: 0, totalPages: 0 };
 var adminCandidateState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '' };
 var adminEmployerState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '' };
@@ -1238,7 +1240,23 @@ function buildSocialCard(user) {
     '</div>';
 }
 
-function loadCandidateFeed(page) {
+function getScreenScrollTop(key) {
+  if (!screens || !screens[key]) return 0;
+  return Number(screens[key].scrollTop || 0);
+}
+
+function restoreScreenScrollTop(key, scrollTop) {
+  if (!screens || !screens[key]) return;
+  screens[key].scrollTop = Number(scrollTop || 0);
+}
+
+function isScreenActive(key) {
+  return !!(screens && screens[key] && screens[key].classList.contains('active'));
+}
+
+function loadCandidateFeed(page, options) {
+  var opts = options || {};
+  var isSilent = !!opts.silent;
   if (page) feedState.page = page;
   feedState.search = (document.getElementById('feedSearchInput')?.value || '').trim();
   feedState.view = (document.getElementById('feedViewFilter')?.value || '').trim();
@@ -1255,23 +1273,26 @@ function loadCandidateFeed(page) {
     return;
   }
 
-  renderFeedLoadingState(listId, 3);
+  if (!isSilent) renderFeedLoadingState(listId, 3);
 
   apiGetFeed({
     page: feedState.page,
     pageSize: feedState.pageSize,
     search: feedState.search,
   }).then(function (result) {
+    var scrollTop = isSilent ? getScreenScrollTop('candidateFeed') : 0;
     var data = normalizePaginatedResponse(result);
     syncPagerState(feedState, data);
     renderFeedList(data.items || []);
     renderPager('candidateFeedPager', feedState, loadCandidateFeed, { label: 'профилей' });
+    if (isSilent) restoreScreenScrollTop('candidateFeed', scrollTop);
   }).catch(function (err) {
     if (recoverAuthFlowOnProtectedError(err, {
       listId: listId,
       pagerId: 'candidateFeedPager',
       label: 'профилей',
     })) return;
+    if (isSilent) return;
     renderFeedErrorState(listId, err, 'Не удалось загрузить ленту');
     renderPager('candidateFeedPager', { total: 0 }, function () {}, { label: 'профилей' });
   });
@@ -1308,7 +1329,9 @@ function renderFeedList(list) {
   }).join('');
 }
 
-function loadEmployerSearch(page) {
+function loadEmployerSearch(page, options) {
+  var opts = options || {};
+  var isSilent = !!opts.silent;
   if (page) employerSearchState.page = page;
   employerSearchState.search = (document.getElementById('empSearchName')?.value || '').trim();
   employerSearchState.verified = (document.getElementById('empSearchVerified')?.value || '').trim();
@@ -1325,7 +1348,7 @@ function loadEmployerSearch(page) {
     return;
   }
 
-  renderFeedLoadingState(listId, 4);
+  if (!isSilent) renderFeedLoadingState(listId, 4);
 
   apiGetCandidates({
     page: employerSearchState.page,
@@ -1333,16 +1356,19 @@ function loadEmployerSearch(page) {
     search: employerSearchState.search,
     verified: employerSearchState.verified === 'verified' ? 'true' : '',
   }).then(function (result) {
+    var scrollTop = isSilent ? getScreenScrollTop('employerSearch') : 0;
     var data = normalizePaginatedResponse(result);
     syncPagerState(employerSearchState, data);
     renderEmployerSearch(data.items || []);
     renderPager('employerCandidatePager', employerSearchState, loadEmployerSearch, { label: 'кандидатов' });
+    if (isSilent) restoreScreenScrollTop('employerSearch', scrollTop);
   }).catch(function (err) {
     if (recoverAuthFlowOnProtectedError(err, {
       listId: listId,
       pagerId: 'employerCandidatePager',
       label: 'кандидатов',
     })) return;
+    if (isSilent) return;
     renderFeedErrorState(listId, err, 'Не удалось загрузить кандидатов');
     renderPager('employerCandidatePager', { total: 0 }, function () {}, { label: 'кандидатов' });
   });
@@ -1487,3 +1513,32 @@ function renderAdminEmployers(list, emptyText) {
     return buildSocialCard(user);
   }).join('');
 }
+
+(function initFeedAutoRefresh() {
+  function refreshActiveFeed() {
+    if (document.hidden || !getToken() || feedAutoRefreshState.inFlight) return;
+
+    var task = null;
+    if (isScreenActive('candidateFeed') && feedState.view !== 'favorites') {
+      task = function () { return loadCandidateFeed(feedState.page, { silent: true }); };
+    } else if (isScreenActive('employerSearch') && employerSearchState.verified !== 'favorites') {
+      task = function () { return loadEmployerSearch(employerSearchState.page, { silent: true }); };
+    }
+
+    if (!task) return;
+    feedAutoRefreshState.inFlight = true;
+    Promise.resolve(task()).catch(function () {}).finally(function () {
+      feedAutoRefreshState.inFlight = false;
+    });
+  }
+
+  if (!feedAutoRefreshState.timer) {
+    feedAutoRefreshState.timer = window.setInterval(refreshActiveFeed, FEED_AUTO_REFRESH_MS);
+  }
+
+  window.addEventListener('focus', refreshActiveFeed);
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) return;
+    refreshActiveFeed();
+  });
+})();
