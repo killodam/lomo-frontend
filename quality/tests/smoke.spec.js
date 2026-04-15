@@ -23,6 +23,29 @@ test('pwa shell exposes manifest and registers service worker', async ({ page })
   })).toBe(true);
 });
 
+test('service worker precaches landing and feed styles', async ({ page }) => {
+  await page.goto('/');
+  await expect.poll(async () => page.evaluate(async () => {
+    if (!('caches' in window)) return { hasLanding: false, hasFeed: false };
+
+    var keys = await caches.keys();
+    var paths = [];
+
+    for (const key of keys) {
+      var cache = await caches.open(key);
+      var requests = await cache.keys();
+      requests.forEach(function (request) {
+        paths.push(new URL(request.url).pathname);
+      });
+    }
+
+    return {
+      hasLanding: paths.includes('/styles/landing.css'),
+      hasFeed: paths.includes('/styles/feed.css'),
+    };
+  })).toEqual({ hasLanding: true, hasFeed: true });
+});
+
 test('candidate login opens feed and paginates server-side', async ({ page }) => {
   let requestedPage = '1';
 
@@ -128,7 +151,7 @@ test('candidate logout from feed returns to landing', async ({ page }) => {
   await page.click('[data-next="fromLoginForm"]');
 
   await expect(page.locator('#screenCandidateFeed')).toHaveClass(/active/);
-  await page.click('#screenCandidateFeed .topRight [data-next="toAuthFromProfile"]');
+  await page.click('#screenCandidateFeed .feedHeaderNav [data-next="toAuthFromProfile"]');
 
   await expect.poll(() => logoutCalled).toBe(true);
   await expect(page.locator('#screenLanding')).toHaveClass(/active/);
@@ -746,6 +769,140 @@ test('mobile candidate feed avoids horizontal overflow after login', async ({ pa
   expect(metrics.docWidth).toBeLessThanOrEqual(metrics.innerWidth + 1);
   expect(metrics.bodyWidth).toBeLessThanOrEqual(metrics.innerWidth + 1);
   expect(metrics.activeWidth).toBeLessThanOrEqual(metrics.innerWidth + 1);
+});
+
+test('mobile candidate feed keeps logout visible and usable', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  let logoutCalled = false;
+
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'emp-1', email: 'candidate@example.com', login: 'candidate', role: 'candidate' },
+          profile: { full_name: 'Иван Кандидат', location: 'Москва', edu_place: 'МГУ', vacancies: 'Product Designer' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/auth/logout')) {
+      logoutCalled = true;
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([
+          {
+            id: 'cand-2',
+            role: 'candidate',
+            full_name: 'Анна Петрова',
+            location: 'Санкт-Петербург',
+            edu_place: 'ИТМО',
+            vacancies: 'Designer',
+            about: 'Хочу работать в сильной команде и развиваться в продукте.',
+          },
+        ], 1, 12, 1)),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.fill('#loginEmail', 'candidate@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  const logoutButton = page.locator('#screenCandidateFeed .feedHeaderNav [data-next="toAuthFromProfile"]');
+  await expect(logoutButton).toBeVisible();
+  await logoutButton.click();
+
+  await expect.poll(() => logoutCalled).toBe(true);
+  await expect(page.locator('#screenLanding')).toHaveClass(/active/);
+});
+
+test('mobile employer search keeps logout visible and usable', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  let logoutCalled = false;
+
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'company-1', email: 'employer@example.com', login: 'employer', role: 'employer' },
+          profile: { full_name: 'Алина HR', company: 'LOMO Labs', industry: 'Tech', location: 'Москва' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/auth/logout')) {
+      logoutCalled = true;
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/candidates')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([
+          {
+            id: 'cand-77',
+            role: 'candidate',
+            full_name: 'Мария Тестова',
+            location: 'Санкт-Петербург',
+            edu_place: 'ИТМО',
+            vacancies: 'Designer',
+            about: 'Хочу в сильную команду',
+          },
+        ], 1, 12, 1)),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.fill('#loginEmail', 'employer@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  const logoutButton = page.locator('#screenEmployerSearch .feedHeaderNav [data-next="toAuthFromProfile"]');
+  await expect(logoutButton).toBeVisible();
+  await logoutButton.click();
+
+  await expect.poll(() => logoutCalled).toBe(true);
+  await expect(page.locator('#screenLanding')).toHaveClass(/active/);
 });
 
 test('existing account can log in by email without validation error', async ({ page }) => {

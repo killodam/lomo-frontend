@@ -63,6 +63,31 @@ function syncPagerState(targetState, response) {
   targetState.totalPages = response.totalPages || (response.total ? 1 : 0);
 }
 
+function renderFeedLoadingState(targetId, cardsCount) {
+  var el = document.getElementById(targetId);
+  if (!el) return;
+
+  var count = Number(cardsCount) || 3;
+  el.innerHTML = '<div class="feedSkeleton">' + Array.from({ length: count }, function () {
+    return '<div class="feedSkeletonCard"><div class="feedSkeletonHead">' +
+      '<div class="skPulse feedSkAv"></div>' +
+      '<div class="feedSkLines"><div class="skPulse feedSkL1"></div><div class="skPulse feedSkL2"></div></div>' +
+    '</div></div>';
+  }).join('') + '</div>';
+}
+
+function renderFeedEmptyState(targetId, icon, text) {
+  var el = document.getElementById(targetId);
+  if (!el) return;
+  el.innerHTML = '<div class="feedEmptyState"><span class="feedEmptyIco">' + escHtml(icon || '•') + '</span><div class="feedEmptyText">' + escHtml(text || 'Пока ничего нет') + '</div></div>';
+}
+
+function renderFeedErrorState(targetId, err) {
+  var el = document.getElementById(targetId);
+  if (!el) return;
+  el.innerHTML = '<div style="padding:20px;color:#991b1b;">Ошибка: ' + escHtml(safeErrorText(err)) + '</div>';
+}
+
 function renderPager(targetId, pagerState, onNavigate, options) {
   var el = document.getElementById(targetId);
   if (!el) return;
@@ -940,14 +965,9 @@ function loadCandidateFeed(page) {
   if (page) feedState.page = page;
   feedState.search = (document.getElementById('feedSearchInput')?.value || '').trim();
 
-  var el = document.getElementById('candidateFeedList');
-  if (!el) return;
-  el.innerHTML = '<div class="feedSkeleton">' + [1,2,3].map(function() {
-    return '<div class="feedSkeletonCard"><div class="feedSkeletonHead">' +
-      '<div class="skPulse feedSkAv"></div>' +
-      '<div class="feedSkLines"><div class="skPulse feedSkL1"></div><div class="skPulse feedSkL2"></div></div>' +
-    '</div></div>';
-  }).join('') + '</div>';
+  var listId = 'candidateFeedList';
+  if (!document.getElementById(listId)) return;
+  renderFeedLoadingState(listId, 3);
 
   apiGetFeed({
     page: feedState.page,
@@ -961,11 +981,11 @@ function loadCandidateFeed(page) {
     renderPager('candidateFeedPager', feedState, loadCandidateFeed, { label: 'профилей' });
   }).catch(function (err) {
     if (recoverAuthFlowOnProtectedError(err, {
-      listId: 'candidateFeedList',
+      listId: listId,
       pagerId: 'candidateFeedPager',
       label: 'профилей',
     })) return;
-    el.innerHTML = '<div style="padding:20px;color:#991b1b;">Ошибка: ' + escHtml(safeErrorText(err)) + '</div>';
+    renderFeedErrorState(listId, err);
     renderPager('candidateFeedPager', { total: 0 }, function () {}, { label: 'профилей' });
   });
 }
@@ -984,7 +1004,7 @@ function renderFeedList(list) {
   });
 
   if (!filtered.length) {
-    el.innerHTML = '<div class="feedEmptyState"><span class="feedEmptyIco">🔍</span><div class="feedEmptyText">По текущему запросу профили не найдены</div></div>';
+    renderFeedEmptyState('candidateFeedList', '🔍', 'По текущему запросу профили не найдены');
     return;
   }
 
@@ -998,14 +1018,9 @@ function loadEmployerSearch(page) {
   employerSearchState.search = (document.getElementById('empSearchName')?.value || '').trim();
   employerSearchState.verified = (document.getElementById('empSearchVerified')?.value || '').trim();
 
-  var el = document.getElementById('employerCandidateList');
-  if (!el) return;
-  el.innerHTML = '<div class="feedSkeleton">' + [1,2,3,4].map(function() {
-    return '<div class="feedSkeletonCard"><div class="feedSkeletonHead">' +
-      '<div class="skPulse feedSkAv"></div>' +
-      '<div class="feedSkLines"><div class="skPulse feedSkL1"></div><div class="skPulse feedSkL2"></div></div>' +
-    '</div></div>';
-  }).join('') + '</div>';
+  var listId = 'employerCandidateList';
+  if (!document.getElementById(listId)) return;
+  renderFeedLoadingState(listId, 4);
 
   apiGetCandidates({
     page: employerSearchState.page,
@@ -1020,11 +1035,11 @@ function loadEmployerSearch(page) {
     renderPager('employerCandidatePager', employerSearchState, loadEmployerSearch, { label: 'кандидатов' });
   }).catch(function (err) {
     if (recoverAuthFlowOnProtectedError(err, {
-      listId: 'employerCandidateList',
+      listId: listId,
       pagerId: 'employerCandidatePager',
       label: 'кандидатов',
     })) return;
-    el.innerHTML = '<div style="padding:20px;color:#991b1b;">Ошибка: ' + escHtml(safeErrorText(err)) + '</div>';
+    renderFeedErrorState(listId, err);
     renderPager('employerCandidatePager', { total: 0 }, function () {}, { label: 'кандидатов' });
   });
 }
@@ -1038,7 +1053,7 @@ function renderEmployerSearch(list) {
   var el = document.getElementById('employerCandidateList');
   if (!el) return;
   if (!list.length) {
-    el.innerHTML = '<div class="feedEmptyState"><span class="feedEmptyIco">👤</span><div class="feedEmptyText">Нет кандидатов по текущему фильтру</div></div>';
+    renderFeedEmptyState('employerCandidateList', '👤', 'Нет кандидатов по текущему фильтру');
     return;
   }
   el.innerHTML = list.map(function (candidate) {

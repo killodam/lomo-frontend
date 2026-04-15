@@ -114,6 +114,13 @@
   color: #1a5c68;
 }
 
+.feedHeaderBurger:focus-visible,
+.feedNavBtn:focus-visible,
+.empFilterChip:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(38,110,120,.16);
+}
+
 .feedNavBtn.accent {
   background: #0e0f0f;
   color: #fff;
@@ -440,9 +447,10 @@
 @media (max-width: 640px) {
   .feedHeaderInner { padding: 0 14px; height: 52px; }
   .feedHeaderWord { display: none; }
-  .feedNavBtn.ghost { display: none; }
-  .feedNavBtn { padding: 6px 11px; font-size: 12px; }
-  .feedNavBtn.accent { padding: 6px 14px; }
+  .feedHeaderNav { gap: 4px; }
+  .feedNavBtn { padding: 6px 9px; font-size: 11.5px; }
+  .feedNavBtn.accent { padding: 6px 11px; }
+  .feedNavBtn.ghost { color: #777; }
   .feedSearchHero { padding: 18px 16px 16px; }
   .feedTitle { font-size: 20px; }
   .feedContent { padding: 14px 12px 36px; }
@@ -514,20 +522,6 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-}
-
-/* ── Count badge in search hero ── */
-.empResultCount {
-  font-size: 12px;
-  color: #aaa;
-  margin-top: 14px;
-  font-weight: 500;
-  letter-spacing: 0.01em;
-}
-
-.empResultCount strong {
-  color: #555;
-  font-weight: 650;
 }
 
 @media (max-width: 640px) {
