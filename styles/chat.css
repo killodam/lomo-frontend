@@ -615,6 +615,7 @@
   justify-content: center;
   color: #6b7280;
   flex-shrink: 0;
+  align-self: center;
   transition: background .15s, border-color .15s, color .15s;
 }
 
