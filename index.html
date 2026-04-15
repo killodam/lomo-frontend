@@ -822,57 +822,80 @@
 
 <!-- CHAT -->
 <section id="screenChat" class="screen" aria-label="Чаты LOMO">
-  <div class="wrap profileWrap">
-    <div class="topBar stickyTop" style="padding:0 16px;">
-      <div class="topLeft" style="display:flex;align-items:center;gap:10px;">
-        <button type="button" class="backBtnInline" id="chatReturnBtn">← Назад</button>
+  <div class="chatScreen">
+
+    <header class="chatHeader">
+      <div class="chatHeaderInner">
+        <button type="button" class="chatHeaderBack" id="chatReturnBtn" aria-label="Назад">
+          <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+          <span>Назад</span>
+        </button>
+        <div class="chatHeaderBrand">
+          <img id="chatScreenLogoImg" class="feedHeaderLogoImg" alt="LOMO">
+          <span class="chatHeaderWord">LOMO</span>
+        </div>
+        <span id="chatAutoBadge" class="chatAutoBadge"></span>
       </div>
-      <div class="topRight"></div>
-    </div>
-    <div class="centerBlock chatCenterBlock">
+    </header>
+
+    <div class="chatBody">
       <div class="chatShell" id="chatShell">
+
         <aside class="chatSidebar" id="chatSidebar">
           <div class="chatSidebarHead">
-            <div>
-              <div class="chatSidebarTitle">Чаты LOMO</div>
-              <div class="chatSidebarMeta" id="chatSidebarMeta">Здесь будут диалоги с вашими контактами и подтверждёнными связями.</div>
+            <div class="chatSidebarTitleRow">
+              <div class="chatSidebarTitle">Сообщения</div>
+              <button type="button" class="chatRefreshIconBtn" id="chatRefreshBtn" aria-label="Обновить">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+              </button>
             </div>
-            <div class="chatSidebarActions">
-              <button type="button" class="miniLink" id="chatRefreshBtn">Обновить</button>
-            </div>
+            <div class="chatSidebarMeta" id="chatSidebarMeta">Здесь будут диалоги с вашими контактами.</div>
           </div>
           <div class="chatConversationList" id="chatConversationList">
-            <div class="miniHint">Загрузка диалогов...</div>
+            <div class="chatConversationEmpty">Загрузка диалогов…</div>
           </div>
           <div id="chatConversationPager" class="pager"></div>
         </aside>
+
         <section class="chatThread" id="chatThread">
           <div class="chatThreadHead">
-            <button type="button" class="miniLink chatThreadBack" id="chatBackToListBtn">← К списку</button>
+            <button type="button" class="chatThreadBack" id="chatBackToListBtn" aria-label="К списку">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 12H5M12 5l-7 7 7 7"/></svg>
+            </button>
             <div class="chatThreadTitleWrap">
               <div class="chatThreadTitle" id="chatThreadTitle">Выберите диалог</div>
-              <div class="chatThreadMeta" id="chatThreadMeta">После подключения или одобренного доступа здесь можно продолжить разговор.</div>
+              <div class="chatThreadMeta" id="chatThreadMeta">После подключения или одобренного доступа здесь можно начать разговор.</div>
             </div>
             <div class="chatThreadActions">
-              <button type="button" class="miniLink hidden" id="chatOpenProfileBtn">Профиль</button>
+              <button type="button" class="chatProfileBtn hidden" id="chatOpenProfileBtn">Профиль →</button>
             </div>
           </div>
+
           <div class="chatEmptyState" id="chatEmptyState">
-            <div class="chatEmptyTitle">Пока без активного диалога</div>
-            <div class="chatEmptyText">Откройте контакт, нажмите «Написать» и начните общение прямо внутри LOMO.</div>
+            <div class="chatEmptyIco">💬</div>
+            <div class="chatEmptyTitle">Нет активного диалога</div>
+            <div class="chatEmptyText">Выберите диалог из списка или начните новый через профиль контакта.</div>
           </div>
+
           <div class="chatMessageList hidden" id="chatMessageList"></div>
           <button type="button" class="chatNewMessagesBtn hidden" id="chatNewMessagesBtn">Новые сообщения ↓</button>
+
           <form class="chatComposer hidden" id="chatComposer">
-            <label class="chatComposerField" for="chatMessageInput">
-              <textarea id="chatMessageInput" rows="3" maxlength="2000" placeholder="Напишите сообщение"></textarea>
-            </label>
-            <div class="chatComposerFooter">
-              <div class="miniHint" id="chatComposerHint">Сообщения видны только участникам диалога.</div>
-              <button type="submit" class="accentBtn nextBtn chatSendBtn" id="chatSendBtn">Отправить</button>
+            <div class="chatComposerRow">
+              <textarea id="chatMessageInput" rows="1" maxlength="2000" class="chatComposerInput" placeholder="Напишите сообщение…"></textarea>
+              <button type="submit" class="chatSendBtn" id="chatSendBtn" aria-label="Отправить">
+                <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2" fill="currentColor" stroke="none"/></svg>
+              </button>
             </div>
+            <div class="chatComposerMeta" id="chatComposerHint">Сообщения видны только участникам диалога.</div>
           </form>
         </section>
+
+      </div>
+    </div>
+
+  </div>
+</section>
       </div>
     </div>
   </div>
