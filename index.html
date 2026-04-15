@@ -205,7 +205,7 @@
 <div class="sqSubtext">Ищу работу</div>
 </div>
 </div>
-<button class="accentBtn nextBtn" id="btnRoleNext" data-next="fromRoleReg" style="margin-top:16px;" disabled>далее</button>
+<button class="accentBtn nextBtn nextBtnOffset" id="btnRoleNext" data-next="fromRoleReg" disabled>далее</button>
 </div>
 </div>
 </section>
@@ -251,7 +251,7 @@
   <div class="consentTitle">Согласия</div>
   <label class="consentItem">
     <input id="consentTerms" type="checkbox"/>
-    <span class="consentText">Я принимаю <span class="consentLinks" data-legal-link="terms" style="cursor:pointer;text-decoration:underline;">Условия использования</span> и <span class="consentLinks" data-legal-link="privacy" style="cursor:pointer;text-decoration:underline;">Политику конфиденциальности</span></span>
+    <span class="consentText">Я принимаю <span class="consentLinks consentLinkAction" data-legal-link="terms">Условия использования</span> и <span class="consentLinks consentLinkAction" data-legal-link="privacy">Политику конфиденциальности</span></span>
   </label>
   <label class="consentItem">
     <input id="consentPd" type="checkbox"/>
@@ -297,7 +297,7 @@
 <section aria-label="Forgot password" class="screen" id="screenForgot">
 <div class="wrap">
 <button aria-label="Back" class="backBtn" data-back="toLoginForm">← Назад</button>
-<div class="centerBlock" style="gap:14px">
+<div class="centerBlock centerBlockTight">
   <div class="authFlowTitle">Забыли пароль?</div>
   <div class="authFlowSub">Введите почту, привязанную к аккаунту — пришлём 6-значный код.</div>
   <div class="formCol">
@@ -319,7 +319,7 @@
 <section aria-label="Verify code" class="screen" id="screenVerifyCode">
 <div class="wrap">
 <button aria-label="Back" class="backBtn" data-back="toForgot">← Назад</button>
-<div class="centerBlock" style="gap:18px">
+<div class="centerBlock centerBlockLoose">
   <div class="authFlowTitle">Введите код</div>
   <div class="authFlowSub" id="verifyCodeSub">Мы отправили 6-значный код на вашу почту. Код действителен 15 минут.</div>
   <div class="codeInputRow" id="codeInputRow">
@@ -343,7 +343,7 @@
 <section aria-label="Reset password" class="screen" id="screenResetPassword">
 <div class="wrap">
 <button aria-label="Back" class="backBtn" data-back="toVerifyCode">← Назад</button>
-<div class="centerBlock" style="gap:14px">
+<div class="centerBlock centerBlockTight">
   <div class="authFlowTitle">Новый пароль</div>
   <div class="authFlowSub">Придумайте надёжный пароль — минимум 8 символов.</div>
   <div class="formCol">
@@ -377,7 +377,7 @@
       <div class="topLeft"><div class="miniBrand">
         <button type="button" class="logoMarkBtn" data-next="toEmployerSearch"><span class="logoMark">LOMO</span></button>
       </div></div>
-      <div class="topRight" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
+      <div class="topRight profileTopActions">
         <button type="button" class="pillBtn" data-next="toEmployerSearch">🔍 Поиск</button>
         <button type="button" class="pillBtn" data-next="toChatHub">Чаты</button>
         <button type="button" class="pillBtn" data-next="toEmployerProfile">Редактировать</button>
@@ -486,7 +486,7 @@
             <div class="sqInput"><input id="mpENeeded" type="text" placeholder="Специалисты через «,» (Backend, Data Analyst, PM)" autocomplete="off"></div>
           </div>
           <div class="blockTitle">Верификация компании</div>
-          <div class="verifyGrid" style="grid-template-columns:1fr;">
+          <div class="verifyGrid verifyGridSingleColumn">
             <div class="miniCard">
               <div class="miniTop">
                 <div class="miniLabel">Документы компании / ИНН</div>
@@ -641,7 +641,7 @@
       <div class="topLeft"><div class="miniBrand">
         <button type="button" class="logoMarkBtn" data-next="toCandidateFeed"><span class="logoMark">LOMO</span></button>
       </div></div>
-      <div class="topRight" style="display:flex;gap:6px;flex-wrap:wrap;justify-content:flex-end;">
+      <div class="topRight profileTopActions">
         <button type="button" class="pillBtn" data-next="toCandidateFeed">🏠 Лента</button>
         <button type="button" class="pillBtn" data-next="toChatHub">Чаты</button>
         <button type="button" class="pillBtn" data-next="toEmployeeProfile">Редактировать</button>
@@ -680,9 +680,9 @@
           </div>
           <div class="blockTitle">Ищу вакансии</div>
           <div class="profileAbout" id="epVacancies">—</div>
-          <div class="blockTitle" style="display:flex;align-items:center;justify-content:space-between;">
+          <div class="blockTitle blockTitleInlineAction">
             Подтверждения
-            <button type="button" id="verifyLevelInfoBtn" style="font-size:11px;color:#2a7a8a;background:none;border:none;cursor:pointer;text-decoration:underline;padding:0;">Что значит подтверждено?</button>
+            <button type="button" id="verifyLevelInfoBtn" class="verifyLevelInfoBtn">Что значит подтверждено?</button>
           </div>
           <div class="achList">
             <div class="achRow"><div><div class="achTitle">Образование</div><div class="achMeta">Статус виден всем · файлы — по запросу</div><div id="epEduReject" class="rejectReason hidden"></div></div><span class="chip ghost" id="epEduStatusChip">не загружено</span></div>
@@ -883,60 +883,60 @@
 <!-- IMPROVED ADMIN PANEL -->
 <section id="screenAdminQueue" class="screen" aria-label="Панель администратора">
   <div class="wrap profileWrap">
-    <div class="topBar stickyTop" style="padding:0 16px;">
-      <div class="topLeft" style="display:flex;align-items:center;gap:10px;">
-        <span style="font-size:11px;background:#fee2e2;color:#991b1b;padding:2px 10px;border-radius:20px;font-weight:700;letter-spacing:.3px;">ADMIN</span>
+    <div class="topBar stickyTop screenTopBarInset">
+      <div class="topLeft screenTopBarCluster">
+        <span class="adminBadge">ADMIN</span>
       </div>
-      <div class="topRight" style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;">
+      <div class="topRight screenTopBarActions">
         <button class="adminTabBtn active" id="adminTabDocs" data-admin-tab="docs">📋 Документы</button>
         <button class="adminTabBtn" id="adminTabCandidates" data-admin-tab="candidates">👥 Кандидаты</button>
         <button class="adminTabBtn" id="adminTabEmployers" data-admin-tab="employers">🏢 Компании</button>
         <button class="adminTabBtn" id="adminTabUsers" data-admin-tab="users">⚙️ Юзеры</button>
-        <button type="button" class="sqBtn sm ghostBtn" id="adminLogoutBtn" style="font-size:12px;">Выйти</button>
+        <button type="button" class="sqBtn sm ghostBtn adminLogoutBtn" id="adminLogoutBtn">Выйти</button>
       </div>
     </div>
-    <div class="centerBlock" style="padding-top:16px;max-width:860px;">
+    <div class="centerBlock">
 
       <!-- TAB: Documents queue -->
       <div id="adminTabPanelDocs">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <div>
-            <div style="font-size:18px;font-weight:700;color:#1a1a1a;">Очередь проверок</div>
-            <div style="font-size:13px;color:#666;margin-top:2px;">Документы, ожидающие верификации</div>
+        <div class="adminSectionHead">
+          <div class="adminSectionHeading">
+            <div class="adminSectionTitle">Очередь проверок</div>
+            <div class="adminSectionSub">Документы, ожидающие верификации</div>
           </div>
           <button class="pillBtn" id="refreshAdminQueueBtn">↻ Обновить</button>
         </div>
-        <div id="adminQueueList"><div style="text-align:center;padding:32px;color:#888;">Загрузка...</div></div>
+        <div id="adminQueueList"><div class="adminListLoading">Загрузка...</div></div>
         <div id="adminQueuePager" class="pager"></div>
       </div>
 
       <!-- TAB: Candidates feed -->
       <div id="adminTabPanelCandidates" style="display:none;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <div style="font-size:18px;font-weight:700;color:#1a1a1a;">Все кандидаты</div>
-          <input id="adminCandSearch" type="text" placeholder="Поиск..." class="sqInput" style="width:220px;">
+        <div class="adminSectionHead">
+          <div class="adminSectionTitle">Все кандидаты</div>
+          <input id="adminCandSearch" type="text" placeholder="Поиск..." class="sqInput adminSearchInput">
         </div>
-        <div id="adminCandidateList"><div style="text-align:center;padding:32px;color:#888;">Загрузка...</div></div>
+        <div id="adminCandidateList"><div class="adminListLoading">Загрузка...</div></div>
         <div id="adminCandidatePager" class="pager"></div>
       </div>
 
       <!-- TAB: Employers feed -->
       <div id="adminTabPanelEmployers" style="display:none;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
-          <div style="font-size:18px;font-weight:700;color:#1a1a1a;">Все работодатели</div>
-          <input id="adminEmpSearch" type="text" placeholder="Поиск..." class="sqInput" style="width:220px;">
+        <div class="adminSectionHead">
+          <div class="adminSectionTitle">Все работодатели</div>
+          <input id="adminEmpSearch" type="text" placeholder="Поиск..." class="sqInput adminSearchInput">
         </div>
-        <div id="adminEmployerList"><div style="text-align:center;padding:32px;color:#888;">Загрузка...</div></div>
+        <div id="adminEmployerList"><div class="adminListLoading">Загрузка...</div></div>
         <div id="adminEmployerPager" class="pager"></div>
       </div>
 
       <!-- TAB: All users -->
       <div id="adminTabPanelUsers" style="display:none;">
-        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;gap:12px;flex-wrap:wrap;">
-          <div style="font-size:18px;font-weight:700;color:#1a1a1a;">Все пользователи</div>
-          <input id="adminUserSearch" type="text" placeholder="Поиск по email или имени..." class="sqInput" style="width:260px;">
+        <div class="adminSectionHead adminSectionHeadWrap">
+          <div class="adminSectionTitle">Все пользователи</div>
+          <input id="adminUserSearch" type="text" placeholder="Поиск по email или имени..." class="sqInput adminSearchInput wide">
         </div>
-        <div id="adminUsersList"><div style="text-align:center;padding:16px;color:#888;">Загрузка...</div></div>
+        <div id="adminUsersList"><div class="adminListLoading compact">Загрузка...</div></div>
         <div id="adminUsersPager" class="pager"></div>
       </div>
 
@@ -969,21 +969,21 @@
     </div>
     <div class="modalBody legalModal">
       <p>LOMO подтверждает <strong>факт</strong> предоставленной информации — но не гарантирует качество работы кандидата.</p>
-      <div style="display:flex;flex-direction:column;gap:10px;margin:12px 0;">
-        <div style="padding:10px 14px;border-radius:12px;border:1px solid rgba(245,158,11,.2);background:rgba(245,158,11,.07);">
+      <div class="verifyLevelList">
+        <div class="verifyLevelCard l1">
           <span class="levelBadge l1">L1 — Базовый</span>
-          <p style="margin:6px 0 0;font-size:13px;color:#555;">Документ загружен и проверен вручную модератором. Формат, дата, название организации соответствуют заявленным данным.</p>
+          <p class="verifyLevelText">Документ загружен и проверен вручную модератором. Формат, дата, название организации соответствуют заявленным данным.</p>
         </div>
-        <div style="padding:10px 14px;border-radius:12px;border:1px solid rgba(38,110,120,.2);background:rgba(38,110,120,.07);">
+        <div class="verifyLevelCard l2">
           <span class="levelBadge l2">L2 — Стандартный</span>
-          <p style="margin:6px 0 0;font-size:13px;color:#555;">Дополнительно — проверка через открытые источники (сайт ВУЗа, реестры компаний) или запрос в организацию.</p>
+          <p class="verifyLevelText">Дополнительно — проверка через открытые источники (сайт ВУЗа, реестры компаний) или запрос в организацию.</p>
         </div>
-        <div style="padding:10px 14px;border-radius:12px;border:1px solid rgba(34,197,94,.2);background:rgba(34,197,94,.07);">
+        <div class="verifyLevelCard l3">
           <span class="levelBadge l3">L3 — Строгий</span>
-          <p style="margin:6px 0 0;font-size:13px;color:#555;">Подтверждение от организации-источника (официальный ответ / API). Высший уровень доверия.</p>
+          <p class="verifyLevelText">Подтверждение от организации-источника (официальный ответ / API). Высший уровень доверия.</p>
         </div>
       </div>
-      <p style="font-size:12px;color:#888;border-top:1px solid #eee;padding-top:10px;margin-top:4px;">LOMO не несёт ответственности за профессиональные качества кандидата. Верификация подтверждает только достоверность представленных документов.</p>
+      <p class="verifyLevelNote">LOMO не несёт ответственности за профессиональные качества кандидата. Верификация подтверждает только достоверность представленных документов.</p>
     </div>
   </div>
 </div>
@@ -1004,8 +1004,8 @@
 <!-- PUBLIC PROFILE SCREEN -->
 <section id="screenPublicProfile" class="screen" aria-label="Профиль пользователя">
   <div class="wrap">
-    <div class="topBar stickyTop" style="padding:0 16px;">
-      <div class="topLeft" style="display:flex;align-items:center;gap:10px;">
+    <div class="topBar stickyTop screenTopBarInset">
+      <div class="topLeft screenTopBarCluster">
         <button type="button" class="backBtnInline" id="pubProfileBackBtn">← Назад</button>
       </div>
       <div class="topRight"></div>
@@ -1015,11 +1015,11 @@
 </section>
 
 <!-- USER PROFILE MODAL -->
-<div id="userProfileModal" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.45);overflow-y:auto;padding:20px 16px;">
-  <div style="max-width:560px;margin:0 auto;background:#fff;border-radius:20px;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.2);">
-    <div id="userProfileContent" style="padding:24px;"></div>
-    <div style="padding:0 24px 20px;display:flex;gap:8px;">
-      <button id="userProfileCloseBtn" style="flex:1;padding:10px;border-radius:12px;border:1.5px solid #e5e7eb;background:#f9fafb;cursor:pointer;font-size:13px;font-weight:600;">Закрыть</button>
+<div id="userProfileModal" class="userProfileModal">
+  <div class="userProfileDialog">
+    <div id="userProfileContent" class="userProfileModalContent"></div>
+    <div class="userProfileModalFooter">
+      <button id="userProfileCloseBtn" class="userProfileCloseBtn">Закрыть</button>
     </div>
   </div>
 </div>

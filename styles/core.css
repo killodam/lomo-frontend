@@ -237,6 +237,19 @@
       justify-content:center;
       gap: 20px;
     }
+    .centerBlockTight{
+      gap: 14px;
+    }
+    .centerBlockLoose{
+      gap: 18px;
+    }
+    .nextBtnOffset{
+      margin-top: 16px;
+    }
+    .consentLinkAction{
+      cursor: pointer;
+      text-decoration: underline;
+    }
 
     .choiceRow{
       display:flex;

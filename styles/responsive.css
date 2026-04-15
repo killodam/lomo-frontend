@@ -368,6 +368,28 @@
         width: 100%;
         max-width: none;
       }
+
+      .adminSectionHead {
+        flex-wrap: wrap;
+        align-items: stretch;
+      }
+
+      .adminSearchInput,
+      .adminSearchInput.wide {
+        width: 100%;
+      }
+
+      .userProfileModal {
+        padding: 16px 12px;
+      }
+
+      .userProfileModalContent {
+        padding: 20px 16px;
+      }
+
+      .userProfileModalFooter {
+        padding: 0 16px 16px;
+      }
     }
 
     @media (max-width: 480px) {

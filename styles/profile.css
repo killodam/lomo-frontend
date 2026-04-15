@@ -11,6 +11,12 @@
       padding: 0 6px;
       gap: 16px;
     }
+    .profileTopActions{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
     .miniBrand{
       display:flex;
       align-items:center;
@@ -224,6 +230,9 @@
       display:grid;
       grid-template-columns: repeat(3, 1fr);
       gap: 12px;
+    }
+    .verifyGridSingleColumn{
+      grid-template-columns: 1fr;
     }
     .fileInput{
       display:none;
@@ -565,9 +574,9 @@
       box-sizing: border-box;
     }
     #screenAdminQueue .centerBlock{
-      padding: 20px 16px 60px;
+      padding: 16px 16px 60px;
       width: 100%;
-      max-width: 900px;
+      max-width: 860px;
       margin: 0 auto;
       box-sizing: border-box;
     }
