@@ -136,6 +136,19 @@ function bindStaticUiActions() {
   const feedSearchInput = document.getElementById('feedSearchInput');
   if (feedSearchInput) feedSearchInput.addEventListener('input', function () { debouncedFilterFeed(); });
 
+  const feedViewFilter = document.getElementById('feedViewFilter');
+  if (feedViewFilter) feedViewFilter.addEventListener('change', function () { filterFeed(); });
+
+  document.querySelectorAll('.feedFilterChip').forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      document.querySelectorAll('.feedFilterChip').forEach(function (c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+      var sel = document.getElementById('feedViewFilter');
+      if (sel) sel.value = chip.getAttribute('data-feed-view') || '';
+      filterFeed();
+    });
+  });
+
   const employerSearchInput = document.getElementById('empSearchName');
   if (employerSearchInput) employerSearchInput.addEventListener('input', function () { debouncedFilterEmployerSearch(); });
 

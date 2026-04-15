@@ -230,6 +230,94 @@ test('candidate can bookmark another user from feed without opening profile', as
   })).toBe(true);
 });
 
+test('candidate favorites filter shows bookmarked profiles and supports removal', async ({ page }) => {
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'cand-1', email: 'candidate@example.com', login: 'candidate', role: 'candidate' },
+          profile: { full_name: 'Иван Кандидат', location: 'Москва', edu_place: 'МГУ', vacancies: 'Product Designer' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([
+          {
+            id: 'cand-2',
+            role: 'candidate',
+            public_id: 'LOMO-CAND00002',
+            full_name: 'Анна Петрова',
+            location: 'Казань',
+            edu_place: 'КФУ',
+            vacancies: 'Data Analyst',
+            about: 'Опытный кандидат',
+          },
+          {
+            id: 'emp-44',
+            role: 'employer',
+            public_id: 'LOMO-EMP00044',
+            full_name: 'Алина HR',
+            company: 'LOMO Labs',
+            industry: 'Tech',
+            location: 'Москва',
+            about: 'Ищем аналитиков',
+          },
+        ], 1, 12, 2)),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.fill('#loginEmail', 'candidate@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await expect(page.locator('#screenCandidateFeed')).toHaveClass(/active/);
+  await expect(page.locator('#candidateFeedList')).toContainText('Анна Петрова');
+  await expect(page.locator('#candidateFeedList')).toContainText('Алина HR');
+
+  await page.click('#candidateFeedList .socialCard:first-child .scBookmarkBtn');
+  await expect(page.locator('#toast')).toContainText('Добавлено в избранное');
+
+  await page.click('.feedFilterChip[data-feed-view="favorites"]');
+  await expect(page.locator('#candidateFeedList')).toContainText('Анна Петрова');
+  await expect(page.locator('#candidateFeedList')).not.toContainText('Алина HR');
+
+  await page.fill('#feedSearchInput', 'Казань');
+  await expect(page.locator('#candidateFeedList')).toContainText('Анна Петрова');
+
+  await page.fill('#feedSearchInput', 'Москва');
+  await expect(page.locator('#candidateFeedList')).toContainText('По этому запросу в избранном никого нет');
+
+  await page.fill('#feedSearchInput', '');
+  await expect(page.locator('#candidateFeedList')).toContainText('Анна Петрова');
+
+  await page.click('#candidateFeedList .scBookmarkBtn');
+  await expect(page.locator('#toast')).toContainText('Удалено из избранного');
+  await expect(page.locator('#candidateFeedList')).toContainText('В избранном пока нет профилей');
+  await expect.poll(async () => page.evaluate(() => {
+    var raw = window.localStorage.getItem('lomo_favs_cand-1') || '{}';
+    var data = JSON.parse(raw);
+    return !!data['cand-2'];
+  })).toBe(false);
+});
+
 test('candidate logout from feed returns to landing', async ({ page }) => {
   let logoutCalled = false;
 

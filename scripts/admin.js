@@ -5,7 +5,7 @@ var _adminFeedData = [];
 var _adminAllUsers = [];
 var _connectionsData = { accepted: [], incoming: [], outgoing: [], counts: { accepted: 0, incoming: 0, outgoing: 0 } };
 
-var feedState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '' };
+var feedState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '', view: '' };
 var employerSearchState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '', verified: '' };
 var adminQueueState = { page: 1, pageSize: 20, total: 0, totalPages: 0 };
 var adminCandidateState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '' };
@@ -993,6 +993,22 @@ function filterBookmarkedUsers(list, query) {
   });
 }
 
+function getVisibleBookmarkedUsers(query) {
+  return filterBookmarkedUsers(getBookmarkedUsersList(), query).filter(function (user) {
+    return String(user && user.id || user && user.email || '') !== String(state.userId || '');
+  });
+}
+
+function syncFeedFilterChips() {
+  var selectedView = '';
+  var select = document.getElementById('feedViewFilter');
+
+  if (select) selectedView = String(select.value || '');
+  document.querySelectorAll('.feedFilterChip').forEach(function (chip) {
+    chip.classList.toggle('active', String(chip.getAttribute('data-feed-view') || '') === selectedView);
+  });
+}
+
 function syncBookmarkButtons(uid, isActive) {
   var targetUid = String(uid || '');
   document.querySelectorAll('.scBookmarkBtn[data-bookmark-uid]').forEach(function (button) {
@@ -1051,6 +1067,9 @@ function toggleBookmark(uid, sourceButton, event) {
 
   if (employerSearchState.verified === 'favorites') {
     loadEmployerSearch();
+  }
+  if (feedState.view === 'favorites') {
+    loadCandidateFeed(feedState.page);
   }
 
   return isActive;
@@ -1194,9 +1213,37 @@ function buildSocialCard(user) {
 function loadCandidateFeed(page) {
   if (page) feedState.page = page;
   feedState.search = (document.getElementById('feedSearchInput')?.value || '').trim();
+  feedState.view = (document.getElementById('feedViewFilter')?.value || '').trim();
+
+  syncFeedFilterChips();
 
   var listId = 'candidateFeedList';
   if (!document.getElementById(listId)) return;
+
+  if (feedState.view === 'favorites') {
+    var bookmarkedUsers = getVisibleBookmarkedUsers(feedState.search);
+    var total = bookmarkedUsers.length;
+    var totalPages = total ? Math.ceil(total / feedState.pageSize) : 0;
+    var safePage = feedState.page || 1;
+    var start;
+
+    if (totalPages && safePage > totalPages) safePage = totalPages;
+    if (!totalPages) safePage = 1;
+
+    feedState.page = safePage;
+    _feedData = bookmarkedUsers;
+    start = (safePage - 1) * feedState.pageSize;
+    renderFeedList(bookmarkedUsers.slice(start, start + feedState.pageSize));
+    syncPagerState(feedState, {
+      total: total,
+      page: safePage,
+      pageSize: feedState.pageSize,
+      totalPages: totalPages,
+    });
+    renderPager('candidateFeedPager', feedState, loadCandidateFeed, { label: 'избранных профилей' });
+    return;
+  }
+
   renderFeedLoadingState(listId, 3);
 
   apiGetFeed({
@@ -1234,6 +1281,14 @@ function renderFeedList(list) {
   });
 
   if (!filtered.length) {
+    if (feedState.view === 'favorites') {
+      renderFeedEmptyState(
+        'candidateFeedList',
+        '★',
+        feedState.search ? 'По этому запросу в избранном никого нет' : 'В избранном пока нет профилей'
+      );
+      return;
+    }
     renderFeedEmptyState('candidateFeedList', '🔍', 'По текущему запросу профили не найдены');
     return;
   }
