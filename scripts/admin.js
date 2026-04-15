@@ -942,7 +942,12 @@ function loadCandidateFeed(page) {
 
   var el = document.getElementById('candidateFeedList');
   if (!el) return;
-  el.innerHTML = '<div style="text-align:center;padding:32px;color:#888;">Загрузка...</div>';
+  el.innerHTML = '<div class="feedSkeleton">' + [1,2,3].map(function() {
+    return '<div class="feedSkeletonCard"><div class="feedSkeletonHead">' +
+      '<div class="skPulse feedSkAv"></div>' +
+      '<div class="feedSkLines"><div class="skPulse feedSkL1"></div><div class="skPulse feedSkL2"></div></div>' +
+    '</div></div>';
+  }).join('') + '</div>';
 
   apiGetFeed({
     page: feedState.page,
@@ -979,7 +984,7 @@ function renderFeedList(list) {
   });
 
   if (!filtered.length) {
-    el.innerHTML = '<div style="padding:40px;text-align:center;color:#aaa;font-size:14px;">По текущему запросу профили не найдены</div>';
+    el.innerHTML = '<div class="feedEmptyState"><span class="feedEmptyIco">🔍</span><div class="feedEmptyText">По текущему запросу профили не найдены</div></div>';
     return;
   }
 

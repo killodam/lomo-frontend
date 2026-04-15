@@ -1,0 +1,449 @@
+/* ══════════════════════════════════════════════
+   LOMO — FEED PAGE STYLES
+   ══════════════════════════════════════════════ */
+
+#screenCandidateFeed {
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-direction: column;
+  background: #f7f8fa;
+}
+
+.feedScreen {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  min-height: 100%;
+}
+
+/* ── Sticky Header ── */
+.feedHeader {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(255,255,255,.97);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(0,0,0,.07);
+}
+
+.feedHeaderInner {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.feedHeaderBurger {
+  display: flex;
+  flex-direction: column;
+  gap: 4.5px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 7px;
+  border-radius: 9px;
+  flex-shrink: 0;
+  transition: background .15s;
+}
+
+.feedHeaderBurger:hover {
+  background: rgba(0,0,0,.06);
+}
+
+.feedHeaderBurger span {
+  display: block;
+  width: 18px;
+  height: 2px;
+  background: #555;
+  border-radius: 2px;
+}
+
+.feedHeaderBrand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex: 1;
+  min-width: 0;
+  user-select: none;
+}
+
+.feedHeaderLogoImg {
+  width: 22px;
+  height: 22px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+}
+
+.feedHeaderWord {
+  font-size: 15px;
+  font-weight: 760;
+  color: #0e0f0f;
+  letter-spacing: -0.3px;
+}
+
+.feedHeaderNav {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+.feedNavBtn {
+  padding: 7px 15px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .18s;
+  font-family: inherit;
+  border: 1.5px solid transparent;
+  background: transparent;
+  color: #555;
+  white-space: nowrap;
+}
+
+.feedNavBtn:hover {
+  background: rgba(38,110,120,.07);
+  color: #1a5c68;
+}
+
+.feedNavBtn.accent {
+  background: #0e0f0f;
+  color: #fff;
+  border-color: #0e0f0f;
+}
+
+.feedNavBtn.accent:hover {
+  background: #1a5c68;
+  border-color: #1a5c68;
+}
+
+.feedNavBtn.ghost {
+  color: #aaa;
+  font-weight: 500;
+  font-size: 12.5px;
+}
+
+.feedNavBtn.ghost:hover {
+  color: #e53e3e;
+  background: rgba(229,62,62,.06);
+}
+
+/* ── Search Hero ── */
+.feedSearchHero {
+  background: #fff;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  padding: 28px 24px 24px;
+}
+
+.feedSearchHeroInner {
+  max-width: 800px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.feedTitle {
+  font-size: 24px;
+  font-weight: 760;
+  color: #0e0f0f;
+  letter-spacing: -0.5px;
+  margin: 0 0 4px;
+}
+
+.feedSub {
+  font-size: 13px;
+  color: #a0a0a0;
+  margin: 0 0 18px;
+}
+
+.feedSearchWrap {
+  position: relative;
+}
+
+.feedSearchIco {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #bbb;
+  pointer-events: none;
+  display: block;
+}
+
+.feedSearchInput {
+  width: 100%;
+  padding: 13px 18px 13px 46px;
+  border: 1.5px solid rgba(0,0,0,.09);
+  border-radius: 18px;
+  font-size: 14px;
+  outline: none;
+  box-sizing: border-box;
+  transition: border .15s, box-shadow .15s, background .15s;
+  font-family: inherit;
+  background: #f7f8fa;
+  color: #0e0f0f;
+}
+
+.feedSearchInput::placeholder {
+  color: #c0c0c0;
+}
+
+.feedSearchInput:focus {
+  border-color: rgba(38,110,120,.4);
+  box-shadow: 0 0 0 3px rgba(38,110,120,.08);
+  background: #fff;
+}
+
+/* ── Feed Content ── */
+.feedContent {
+  flex: 1;
+  padding: 20px 24px 48px;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* ── Feed Card List ── */
+.feedListWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+/* Override / enhance socialCard for feed context */
+.feedListWrap .socialCard {
+  border-radius: 20px;
+  padding: 20px;
+  border: 1px solid rgba(0,0,0,.07);
+  box-shadow: 0 1px 6px rgba(0,0,0,.04);
+  transition: transform .2s, box-shadow .22s, border-color .2s;
+  position: relative;
+  overflow: hidden;
+  background: #fff;
+  cursor: pointer;
+}
+
+/* Teal left-rail accent on hover */
+.feedListWrap .socialCard::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, #26707a 0%, #38b2ac 100%);
+  opacity: 0;
+  transition: opacity .22s;
+  border-radius: 0 0 0 0;
+}
+
+.feedListWrap .socialCard:hover::before {
+  opacity: 1;
+}
+
+.feedListWrap .socialCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(38,110,120,.10);
+  border-color: rgba(38,110,120,.18);
+}
+
+/* Typography overrides */
+.feedListWrap .scName {
+  font-size: 15.5px;
+  font-weight: 720;
+  color: #0e0f0f;
+  letter-spacing: -0.1px;
+}
+
+.feedListWrap .scVerBadge {
+  font-size: 11px;
+  background: rgba(22,163,74,.09);
+  color: #15803d;
+  border: 1px solid rgba(22,163,74,.22);
+  border-radius: 999px;
+  padding: 2px 10px;
+  font-weight: 650;
+}
+
+.feedListWrap .scVerBadge.pending {
+  background: rgba(217,119,6,.09);
+  color: #b45309;
+  border-color: rgba(217,119,6,.25);
+}
+
+.feedListWrap .scVerItem {
+  background: rgba(22,163,74,.08);
+  color: #15803d;
+  border: 1px solid rgba(22,163,74,.2);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.feedListWrap .scProject {
+  background: rgba(38,110,120,.07);
+  color: #1a5c68;
+  border: 1px solid rgba(38,110,120,.18);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font-size: 11px;
+}
+
+.feedListWrap .scProject.hiring {
+  background: rgba(59,130,246,.07);
+  color: #2563eb;
+  border-color: rgba(59,130,246,.2);
+}
+
+.feedListWrap .scRoleTag {
+  border-radius: 999px;
+  font-size: 11px;
+  padding: 2px 10px;
+  font-weight: 650;
+}
+
+.feedListWrap .scRoleTag.candidate {
+  background: rgba(59,130,246,.08);
+  color: #2563eb;
+  border: 1px solid rgba(59,130,246,.18);
+}
+
+.feedListWrap .scRoleTag.employer {
+  background: rgba(38,110,120,.08);
+  color: #1a5c68;
+  border: 1px solid rgba(38,110,120,.2);
+}
+
+.feedListWrap .scSub {
+  font-size: 12.5px;
+  color: #888;
+}
+
+.feedListWrap .scBody {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0,0,0,.05);
+}
+
+.feedListWrap .scAbout {
+  font-size: 13px;
+  color: #555;
+  line-height: 1.55;
+}
+
+.feedListWrap .scJobLine {
+  font-size: 12.5px;
+  color: #666;
+  margin-top: 4px;
+}
+
+.feedListWrap .scExpItem {
+  font-size: 12.5px;
+  color: #666;
+  margin-bottom: 2px;
+}
+
+.feedListWrap .scExpCo {
+  font-weight: 600;
+  color: #444;
+}
+
+.feedListWrap .scExpPeriod {
+  color: #aaa;
+  font-size: 11.5px;
+}
+
+/* ── Skeleton Loader ── */
+.feedSkeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.feedSkeletonCard {
+  background: #fff;
+  border-radius: 20px;
+  border: 1px solid rgba(0,0,0,.07);
+  padding: 20px;
+  box-shadow: 0 1px 6px rgba(0,0,0,.03);
+}
+
+.feedSkeletonHead {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.feedSkLines {
+  flex: 1;
+}
+
+.skPulse {
+  background: linear-gradient(90deg, #f0f2f4 25%, #e5e8ea 50%, #f0f2f4 75%);
+  background-size: 400% 100%;
+  animation: skPulseAnim 1.5s ease-in-out infinite;
+  border-radius: 6px;
+}
+
+@keyframes skPulseAnim {
+  0%   { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}
+
+.feedSkAv {
+  width: 54px;
+  height: 54px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.feedSkL1 {
+  height: 14px;
+  width: 52%;
+  margin-bottom: 9px;
+}
+
+.feedSkL2 {
+  height: 11px;
+  width: 32%;
+}
+
+/* ── Empty State ── */
+.feedEmptyState {
+  text-align: center;
+  padding: 56px 20px;
+  color: #bbb;
+}
+
+.feedEmptyIco {
+  font-size: 38px;
+  display: block;
+  margin-bottom: 12px;
+  opacity: .6;
+}
+
+.feedEmptyText {
+  font-size: 14px;
+  color: #aaa;
+  line-height: 1.6;
+}
+
+/* ── Responsive ── */
+@media (max-width: 640px) {
+  .feedHeaderInner { padding: 0 14px; height: 52px; }
+  .feedHeaderWord { display: none; }
+  .feedNavBtn.ghost { display: none; }
+  .feedNavBtn { padding: 6px 11px; font-size: 12px; }
+  .feedNavBtn.accent { padding: 6px 14px; }
+  .feedSearchHero { padding: 18px 16px 16px; }
+  .feedTitle { font-size: 20px; }
+  .feedContent { padding: 14px 12px 36px; }
+}

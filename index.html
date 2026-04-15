@@ -770,28 +770,41 @@
 
 <!-- CANDIDATE FEED -->
 <section id="screenCandidateFeed" class="screen" aria-label="Лента кандидатов">
-  <div class="wrap profileWrap">
-    <div class="topBar stickyTop" style="padding:0 16px;">
-      <div class="topLeft" style="display:flex;align-items:center;gap:10px;">
-        <button aria-label="Menu" class="burgerBtn feedBurger js-toggle-drawer"><span></span><span></span><span></span></button>
+  <div class="feedScreen">
+
+    <header class="feedHeader">
+      <div class="feedHeaderInner">
+        <button class="feedHeaderBurger js-toggle-drawer" aria-label="Меню">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="feedHeaderBrand">
+          <img id="feedHeaderLogoImg" class="feedHeaderLogoImg" alt="LOMO">
+          <span class="feedHeaderWord">LOMO</span>
+        </div>
+        <nav class="feedHeaderNav">
+          <button type="button" class="feedNavBtn" data-next="toChatHub">Чаты</button>
+          <button type="button" class="feedNavBtn accent" id="feedMyProfileBtn">Мой профиль</button>
+          <button type="button" class="feedNavBtn ghost" data-next="toAuthFromProfile">Выйти</button>
+        </nav>
       </div>
-      <div class="topRight" style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
-        <button type="button" class="pillBtn" data-next="toChatHub" style="font-size:13px;font-weight:600;">Чаты</button>
-        <button type="button" class="pillBtn" id="feedMyProfileBtn" data-next="toEmployeePublic" style="font-size:13px;font-weight:600;">Мой профиль</button>
-        <button type="button" class="sqBtn sm ghostBtn" data-next="toAuthFromProfile" style="font-size:13px;">Выйти</button>
+    </header>
+
+    <div class="feedSearchHero">
+      <div class="feedSearchHeroInner">
+        <h1 class="feedTitle">Лента LOMO</h1>
+        <p class="feedSub">Верифицированные профили · кандидаты и компании</p>
+        <div class="feedSearchWrap">
+          <svg class="feedSearchIco" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+          <input id="feedSearchInput" type="text" class="feedSearchInput" placeholder="Имя, университет, навык, город...">
+        </div>
       </div>
     </div>
-    <div class="centerBlock" style="padding-top:20px;max-width:660px;">
-      <div style="margin-bottom:16px;">
-        <div style="font-size:22px;font-weight:800;color:#1a1a1a;letter-spacing:-.3px;">Лента LOMO</div>
-        <div style="font-size:13px;color:#999;margin-top:3px;">Люди и компании платформы · верификация документов</div>
-      </div>
-      <input id="feedSearchInput" type="text" placeholder="🔍  Имя, университет, навык, город..." style="width:100%;margin-bottom:16px;padding:11px 16px;border:1.5px solid #e5e7eb;border-radius:14px;font-size:14px;outline:none;box-sizing:border-box;transition:border .15s;">
-      <div id="candidateFeedList" style="display:flex;flex-direction:column;gap:10px;">
-        <div style="text-align:center;padding:32px;color:#888;">Загрузка...</div>
-      </div>
+
+    <div class="feedContent">
+      <div id="candidateFeedList" class="feedListWrap"></div>
       <div id="candidateFeedPager" class="pager"></div>
     </div>
+
   </div>
 </section>
 

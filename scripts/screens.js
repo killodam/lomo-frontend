@@ -47,6 +47,11 @@ if (ldNavLogoImg && mainLogoImg) {
   ldNavLogoImg.src = mainLogoImg.src;
 }
 
+const feedHeaderLogoImg = document.getElementById('feedHeaderLogoImg');
+if (feedHeaderLogoImg && mainLogoImg) {
+  feedHeaderLogoImg.src = mainLogoImg.src;
+}
+
 function clearScreenInputs(key) {
   if (!screens[key]) return;
   screens[key].querySelectorAll('input, textarea').forEach((element) => {
