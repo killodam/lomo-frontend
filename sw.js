@@ -1,4 +1,4 @@
-const STATIC_CACHE = 'lomo-static-v2';
+const STATIC_CACHE = 'lomo-static-v3';
 const OFFLINE_URL = '/offline.html';
 const PRECACHE_URLS = [
   '/',
@@ -67,6 +67,11 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
+  const preferFreshAsset = request.destination === 'script'
+    || request.destination === 'style'
+    || url.pathname === '/config.js'
+    || url.pathname === '/manifest.webmanifest';
+
   event.respondWith(
     caches.match(request).then((cached) => {
       const networkFetch = fetch(request)
@@ -74,9 +79,13 @@ self.addEventListener('fetch', (event) => {
           const responseClone = response.clone();
           caches.open(STATIC_CACHE).then((cache) => cache.put(request, responseClone)).catch(() => {});
           return response;
-        })
-        .catch(() => cached);
-      return cached || networkFetch;
+        });
+
+      if (preferFreshAsset) {
+        return networkFetch.catch(() => cached || Response.error());
+      }
+
+      return cached || networkFetch.catch(() => Response.error());
     })
   );
 });

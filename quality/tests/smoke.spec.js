@@ -590,6 +590,71 @@ test('admin dashboard loads queue and users with server-side search', async ({ p
   await expect.poll(() => userSearch).toBe('founder');
 });
 
+test('admin logout returns to landing', async ({ page }) => {
+  let logoutCalled = false;
+
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'admin-1', email: 'admin@example.com', login: 'admin', role: 'admin' },
+          profile: null,
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/auth/logout')) {
+      logoutCalled = true;
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true }),
+      });
+    }
+
+    if (url.pathname.endsWith('/admin/queue')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([], 1, 20, 0)),
+      });
+    }
+
+    if (url.pathname.endsWith('/admin/users')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([], 1, 20, 0)),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.evaluate(() => { document.cookie = 'lomo_csrf=test-suite; path=/'; });
+  await page.fill('#loginEmail', 'admin@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await expect(page.locator('#screenAdminQueue')).toHaveClass(/active/);
+  await page.click('#adminLogoutBtn');
+
+  await expect.poll(() => logoutCalled).toBe(true);
+  await expect(page.locator('#screenLanding')).toHaveClass(/active/);
+  await expect(page.locator('#screenLanding')).toContainText('Подтверждённый.');
+});
+
 test('mobile registration role step stays readable and actionable', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
 
