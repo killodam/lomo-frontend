@@ -1,4 +1,3 @@
-const startBtn = document.getElementById('startBtn');
 const legalModalEl = document.getElementById('legalModal');
 const legalModalCloseEl = document.getElementById('legalModalClose');
 const verifyLevelModalEl = document.getElementById('verifyLevelModal');
@@ -112,11 +111,8 @@ function handleLogoutToLanding(action) {
 }
 
 function bindStaticUiActions() {
-  bindUiAction('authSearchBtn', 'click', function () { goToSearch(); });
   bindUiAction('feedMyProfileBtn', 'click', function () { goToMyProfile(); });
   bindUiAction('searchCompanyProfileBtn', 'click', function () { goToMyProfile(); });
-  bindUiAction('authLogoutAllBtn', 'click', function () { handleLogoutToLanding(logoutAllSessions); });
-  bindUiAction('authLogoutBtn', 'click', function () { handleLogoutToLanding(logout); });
   bindUiAction('employerLogoutAllBtn', 'click', function () { handleLogoutToLanding(logoutAllSessions); });
   bindUiAction('employeeLogoutAllBtn', 'click', function () { handleLogoutToLanding(logoutAllSessions); });
   bindUiAction('adminLogoutBtn', 'click', function () { handleLogoutToLanding(logout); });
@@ -216,18 +212,6 @@ function showEmployeeDashboard() {
 
 initHashRouting();
 window.addEventListener('hashchange', initHashRouting);
-
-if (startBtn) {
-  startBtn.addEventListener('click', function () {
-    logoWrap.classList.add('animUp');
-    setTimeout(function () {
-      show('landing');
-      if (typeof resetLogo === 'function') resetLogo();
-    }, 720);
-  });
-}
-
-if (authBurger) authBurger.addEventListener('click', toggleDrawer);
 if (drawerCloseBtn) drawerCloseBtn.addEventListener('click', closeDrawer);
 if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
 

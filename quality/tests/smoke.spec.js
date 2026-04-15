@@ -23,6 +23,13 @@ test('pwa shell exposes manifest and registers service worker', async ({ page })
   })).toBe(true);
 });
 
+test('landing no longer renders legacy auth or logo screens', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('#screenLogo')).toHaveCount(0);
+  await expect(page.locator('#screenAuth')).toHaveCount(0);
+  await expect(page.locator('#ldNavLogoImg')).toHaveAttribute('src', './icons/app-icon.svg');
+});
+
 test('service worker precaches landing and feed styles', async ({ page }) => {
   await page.goto('/');
   await expect.poll(async () => page.evaluate(async () => {

@@ -26,17 +26,11 @@
         min-height: 100dvh;
       }
 
-      .logo {
-        max-width: 85vw;
-        max-height: 50vh;
-      }
-
       .sqBtn {
         min-width: auto;
         width: 85vw;
       }
 
-      #screenAuth .wrap,
       #screenRoleReg .wrap,
       #screenLoginForm .wrap,
       #screenForgot .wrap,
@@ -81,10 +75,6 @@
         overflow-x: hidden;
       }
 
-      #screenAuth .wrap {
-        padding-top: calc(72px + env(safe-area-inset-top, 0px));
-      }
-
       #screenRoleReg .wrap,
       #screenLoginForm .wrap,
       #screenForgot .wrap,
@@ -109,27 +99,12 @@
         gap: 18px;
       }
 
-      #screenAuth .authHero {
-        width: 100%;
-        max-width: 420px;
-        margin: 0 auto;
-        padding: 0 4px;
-        gap: 16px;
-      }
-
-      #screenAuth .authTopRight,
-      #authLoggedIn,
-      #screenAuth .authBenefits,
       #screenForgot .formCol,
       #screenLoginForm .formCol,
       #screenResetPassword .formCol {
         width: min(100%, 420px);
         margin-left: auto;
         margin-right: auto;
-      }
-
-      #screenAuth .authLogo {
-        width: min(220px, 58vw);
       }
 
       .choiceRow {
@@ -396,7 +371,6 @@
     }
 
     @media (max-width: 480px) {
-      #screenAuth .wrap,
       #screenRoleReg .wrap,
       #screenLoginForm .wrap,
       #screenForgot .wrap,
@@ -444,11 +418,6 @@
         padding: 18px 14px;
       }
 
-      .authTagline {
-        font-size: 14px;
-      }
-
-      .authBenefit,
       .authFlowSub {
         font-size: 13px;
       }

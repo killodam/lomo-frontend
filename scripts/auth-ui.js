@@ -48,10 +48,6 @@ function resetConsents() {
   updateRegNextState();
 }
 
-function resetLogo() {
-  logoWrap.classList.remove('animUp');
-}
-
 const regPasswordEl = document.getElementById('regPassword');
 if (regPasswordEl) {
   regPasswordEl.addEventListener('input', function () {

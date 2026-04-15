@@ -278,12 +278,6 @@ function deleteOwnAccount(password) {
       if(!pick) return;
       const kind = pick.dataset.pick;
       const value = pick.dataset.value;
-      if(kind === 'auth'){
-        state.auth = value;
-        pickInGroup('authChoices', value);
-        if(value === 'REGISTRATION') show('roleReg');
-        else show('loginForm');
-      }
       if(kind === 'roleReg'){
         state.roleReg = value;
         pickInGroup('roleChoices', value);
@@ -453,13 +447,6 @@ function deleteOwnAccount(password) {
       const next = e.target.closest('[data-next]');
       if(next){
         const route = next.dataset.next;
-
-        if(route === 'fromAuth'){
-          const mode = state.auth || 'LOGIN';
-          if(mode === 'REGISTRATION') show('roleReg');
-          else show('loginForm');
-          return;
-        }
 
         if(route === 'fromRoleReg'){
           if(!state.roleReg) state.roleReg = 'EMPLOYEE';
@@ -680,12 +667,6 @@ function deleteOwnAccount(password) {
           return;
         }
 
-
-        if(route === 'toAuthHome'){
-          showEntryScreen();
-          return;
-        }
-
         if(route === 'toForgot'){
           // Clear forgot form
           const fe = document.getElementById('forgotEmail'); if(fe) fe.value='';
@@ -726,9 +707,7 @@ function deleteOwnAccount(password) {
       const back = e.target.closest('[data-back]');
       if(back){
         const where = back.dataset.back;
-        if(where === 'toLogo'){ showEntryScreen(); return; }
         if(where === 'toLanding'){ showEntryScreen(); return; }
-        if(where === 'toAuth'){ showEntryScreen(); return; }
         if(where === 'toRoleReg'){ show('roleReg'); return; }
         if(where === 'toLoginForm'){ show('loginForm'); return; }
         if(where === 'toForgot'){ show('forgot'); return; }
@@ -758,7 +737,6 @@ function deleteOwnAccount(password) {
       if(screens.regForm?.classList.contains('active')){ show('roleReg'); return; }
       if(screens.roleReg?.classList.contains('active')){ showEntryScreen(); return; }
       if(screens.loginForm?.classList.contains('active')){ showEntryScreen(); return; }
-      if(screens.auth?.classList.contains('active')){ show('landing'); return; }
     });
 
     // initial — always show landing, no auto-login ever

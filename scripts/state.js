@@ -3,9 +3,8 @@ function emptyProof() {
 }
 
 const state = {
-  auth: null,
   roleReg: null,
-  prevFromDone: 'auth',
+  prevFromDone: 'landing',
   email: '',
   login: '',
   userId: '',
@@ -230,7 +229,6 @@ function resetState() {
   state.email = '';
   state.login = '';
   state.roleReg = null;
-  state.auth = null;
   state.publicId = '';
   state.connections = {
     accepted: [],
