@@ -386,7 +386,7 @@
     <div class="centerBlock">
       <div class="profileCard premium">
         <div class="profileHead">
-          <div class="avatarCircle"><img id="rpAvatarImg" class="avatarImg" alt="avatar"/></div>
+          <div class="avatarCircle"><img id="rpAvatarImg" class="avatarImg hidden" alt="avatar"/></div>
           <div class="headText">
             <div class="profileName" id="rpCompanyName">Название компании</div>
             <div class="profileMeta"><span id="rpIndustry">Сфера</span></div>
@@ -403,11 +403,11 @@
           </div>
           <div class="blockTitle">О компании</div>
           <div class="profileAbout" id="rpAbout">—</div>
-          <div class="blockTitle" id="rpProductsTitle" style="display:none">Продукты</div>
-          <div class="profileAbout" id="rpProducts" style="display:none"></div>
-          <div class="blockTitle" id="rpProjectsTitle" style="display:none">Актуальные направления</div>
+          <div class="blockTitle hidden" id="rpProductsTitle">Продукты</div>
+          <div class="profileAbout hidden" id="rpProducts"></div>
+          <div class="blockTitle hidden" id="rpProjectsTitle">Актуальные направления</div>
           <div class="achList" id="rpProjectsList"></div>
-          <div class="blockTitle" id="rpNeededTitle" style="display:none">Кого ищем</div>
+          <div class="blockTitle hidden" id="rpNeededTitle">Кого ищем</div>
           <div class="tagRow" id="rpNeededTags"></div>
           <div class="blockTitle">Верификация</div>
           <div class="achList">
@@ -447,7 +447,7 @@
       <div class="profileCard premium">
         <div class="profileHead">
           <div class="avatarEdit">
-            <div class="avatarCircle lg"><img id="mpEAvatarImg" class="avatarImg" alt="avatar"/></div>
+            <div class="avatarCircle lg"><img id="mpEAvatarImg" class="avatarImg hidden" alt="avatar"/></div>
             <div class="avatarEditActions">
               <label class="pillBtn soft">Загрузить логотип<input id="mpEAvatar" class="fileHidden" type="file" accept="image/*"/></label>
               <button type="button" class="pillBtn" id="btnRemoveEAvatar">Удалить</button>
@@ -527,7 +527,7 @@
       <div class="profileCard premium">
         <div class="profileHead">
           <div class="avatarEdit">
-            <div class="avatarCircle lg"><img id="mpCAvatarImg" class="avatarImg" alt="avatar"/></div>
+            <div class="avatarCircle lg"><img id="mpCAvatarImg" class="avatarImg hidden" alt="avatar"/></div>
             <div class="avatarEditActions">
               <label class="pillBtn soft">Загрузить фото<input id="mpCAvatar" class="fileHidden" type="file" accept="image/*"/></label>
               <button type="button" class="pillBtn" id="btnRemoveCAvatar">Удалить фото</button>
@@ -650,20 +650,20 @@
     <div class="centerBlock">
       <div class="profileCard premium">
         <div class="profileHead">
-          <div class="avatarCircle"><img id="epAvatarImg" class="avatarImg" alt="avatar"/></div>
+          <div class="avatarCircle"><img id="epAvatarImg" class="avatarImg hidden" alt="avatar"/></div>
           <div class="headText">
             <div class="profileName" id="epName">Имя Фамилия</div>
             <div class="profileMeta" id="epCity"></div>
             <div class="profileSub"><span id="epEduPlace">ВУЗ</span> · <span id="epEduYear">Год</span></div>
             <div class="profileSub" id="epEmail"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="e1848c80888da18499808c918d84cf828e8c">[email&#160;protected]</a></div>
-            <div class="profileSub" id="epPhone" style="display:none"></div>
+            <div class="profileSub hidden" id="epPhone"></div>
             <div class="profileSub" id="epTg">@telegram</div>
             <div class="badgeRow"><span class="badge ok">Профиль кандидата</span></div>
           </div>
         </div>
         <div class="profileBody">
           <div class="profileProgress" id="epProgress">
-            <div class="progressBar"><div class="progressFill" id="epProgressFill" style="width:10%"></div></div>
+            <div class="progressBar"><div class="progressFill" id="epProgressFill"></div></div>
             <div class="progressLabel" id="epProgressLabel">Профиль 10% — начните с себя</div>
             <div class="progressHints" id="epProgressHints"></div>
           </div>
@@ -757,7 +757,7 @@
           <button class="feedFilterChip active" data-feed-view="" type="button">Все профили</button>
           <button class="feedFilterChip" data-feed-view="favorites" type="button">★ Избранные</button>
         </div>
-        <select id="feedViewFilter" style="display:none">
+        <select id="feedViewFilter" class="hidden">
           <option value="">Все профили</option>
           <option value="favorites">Избранное</option>
         </select>
@@ -806,7 +806,7 @@
           <button class="empFilterChip" data-verified="verified" type="button">✓ Верифицированные</button>
           <button class="empFilterChip" data-verified="favorites" type="button">★ Избранные</button>
         </div>
-        <select id="empSearchVerified" style="display:none">
+        <select id="empSearchVerified" class="hidden">
           <option value="">Все кандидаты</option>
           <option value="verified">Верифицированные</option>
           <option value="favorites">Избранное</option>
@@ -911,7 +911,7 @@
       </div>
 
       <!-- TAB: Candidates feed -->
-      <div id="adminTabPanelCandidates" style="display:none;">
+      <div id="adminTabPanelCandidates" class="hidden">
         <div class="adminSectionHead">
           <div class="adminSectionTitle">Все кандидаты</div>
           <input id="adminCandSearch" type="text" placeholder="Поиск..." class="sqInput adminSearchInput">
@@ -921,7 +921,7 @@
       </div>
 
       <!-- TAB: Employers feed -->
-      <div id="adminTabPanelEmployers" style="display:none;">
+      <div id="adminTabPanelEmployers" class="hidden">
         <div class="adminSectionHead">
           <div class="adminSectionTitle">Все работодатели</div>
           <input id="adminEmpSearch" type="text" placeholder="Поиск..." class="sqInput adminSearchInput">
@@ -931,7 +931,7 @@
       </div>
 
       <!-- TAB: All users -->
-      <div id="adminTabPanelUsers" style="display:none;">
+      <div id="adminTabPanelUsers" class="hidden">
         <div class="adminSectionHead adminSectionHeadWrap">
           <div class="adminSectionTitle">Все пользователи</div>
           <input id="adminUserSearch" type="text" placeholder="Поиск по email или имени..." class="sqInput adminSearchInput wide">

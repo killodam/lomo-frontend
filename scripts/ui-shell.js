@@ -219,7 +219,7 @@ function bindStaticUiActions() {
   bindUiAction('cvPublicToggle', 'change', function () { updateCvPrivacy(); });
   bindUiAction('epOnboardDismiss', 'click', function () {
     const banner = document.getElementById('epOnboardBanner');
-    if (banner) banner.style.display = 'none';
+    if (banner) banner.classList.add('hidden');
   });
   bindUiAction('verifyLevelInfoBtn', 'click', function () { openVerifyLevelModal(); });
   bindUiAction('refreshAdminQueueBtn', 'click', function () { loadAdminQueue(); });

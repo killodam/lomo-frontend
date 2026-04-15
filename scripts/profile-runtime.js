@@ -21,6 +21,26 @@ function applyChip(elId, status) {
   }
 }
 
+function setHidden(target, isHidden) {
+  const el = typeof target === 'string' ? document.getElementById(target) : target;
+  if (!el) return null;
+  el.classList.toggle('hidden', !!isHidden);
+  return el;
+}
+
+function setPairHidden(first, second, isHidden) {
+  setHidden(first, isHidden);
+  setHidden(second, isHidden);
+}
+
+function setProgressWidth(target, value) {
+  const el = typeof target === 'string' ? document.getElementById(target) : target;
+  const safeValue = Math.max(0, Math.min(100, Number(value) || 0));
+  if (!el) return safeValue;
+  el.style.setProperty('--progress-width', safeValue + '%');
+  return safeValue;
+}
+
 function renderRecruiterPublic() {
   const p = state.employer;
   setText('rpCompanyName', p.company || 'Название компании');
@@ -36,14 +56,8 @@ function renderRecruiterPublic() {
   const productsEl = document.getElementById('rpProducts');
   const productsTitleEl = document.getElementById('rpProductsTitle');
   if (productsEl && productsTitleEl) {
-    if (p.products) {
-      productsEl.textContent = p.products;
-      productsEl.style.display = '';
-      productsTitleEl.style.display = '';
-    } else {
-      productsEl.style.display = 'none';
-      productsTitleEl.style.display = 'none';
-    }
+    productsEl.textContent = p.products || '';
+    setPairHidden(productsEl, productsTitleEl, !p.products);
   }
 
   const projectsList = document.getElementById('rpProjectsList');
@@ -52,15 +66,15 @@ function renderRecruiterPublic() {
     projectsList.innerHTML = '';
     const projects = (p.activeProjects || '').split(';').map(function (value) { return value.trim(); }).filter(Boolean);
     if (projects.length) {
-      if (projectsTitle) projectsTitle.style.display = '';
+      setHidden(projectsTitle, false);
       projects.forEach(function (project) {
         const el = document.createElement('div');
         el.className = 'projectItem';
         el.innerHTML = '<div class="projectDot"></div>' + escapeHtml(project);
         projectsList.appendChild(el);
       });
-    } else if (projectsTitle) {
-      projectsTitle.style.display = 'none';
+    } else {
+      setHidden(projectsTitle, true);
     }
   }
 
@@ -70,15 +84,15 @@ function renderRecruiterPublic() {
     tagsEl.innerHTML = '';
     const tags = (p.neededSpecialists || '').split(',').map(function (value) { return value.trim(); }).filter(Boolean);
     if (tags.length) {
-      if (tagsTitle) tagsTitle.style.display = '';
+      setHidden(tagsTitle, false);
       tags.forEach(function (tag) {
         const el = document.createElement('span');
         el.className = 'tag';
         el.textContent = tag;
         tagsEl.appendChild(el);
       });
-    } else if (tagsTitle) {
-      tagsTitle.style.display = 'none';
+    } else {
+      setHidden(tagsTitle, true);
     }
   }
 
@@ -98,18 +112,14 @@ function renderEmployeePublic() {
 
   const phoneEl = document.getElementById('epPhone');
   if (phoneEl) {
-    if (p.phone) {
-      phoneEl.textContent = p.phone;
-      phoneEl.style.display = '';
-    } else {
-      phoneEl.style.display = 'none';
-    }
+    phoneEl.textContent = p.phone || '';
+    setHidden(phoneEl, !p.phone);
   }
 
   const aboutSec = document.getElementById('epAboutSection');
-  if (aboutSec) aboutSec.style.display = p.about ? '' : 'none';
+  setHidden(aboutSec, !p.about);
   const aboutEl = document.getElementById('epAbout');
-  if (aboutEl && p.about) aboutEl.textContent = p.about;
+  if (aboutEl) aboutEl.textContent = p.about || '—';
 
   applyChip('epEduStatusChip', p.proofs?.education?.status);
   applyChip('epWorkStatusChip', p.proofs?.work?.status);
@@ -177,10 +187,10 @@ function setAvatar(imgId, dataUrl) {
   if (!img) return;
   if (dataUrl) {
     img.src = dataUrl;
-    img.style.display = 'block';
+    setHidden(img, false);
   } else {
     img.removeAttribute('src');
-    img.style.display = 'none';
+    setHidden(img, true);
   }
 }
 

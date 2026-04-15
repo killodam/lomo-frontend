@@ -769,7 +769,10 @@ function updateProfileProgress() {
   var banner = document.getElementById('epOnboardBanner');
   var bannerText = document.getElementById('epOnboardText');
 
-  if (fill) fill.style.width = pct + '%';
+  if (fill) {
+    if (typeof setProgressWidth === 'function') setProgressWidth(fill, pct);
+    else fill.style.setProperty('--progress-width', pct + '%');
+  }
   if (label) label.textContent = 'Профиль ' + pct + '%' + (pct < 50 ? ' — заполните для видимости' : pct < 100 ? ' — почти готово!' : ' — профиль полный');
   if (hintsEl) {
     hintsEl.innerHTML = hints.slice(0, 3).map(function (hint) {
@@ -777,7 +780,7 @@ function updateProfileProgress() {
     }).join('');
   }
 
-  if (pct >= 100 && banner) banner.style.display = 'none';
+  if (banner) banner.classList.toggle('hidden', pct >= 100);
   if (pct > 0 && pct < 100 && bannerText && hints[0]) {
     bannerText.textContent = 'Следующий шаг: ' + hints[0].text;
   }
@@ -1436,7 +1439,7 @@ function switchAdminTab(tab) {
   ['docs', 'candidates', 'employers', 'users'].forEach(function (key) {
     var panel = document.getElementById('adminTabPanel' + key.charAt(0).toUpperCase() + key.slice(1));
     var button = document.getElementById('adminTab' + key.charAt(0).toUpperCase() + key.slice(1));
-    if (panel) panel.style.display = key === tab ? '' : 'none';
+    if (panel) panel.classList.toggle('hidden', key !== tab);
     if (button) button.classList.toggle('active', key === tab);
   });
 
