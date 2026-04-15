@@ -110,6 +110,27 @@ function handleLogoutToLanding(action) {
   showEntryScreen();
 }
 
+function bindChipFilter(chipSelector, selectId, attributeName, handler) {
+  var select = document.getElementById(selectId);
+
+  if (select) {
+    select.addEventListener('change', function () {
+      handler();
+    });
+  }
+
+  document.querySelectorAll(chipSelector).forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      document.querySelectorAll(chipSelector).forEach(function (currentChip) {
+        currentChip.classList.remove('active');
+      });
+      chip.classList.add('active');
+      if (select) select.value = chip.getAttribute(attributeName) || '';
+      handler();
+    });
+  });
+}
+
 function bindStaticUiActions() {
   bindUiAction('feedMyProfileBtn', 'click', function () { goToMyProfile(); });
   bindUiAction('searchCompanyProfileBtn', 'click', function () { goToMyProfile(); });
@@ -136,34 +157,12 @@ function bindStaticUiActions() {
   const feedSearchInput = document.getElementById('feedSearchInput');
   if (feedSearchInput) feedSearchInput.addEventListener('input', function () { debouncedFilterFeed(); });
 
-  const feedViewFilter = document.getElementById('feedViewFilter');
-  if (feedViewFilter) feedViewFilter.addEventListener('change', function () { filterFeed(); });
-
-  document.querySelectorAll('.feedFilterChip').forEach(function (chip) {
-    chip.addEventListener('click', function () {
-      document.querySelectorAll('.feedFilterChip').forEach(function (c) { c.classList.remove('active'); });
-      chip.classList.add('active');
-      var sel = document.getElementById('feedViewFilter');
-      if (sel) sel.value = chip.getAttribute('data-feed-view') || '';
-      filterFeed();
-    });
-  });
+  bindChipFilter('.feedFilterChip', 'feedViewFilter', 'data-feed-view', filterFeed);
 
   const employerSearchInput = document.getElementById('empSearchName');
   if (employerSearchInput) employerSearchInput.addEventListener('input', function () { debouncedFilterEmployerSearch(); });
 
-  const employerVerified = document.getElementById('empSearchVerified');
-  if (employerVerified) employerVerified.addEventListener('change', function () { filterEmployerSearch(); });
-
-  document.querySelectorAll('.empFilterChip').forEach(function (chip) {
-    chip.addEventListener('click', function () {
-      document.querySelectorAll('.empFilterChip').forEach(function (c) { c.classList.remove('active'); });
-      chip.classList.add('active');
-      var sel = document.getElementById('empSearchVerified');
-      if (sel) sel.value = chip.getAttribute('data-verified') || '';
-      filterEmployerSearch();
-    });
-  });
+  bindChipFilter('.empFilterChip', 'empSearchVerified', 'data-verified', filterEmployerSearch);
 
   const adminCandSearch = document.getElementById('adminCandSearch');
   if (adminCandSearch) adminCandSearch.addEventListener('input', function () { debouncedFilterAdminCandidates(); });

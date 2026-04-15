@@ -1,8 +1,4 @@
 var _userCache = {};
-var _feedData = [];
-var _empSearchData = [];
-var _adminFeedData = [];
-var _adminAllUsers = [];
 var _connectionsData = { accepted: [], incoming: [], outgoing: [], counts: { accepted: 0, incoming: 0, outgoing: 0 } };
 
 var feedState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '', view: '' };
@@ -553,13 +549,13 @@ function loadAdminUsers(page) {
     search: adminUsersState.search,
   }).then(function (result) {
     var data = normalizePaginatedResponse(result);
+    var users = data.items || [];
     syncPagerState(adminUsersState, data);
-    _adminAllUsers = data.items || [];
 
     var listEl = document.getElementById('adminUsersList');
     if (!listEl) return;
 
-    if (!_adminAllUsers.length) {
+    if (!users.length) {
       listEl.innerHTML = '<div style="color:#888;padding:8px;">Нет пользователей</div>';
       renderPager('adminUsersPager', { total: 0 }, function () {}, { label: 'пользователей' });
       return;
@@ -577,7 +573,7 @@ function loadAdminUsers(page) {
       '</tr></thead>';
 
     var tbody = document.createElement('tbody');
-    _adminAllUsers.forEach(function (user) {
+    users.forEach(function (user) {
       var tr = document.createElement('tr');
       tr.style.borderBottom = '1px solid rgba(0,0,0,.05)';
       tr.innerHTML =
@@ -993,9 +989,36 @@ function filterBookmarkedUsers(list, query) {
   });
 }
 
+function paginateLocalItems(items, pagerState) {
+  var total = items.length;
+  var totalPages = total ? Math.ceil(total / pagerState.pageSize) : 0;
+  var safePage = pagerState.page || 1;
+  var start;
+
+  if (totalPages && safePage > totalPages) safePage = totalPages;
+  if (!totalPages) safePage = 1;
+
+  pagerState.page = safePage;
+  start = (safePage - 1) * pagerState.pageSize;
+  syncPagerState(pagerState, {
+    total: total,
+    page: safePage,
+    pageSize: pagerState.pageSize,
+    totalPages: totalPages,
+  });
+  return items.slice(start, start + pagerState.pageSize);
+}
+
 function getVisibleBookmarkedUsers(query) {
   return filterBookmarkedUsers(getBookmarkedUsersList(), query).filter(function (user) {
     return String(user && user.id || user && user.email || '') !== String(state.userId || '');
+  });
+}
+
+function syncChipSelection(chipSelector, attributeName, selectedValue) {
+  var normalizedValue = String(selectedValue || '');
+  document.querySelectorAll(chipSelector).forEach(function (chip) {
+    chip.classList.toggle('active', String(chip.getAttribute(attributeName) || '') === normalizedValue);
   });
 }
 
@@ -1004,9 +1027,15 @@ function syncFeedFilterChips() {
   var select = document.getElementById('feedViewFilter');
 
   if (select) selectedView = String(select.value || '');
-  document.querySelectorAll('.feedFilterChip').forEach(function (chip) {
-    chip.classList.toggle('active', String(chip.getAttribute('data-feed-view') || '') === selectedView);
-  });
+  syncChipSelection('.feedFilterChip', 'data-feed-view', selectedView);
+}
+
+function syncEmployerFilterChips() {
+  var selectedView = '';
+  var select = document.getElementById('empSearchVerified');
+
+  if (select) selectedView = String(select.value || '');
+  syncChipSelection('.empFilterChip', 'data-verified', selectedView);
 }
 
 function syncBookmarkButtons(uid, isActive) {
@@ -1222,24 +1251,7 @@ function loadCandidateFeed(page) {
 
   if (feedState.view === 'favorites') {
     var bookmarkedUsers = getVisibleBookmarkedUsers(feedState.search);
-    var total = bookmarkedUsers.length;
-    var totalPages = total ? Math.ceil(total / feedState.pageSize) : 0;
-    var safePage = feedState.page || 1;
-    var start;
-
-    if (totalPages && safePage > totalPages) safePage = totalPages;
-    if (!totalPages) safePage = 1;
-
-    feedState.page = safePage;
-    _feedData = bookmarkedUsers;
-    start = (safePage - 1) * feedState.pageSize;
-    renderFeedList(bookmarkedUsers.slice(start, start + feedState.pageSize));
-    syncPagerState(feedState, {
-      total: total,
-      page: safePage,
-      pageSize: feedState.pageSize,
-      totalPages: totalPages,
-    });
+    renderFeedList(paginateLocalItems(bookmarkedUsers, feedState));
     renderPager('candidateFeedPager', feedState, loadCandidateFeed, { label: 'избранных профилей' });
     return;
   }
@@ -1253,8 +1265,7 @@ function loadCandidateFeed(page) {
   }).then(function (result) {
     var data = normalizePaginatedResponse(result);
     syncPagerState(feedState, data);
-    _feedData = data.items || [];
-    renderFeedList(_feedData);
+    renderFeedList(data.items || []);
     renderPager('candidateFeedPager', feedState, loadCandidateFeed, { label: 'профилей' });
   }).catch(function (err) {
     if (recoverAuthFlowOnProtectedError(err, {
@@ -1303,29 +1314,14 @@ function loadEmployerSearch(page) {
   employerSearchState.search = (document.getElementById('empSearchName')?.value || '').trim();
   employerSearchState.verified = (document.getElementById('empSearchVerified')?.value || '').trim();
 
+  syncEmployerFilterChips();
+
   var listId = 'employerCandidateList';
   if (!document.getElementById(listId)) return;
 
   if (employerSearchState.verified === 'favorites') {
     var bookmarkedUsers = filterBookmarkedUsers(getBookmarkedUsersList(), employerSearchState.search);
-    var total = bookmarkedUsers.length;
-    var totalPages = total ? Math.ceil(total / employerSearchState.pageSize) : 0;
-    var safePage = employerSearchState.page || 1;
-    var start;
-
-    if (totalPages && safePage > totalPages) safePage = totalPages;
-    if (!totalPages) safePage = 1;
-
-    employerSearchState.page = safePage;
-    start = (safePage - 1) * employerSearchState.pageSize;
-    _empSearchData = bookmarkedUsers.slice(start, start + employerSearchState.pageSize);
-    syncPagerState(employerSearchState, {
-      total: total,
-      page: safePage,
-      pageSize: employerSearchState.pageSize,
-      totalPages: totalPages,
-    });
-    renderEmployerSearch(_empSearchData);
+    renderEmployerSearch(paginateLocalItems(bookmarkedUsers, employerSearchState));
     renderPager('employerCandidatePager', employerSearchState, loadEmployerSearch, { label: 'избранных' });
     return;
   }
@@ -1340,8 +1336,7 @@ function loadEmployerSearch(page) {
   }).then(function (result) {
     var data = normalizePaginatedResponse(result);
     syncPagerState(employerSearchState, data);
-    _empSearchData = data.items || [];
-    renderEmployerSearch(_empSearchData);
+    renderEmployerSearch(data.items || []);
     renderPager('employerCandidatePager', employerSearchState, loadEmployerSearch, { label: 'кандидатов' });
   }).catch(function (err) {
     if (recoverAuthFlowOnProtectedError(err, {
@@ -1395,8 +1390,7 @@ function loadAdminCandidates(page) {
   }).then(function (result) {
     var data = normalizePaginatedResponse(result);
     syncPagerState(adminCandidateState, data);
-    _adminFeedData = data.items || [];
-    renderAdminCandidates(_adminFeedData);
+    renderAdminCandidates(data.items || []);
     renderPager('adminCandidatePager', adminCandidateState, loadAdminCandidates, { label: 'кандидатов' });
   }).catch(function (err) {
     if (recoverAuthFlowOnProtectedError(err, {
@@ -1427,8 +1421,7 @@ function loadAdminEmployers(page) {
   }).then(function (result) {
     var data = normalizePaginatedResponse(result);
     syncPagerState(adminEmployerState, data);
-    _adminAllUsers = data.items || [];
-    renderAdminEmployers(_adminAllUsers);
+    renderAdminEmployers(data.items || []);
     renderPager('adminEmployerPager', adminEmployerState, loadAdminEmployers, { label: 'компаний' });
   }).catch(function (err) {
     if (recoverAuthFlowOnProtectedError(err, {

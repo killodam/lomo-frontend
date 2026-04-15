@@ -116,6 +116,7 @@
 
 .feedHeaderBurger:focus-visible,
 .feedNavBtn:focus-visible,
+.feedFilterChip:focus-visible,
 .empFilterChip:focus-visible {
   outline: none;
   box-shadow: 0 0 0 3px rgba(38,110,120,.16);
@@ -209,14 +210,16 @@
   background: #fff;
 }
 
-.feedFilterChips {
+.feedFilterChips,
+.empFilterChips {
   display: flex;
   gap: 7px;
   flex-wrap: wrap;
   margin-top: 12px;
 }
 
-.feedFilterChip {
+.feedFilterChip,
+.empFilterChip {
   padding: 7px 18px;
   border-radius: 999px;
   font-size: 13px;
@@ -230,19 +233,22 @@
   white-space: nowrap;
 }
 
-.feedFilterChip:hover {
+.feedFilterChip:hover,
+.empFilterChip:hover {
   border-color: rgba(38,110,120,.32);
   color: #1a5c68;
   background: rgba(38,110,120,.06);
 }
 
-.feedFilterChip.active {
+.feedFilterChip.active,
+.empFilterChip.active {
   background: #0e0f0f;
   color: #fff;
   border-color: #0e0f0f;
 }
 
-.feedFilterChip.active:hover {
+.feedFilterChip.active:hover,
+.empFilterChip.active:hover {
   background: #1a5c68;
   border-color: #1a5c68;
 }
@@ -502,8 +508,10 @@
   .feedSearchHero { padding: 18px 16px 16px; }
   .feedTitle { font-size: 20px; }
   .feedContent { padding: 14px 12px 36px; }
-  .feedFilterChips { gap: 5px; }
-  .feedFilterChip { padding: 6px 14px; font-size: 12px; }
+  .feedFilterChips,
+  .empFilterChips { gap: 5px; }
+  .feedFilterChip,
+  .empFilterChip { padding: 6px 14px; font-size: 12px; }
 }
 
 /* ══════════════════════════════════════════════
@@ -515,45 +523,6 @@
   justify-content: flex-start;
   flex-direction: column;
   background: #f7f8fa;
-}
-
-/* ── Filter chips ── */
-.empFilterChips {
-  display: flex;
-  gap: 7px;
-  flex-wrap: wrap;
-  margin-top: 12px;
-}
-
-.empFilterChip {
-  padding: 7px 18px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all .18s;
-  font-family: inherit;
-  border: 1.5px solid rgba(0,0,0,.10);
-  background: transparent;
-  color: #666;
-  white-space: nowrap;
-}
-
-.empFilterChip:hover {
-  border-color: rgba(38,110,120,.32);
-  color: #1a5c68;
-  background: rgba(38,110,120,.06);
-}
-
-.empFilterChip.active {
-  background: #0e0f0f;
-  color: #fff;
-  border-color: #0e0f0f;
-}
-
-.empFilterChip.active:hover {
-  background: #1a5c68;
-  border-color: #1a5c68;
 }
 
 /* Verified chip keeps teal accent when active */
@@ -572,11 +541,6 @@
   display: flex;
   flex-direction: column;
   gap: 10px;
-}
-
-@media (max-width: 640px) {
-  .empFilterChips { gap: 5px; }
-  .empFilterChip { padding: 6px 14px; font-size: 12px; }
 }
 /* ── Bookmarks / Favorites ── */
 .scBookmarkBtn {
