@@ -359,23 +359,26 @@
     }
 
     if (attachment && attachment.url) {
+      var escapedUrl = escapeHtml(attachment.url);
+      var escapedName = escapeHtml(attachment.name);
       if (isImageAttachment(attachment)) {
         html +=
           '<div class="chatAttachmentBlock">' +
-            '<a href="' + escapeHtml(attachment.url) + '" target="_blank" rel="noopener noreferrer" class="chatAttachmentLink">' +
+            '<a href="' + escapedUrl + '" target="_blank" rel="noopener noreferrer" class="chatAttachmentLink chatAttachmentLinkImage">' +
               '<div class="chatAttachmentImageWrap">' +
-                '<img class="chatAttachmentImage" src="' + escapeHtml(attachment.url) + '" alt="' + escapeHtml(attachment.name) + '" loading="lazy" decoding="async">' +
-                '<div class="chatAttachmentCaption"><span>🖼</span><span>' + escapeHtml(attachment.name) + '</span></div>' +
+                '<div class="chatImgSkeleton"></div>' +
+                '<img class="chatAttachmentImage" data-src="' + escapedUrl + '" alt="' + escapedName + '" decoding="async">' +
               '</div>' +
             '</a>' +
           '</div>';
       } else {
         html +=
           '<div class="chatAttachmentBlock">' +
-            '<a href="' + escapeHtml(attachment.url) + '" target="_blank" rel="noopener noreferrer" class="chatAttachmentLink">' +
+            '<a href="' + escapedUrl + '" target="_blank" rel="noopener noreferrer" class="chatAttachmentLink">' +
               '<span class="chatAttachment">' +
                 '<span class="chatAttachmentIcon">📎</span>' +
-                '<span class="chatAttachmentLabel">' + escapeHtml(attachment.name) + '</span>' +
+                '<span class="chatAttachmentLabel">' + escapedName + '</span>' +
+                '<span class="chatAttachmentArrow">↗</span>' +
               '</span>' +
             '</a>' +
           '</div>';
@@ -383,6 +386,32 @@
     }
 
     return html || '<p>Пустое сообщение</p>';
+  }
+
+  function isImageOnlyMessage(body) {
+    var attachment = parseAttachment(body);
+    var text = stripAttachmentToken(body).trim();
+    return !!(attachment && isImageAttachment(attachment) && !text);
+  }
+
+  function loadBubbleImages(container) {
+    if (!container) return;
+    container.querySelectorAll('img.chatAttachmentImage[data-src]').forEach(function (img) {
+      var src = img.getAttribute('data-src');
+      if (!src) return;
+      img.removeAttribute('data-src');
+      var apiPath = src.replace(/^https?:\/\/[^/]+\/api/, '').replace(/^\/api/, '');
+      apiFetchBlob(apiPath)
+        .then(function (blob) {
+          img.src = URL.createObjectURL(blob);
+          var block = img.closest('.chatAttachmentBlock');
+          if (block) block.classList.add('chatImgLoaded');
+        })
+        .catch(function () {
+          var block = img.closest('.chatAttachmentBlock');
+          if (block) block.classList.add('chatImgFailed');
+        });
+    });
   }
 
   function buildChatAttachmentUrl(fileUrl) {
@@ -598,15 +627,18 @@
 
     elements.messages.innerHTML = messages.map(function (message) {
       var mine = String(message.author_user_id) === String(state.userId || '');
+      var imageOnly = isImageOnlyMessage(message.body);
+      var bubbleExtra = (mine ? ' mine' : '') + (imageOnly ? ' chatBubble--media' : '');
       return (
         '<div class="chatBubbleRow' + (mine ? ' mine' : '') + '">' +
-          '<div class="chatBubble' + (mine ? ' mine' : '') + '">' +
+          '<div class="chatBubble' + bubbleExtra + '">' +
             '<div class="chatBubbleText">' + renderMessageBodyHtml(message.body) + '</div>' +
-            '<div class="chatBubbleMeta">' + escapeHtml(formatChatTime(message.created_at)) + '</div>' +
+            '<div class="chatBubbleMeta' + (imageOnly ? ' chatBubbleMeta--overlay' : '') + '">' + escapeHtml(formatChatTime(message.created_at)) + '</div>' +
           '</div>' +
         '</div>'
       );
     }).join('');
+    loadBubbleImages(elements.messages);
 
     if (shouldStickToBottom) {
       scrollMessagesToBottom(options.smooth ? 'smooth' : 'auto');
@@ -809,12 +841,24 @@
     if (chatState.pollingTimer || !shouldEnableChat()) return;
     chatState.socketMode = 'fallback';
     updateAutoBadge('Авто', 'fallback');
+    var pollCycle = 0;
     chatState.pollingTimer = window.setInterval(function () {
-      if (chatState.pollingInFlight || !shouldEnableChat() || document.hidden) return;
-      chatState.pollingInFlight = true;
-      loadConversations({ silent: !isChatActive(), reason: 'fallback-poll' }).catch(function () {}).finally(function () {
-        chatState.pollingInFlight = false;
-      });
+      if (!shouldEnableChat() || document.hidden) return;
+      pollCycle++;
+      if (!chatState.pollingInFlight) {
+        chatState.pollingInFlight = true;
+        loadConversations({ silent: !isChatActive(), reason: 'fallback-poll' }).catch(function () {}).finally(function () {
+          chatState.pollingInFlight = false;
+        });
+      }
+      // Refresh connection inbox every 3rd cycle (~36s) so pending contact requests
+      // appear automatically even without a WebSocket connection.
+      if (pollCycle % 3 === 0 && !chatState.connectionsInFlight) {
+        chatState.connectionsInFlight = true;
+        loadConnectionInbox({ silent: !isChatActive() }).catch(function () {}).finally(function () {
+          chatState.connectionsInFlight = false;
+        });
+      }
     }, FALLBACK_POLL_INTERVAL_MS);
   }
 
