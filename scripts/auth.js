@@ -770,6 +770,7 @@ function deleteOwnAccount(password) {
               return;
             }
             if (typeof loadEmployerSearch === 'function') {
+              loadEmployerSearch();
               show('employerSearch');
               return;
             }
@@ -779,6 +780,7 @@ function deleteOwnAccount(password) {
               return;
             }
             if (typeof loadCandidateFeed === 'function') {
+              loadCandidateFeed();
               show('candidateFeed');
               return;
             }

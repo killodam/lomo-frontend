@@ -8,15 +8,19 @@
     previousScreen: 'auth',
     pollingTimer: null,
     pollingInFlight: false,
+    connectionsInFlight: false,
     conversationPager: { page: 1, pageSize: 20, total: 0, totalPages: 0 },
     socket: null,
     socketMode: 'idle',
     reconnectTimer: null,
     reconnectAttempts: 0,
     syncTimer: null,
+    connectionSyncTimer: null,
     renderedMetaByConversation: {},
     lastRenderedConversationId: '',
     newestWhileAwayCount: 0,
+    knownIncomingConnectionIds: [],
+    connectionsSnapshotReady: false,
   };
 
   var elements = {
@@ -42,9 +46,21 @@
     attachPreview: document.getElementById('chatAttachPreview'),
     attachName: document.getElementById('chatAttachName'),
     attachClear: document.getElementById('chatAttachClear'),
+    connectionInbox: document.getElementById('chatConnectionInbox'),
   };
 
   var pendingFile = null;
+  var CHAT_ATTACHMENT_TOKEN_RE = /\[\[attachment\|([^\]|]+)\|([^\]]+)\]\]/;
+  var CHAT_ATTACHMENT_TOKEN_RE_GLOBAL = /\[\[attachment\|([^\]|]+)\|([^\]]+)\]\]/g;
+  var CHAT_ALLOWED_FILE_EXT_RE = /\.(pdf|doc|docx|png|jpe?g|webp)$/i;
+  var CHAT_ALLOWED_FILE_TYPES = {
+    'application/pdf': true,
+    'application/msword': true,
+    'application/vnd.openxmlformats-officedocument.wordprocessingml.document': true,
+    'image/png': true,
+    'image/jpeg': true,
+    'image/webp': true,
+  };
 
   function shouldEnableChat() {
     return !!getToken() && state.roleReg !== 'ADMIN';
@@ -165,6 +181,214 @@
     }, 0);
   }
 
+  function computeIncomingConnectionTotal() {
+    return Number(state.connections && state.connections.counts && state.connections.counts.incoming || 0);
+  }
+
+  function normalizeConnectionsPayload(data) {
+    var payload = data || {};
+    var accepted = Array.isArray(payload.accepted) ? payload.accepted : [];
+    var incoming = Array.isArray(payload.incoming) ? payload.incoming : [];
+    var outgoing = Array.isArray(payload.outgoing) ? payload.outgoing : [];
+    return {
+      accepted: accepted,
+      incoming: incoming,
+      outgoing: outgoing,
+      counts: payload.counts || {
+        accepted: accepted.length,
+        incoming: incoming.length,
+        outgoing: outgoing.length,
+      },
+    };
+  }
+
+  function buildConnectionName(item) {
+    return item && (item.full_name || item.company || 'Пользователь LOMO') || 'Пользователь LOMO';
+  }
+
+  function buildConnectionMeta(item) {
+    if (!item) return 'Контакт LOMO';
+    if (item.role === 'employer') return item.company || item.industry || item.location || 'Работодатель';
+    return item.current_job || item.job_title || item.location || 'Кандидат';
+  }
+
+  function connectionAvatarHtml(item) {
+    var avatarSrc = typeof safeImageUrl === 'function' ? safeImageUrl(item && item.avatar_url) : '';
+    var initials = buildConnectionName(item)
+      .split(' ')
+      .map(function (segment) { return segment[0] || ''; })
+      .join('')
+      .slice(0, 2)
+      .toUpperCase() || 'LO';
+    return avatarSrc
+      ? '<div class="chatConnectionAvatar"><img src="' + escapeHtml(avatarSrc) + '" alt="avatar"></div>'
+      : '<div class="chatConnectionAvatar"><span>' + escapeHtml(initials) + '</span></div>';
+  }
+
+  function collectConnectionIds(items) {
+    return (items || []).map(function (item) {
+      return String(item && item.id || '');
+    }).filter(Boolean);
+  }
+
+  function updateConnectionNotifications(data) {
+    var incomingIds = collectConnectionIds(data && data.incoming);
+    if (chatState.connectionsSnapshotReady) {
+      var knownIds = chatState.knownIncomingConnectionIds || [];
+      var freshIds = incomingIds.filter(function (id) {
+        return knownIds.indexOf(id) === -1;
+      });
+      if (freshIds.length && !isChatActive()) {
+        showToast(freshIds.length > 1 ? 'Новые запросы в контакты' : 'Новый запрос в контакты', 'info');
+      }
+    }
+    chatState.knownIncomingConnectionIds = incomingIds;
+    chatState.connectionsSnapshotReady = true;
+  }
+
+  function renderConnectionInbox() {
+    if (!elements.connectionInbox) return;
+    var data = normalizeConnectionsPayload(state.connections);
+    var incoming = data.incoming || [];
+    var outgoing = data.outgoing || [];
+    var sections = [];
+
+    if (!shouldEnableChat() || (!incoming.length && !outgoing.length)) {
+      elements.connectionInbox.classList.add('hidden');
+      elements.connectionInbox.innerHTML = '';
+      renderHeaderUnreadBadges();
+      return;
+    }
+
+    function renderConnectionCard(item, kind) {
+      var actionHtml = kind === 'incoming'
+        ? '<button type="button" class="chatConnectionBtn primary" data-connection-action="accept" data-connection-id="' + escapeHtml(item.id) + '" data-target-user-id="' + escapeHtml(item.user_id) + '">Принять</button>' +
+            '<button type="button" class="chatConnectionBtn danger" data-connection-action="reject" data-connection-id="' + escapeHtml(item.id) + '" data-target-user-id="' + escapeHtml(item.user_id) + '">Отклонить</button>'
+        : '<button type="button" class="chatConnectionBtn" data-connection-action="remove" data-connection-id="' + escapeHtml(item.id) + '" data-target-user-id="' + escapeHtml(item.user_id) + '">Отменить</button>';
+      return (
+        '<div class="chatConnectionCard ' + kind + '">' +
+          connectionAvatarHtml(item) +
+          '<div class="chatConnectionBody">' +
+            '<div class="chatConnectionName">' + escapeHtml(buildConnectionName(item)) + '</div>' +
+            '<div class="chatConnectionMeta">' + escapeHtml(buildConnectionMeta(item)) + (kind === 'incoming' ? ' • хочет добавить вас в контакты' : ' • запрос отправлен') + '</div>' +
+            '<div class="chatConnectionActions">' +
+              '<button type="button" class="chatConnectionBtn" data-open-connection-profile="' + escapeHtml(item.user_id) + '">Профиль</button>' +
+              actionHtml +
+            '</div>' +
+          '</div>' +
+        '</div>'
+      );
+    }
+
+    if (incoming.length) {
+      sections.push(
+        '<div class="chatInboxSection">' +
+          '<div class="chatInboxHeading">' +
+            '<div class="chatInboxTitle">Запросы в контакты</div>' +
+            '<span class="chatInboxCount">' + escapeHtml(String(incoming.length)) + '</span>' +
+          '</div>' +
+          incoming.map(function (item) {
+            return renderConnectionCard(item, 'incoming');
+          }).join('') +
+        '</div>'
+      );
+    }
+
+    if (outgoing.length) {
+      sections.push(
+        '<div class="chatInboxSection">' +
+          '<div class="chatInboxHeading">' +
+            '<div class="chatInboxTitle">Ожидают ответа</div>' +
+            '<span class="chatInboxCount">' + escapeHtml(String(outgoing.length)) + '</span>' +
+          '</div>' +
+          outgoing.map(function (item) {
+            return renderConnectionCard(item, 'outgoing');
+          }).join('') +
+        '</div>'
+      );
+    }
+
+    elements.connectionInbox.innerHTML = sections.join('');
+    elements.connectionInbox.classList.remove('hidden');
+    renderHeaderUnreadBadges();
+  }
+
+  function renderTextWithLinks(text) {
+    var escaped = escapeHtml(text || '');
+    return escaped.replace(/((?:https?:\/\/|\/api\/chat\/attachments\/)[^\s<>"]+)/g, function (url) {
+      return '<a href="' + url + '" target="_blank" rel="noopener noreferrer" class="chatLink">' + url + '</a>';
+    });
+  }
+
+  function parseAttachment(body) {
+    var match = String(body || '').match(CHAT_ATTACHMENT_TOKEN_RE);
+    if (!match) return null;
+    return {
+      name: match[1] || 'Файл',
+      url: match[2] || '',
+    };
+  }
+
+  function stripAttachmentToken(body) {
+    return String(body || '').replace(CHAT_ATTACHMENT_TOKEN_RE_GLOBAL, '').replace(/\n{3,}/g, '\n\n').trim();
+  }
+
+  function formatConversationPreview(body) {
+    var attachment = parseAttachment(body);
+    var text = stripAttachmentToken(body).replace(/\s+/g, ' ').trim();
+    if (text && attachment) return text + ' · 📎 ' + attachment.name;
+    if (attachment) return '📎 ' + attachment.name;
+    return text || 'Диалог готов к старту';
+  }
+
+  function renderMessageBodyHtml(body) {
+    var attachment = parseAttachment(body);
+    var text = stripAttachmentToken(body);
+    var html = '';
+
+    if (text) {
+      html += text.split(/\n+/).map(function (line) {
+        return '<p>' + renderTextWithLinks(line) + '</p>';
+      }).join('');
+    }
+
+    if (attachment && attachment.url) {
+      html +=
+        '<div class="chatAttachmentBlock">' +
+          '<a href="' + escapeHtml(attachment.url) + '" target="_blank" rel="noopener noreferrer" class="chatAttachment">' +
+            '<span class="chatAttachmentIcon">📎</span>' +
+            '<span class="chatAttachmentLabel">' + escapeHtml(attachment.name) + '</span>' +
+          '</a>' +
+        '</div>';
+    }
+
+    return html || '<p>Пустое сообщение</p>';
+  }
+
+  function buildChatAttachmentUrl(fileUrl) {
+    var match = String(fileUrl || '').trim().match(/\/files\/([^/?#]+)$/);
+    if (!match) return '';
+    return '/api/chat/attachments/' + encodeURIComponent(match[1]);
+  }
+
+  function buildChatAttachmentToken(name, url) {
+    if (!url) return '';
+    return '[[attachment|' + String(name || 'Файл').trim() + '|' + String(url).trim() + ']]';
+  }
+
+  function buildChatMessageBody(text, attachment) {
+    var parts = [];
+    if (text) parts.push(text);
+    if (attachment && attachment.url) parts.push(buildChatAttachmentToken(attachment.name, attachment.url));
+    return parts.join('\n').trim();
+  }
+
+  function isAllowedChatFile(file) {
+    if (!file) return false;
+    if (CHAT_ALLOWED_FILE_TYPES[file.type]) return true;
+    return CHAT_ALLOWED_FILE_EXT_RE.test(file.name || '');
+  }
+
   function ensureHeaderChatBadge(button) {
     if (!button) return null;
     var badge = button.querySelector('.chatNavUnreadBadge');
@@ -176,7 +400,7 @@
   }
 
   function renderHeaderUnreadBadges() {
-    var unreadTotal = computeUnreadTotal();
+    var unreadTotal = computeUnreadTotal() + computeIncomingConnectionTotal();
     document.querySelectorAll('[data-next="toChatHub"]').forEach(function (button) {
       var badge = ensureHeaderChatBadge(button);
       if (!badge) return;
@@ -255,25 +479,30 @@
     if (!elements.list) return;
     var conversations = Array.isArray(state.chat.conversations) ? state.chat.conversations : [];
     var unreadTotal = computeUnreadTotal();
+    var incomingTotal = computeIncomingConnectionTotal();
 
     if (!conversations.length) {
       elements.list.innerHTML = '<div class="chatConversationEmpty">Контакты появятся здесь, как только вы начнёте первый диалог.</div>';
       if (elements.sidebarMeta) {
-        elements.sidebarMeta.textContent = 'Пока без диалогов. Напишите контакту из профиля или после одобренного доступа.';
+        elements.sidebarMeta.textContent = incomingTotal
+          ? 'Новых запросов в контакты: ' + incomingTotal
+          : 'Пока без диалогов. Напишите контакту из профиля или после одобренного доступа.';
       }
       renderHeaderUnreadBadges();
       return;
     }
 
     if (elements.sidebarMeta) {
-      elements.sidebarMeta.textContent = 'Диалогов: ' + conversations.length + (unreadTotal ? ' • новых: ' + unreadTotal : '');
+      elements.sidebarMeta.textContent = 'Диалогов: ' + conversations.length
+        + (unreadTotal ? ' • новых сообщений: ' + unreadTotal : '')
+        + (incomingTotal ? ' • запросов: ' + incomingTotal : '');
     }
 
     elements.list.innerHTML = conversations.map(function (conversation) {
       var isActive = String(conversation.id) === String(state.chat.activeConversationId || '');
       var avatarSrc = typeof safeImageUrl === 'function' ? safeImageUrl(conversation.avatar_url) : '';
       var unreadCount = Number(conversation.unread_count || 0);
-      var preview = conversation.last_message_body || 'Диалог готов к старту';
+      var preview = formatConversationPreview(conversation.last_message_body);
       return (
         '<button type="button" class="chatConversationItem' + (isActive ? ' active' : '') + '" data-chat-conversation-id="' + escapeHtml(conversation.id) + '">' +
           '<div class="chatConversationAvatar">' +
@@ -351,7 +580,7 @@
       return (
         '<div class="chatBubbleRow' + (mine ? ' mine' : '') + '">' +
           '<div class="chatBubble' + (mine ? ' mine' : '') + '">' +
-            '<div class="chatBubbleText">' + linkifyMessage(message.body) + '</div>' +
+            '<div class="chatBubbleText">' + renderMessageBodyHtml(message.body) + '</div>' +
             '<div class="chatBubbleMeta">' + escapeHtml(formatChatTime(message.created_at)) + '</div>' +
           '</div>' +
         '</div>'
@@ -457,10 +686,42 @@
     } catch (err) {
       if (handleProtectedError(err)) return [];
       if (!options.silent && elements.list && isChatActive()) {
-        elements.list.innerHTML = '<div class="miniHint" style="color:#991b1b;">Ошибка: ' + escapeHtml(safeErrorText(err)) + '</div>';
+        showToast('Не удалось загрузить чаты: ' + safeErrorText(err), 'error');
+        elements.list.innerHTML = '<div class="chatConversationEmpty">Не удалось загрузить диалоги</div>';
       }
       renderPager('chatConversationPager', { total: 0 }, function () {}, { label: 'чатов' });
       updateAutoBadge('Ошибка', 'error');
+      throw err;
+    }
+  }
+
+  async function loadConnectionInbox(options) {
+    if (!shouldEnableChat()) {
+      state.connections = normalizeConnectionsPayload();
+      chatState.knownIncomingConnectionIds = [];
+      chatState.connectionsSnapshotReady = false;
+      renderConnectionInbox();
+      return state.connections;
+    }
+
+    options = options || {};
+
+    try {
+      var result = await apiGetConnections();
+      var data = normalizeConnectionsPayload(result);
+      state.connections = data;
+      updateConnectionNotifications(data);
+      renderConnectionInbox();
+      renderConversationList();
+      return data;
+    } catch (err) {
+      if (!options.silent) {
+        showToast('Не удалось загрузить запросы в контакты: ' + safeErrorText(err), 'error');
+      }
+      if (elements.connectionInbox && isChatActive()) {
+        elements.connectionInbox.classList.remove('hidden');
+        elements.connectionInbox.innerHTML = '<div class="chatConversationEmpty">Не удалось загрузить запросы в контакты</div>';
+      }
       throw err;
     }
   }
@@ -496,7 +757,8 @@
     } catch (err) {
       if (handleProtectedError(err)) return [];
       if (elements.messages && isChatActive()) {
-        elements.messages.innerHTML = '<div class="chatThreadPlaceholder" style="color:#991b1b;">Ошибка загрузки: ' + escapeHtml(safeErrorText(err)) + '</div>';
+        showToast('Не удалось загрузить сообщения: ' + safeErrorText(err), 'error');
+        elements.messages.innerHTML = '<div class="chatThreadPlaceholder">Не удалось загрузить сообщения</div>';
       }
       throw err;
     }
@@ -542,6 +804,10 @@
       window.clearTimeout(chatState.syncTimer);
       chatState.syncTimer = null;
     }
+    if (chatState.connectionSyncTimer) {
+      window.clearTimeout(chatState.connectionSyncTimer);
+      chatState.connectionSyncTimer = null;
+    }
     if (chatState.socket) {
       try {
         chatState.socket.close();
@@ -574,6 +840,19 @@
     }, 150);
   }
 
+  function scheduleConnectionInboxSync(options) {
+    if (!shouldEnableChat()) return;
+    if (chatState.connectionSyncTimer) window.clearTimeout(chatState.connectionSyncTimer);
+    chatState.connectionSyncTimer = window.setTimeout(function () {
+      chatState.connectionSyncTimer = null;
+      if (chatState.connectionsInFlight) return;
+      chatState.connectionsInFlight = true;
+      loadConnectionInbox({ silent: !(options && options.loud) }).catch(function () {}).finally(function () {
+        chatState.connectionsInFlight = false;
+      });
+    }, 120);
+  }
+
   function handleSocketPayload(raw) {
     try {
       var payload = JSON.parse(String(raw || '{}'));
@@ -585,7 +864,8 @@
       }
       if (payload.type === 'chat.pong') return;
       if (payload.type === 'chat.sync') {
-        scheduleConversationSync(payload);
+        if (String(payload.reason || '').indexOf('connection-') === 0) scheduleConnectionInboxSync({ loud: !isChatActive() });
+        else scheduleConversationSync(payload);
       }
     } catch (error) {
       updateAutoBadge('Ошибка', 'error');
@@ -674,10 +954,15 @@
     resetNewMessagesIndicator();
     setThreadVisibility(false);
     show('chat');
+    scheduleConnectionInboxSync({ loud: false });
     if (!state.chat.conversations.length) {
-      await loadConversations({ silent: false });
+      await Promise.all([
+        loadConversations({ silent: false }),
+        loadConnectionInbox({ silent: false }).catch(function () {}),
+      ]);
       return;
     }
+    renderConnectionInbox();
     renderConversationList();
     renderThread();
   }
@@ -726,6 +1011,11 @@
   }
 
   function setPendingFile(file) {
+    if (!isAllowedChatFile(file)) {
+      clearPendingFile();
+      showToast('Разрешены PDF, JPG, PNG, WEBP, DOC и DOCX', 'error');
+      return;
+    }
     pendingFile = file;
     if (elements.attachName) elements.attachName.textContent = file.name;
     if (elements.attachPreview) elements.attachPreview.classList.remove('hidden');
@@ -742,11 +1032,11 @@
       var body = text;
       if (pendingFile) {
         var uploadResult = await apiUploadFile(pendingFile);
-        var fileUrl = uploadResult && (uploadResult.url || uploadResult.file_url || uploadResult.path || '');
-        if (fileUrl) {
-          body = text ? text + '\n' + fileUrl : fileUrl;
-        }
+        var uploadedFileUrl = uploadResult && (uploadResult.fileUrl || uploadResult.file_url || uploadResult.url || uploadResult.path || '');
+        var attachmentUrl = buildChatAttachmentUrl(uploadedFileUrl);
+        var attachmentName = uploadResult && (uploadResult.fileName || uploadResult.file_name || pendingFile.name || 'Файл');
         clearPendingFile();
+        body = buildChatMessageBody(text, attachmentUrl ? { name: attachmentName, url: attachmentUrl } : null);
       }
       if (!body) return;
       var message = normalizeMessage(await apiSendChatMessage(conversationId, body));
@@ -784,14 +1074,22 @@
   function handleScreenChange(screenKey) {
     if (!shouldEnableChat()) {
       disconnectRealtime();
+      renderConnectionInbox();
       renderHeaderUnreadBadges();
       if (screenKey !== 'chat') setThreadVisibility(false);
       return;
     }
 
     ensureRealtimeConnection(false).catch(function () {});
+    if (!chatState.connectionsInFlight) {
+      chatState.connectionsInFlight = true;
+      loadConnectionInbox({ silent: screenKey !== 'chat' }).catch(function () {}).finally(function () {
+        chatState.connectionsInFlight = false;
+      });
+    }
 
     if (screenKey === 'chat') {
+      renderConnectionInbox();
       renderConversationList();
       renderThread({ forceScrollBottom: !chatState.lastRenderedConversationId });
       if (!state.chat.conversations.length) {
@@ -819,6 +1117,12 @@
         chatState.pollingInFlight = false;
       });
     }
+    if (!chatState.connectionsInFlight) {
+      chatState.connectionsInFlight = true;
+      loadConnectionInbox({ silent: !isChatActive() }).catch(function () {}).finally(function () {
+        chatState.connectionsInFlight = false;
+      });
+    }
   });
 
   document.addEventListener('visibilitychange', function () {
@@ -828,6 +1132,12 @@
       chatState.pollingInFlight = true;
       loadConversations({ silent: !isChatActive(), reason: 'visibility-sync' }).catch(function () {}).finally(function () {
         chatState.pollingInFlight = false;
+      });
+    }
+    if (!chatState.connectionsInFlight) {
+      chatState.connectionsInFlight = true;
+      loadConnectionInbox({ silent: !isChatActive() }).catch(function () {}).finally(function () {
+        chatState.connectionsInFlight = false;
       });
     }
   });
@@ -930,6 +1240,9 @@
     openWithUser: openWithUser,
     goBack: goBack,
     handleScreenChange: handleScreenChange,
+    refreshConnectionInbox: function () {
+      return loadConnectionInbox({ silent: !isChatActive() });
+    },
   };
 
   renderHeaderUnreadBadges();

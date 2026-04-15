@@ -353,7 +353,6 @@ function renderPublicConnectionPanel(targetUserId, statusData) {
   if (!box) return;
 
   var relation = statusData?.relation || 'none';
-  var connectionId = statusData?.connectionId || '';
   var count = Number(statusData?.connections_count || 0);
   var buttonsHtml = '';
   var hint = count ? 'В сети LOMO: ' + count + ' контакт(ов)' : 'Это может стать полезным профессиональным контактом в LOMO.';
@@ -361,16 +360,13 @@ function renderPublicConnectionPanel(targetUserId, statusData) {
   if (relation === 'connected') {
     buttonsHtml =
       '<button type="button" class="pillBtn" disabled>Уже в контактах</button>' +
-      '<button type="button" class="pillBtn" data-open-chat-user="' + escapeHtml(targetUserId) + '">Написать</button>' +
-      '<button type="button" class="pillBtn" data-connection-action="remove" data-connection-id="' + escapeHtml(connectionId) + '" data-target-user-id="' + escapeHtml(targetUserId) + '">Удалить из контактов</button>';
+      '<button type="button" class="pillBtn" data-open-chat-user="' + escapeHtml(targetUserId) + '">Написать</button>';
   } else if (relation === 'incoming') {
-    buttonsHtml =
-      '<button type="button" class="pillBtn" data-connection-action="accept" data-connection-id="' + escapeHtml(connectionId) + '" data-target-user-id="' + escapeHtml(targetUserId) + '">Принять запрос</button>' +
-      '<button type="button" class="pillBtn" data-connection-action="reject" data-connection-id="' + escapeHtml(connectionId) + '" data-target-user-id="' + escapeHtml(targetUserId) + '">Отклонить</button>';
+    hint = 'Новый запрос в контакты ждёт решения в разделе чатов.';
+    buttonsHtml = '<button type="button" class="pillBtn" data-next="toChatHub">Открыть чаты</button>';
   } else if (relation === 'outgoing') {
-    buttonsHtml =
-      '<button type="button" class="pillBtn" disabled>Запрос отправлен</button>' +
-      '<button type="button" class="pillBtn" data-connection-action="remove" data-connection-id="' + escapeHtml(connectionId) + '" data-target-user-id="' + escapeHtml(targetUserId) + '">Отменить</button>';
+    hint = 'Запрос отправлен. Ответ появится в разделе чатов.';
+    buttonsHtml = '<button type="button" class="pillBtn" data-next="toChatHub">Открыть чаты</button>';
   } else if (relation === 'unavailable') {
     buttonsHtml = '<button type="button" class="pillBtn" disabled>Контакты недоступны</button>';
   } else {
@@ -399,6 +395,9 @@ function refreshConnectionViews(targetUserId) {
   loadOwnConnections();
   if (targetUserId && String(targetUserId) === String(_activePublicProfileUserId)) {
     loadPublicConnectionPanel(targetUserId);
+  }
+  if (window.LOMO_CHAT_UI && typeof window.LOMO_CHAT_UI.refreshConnectionInbox === 'function') {
+    window.LOMO_CHAT_UI.refreshConnectionInbox();
   }
 }
 

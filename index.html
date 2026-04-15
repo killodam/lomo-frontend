@@ -851,6 +851,7 @@
             </div>
             <div class="chatSidebarMeta" id="chatSidebarMeta">Здесь будут диалоги с вашими контактами.</div>
           </div>
+          <div class="chatConnectionInbox hidden" id="chatConnectionInbox"></div>
           <div class="chatConversationList" id="chatConversationList">
             <div class="chatConversationEmpty">Загрузка диалогов…</div>
           </div>
@@ -883,7 +884,7 @@
           <form class="chatComposer hidden" id="chatComposer">
             <div class="chatAttachPreview hidden" id="chatAttachPreview"><span class="chatAttachName" id="chatAttachName"></span><button type="button" class="chatAttachClear" id="chatAttachClear" aria-label="Убрать файл">✕</button></div>
             <div class="chatComposerRow">
-              <input type="file" id="chatFileInput" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt" style="display:none">
+              <input type="file" id="chatFileInput" class="hidden" accept="image/png,image/jpeg,image/webp,.pdf,.doc,.docx">
               <button type="button" class="chatAttachBtn" id="chatAttachBtn" aria-label="Прикрепить файл"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/></svg></button>
               <textarea id="chatMessageInput" rows="1" maxlength="2000" class="chatComposerInput" placeholder="Напишите сообщение…"></textarea>
               <button type="submit" class="chatSendBtn" id="chatSendBtn" aria-label="Отправить">
@@ -897,10 +898,6 @@
       </div>
     </div>
 
-  </div>
-</section>
-      </div>
-    </div>
   </div>
 </section>
 

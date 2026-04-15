@@ -191,6 +191,161 @@
   line-height: 1.6;
 }
 
+.chatConnectionInbox {
+  flex-shrink: 0;
+  padding: 10px 10px 4px;
+  border-bottom: 1px solid rgba(0,0,0,.05);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.chatInboxSection {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.chatInboxHeading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 4px;
+}
+
+.chatInboxTitle {
+  font-size: 11px;
+  font-weight: 720;
+  letter-spacing: .45px;
+  text-transform: uppercase;
+  color: #8a8a8a;
+}
+
+.chatInboxCount {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: rgba(38,110,120,.08);
+  color: #1a5c68;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.chatConnectionCard {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  padding: 12px;
+  border: 1px solid rgba(0,0,0,.07);
+  border-radius: 16px;
+  background: #fafbfc;
+}
+
+.chatConnectionCard.incoming {
+  background: linear-gradient(180deg, rgba(38,110,120,.06), rgba(38,110,120,.02));
+  border-color: rgba(38,110,120,.12);
+}
+
+.chatConnectionCard.outgoing {
+  background: rgba(0,0,0,.02);
+}
+
+.chatConnectionAvatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #26707a, #38b2ac);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.chatConnectionAvatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.chatConnectionBody {
+  min-width: 0;
+  flex: 1;
+}
+
+.chatConnectionName {
+  font-size: 13px;
+  font-weight: 650;
+  color: #0e0f0f;
+  line-height: 1.4;
+  margin-bottom: 2px;
+}
+
+.chatConnectionMeta {
+  font-size: 11.5px;
+  color: #7b8794;
+  line-height: 1.45;
+  margin-bottom: 8px;
+}
+
+.chatConnectionActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chatConnectionBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,.08);
+  background: #fff;
+  color: #0e0f0f;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform .15s, border-color .18s, background .18s, color .18s;
+}
+
+.chatConnectionBtn:hover {
+  transform: translateY(-1px);
+  border-color: rgba(38,110,120,.22);
+  color: #1a5c68;
+}
+
+.chatConnectionBtn.primary {
+  background: #0e0f0f;
+  border-color: #0e0f0f;
+  color: #fff;
+}
+
+.chatConnectionBtn.primary:hover {
+  background: #1a5c68;
+  border-color: #1a5c68;
+  color: #fff;
+}
+
+.chatConnectionBtn.danger {
+  color: #b42318;
+}
+
+.chatConnectionBtn.danger:hover {
+  border-color: rgba(180,35,24,.18);
+  color: #8f1d15;
+}
+
 /* ── Conversation Items ── */
 .chatConversationItem {
   width: 100%;
@@ -490,6 +645,55 @@
   color: #fff;
 }
 
+.chatBubbleText p {
+  margin: 0;
+}
+
+.chatBubbleText p + p {
+  margin-top: 8px;
+}
+
+.chatAttachmentBlock {
+  margin-top: 8px;
+}
+
+.chatAttachment {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 100%;
+  padding: 8px 12px;
+  border-radius: 14px;
+  background: rgba(0,0,0,.04);
+  color: inherit;
+  text-decoration: none;
+  border: 1px solid rgba(0,0,0,.07);
+  box-sizing: border-box;
+}
+
+.chatBubble.mine .chatAttachment {
+  background: rgba(255,255,255,.12);
+  border-color: rgba(255,255,255,.16);
+}
+
+.chatAttachment:hover {
+  background: rgba(38,110,120,.08);
+}
+
+.chatBubble.mine .chatAttachment:hover {
+  background: rgba(255,255,255,.18);
+}
+
+.chatAttachmentIcon {
+  flex-shrink: 0;
+}
+
+.chatAttachmentLabel {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .chatBubbleMeta {
   margin-top: 4px;
   font-size: 10px;
@@ -737,10 +941,12 @@
   .chatHeaderInner { padding: 0 14px; height: 52px; }
   .chatHeaderBack span { display: none; }
   .chatSidebarHead { padding: 13px 14px 10px; }
+  .chatConnectionInbox { padding: 8px 8px 2px; }
   .chatConversationList { padding: 6px; }
   .chatThreadHead { padding: 12px 14px; }
   .chatMessageList { padding: 12px 14px 6px; }
   .chatComposer { padding: 8px 12px 12px; }
   .chatBubble { max-width: 88%; }
   .chatHeaderWord { font-size: 14px; }
+  .chatConnectionCard { padding: 11px; }
 }

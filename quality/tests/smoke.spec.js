@@ -835,6 +835,309 @@ test('connected users can open chat from public profile and send a message', asy
   await expect(page.locator('#chatMessageList')).toContainText('Добрый день!');
 });
 
+test('incoming connection request is visible in chat inbox and can be accepted there', async ({ page }) => {
+  let acceptCalled = false;
+  let connectionState = 'incoming';
+
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'cand-1', email: 'candidate@example.com', role: 'candidate' },
+          profile: { full_name: 'Иван Кандидат', location: 'Москва', edu_place: 'МГУ', vacancies: 'Designer' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([
+          { id: 'cand-2', role: 'candidate', full_name: 'Анна Петрова', location: 'Москва', edu_place: 'МФТИ', vacancies: 'Designer' },
+        ], 1, 12, 1)),
+      });
+    }
+
+    if (url.pathname.endsWith('/chat/conversations') && request.method() === 'GET') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([], 1, 20, 0)),
+      });
+    }
+
+    if (url.pathname.endsWith('/connections') && request.method() === 'GET') {
+      const incoming = connectionState === 'incoming'
+        ? [{
+            id: 'conn-77',
+            status: 'pending',
+            initiator_id: 'emp-44',
+            user_id: 'emp-44',
+            role: 'employer',
+            full_name: 'Алина HR',
+            company: 'LOMO Labs',
+            location: 'Москва',
+            industry: 'Tech',
+          }]
+        : [];
+      const accepted = connectionState === 'accepted'
+        ? [{
+            id: 'conn-77',
+            status: 'accepted',
+            initiator_id: 'emp-44',
+            user_id: 'emp-44',
+            role: 'employer',
+            full_name: 'Алина HR',
+            company: 'LOMO Labs',
+            location: 'Москва',
+            industry: 'Tech',
+          }]
+        : [];
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          accepted,
+          incoming,
+          outgoing: [],
+          counts: { accepted: accepted.length, incoming: incoming.length, outgoing: 0 },
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/connections/conn-77/accept')) {
+      acceptCalled = true;
+      connectionState = 'accepted';
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true, relation: 'connected', connectionId: 'conn-77', status: 'accepted' }),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.evaluate(() => { document.cookie = 'lomo_csrf=test-suite; path=/'; });
+  await page.fill('#loginEmail', 'candidate@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await page.click('#screenCandidateFeed [data-next="toChatHub"]');
+  await expect(page.locator('#screenChat')).toHaveClass(/active/);
+  await expect(page.locator('#chatConnectionInbox')).toContainText('Алина HR');
+  await expect(page.locator('#chatConnectionInbox')).toContainText('хочет добавить вас в контакты');
+
+  await page.click('#chatConnectionInbox [data-connection-action="accept"]');
+  await expect.poll(() => acceptCalled).toBe(true);
+  await expect(page.locator('#chatConnectionInbox')).not.toContainText('Алина HR');
+});
+
+test('chat composer sends attachment and renders file card', async ({ page }) => {
+  let sentMessage = '';
+  let chatStarted = false;
+
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'cand-1', email: 'candidate@example.com', role: 'candidate' },
+          profile: { full_name: 'Иван Кандидат', location: 'Москва', edu_place: 'МГУ', vacancies: 'Designer' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([
+          {
+            id: 'emp-44',
+            role: 'employer',
+            public_id: 'LOMO-EMP00044',
+            full_name: 'Алина HR',
+            company: 'LOMO Labs',
+            industry: 'Tech',
+            location: 'Москва',
+          },
+        ], 1, 12, 1)),
+      });
+    }
+
+    if (url.pathname.endsWith('/public/profile/LOMO-EMP00044')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'emp-44',
+          role: 'employer',
+          public_id: 'LOMO-EMP00044',
+          full_name: 'Алина HR',
+          company: 'LOMO Labs',
+          industry: 'Tech',
+          location: 'Москва',
+          about: 'Нанимаем сильных специалистов',
+          connections_count: 12,
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/connections/status/emp-44')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          relation: 'connected',
+          connectionId: 'conn-44',
+          status: 'accepted',
+          connections_count: 12,
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/connections')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ accepted: [], incoming: [], outgoing: [], counts: { accepted: 0, incoming: 0, outgoing: 0 } }),
+      });
+    }
+
+    if (url.pathname.endsWith('/chat/conversations') && request.method() === 'POST') {
+      chatStarted = true;
+      return route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          created: true,
+          conversation: {
+            id: 'chat-1',
+            kind: 'direct',
+            created_at: '2026-04-14T10:00:00.000Z',
+            last_message_at: '2026-04-14T10:00:00.000Z',
+            participant: {
+              id: 'emp-44',
+              role: 'employer',
+              public_id: 'LOMO-EMP00044',
+              full_name: 'Алина HR',
+              company: 'LOMO Labs',
+              location: 'Москва',
+              industry: 'Tech',
+            },
+          },
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/chat/conversations') && request.method() === 'GET') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([
+          {
+            id: 'chat-1',
+            kind: 'direct',
+            participant_user_id: 'emp-44',
+            participant_role: 'employer',
+            public_id: 'LOMO-EMP00044',
+            full_name: 'Алина HR',
+            company: 'LOMO Labs',
+            location: 'Москва',
+            industry: 'Tech',
+            last_message_body: sentMessage || '',
+            last_message_created_at: '2026-04-14T10:01:00.000Z',
+            unread_count: 0,
+          },
+        ], 1, 20, 1)),
+      });
+    }
+
+    if (url.pathname.endsWith('/chat/conversations/chat-1/messages') && request.method() === 'GET') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([], 1, 30, 0)),
+      });
+    }
+
+    if (url.pathname.endsWith('/upload')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          fileUrl: '/files/chat-file.pdf',
+          fileName: 'portfolio.pdf',
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/chat/conversations/chat-1/messages') && request.method() === 'POST') {
+      const body = JSON.parse(request.postData() || '{}');
+      sentMessage = body.body;
+      return route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'msg-2',
+          conversation_id: 'chat-1',
+          author_user_id: 'cand-1',
+          body: body.body,
+          created_at: '2026-04-14T10:01:00.000Z',
+          edited_at: null,
+        }),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.evaluate(() => { document.cookie = 'lomo_csrf=test-suite; path=/'; });
+  await page.fill('#loginEmail', 'candidate@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await page.click('#candidateFeedList .socialCard');
+  await expect(page.locator('#screenPublicProfile')).toHaveClass(/active/);
+  await page.click('[data-open-chat-user="emp-44"]');
+  await expect.poll(() => chatStarted).toBe(true);
+  await expect(page.locator('#screenChat')).toHaveClass(/active/);
+
+  await page.setInputFiles('#chatFileInput', {
+    name: 'portfolio.pdf',
+    mimeType: 'application/pdf',
+    buffer: Buffer.from('pdf-file'),
+  });
+  await expect(page.locator('#chatAttachPreview')).toContainText('portfolio.pdf');
+  await page.click('#chatSendBtn');
+
+  await expect.poll(() => sentMessage).toContain('[[attachment|portfolio.pdf|/api/chat/attachments/chat-file.pdf]]');
+  await expect(page.locator('#chatMessageList .chatAttachmentLabel')).toContainText('portfolio.pdf');
+});
+
 test('chat hub opens on conversation list without auto-selecting a thread', async ({ page }) => {
   await page.route('**/api/**', async (route) => {
     const request = route.request();
