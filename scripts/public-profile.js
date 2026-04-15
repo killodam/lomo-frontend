@@ -53,24 +53,24 @@
       var avatarRadius = isEmployer ? '14px' : '50%';
       var profileAvatarSrc = safeImageUrl(u.avatar_url);
       var avatarHtml = profileAvatarSrc
-        ? '<img src="'+escHtml(profileAvatarSrc)+'" style="width:72px;height:72px;border-radius:'+avatarRadius+';object-fit:cover;box-shadow:0 2px 10px rgba(0,0,0,.15);">'
-        : '<div style="width:72px;height:72px;border-radius:'+avatarRadius+';'+avatarBg+';color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.15);">'+initials+'</div>';
+        ? '<img src="'+escHtml(profileAvatarSrc)+'" class="pubProfileAvatarImg" style="border-radius:'+avatarRadius+';">'
+        : '<div class="pubProfileAvatarFallback" style="border-radius:'+avatarRadius+';'+avatarBg+';">'+initials+'</div>';
       var verLabels = {edu_status:'Образование',work_status:'Опыт работы',course_status:'Курсы',pass_status:'Паспорт',cv_status:'CV'};
-      var verifiedChips = Object.keys(verLabels).filter(function(k){return u[k]==='verified';}).map(function(k){return '<span style="font-size:12px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;padding:3px 10px;border-radius:20px;">✓ '+verLabels[k]+'</span>';}).join('');
-      var pendingChips = Object.keys(verLabels).filter(function(k){return u[k]==='pending';}).map(function(k){return '<span style="font-size:12px;background:#fffbeb;color:#d97706;border:1px solid #fde68a;padding:3px 10px;border-radius:20px;">⏳ '+verLabels[k]+'</span>';}).join('');
+      var verifiedChips = Object.keys(verLabels).filter(function(k){return u[k]==='verified';}).map(function(k){return '<span class="pubVerChip">✓ '+verLabels[k]+'</span>';}).join('');
+      var pendingChips = Object.keys(verLabels).filter(function(k){return u[k]==='pending';}).map(function(k){return '<span class="pubVerChip pending">⏳ '+verLabels[k]+'</span>';}).join('');
       var infoRows = '';
       if(!isEmployer){
-        if(u.edu_place) infoRows += '<div style="font-size:13px;color:#555;margin-bottom:4px;">🎓 '+escHtml(u.edu_place+(u.edu_year?' · '+u.edu_year:''))+'</div>';
-        if(u.vacancies) infoRows += '<div style="font-size:13px;color:#2a7a8a;margin-bottom:4px;">🔍 Ищу: '+escHtml(u.vacancies)+'</div>';
+        if(u.edu_place) infoRows += '<div class="pubInfoRow">🎓 '+escHtml(u.edu_place+(u.edu_year?' · '+u.edu_year:''))+'</div>';
+        if(u.vacancies) infoRows += '<div class="pubInfoRow teal">🔍 Ищу: '+escHtml(u.vacancies)+'</div>';
       } else {
-        if(u.industry) infoRows += '<div style="font-size:13px;color:#555;margin-bottom:4px;">🏭 '+escHtml(u.industry)+'</div>';
+        if(u.industry) infoRows += '<div class="pubInfoRow">🏭 '+escHtml(u.industry)+'</div>';
         var publicWebsite = safeHttpUrl(u.website);
-        if(publicWebsite) infoRows += '<div style="font-size:13px;margin-bottom:4px;">🌐 <a href="'+escHtml(publicWebsite)+'" target="_blank" rel="noopener noreferrer" style="color:#2a7a8a;">'+escHtml(u.website)+'</a></div>';
-        if(u.needed) infoRows += '<div style="font-size:13px;color:#3b82f6;margin-bottom:4px;">👥 Ищем: '+escHtml(u.needed)+'</div>';
-        if(u.active_projects) infoRows += '<div style="font-size:13px;color:#555;margin-bottom:4px;">📌 Проекты: '+escHtml(u.active_projects.replace(/;/g,', '))+'</div>';
+        if(publicWebsite) infoRows += '<div class="pubInfoRow">🌐 <a href="'+escHtml(publicWebsite)+'" target="_blank" rel="noopener noreferrer" class="pubInfoLink">'+escHtml(u.website)+'</a></div>';
+        if(u.needed) infoRows += '<div class="pubInfoRow blue">👥 Ищем: '+escHtml(u.needed)+'</div>';
+        if(u.active_projects) infoRows += '<div class="pubInfoRow">📌 Проекты: '+escHtml(u.active_projects.replace(/;/g,', '))+'</div>';
       }
-      if(u.location) infoRows += '<div style="font-size:13px;color:#888;margin-bottom:4px;">📍 '+escHtml(u.location)+'</div>';
-      if(Number(u.connections_count || 0) > 0) infoRows += '<div style="font-size:13px;color:#888;margin-bottom:4px;">🤝 Контактов в LOMO: '+escHtml(u.connections_count)+'</div>';
+      if(u.location) infoRows += '<div class="pubInfoRow muted">📍 '+escHtml(u.location)+'</div>';
+      if(Number(u.connections_count || 0) > 0) infoRows += '<div class="pubInfoRow muted">🤝 Контактов в LOMO: '+escHtml(u.connections_count)+'</div>';
       // Admin sees files
       var verCount = [u.edu_status,u.work_status,u.course_status,u.pass_status,u.cv_status].filter(function(s){return s==='verified';}).length;
       var content = document.getElementById('pubProfileContent');
@@ -91,8 +91,8 @@
       if(state.roleReg === 'ADMIN'){
         adminFilesHtml = '<div class="pubProfileSection">'
           + '<div class="pubProfileSTitle">Файлы пользователя</div>'
-          + '<button class="js-load-files" data-uid="'+u.id+'" style="padding:8px 16px;border-radius:12px;border:1.5px solid #2a7a8a;color:#2a7a8a;background:#f0fdfa;cursor:pointer;font-size:13px;font-weight:600;position:relative;z-index:10;">📂 Просмотреть файлы</button>'
-          + '<div id="userFileslist" style="margin-top:10px;"></div>'
+          + '<button class="js-load-files pubProfileAdminLoadBtn" data-uid="'+u.id+'">📂 Просмотреть файлы</button>'
+          + '<div id="userFileslist" class="pubProfileFiles"></div>'
           + '</div>';
       }
 
@@ -100,15 +100,15 @@
         '<div class="pubProfileCard">'
           + '<div class="pubProfileHead">'
             + avatarHtml
-            + '<div style="flex:1;min-width:0;">'
-              + '<div style="font-size:22px;font-weight:800;color:#1a1a1a;margin-bottom:4px;">'+name+'</div>'
-              + '<span style="font-size:12px;padding:3px 10px;border-radius:20px;font-weight:600;'+(isEmployer?'background:#f0fdfa;color:#2a7a8a;border:1px solid #d1fae5;':'background:#eff6ff;color:#3b82f6;border:1px solid #bfdbfe;')+'">'+(isEmployer?'🏢 Работодатель':'👤 Кандидат')+'</span>'
+            + '<div class="pubProfileHeadInfo">'
+              + '<div class="pubProfileName">'+name+'</div>'
+              + '<span class="pubProfileRoleTag '+(isEmployer?'employer':'candidate')+'">'+(isEmployer?'🏢 Работодатель':'👤 Кандидат')+'</span>'
               + (verCount > 0 ? ' <span class="scVerBadge">✓ LOMO '+verCount+'</span>' : '')
             + '</div>'
           + '</div>'
           + '<div class="pubProfileBody">'
-            + (infoRows ? '<div style="margin-bottom:14px;">'+infoRows+'</div>' : '')
-            + (u.about ? '<div class="pubProfileSection"><div class="pubProfileSTitle">О себе</div><div style="font-size:14px;color:#444;line-height:1.6;">'+escHtml(u.about)+'</div></div>' : '')
+            + (infoRows ? '<div class="pubProfileIntro">'+infoRows+'</div>' : '')
+            + (u.about ? '<div class="pubProfileSection"><div class="pubProfileSTitle">О себе</div><div class="pubProfileText">'+escHtml(u.about)+'</div></div>' : '')
             + ((verifiedChips||pendingChips) ? '<div class="pubProfileSection"><div class="pubProfileSTitle">Верификация документов</div><div>'+verifiedChips+pendingChips+'</div></div>' : '')
             + publicCvHtml
             + connectionPanelHtml
@@ -142,14 +142,14 @@
     function loadUserFiles(userId){
       var el = document.getElementById('userFileslist');
       if(!el) return;
-      el.innerHTML = '<div style="font-size:12px;color:#888;">Загрузка...</div>';
+      el.innerHTML = '<div class="pubProfileFilesState">Загрузка...</div>';
       apiFetch('/admin/users/'+userId+'/files').then(function(files){
-        if(!files||!files.length){ el.innerHTML='<div style="font-size:12px;color:#aaa;">Файлов нет</div>'; return; }
+        if(!files||!files.length){ el.innerHTML='<div class="pubProfileFilesState empty">Файлов нет</div>'; return; }
         el.innerHTML = files.map(function(f){
-          return '<div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">'
-            + '<span style="font-size:12px;color:#555;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">'+escHtml(f.file_name||'файл')+'</span>'
+          return '<div class="pubProfileFileRow">'
+            + '<span class="pubProfileFileName">'+escHtml(f.file_name||'файл')+'</span>'
             + '<button type="button" class="miniLink" data-open-doc="'+escHtml(f.id)+'" data-file-name="'+escHtml(f.file_name||'файл')+'">Открыть</button>'
             + '</div>';
         }).join('');
-      }).catch(function(e){ el.innerHTML='<div style="font-size:12px;color:#991b1b;">'+escHtml(safeErrorText(e))+'</div>'; });
+      }).catch(function(e){ el.innerHTML='<div class="pubProfileFilesState error">'+escHtml(safeErrorText(e))+'</div>'; });
     }

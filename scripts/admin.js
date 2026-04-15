@@ -222,7 +222,7 @@ function renderPager(targetId, pagerState, onNavigate, options) {
 }
 
 function queueEmptyState(text) {
-  return '<div style="text-align:center;padding:24px;color:#888;font-size:14px;">' + escapeHtml(text) + '</div>';
+  return '<div class="adminEmptyState">' + escapeHtml(text) + '</div>';
 }
 
 function upsertConnectionUser(item) {
@@ -541,7 +541,7 @@ function loadAdminUsers(page) {
   adminUsersState.search = (document.getElementById('adminUserSearch')?.value || '').trim();
 
   var el = document.getElementById('adminUsersList');
-  if (el) el.innerHTML = '<div style="color:#888;padding:8px;">Загрузка...</div>';
+  if (el) el.innerHTML = '<div class="adminEmptyState compact">Загрузка...</div>';
 
   apiAdminUsers({
     page: adminUsersState.page,
@@ -556,38 +556,36 @@ function loadAdminUsers(page) {
     if (!listEl) return;
 
     if (!users.length) {
-      listEl.innerHTML = '<div style="color:#888;padding:8px;">Нет пользователей</div>';
+      listEl.innerHTML = '<div class="adminEmptyState compact">Нет пользователей</div>';
       renderPager('adminUsersPager', { total: 0 }, function () {}, { label: 'пользователей' });
       return;
     }
 
     listEl.innerHTML = '';
     var table = document.createElement('table');
-    table.style.cssText = 'width:100%;border-collapse:collapse;font-size:13px;';
+    table.className = 'adminUsersTable';
     table.innerHTML =
-      '<thead><tr style="border-bottom:1px solid rgba(38,110,120,.15);">' +
-        '<th style="text-align:left;padding:6px 8px;color:#666;">Email</th>' +
-        '<th style="text-align:left;padding:6px 8px;color:#666;">Имя / Компания</th>' +
-        '<th style="text-align:left;padding:6px 8px;color:#666;">Роль</th>' +
-        '<th style="text-align:left;padding:6px 8px;color:#666;">Действия</th>' +
+      '<thead><tr class="adminUsersHeadRow">' +
+        '<th class="adminUsersHeadCell">Email</th>' +
+        '<th class="adminUsersHeadCell">Имя / Компания</th>' +
+        '<th class="adminUsersHeadCell">Роль</th>' +
+        '<th class="adminUsersHeadCell">Действия</th>' +
       '</tr></thead>';
 
     var tbody = document.createElement('tbody');
     users.forEach(function (user) {
       var tr = document.createElement('tr');
-      tr.style.borderBottom = '1px solid rgba(0,0,0,.05)';
+      tr.className = 'adminUsersRow';
       tr.innerHTML =
-        '<td style="padding:8px;">' + escapeHtml(user.email || '—') + '</td>' +
-        '<td style="padding:8px;">' + escapeHtml(user.full_name || user.company || '—') + '</td>' +
-        '<td style="padding:8px;"><span style="padding:2px 8px;border-radius:6px;font-size:11px;font-weight:700;background:rgba(38,110,120,.10);color:#1a5c68;">' + escapeHtml(user.role || '—') + '</span></td>' +
-        '<td style="padding:8px;" id="uactions_' + user.id + '"></td>';
+        '<td class="adminUsersCell">' + escapeHtml(user.email || '—') + '</td>' +
+        '<td class="adminUsersCell">' + escapeHtml(user.full_name || user.company || '—') + '</td>' +
+        '<td class="adminUsersCell"><span class="adminUsersRoleTag">' + escapeHtml(user.role || '—') + '</span></td>' +
+        '<td class="adminUsersCell" id="uactions_' + user.id + '"></td>';
 
       var actionsCell = tr.querySelector('#uactions_' + user.id);
       if (user.role !== 'admin') {
         var delBtn = document.createElement('button');
-        delBtn.className = 'adminBtn danger';
-        delBtn.style.fontSize = '11px';
-        delBtn.style.padding = '4px 10px';
+        delBtn.className = 'adminBtn danger compact';
         delBtn.textContent = 'Удалить';
         delBtn.addEventListener('click', function () {
           if (!confirm('Удалить пользователя ' + user.email + '?')) return;
@@ -1381,7 +1379,7 @@ function loadAdminCandidates(page) {
 
   var el = document.getElementById('adminCandidateList');
   if (!el) return;
-  el.innerHTML = '<div style="text-align:center;padding:32px;color:#888;">Загрузка...</div>';
+  el.innerHTML = '<div class="adminListLoading">Загрузка...</div>';
 
   apiGetCandidates({
     page: adminCandidateState.page,
@@ -1411,7 +1409,7 @@ function loadAdminEmployers(page) {
 
   var el = document.getElementById('adminEmployerList');
   if (!el) return;
-  el.innerHTML = '<div style="text-align:center;padding:32px;color:#888;">Загрузка...</div>';
+  el.innerHTML = '<div class="adminListLoading">Загрузка...</div>';
 
   apiAdminUsers({
     page: adminEmployerState.page,
@@ -1468,7 +1466,7 @@ function renderAdminCandidates(list, emptyText) {
   var el = document.getElementById('adminCandidateList');
   if (!el) return;
   if (!list.length) {
-    el.innerHTML = '<div style="padding:20px;text-align:center;color:#888;">' + escapeHtml(emptyText || 'Нет кандидатов') + '</div>';
+    el.innerHTML = '<div class="adminEmptyState">' + escapeHtml(emptyText || 'Нет кандидатов') + '</div>';
     return;
   }
   el.innerHTML = list.map(function (candidate) {
@@ -1481,7 +1479,7 @@ function renderAdminEmployers(list, emptyText) {
   var el = document.getElementById('adminEmployerList');
   if (!el) return;
   if (!list.length) {
-    el.innerHTML = '<div style="padding:20px;text-align:center;color:#888;">' + escapeHtml(emptyText || 'Нет работодателей') + '</div>';
+    el.innerHTML = '<div class="adminEmptyState">' + escapeHtml(emptyText || 'Нет работодателей') + '</div>';
     return;
   }
   el.innerHTML = list.map(function (user) {
