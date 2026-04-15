@@ -927,6 +927,44 @@ function buildFeedTags(user) {
   return tags.join('');
 }
 
+// ── BOOKMARKS LOGIC ───────────────────────────────────────
+function _isBookmarked(uid) {
+  const employerId = state.userId || 'anon';
+  const key = `lomo_favs_${employerId}`;
+  const favs = JSON.parse(localStorage.getItem(key) || '{}');
+  return !!favs[uid];
+}
+
+function toggleBookmark(uid, event) {
+  if (event) event.stopPropagation();
+  const employerId = state.userId || 'anon';
+  const key = `lomo_favs_${employerId}`;
+  const favs = JSON.parse(localStorage.getItem(key) || '{}');
+  
+  if (favs[uid]) {
+    delete favs[uid];
+    showToast('Удалено из избранного', 'info');
+  } else {
+    const user = _userCache[uid];
+    if (user) {
+      favs[uid] = user;
+      showToast('Добавлено в избранное', 'success');
+    }
+  }
+  
+  localStorage.setItem(key, JSON.stringify(favs));
+  
+  // Update UI if we are in the favorites view
+  if (employerSearchState.verified === 'favorites') {
+    loadEmployerSearch();
+  } else {
+    // Just toggle the star class
+    const btn = document.querySelector(`.socialCard[data-uid="${uid}"] .scBookmarkBtn`);
+    if (btn) btn.classList.toggle('active');
+  }
+}
+
+
 function buildSocialCard(user) {
   var isEmployer = user.role === 'employer';
   var name = escHtml(user.full_name || (isEmployer ? user.company : '') || user.email || '?');
@@ -1039,7 +1077,16 @@ function buildSocialCard(user) {
 
   var uid = String(user.id || user.email || '?');
   _userCache[uid] = user;
+
+  // Bookmarking button for employers
+  var bookmarkBtn = '';
+  if (state.roleReg === 'EMPLOYER' || (getToken() && state.userId)) {
+    const activeClass = _isBookmarked(uid) ? ' active' : '';
+    bookmarkBtn = `<button class="scBookmarkBtn${activeClass}" onclick="toggleBookmark('${uid}', event)" title="Добавить в избранное">★</button>`;
+  }
+
   return '<div class="socialCard" data-uid="' + uid + '" style="cursor:pointer;">' +
+    bookmarkBtn +
     '<div class="scHead">' +
       avatarHtml +
       '<div class="scInfo">' +
@@ -1049,7 +1096,7 @@ function buildSocialCard(user) {
       '</div>' +
     '</div>' +
     (hasBody ? '<div class="scBody">' + (aboutSnippet || '') + jobLine + workExpLine + extraLines + detailLines + projectsLine + '</div>' : '') +
-  '</div>';
+    '</div>';
 }
 
 function loadCandidateFeed(page) {
@@ -1111,6 +1158,30 @@ function loadEmployerSearch(page) {
 
   var listId = 'employerCandidateList';
   if (!document.getElementById(listId)) return;
+
+  if (employerSearchState.verified === 'favorites') {
+    const employerId = state.userId || 'anon';
+    const key = `lomo_favs_${employerId}`;
+    const favs = JSON.parse(localStorage.getItem(key) || '{}');
+    let items = Object.values(favs);
+    
+    // Apply search filter if any
+    if (employerSearchState.search) {
+      const q = employerSearchState.search.toLowerCase();
+      items = items.filter(u => 
+        (u.full_name || '').toLowerCase().includes(q) || 
+        (u.current_job || '').toLowerCase().includes(q) ||
+        (u.job_title || '').toLowerCase().includes(q)
+      );
+    }
+    
+    _empSearchData = items;
+    syncPagerState(employerSearchState, { total: items.length, page: 1, pageSize: 1000 });
+    renderEmployerSearch(_empSearchData);
+    renderPager('employerCandidatePager', { total: items.length, page: 1, pageSize: 1000 }, loadEmployerSearch, { label: 'избранных' });
+    return;
+  }
+
   renderFeedLoadingState(listId, 4);
 
   apiGetCandidates({

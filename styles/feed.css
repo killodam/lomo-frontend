@@ -528,3 +528,38 @@
   .empFilterChips { gap: 5px; }
   .empFilterChip { padding: 6px 14px; font-size: 12px; }
 }
+/* ── Bookmarks / Favorites ── */
+.scBookmarkBtn {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #ddd;
+  transition: all .2s;
+  z-index: 10;
+  padding: 5px;
+  line-height: 1;
+}
+
+.scBookmarkBtn:hover {
+  transform: scale(1.15);
+  color: #f59e0b;
+}
+
+.scBookmarkBtn.active {
+  color: #f59e0b;
+}
+
+/* Favorites chip specific style */
+.empFilterChip[data-verified="favorites"].active {
+  background: rgba(245, 158, 11, 0.12);
+  color: #b45309;
+  border-color: rgba(245, 158, 11, 0.35);
+}
+
+.empFilterChip[data-verified="favorites"].active:hover {
+  background: rgba(245, 158, 11, 0.18);
+}
