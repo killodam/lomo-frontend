@@ -414,12 +414,9 @@
       chatState.conversationPager.totalPages = data.totalPages || 0;
       state.chat.conversations = (data.items || []).map(normalizeConversation).filter(Boolean);
 
-      if (!state.chat.activeConversationId && state.chat.conversations[0]) {
-        state.chat.activeConversationId = state.chat.conversations[0].id;
-      }
-
       if (state.chat.activeConversationId && !findConversation(state.chat.activeConversationId)) {
-        state.chat.activeConversationId = state.chat.conversations[0] ? state.chat.conversations[0].id : '';
+        state.chat.activeConversationId = '';
+        chatState.lastRenderedConversationId = '';
       }
 
       renderConversationList();
@@ -665,13 +662,17 @@
     }
 
     rememberReturnScreen();
+    state.chat.activeConversationId = '';
+    chatState.lastRenderedConversationId = '';
+    resetNewMessagesIndicator();
+    setThreadVisibility(false);
     show('chat');
     if (!state.chat.conversations.length) {
       await loadConversations({ silent: false });
       return;
     }
     renderConversationList();
-    renderThread({ forceScrollBottom: true });
+    renderThread();
   }
 
   async function openWithUser(userId) {
@@ -841,8 +842,12 @@
 
   if (elements.backToListBtn) {
     elements.backToListBtn.addEventListener('click', function () {
+      state.chat.activeConversationId = '';
+      chatState.lastRenderedConversationId = '';
       setThreadVisibility(false);
       resetNewMessagesIndicator();
+      renderConversationList();
+      renderThread();
     });
   }
 

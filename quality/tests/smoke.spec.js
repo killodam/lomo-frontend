@@ -835,6 +835,105 @@ test('connected users can open chat from public profile and send a message', asy
   await expect(page.locator('#chatMessageList')).toContainText('Добрый день!');
 });
 
+test('chat hub opens on conversation list without auto-selecting a thread', async ({ page }) => {
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'cand-1', email: 'candidate@example.com', role: 'candidate' },
+          profile: { full_name: 'Иван Кандидат', location: 'Москва', edu_place: 'МГУ', vacancies: 'Designer' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([
+          {
+            id: 'cand-2',
+            role: 'candidate',
+            public_id: 'LOMO-CAND00002',
+            full_name: 'Анна Петрова',
+            location: 'Москва',
+            edu_place: 'МФТИ',
+            vacancies: 'Designer',
+          },
+        ], 1, 12, 1)),
+      });
+    }
+
+    if (url.pathname.endsWith('/chat/conversations') && request.method() === 'GET') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([
+          {
+            id: 'chat-1',
+            kind: 'direct',
+            participant_user_id: 'emp-44',
+            participant_role: 'employer',
+            public_id: 'LOMO-EMP00044',
+            full_name: 'Алина HR',
+            company: 'LOMO Labs',
+            location: 'Москва',
+            industry: 'Tech',
+            last_message_body: 'Добрый день!',
+            last_message_created_at: '2026-04-14T10:01:00.000Z',
+            unread_count: 0,
+          },
+        ], 1, 20, 1)),
+      });
+    }
+
+    if (url.pathname.endsWith('/chat/conversations/chat-1/messages') && request.method() === 'GET') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([
+          {
+            id: 'msg-1',
+            conversation_id: 'chat-1',
+            author_user_id: 'emp-44',
+            body: 'Добрый день!',
+            created_at: '2026-04-14T10:01:00.000Z',
+            edited_at: null,
+          },
+        ], 1, 30, 1)),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.evaluate(() => { document.cookie = 'lomo_csrf=test-suite; path=/'; });
+  await page.fill('#loginEmail', 'candidate@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await page.click('#screenCandidateFeed [data-next="toChatHub"]');
+  await expect(page.locator('#screenChat')).toHaveClass(/active/);
+  await expect(page.locator('#chatConversationList')).toContainText('Алина HR');
+  await expect(page.locator('#chatThreadTitle')).toContainText('Выберите диалог');
+  await expect(page.locator('#chatEmptyState')).toBeVisible();
+
+  await page.click('[data-chat-conversation-id="chat-1"]');
+  await expect(page.locator('#chatThreadTitle')).toContainText('Алина HR');
+  await expect(page.locator('#chatMessageList')).toContainText('Добрый день!');
+});
+
 test('admin dashboard loads queue and users with server-side search', async ({ page }) => {
   let userSearch = '';
 
