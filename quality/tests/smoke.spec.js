@@ -155,11 +155,76 @@ test('candidate login opens feed and paginates server-side', async ({ page }) =>
   await expect.poll(() => requestedPage).toBe('2');
 });
 
-test('candidate feed refreshes silently in background', async ({ page }) => {
+test('candidate feed refreshes silently without page reload', async ({ page }) => {
   let feedCallCount = 0;
 
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'cand-1', email: 'candidate@example.com', login: 'candidate', role: 'candidate' },
+          profile: { full_name: 'Иван Кандидат', location: 'Москва', edu_place: 'МГУ', vacancies: 'Product Designer' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      feedCallCount += 1;
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([
+          {
+            id: feedCallCount > 1 ? 'cand-3' : 'cand-2',
+            role: 'candidate',
+            full_name: feedCallCount > 1 ? 'Павел Иванов' : 'Анна Петрова',
+            location: 'Москва',
+            edu_place: 'МФТИ',
+            vacancies: 'Designer',
+            about: 'Опытный кандидат',
+          },
+        ], 1, 12, 1)),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.fill('#loginEmail', 'candidate@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await expect(page.locator('#candidateFeedList')).toContainText('Анна Петрова');
+  await expect.poll(() => feedCallCount).toBe(1);
+
+  await page.evaluate(() => {
+    if (typeof refreshActiveFeed === 'function') {
+      return refreshActiveFeed({ silent: true });
+    }
+    return Promise.resolve(false);
+  });
+
+  await expect.poll(() => feedCallCount).toBe(2);
+  await expect(page.locator('#candidateFeedList')).toContainText('Павел Иванов', { timeout: 3000 });
+});
+
+test('mobile candidate feed supports pull to refresh', async ({ page }) => {
+  let feedCallCount = 0;
+
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.addInitScript(function () {
-    window.LOMO_CONFIG = Object.assign({}, window.LOMO_CONFIG || {}, { FEED_AUTO_REFRESH_MS: 120 });
+    window.LOMO_CONFIG = Object.assign({}, window.LOMO_CONFIG || {}, { FEED_AUTO_REFRESH_MS: 999999 });
   });
 
   await page.route('**/api/**', async (route) => {
@@ -209,8 +274,30 @@ test('candidate feed refreshes silently in background', async ({ page }) => {
   await page.fill('#loginPassword', 'secret123');
   await page.click('[data-next="fromLoginForm"]');
 
-  await expect.poll(() => feedCallCount).toBeGreaterThan(0);
-  await expect(page.locator('#candidateFeedList')).toContainText('Павел Иванов', { timeout: 3000 });
+  await expect(page.locator('#candidateFeedList')).toContainText('Анна Петрова');
+  await expect.poll(() => feedCallCount).toBe(1);
+
+  await page.evaluate(() => {
+    var el = document.getElementById('screenCandidateFeed');
+    function fire(type, y) {
+      var event = new Event(type, { bubbles: true, cancelable: true });
+      Object.defineProperty(event, 'touches', {
+        value: type === 'touchend' ? [] : [{ clientX: 120, clientY: y }],
+      });
+      Object.defineProperty(event, 'changedTouches', {
+        value: [{ clientX: 120, clientY: y }],
+      });
+      el.dispatchEvent(event);
+    }
+
+    el.scrollTop = 0;
+    fire('touchstart', 88);
+    fire('touchmove', 228);
+    fire('touchend', 228);
+  });
+
+  await expect.poll(() => feedCallCount).toBe(2);
+  await expect(page.locator('#candidateFeedList')).toContainText('Павел Иванов');
 });
 
 test('candidate can bookmark another user from feed without opening profile', async ({ page }) => {

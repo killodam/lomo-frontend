@@ -273,6 +273,69 @@
   box-sizing: border-box;
 }
 
+.feedPullRefresh {
+  position: fixed;
+  top: 10px;
+  left: 50%;
+  z-index: 80;
+  transform: translate(-50%, -14px);
+  opacity: 0;
+  pointer-events: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 34px;
+  max-width: calc(100vw - 28px);
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(255,255,255,.96);
+  border: 1px solid rgba(38,110,120,.16);
+  color: #1a5c68;
+  box-shadow: 0 10px 28px rgba(15,23,42,.10);
+  transition: transform .18s ease, opacity .18s ease, background .18s ease, border-color .18s ease, color .18s ease;
+  will-change: transform, opacity;
+}
+
+.feedPullRefresh.visible {
+  opacity: 1;
+}
+
+.feedPullRefresh.ready {
+  background: #0e0f0f;
+  border-color: #0e0f0f;
+  color: #fff;
+}
+
+.feedPullRefresh.loading {
+  background: rgba(38,110,120,.14);
+  border-color: rgba(38,110,120,.24);
+  color: #1a5c68;
+}
+
+.feedPullRefreshLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 650;
+  white-space: nowrap;
+}
+
+.feedPullRefresh.loading .feedPullRefreshLabel::before {
+  content: '';
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  display: inline-block;
+  animation: feedPullSpin .65s linear infinite;
+}
+
+@keyframes feedPullSpin {
+  to { transform: rotate(360deg); }
+}
+
 /* ── Feed Card List ── */
 .feedListWrap {
   display: flex;

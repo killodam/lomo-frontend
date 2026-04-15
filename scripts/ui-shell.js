@@ -291,12 +291,10 @@ function bindStaticUiActions() {
 }
 
 function showEmployerDashboard() {
-  loadEmployerSearch();
   show('employerSearch');
 }
 
 function showEmployeeDashboard() {
-  loadCandidateFeed();
   show('candidateFeed');
 }
 

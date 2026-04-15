@@ -4,7 +4,10 @@ var _connectionsData = { accepted: [], incoming: [], outgoing: [], counts: { acc
 var feedState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '', view: '' };
 var employerSearchState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '', verified: '' };
 var FEED_AUTO_REFRESH_MS = Math.max(10000, Number(window.LOMO_CONFIG && window.LOMO_CONFIG.FEED_AUTO_REFRESH_MS || 30000) || 30000);
+var FEED_PULL_REFRESH_TRIGGER_PX = 78;
+var FEED_PULL_REFRESH_MAX_PX = 132;
 var feedAutoRefreshState = { timer: null, inFlight: false };
+var feedPullRefreshState = { screenKey: '', screenEl: null, startY: 0, distance: 0, dragging: false, armed: false, hideTimer: null };
 var adminQueueState = { page: 1, pageSize: 20, total: 0, totalPages: 0 };
 var adminCandidateState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '' };
 var adminEmployerState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '' };
@@ -1264,18 +1267,18 @@ function loadCandidateFeed(page, options) {
   syncFeedFilterChips();
 
   var listId = 'candidateFeedList';
-  if (!document.getElementById(listId)) return;
+  if (!document.getElementById(listId)) return Promise.resolve();
 
   if (feedState.view === 'favorites') {
     var bookmarkedUsers = getVisibleBookmarkedUsers(feedState.search);
     renderFeedList(paginateLocalItems(bookmarkedUsers, feedState));
     renderPager('candidateFeedPager', feedState, loadCandidateFeed, { label: 'избранных профилей' });
-    return;
+    return Promise.resolve(bookmarkedUsers);
   }
 
   if (!isSilent) renderFeedLoadingState(listId, 3);
 
-  apiGetFeed({
+  return apiGetFeed({
     page: feedState.page,
     pageSize: feedState.pageSize,
     search: feedState.search,
@@ -1339,18 +1342,18 @@ function loadEmployerSearch(page, options) {
   syncEmployerFilterChips();
 
   var listId = 'employerCandidateList';
-  if (!document.getElementById(listId)) return;
+  if (!document.getElementById(listId)) return Promise.resolve();
 
   if (employerSearchState.verified === 'favorites') {
     var bookmarkedUsers = filterBookmarkedUsers(getBookmarkedUsersList(), employerSearchState.search);
     renderEmployerSearch(paginateLocalItems(bookmarkedUsers, employerSearchState));
     renderPager('employerCandidatePager', employerSearchState, loadEmployerSearch, { label: 'избранных' });
-    return;
+    return Promise.resolve(bookmarkedUsers);
   }
 
   if (!isSilent) renderFeedLoadingState(listId, 4);
 
-  apiGetCandidates({
+  return apiGetCandidates({
     page: employerSearchState.page,
     pageSize: employerSearchState.pageSize,
     search: employerSearchState.search,
@@ -1514,31 +1517,200 @@ function renderAdminEmployers(list, emptyText) {
   }).join('');
 }
 
-(function initFeedAutoRefresh() {
-  function refreshActiveFeed() {
-    if (document.hidden || !getToken() || feedAutoRefreshState.inFlight) return;
+function getFeedRefreshTask(screenKey, options) {
+  var opts = options || {};
+  var silent = opts.silent !== false;
 
-    var task = null;
-    if (isScreenActive('candidateFeed') && feedState.view !== 'favorites') {
-      task = function () { return loadCandidateFeed(feedState.page, { silent: true }); };
-    } else if (isScreenActive('employerSearch') && employerSearchState.verified !== 'favorites') {
-      task = function () { return loadEmployerSearch(employerSearchState.page, { silent: true }); };
+  if (screenKey === 'candidateFeed' && feedState.view !== 'favorites') {
+    return function () { return loadCandidateFeed(feedState.page, { silent: silent }); };
+  }
+
+  if (screenKey === 'employerSearch' && employerSearchState.verified !== 'favorites') {
+    return function () { return loadEmployerSearch(employerSearchState.page, { silent: silent }); };
+  }
+
+  return null;
+}
+
+function refreshFeedScreen(screenKey, options) {
+  var task = getFeedRefreshTask(screenKey, options);
+  if (!state.userId || !task || feedAutoRefreshState.inFlight) return Promise.resolve(false);
+
+  feedAutoRefreshState.inFlight = true;
+  return Promise.resolve(task()).then(function () {
+    return true;
+  }).catch(function () {
+    return false;
+  }).finally(function () {
+    feedAutoRefreshState.inFlight = false;
+  });
+}
+
+function refreshActiveFeed(options) {
+  if (!state.userId) return Promise.resolve(false);
+
+  if (isScreenActive('candidateFeed') && feedState.view !== 'favorites') {
+    return refreshFeedScreen('candidateFeed', options);
+  }
+
+  if (isScreenActive('employerSearch') && employerSearchState.verified !== 'favorites') {
+    return refreshFeedScreen('employerSearch', options);
+  }
+
+  return Promise.resolve(false);
+}
+
+function getPullRefreshPoint(event) {
+  if (event.touches && event.touches[0]) return event.touches[0];
+  if (event.changedTouches && event.changedTouches[0]) return event.changedTouches[0];
+  return null;
+}
+
+function isPullRefreshBlockedTarget(target) {
+  if (!target || typeof target.closest !== 'function') return false;
+  return !!target.closest('input, textarea, select, button, a, label');
+}
+
+function ensureFeedPullRefreshIndicator(screenEl) {
+  if (!screenEl) return null;
+  var existing = screenEl.querySelector('.feedPullRefresh');
+  if (existing) return existing;
+
+  var indicator = document.createElement('div');
+  indicator.className = 'feedPullRefresh';
+  indicator.setAttribute('aria-hidden', 'true');
+  indicator.innerHTML = '<span class="feedPullRefreshLabel">Потяните вниз, чтобы обновить</span>';
+  screenEl.appendChild(indicator);
+  return indicator;
+}
+
+function updateFeedPullRefreshIndicator(screenEl, mode, distance) {
+  var indicator = ensureFeedPullRefreshIndicator(screenEl);
+  if (!indicator) return;
+
+  var label = indicator.querySelector('.feedPullRefreshLabel');
+  var offset = mode === 'loading'
+    ? 14
+    : Math.max(-14, Math.min(24, Math.round(Number(distance || 0) / 3) - 10));
+
+  indicator.className = 'feedPullRefresh' + (mode === 'hidden' ? '' : ' visible') + (mode === 'ready' ? ' ready' : '') + (mode === 'loading' ? ' loading' : '');
+  indicator.style.transform = 'translate(-50%, ' + offset + 'px)';
+
+  if (label) {
+    if (mode === 'ready') label.textContent = 'Отпустите, чтобы обновить';
+    else if (mode === 'loading') label.textContent = 'Обновляем ленту…';
+    else label.textContent = 'Потяните вниз, чтобы обновить';
+  }
+}
+
+function resetFeedPullRefreshIndicator(screenEl) {
+  window.clearTimeout(feedPullRefreshState.hideTimer);
+  updateFeedPullRefreshIndicator(screenEl, 'hidden', 0);
+}
+
+function releaseFeedPullRefresh() {
+  var screenEl = feedPullRefreshState.screenEl;
+  var screenKey = feedPullRefreshState.screenKey;
+  var shouldRefresh = !!(screenEl && feedPullRefreshState.dragging && feedPullRefreshState.armed);
+
+  feedPullRefreshState.screenKey = '';
+  feedPullRefreshState.screenEl = null;
+  feedPullRefreshState.startY = 0;
+  feedPullRefreshState.distance = 0;
+  feedPullRefreshState.dragging = false;
+  feedPullRefreshState.armed = false;
+
+  if (!screenEl) return;
+  if (!shouldRefresh) {
+    resetFeedPullRefreshIndicator(screenEl);
+    return;
+  }
+
+  updateFeedPullRefreshIndicator(screenEl, 'loading', FEED_PULL_REFRESH_TRIGGER_PX);
+  refreshFeedScreen(screenKey, { silent: true }).finally(function () {
+    window.clearTimeout(feedPullRefreshState.hideTimer);
+    feedPullRefreshState.hideTimer = window.setTimeout(function () {
+      resetFeedPullRefreshIndicator(screenEl);
+    }, 180);
+  });
+}
+
+function bindFeedPullRefresh(screenKey) {
+  var screenEl = screens && screens[screenKey];
+  if (!screenEl || screenEl.dataset.pullRefreshBound === '1') return;
+
+  ensureFeedPullRefreshIndicator(screenEl);
+
+  screenEl.addEventListener('touchstart', function (event) {
+    var point;
+    if (!isScreenActive(screenKey) || screenEl.scrollTop > 0 || feedAutoRefreshState.inFlight) return;
+    if (isPullRefreshBlockedTarget(event.target) || !getFeedRefreshTask(screenKey, { silent: true })) return;
+
+    point = getPullRefreshPoint(event);
+    if (!point) return;
+
+    window.clearTimeout(feedPullRefreshState.hideTimer);
+    feedPullRefreshState.screenKey = screenKey;
+    feedPullRefreshState.screenEl = screenEl;
+    feedPullRefreshState.startY = point.clientY;
+    feedPullRefreshState.distance = 0;
+    feedPullRefreshState.dragging = true;
+    feedPullRefreshState.armed = false;
+    updateFeedPullRefreshIndicator(screenEl, 'pull', 0);
+  }, { passive: true });
+
+  screenEl.addEventListener('touchmove', function (event) {
+    var point;
+    var deltaY;
+    var distance;
+    if (!feedPullRefreshState.dragging || feedPullRefreshState.screenEl !== screenEl) return;
+    if (screenEl.scrollTop > 0) {
+      releaseFeedPullRefresh();
+      return;
     }
 
-    if (!task) return;
-    feedAutoRefreshState.inFlight = true;
-    Promise.resolve(task()).catch(function () {}).finally(function () {
-      feedAutoRefreshState.inFlight = false;
-    });
-  }
+    point = getPullRefreshPoint(event);
+    if (!point) return;
 
+    deltaY = point.clientY - feedPullRefreshState.startY;
+    if (deltaY <= 0) {
+      resetFeedPullRefreshIndicator(screenEl);
+      return;
+    }
+
+    if (event.cancelable) event.preventDefault();
+    distance = Math.min(FEED_PULL_REFRESH_MAX_PX, Math.round(deltaY * 0.65));
+    feedPullRefreshState.distance = distance;
+    feedPullRefreshState.armed = distance >= FEED_PULL_REFRESH_TRIGGER_PX;
+    updateFeedPullRefreshIndicator(screenEl, feedPullRefreshState.armed ? 'ready' : 'pull', distance);
+  }, { passive: false });
+
+  screenEl.addEventListener('touchend', function () {
+    releaseFeedPullRefresh();
+  });
+
+  screenEl.addEventListener('touchcancel', function () {
+    releaseFeedPullRefresh();
+  });
+
+  screenEl.dataset.pullRefreshBound = '1';
+}
+
+(function initFeedAutoRefresh() {
   if (!feedAutoRefreshState.timer) {
-    feedAutoRefreshState.timer = window.setInterval(refreshActiveFeed, FEED_AUTO_REFRESH_MS);
+    feedAutoRefreshState.timer = window.setInterval(function () {
+      refreshActiveFeed({ silent: true });
+    }, FEED_AUTO_REFRESH_MS);
   }
 
-  window.addEventListener('focus', refreshActiveFeed);
+  bindFeedPullRefresh('candidateFeed');
+  bindFeedPullRefresh('employerSearch');
+
+  window.addEventListener('focus', function () {
+    refreshActiveFeed({ silent: true });
+  });
   document.addEventListener('visibilitychange', function () {
     if (document.hidden) return;
-    refreshActiveFeed();
+    refreshActiveFeed({ silent: true });
   });
 })();
