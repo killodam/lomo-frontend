@@ -739,8 +739,27 @@ function deleteOwnAccount(password) {
       if(screens.loginForm?.classList.contains('active')){ showEntryScreen(); return; }
     });
 
-    // initial — always show landing, no auto-login ever
-    show('landing');
+    (async function initEntryFlow() {
+      var user = false;
+      try {
+        user = await tryAutoLogin();
+      } catch (error) {}
+
+      if (user) {
+        if (state.roleReg === 'ADMIN' || user.role === 'admin') {
+          show('adminQueue');
+          return;
+        }
+        if (state.roleReg === 'EMPLOYER' || user.role === 'employer') {
+          showEmployerDashboard();
+          return;
+        }
+        showEmployeeDashboard();
+        return;
+      }
+
+      show('landing');
+    })();
 
     document.addEventListener('change', (e) => {
       const t = e.target;
