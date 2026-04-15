@@ -474,3 +474,9 @@ body { padding-bottom: 0; }
   opacity: .45;
   cursor: not-allowed;
 }
+.pagerNum {
+  min-width: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}

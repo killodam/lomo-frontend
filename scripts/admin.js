@@ -21,17 +21,14 @@ function recoverAuthFlowOnProtectedError(err, options) {
   resetDisplay();
 
   if (options && options.listId) {
-    var listEl = document.getElementById(options.listId);
-    if (listEl) {
-      listEl.innerHTML = '<div style="padding:20px;color:#991b1b;">Сессия завершилась. Войдите снова.</div>';
-    }
+    renderListFallbackState(options.listId, 'Сессия завершилась. Войдите снова.');
   }
 
   if (options && options.pagerId) {
     renderPager(options.pagerId, { total: 0 }, function () {}, { label: options.label || 'элементов' });
   }
 
-  showToast('Сессия завершилась. Войдите снова.');
+  showToast('Сессия завершилась. Войдите снова.', 'error');
   showEntryScreen();
   return true;
 }
@@ -82,10 +79,74 @@ function renderFeedEmptyState(targetId, icon, text) {
   el.innerHTML = '<div class="feedEmptyState"><span class="feedEmptyIco">' + escHtml(icon || '•') + '</span><div class="feedEmptyText">' + escHtml(text || 'Пока ничего нет') + '</div></div>';
 }
 
-function renderFeedErrorState(targetId, err) {
+function renderAdminNoticeState(targetId, text) {
   var el = document.getElementById(targetId);
   if (!el) return;
-  el.innerHTML = '<div style="padding:20px;color:#991b1b;">Ошибка: ' + escHtml(safeErrorText(err)) + '</div>';
+  el.innerHTML = queueEmptyState(text);
+}
+
+function renderListFallbackState(targetId, text) {
+  if (!targetId) return;
+
+  if (targetId === 'candidateFeedList' || targetId === 'employerCandidateList') {
+    renderFeedEmptyState(targetId, '⚠', text || 'Не удалось загрузить данные');
+    return;
+  }
+
+  if (targetId === 'adminCandidateList') {
+    renderAdminCandidates([], text);
+    return;
+  }
+
+  if (targetId === 'adminEmployerList') {
+    renderAdminEmployers([], text);
+    return;
+  }
+
+  if (targetId === 'adminUsersList' || targetId === 'adminQueueList') {
+    renderAdminNoticeState(targetId, text || 'Не удалось загрузить данные');
+    return;
+  }
+
+  var el = document.getElementById(targetId);
+  if (!el) return;
+  el.innerHTML = '<div class="miniHint">' + escapeHtml(text || 'Не удалось загрузить данные') + '</div>';
+}
+
+function renderFeedErrorState(targetId, err, emptyText) {
+  showToast(safeErrorText(err), 'error');
+  renderFeedEmptyState(targetId, '⚠', emptyText || 'Не удалось загрузить данные');
+}
+
+function appendPagerPageButton(container, pageNumber, currentPage, onNavigate) {
+  var button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'pagerBtn pagerNum';
+  button.textContent = String(pageNumber);
+
+  if (pageNumber === currentPage) {
+    button.disabled = true;
+    button.style.opacity = '1';
+    button.style.cursor = 'default';
+    button.style.background = '#0e0f0f';
+    button.style.color = '#fff';
+    button.style.borderColor = '#0e0f0f';
+    button.setAttribute('aria-current', 'page');
+  } else {
+    button.addEventListener('click', function () {
+      onNavigate(pageNumber);
+    });
+  }
+
+  container.appendChild(button);
+}
+
+function appendPagerEllipsis(container) {
+  var dots = document.createElement('span');
+  dots.className = 'pagerMeta';
+  dots.textContent = '…';
+  dots.style.padding = '0 2px';
+  container.appendChild(dots);
 }
 
 function renderPager(targetId, pagerState, onNavigate, options) {
@@ -124,6 +185,31 @@ function renderPager(targetId, pagerState, onNavigate, options) {
     if (page > 1) onNavigate(page - 1);
   });
 
+  actions.appendChild(prev);
+
+  if (totalPages > 1) {
+    var start = Math.max(1, page - 2);
+    var end = Math.min(totalPages, page + 2);
+
+    if (totalPages > 5) {
+      if (page <= 3) {
+        start = 1;
+        end = 5;
+      } else if (page >= totalPages - 2) {
+        start = totalPages - 4;
+        end = totalPages;
+      }
+    }
+
+    if (start > 1) appendPagerEllipsis(actions);
+
+    for (var pageNumber = start; pageNumber <= end; pageNumber += 1) {
+      appendPagerPageButton(actions, pageNumber, page, onNavigate);
+    }
+
+    if (end < totalPages) appendPagerEllipsis(actions);
+  }
+
   var next = document.createElement('button');
   next.type = 'button';
   next.className = 'pagerBtn';
@@ -133,7 +219,6 @@ function renderPager(targetId, pagerState, onNavigate, options) {
     if (page < totalPages) onNavigate(page + 1);
   });
 
-  actions.appendChild(prev);
   actions.appendChild(next);
   wrap.appendChild(meta);
   wrap.appendChild(actions);
@@ -262,7 +347,8 @@ function loadOwnConnections() {
   }).catch(function (err) {
     var targetId = state.roleReg === 'EMPLOYER' ? 'rpConnectionsList' : 'epConnectionsList';
     var listEl = document.getElementById(targetId);
-    if (listEl) listEl.innerHTML = '<div class="miniHint" style="color:#991b1b;">Ошибка: ' + escapeHtml(safeErrorText(err)) + '</div>';
+    showToast(safeErrorText(err), 'error');
+    if (listEl) listEl.innerHTML = '<div class="miniHint">Не удалось загрузить контакты</div>';
   });
 }
 
@@ -308,7 +394,8 @@ function loadPublicConnectionPanel(targetUserId) {
   apiGetConnectionStatus(targetUserId).then(function (statusData) {
     renderPublicConnectionPanel(targetUserId, statusData);
   }).catch(function (err) {
-    box.innerHTML = '<div class="miniHint" style="color:#991b1b;">Ошибка: ' + escapeHtml(safeErrorText(err)) + '</div>';
+    showToast(safeErrorText(err), 'error');
+    box.innerHTML = '<div class="miniHint">Не удалось загрузить контакты LOMO</div>';
   });
 }
 
@@ -328,15 +415,15 @@ function handleConnectionAction(action, connectionId, targetUserId) {
   if (!request) return Promise.resolve();
 
   return request.then(function (result) {
-    if (action === 'send' && result?.autoAccepted) showToast('Контакт подтверждён');
-    else if (action === 'send') showToast('Запрос в контакты отправлен');
-    else if (action === 'accept') showToast('Контакт добавлен');
-    else if (action === 'reject') showToast('Запрос отклонён');
-    else if (action === 'remove') showToast('Контакт обновлён');
+    if (action === 'send' && result?.autoAccepted) showToast('Контакт подтверждён', 'success');
+    else if (action === 'send') showToast('Запрос в контакты отправлен', 'success');
+    else if (action === 'accept') showToast('Контакт добавлен', 'success');
+    else if (action === 'reject') showToast('Запрос отклонён', 'info');
+    else if (action === 'remove') showToast('Контакт обновлён', 'success');
     refreshConnectionViews(targetUserId);
     return result;
   }).catch(function (err) {
-    showToast('Ошибка: ' + err.message);
+    showToast(safeErrorText(err), 'error');
     throw err;
   });
 }
@@ -402,7 +489,7 @@ function loadAdminQueue(page) {
         btnView.style.cssText = 'background:#e0f2fe;color:#0369a1;border:1px solid #bae6fd;';
         btnView.addEventListener('click', function () {
           openSecureDocument(item.id, item.file_name).catch(function (err) {
-            showToast('Ошибка: ' + err.message);
+            showToast(safeErrorText(err), 'error');
           });
         });
         actions.appendChild(btnView);
@@ -413,10 +500,10 @@ function loadAdminQueue(page) {
       btnApprove.textContent = 'Подтвердить';
       btnApprove.addEventListener('click', function () {
         apiAdminApprove(item.id).then(function () {
-          showToast('Документ подтверждён');
+          showToast('Документ подтверждён', 'success');
           loadAdminQueue(adminQueueState.page);
         }).catch(function (err) {
-          showToast('Ошибка: ' + err.message);
+          showToast(safeErrorText(err), 'error');
         });
       });
 
@@ -427,14 +514,14 @@ function loadAdminQueue(page) {
         var reason = document.getElementById('rInput_' + item.id);
         var value = reason ? reason.value.trim() : '';
         if (!value) {
-          showToast('Укажите причину отказа');
+          showToast('Укажите причину отказа', 'info');
           return;
         }
         apiAdminReject(item.id, value).then(function () {
-          showToast('Документ отклонён');
+          showToast('Документ отклонён', 'success');
           loadAdminQueue(adminQueueState.page);
         }).catch(function (err) {
-          showToast('Ошибка: ' + err.message);
+          showToast(safeErrorText(err), 'error');
         });
       });
 
@@ -446,7 +533,8 @@ function loadAdminQueue(page) {
     renderPager('adminQueuePager', adminQueueState, loadAdminQueue, { label: 'документов' });
   }).catch(function (err) {
     var listEl = document.getElementById('adminQueueList');
-    if (listEl) listEl.innerHTML = '<div style="color:#991b1b;padding:16px;">Ошибка загрузки: ' + escapeHtml(safeErrorText(err)) + '</div>';
+    showToast(safeErrorText(err), 'error');
+    if (listEl) listEl.innerHTML = queueEmptyState('Не удалось загрузить очередь');
     renderPager('adminQueuePager', { total: 0 }, function () {}, { label: 'документов' });
   });
 }
@@ -508,10 +596,10 @@ function loadAdminUsers(page) {
         delBtn.addEventListener('click', function () {
           if (!confirm('Удалить пользователя ' + user.email + '?')) return;
           apiFetch('/admin/users/' + user.id, { method: 'DELETE' }).then(function () {
-            showToast('Пользователь удалён');
+            showToast('Пользователь удалён', 'success');
             loadAdminUsers(adminUsersState.page);
           }).catch(function (err) {
-            showToast('Ошибка: ' + err.message);
+            showToast(safeErrorText(err), 'error');
           });
         });
         actionsCell.appendChild(delBtn);
@@ -525,7 +613,8 @@ function loadAdminUsers(page) {
     renderPager('adminUsersPager', adminUsersState, loadAdminUsers, { label: 'пользователей' });
   }).catch(function (err) {
     var listEl = document.getElementById('adminUsersList');
-    if (listEl) listEl.innerHTML = '<div style="color:#991b1b;padding:8px;">Ошибка: ' + escapeHtml(safeErrorText(err)) + '</div>';
+    showToast(safeErrorText(err), 'error');
+    if (listEl) listEl.innerHTML = queueEmptyState('Не удалось загрузить пользователей');
     renderPager('adminUsersPager', { total: 0 }, function () {}, { label: 'пользователей' });
   });
 }
@@ -565,27 +654,28 @@ function loadIncomingRequests() {
       '</div>';
     }).join('');
   }).catch(function (err) {
-    el.innerHTML = '<div class="miniHint" style="color:#991b1b;">Ошибка: ' + escapeHtml(err.message) + '</div>';
+    showToast(safeErrorText(err), 'error');
+    el.innerHTML = '<div class="miniHint">Не удалось загрузить запросы</div>';
   });
 }
 
 function handleRequestDecision(requestId, action) {
   var fn = action === 'approve' ? apiApproveRequest : apiRejectRequest;
   fn(requestId).then(function () {
-    showToast(action === 'approve' ? 'Доступ разрешён' : 'Запрос отклонён');
+    showToast(action === 'approve' ? 'Доступ разрешён' : 'Запрос отклонён', action === 'approve' ? 'success' : 'info');
     loadIncomingRequests();
     if (_activePublicProfileUserId) loadEmployerAccessPanel(_activePublicProfileUserId);
   }).catch(function (err) {
-    showToast('Ошибка: ' + err.message);
+    showToast(safeErrorText(err), 'error');
   });
 }
 
 function requestDocumentAccess(candidateId, documentType) {
   apiSendRequest(candidateId, documentType).then(function () {
-    showToast('Запрос отправлен');
+    showToast('Запрос отправлен', 'success');
     loadEmployerAccessPanel(candidateId);
   }).catch(function (err) {
-    showToast('Ошибка: ' + err.message);
+    showToast(safeErrorText(err), 'error');
   });
 }
 
@@ -655,7 +745,8 @@ function loadEmployerAccessPanel(candidateId) {
     var requests = (result[0] || []).filter(function (req) { return req.candidate_id === candidateId; });
     renderEmployerAccessPanel(candidateId, requests, result[1] || []);
   }).catch(function (err) {
-    box.innerHTML = '<div class="miniHint" style="color:#991b1b;">Ошибка: ' + escapeHtml(err.message) + '</div>';
+    showToast(safeErrorText(err), 'error');
+    box.innerHTML = '<div class="miniHint">Не удалось загрузить доступ к документам</div>';
   });
 }
 
@@ -985,7 +1076,7 @@ function loadCandidateFeed(page) {
       pagerId: 'candidateFeedPager',
       label: 'профилей',
     })) return;
-    renderFeedErrorState(listId, err);
+    renderFeedErrorState(listId, err, 'Не удалось загрузить ленту');
     renderPager('candidateFeedPager', { total: 0 }, function () {}, { label: 'профилей' });
   });
 }
@@ -1039,7 +1130,7 @@ function loadEmployerSearch(page) {
       pagerId: 'employerCandidatePager',
       label: 'кандидатов',
     })) return;
-    renderFeedErrorState(listId, err);
+    renderFeedErrorState(listId, err, 'Не удалось загрузить кандидатов');
     renderPager('employerCandidatePager', { total: 0 }, function () {}, { label: 'кандидатов' });
   });
 }
@@ -1086,7 +1177,8 @@ function loadAdminCandidates(page) {
       pagerId: 'adminCandidatePager',
       label: 'кандидатов',
     })) return;
-    el.innerHTML = '<div style="padding:20px;color:#991b1b;">Ошибка: ' + escHtml(safeErrorText(err)) + '</div>';
+    showToast(safeErrorText(err), 'error');
+    renderAdminCandidates([], 'Не удалось загрузить кандидатов');
     renderPager('adminCandidatePager', { total: 0 }, function () {}, { label: 'кандидатов' });
   });
 }
@@ -1117,7 +1209,8 @@ function loadAdminEmployers(page) {
       pagerId: 'adminEmployerPager',
       label: 'компаний',
     })) return;
-    el.innerHTML = '<div style="padding:20px;color:#991b1b;">Ошибка: ' + escHtml(safeErrorText(err)) + '</div>';
+    showToast(safeErrorText(err), 'error');
+    renderAdminEmployers([], 'Не удалось загрузить компании');
     renderPager('adminEmployerPager', { total: 0 }, function () {}, { label: 'компаний' });
   });
 }
@@ -1151,11 +1244,11 @@ function filterAdminEmployers() {
   loadAdminEmployers(1);
 }
 
-function renderAdminCandidates(list) {
+function renderAdminCandidates(list, emptyText) {
   var el = document.getElementById('adminCandidateList');
   if (!el) return;
   if (!list.length) {
-    el.innerHTML = '<div style="padding:20px;text-align:center;color:#888;">Нет кандидатов</div>';
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:#888;">' + escapeHtml(emptyText || 'Нет кандидатов') + '</div>';
     return;
   }
   el.innerHTML = list.map(function (candidate) {
@@ -1164,11 +1257,11 @@ function renderAdminCandidates(list) {
   }).join('');
 }
 
-function renderAdminEmployers(list) {
+function renderAdminEmployers(list, emptyText) {
   var el = document.getElementById('adminEmployerList');
   if (!el) return;
   if (!list.length) {
-    el.innerHTML = '<div style="padding:20px;text-align:center;color:#888;">Нет работодателей</div>';
+    el.innerHTML = '<div style="padding:20px;text-align:center;color:#888;">' + escapeHtml(emptyText || 'Нет работодателей') + '</div>';
     return;
   }
   el.innerHTML = list.map(function (user) {

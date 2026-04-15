@@ -397,9 +397,20 @@ function loadWorkExpData(items) {
   });
 }
 
-function showToast(message) {
-  const toast = document.getElementById('toast');
+function showToast(message, type) {
+  var toast = document.getElementById('toast');
+  var toastType = type || 'info';
+  if (!toast) return;
+
+  if (toast._hideTimer) clearTimeout(toast._hideTimer);
+
   toast.textContent = message;
+  toast.setAttribute('data-type', toastType);
+  toast.classList.remove('success', 'error', 'info');
+  toast.classList.add(toastType);
   toast.classList.add('show');
-  setTimeout(() => toast.classList.remove('show'), 2600);
+
+  toast._hideTimer = setTimeout(function () {
+    toast.classList.remove('show');
+  }, 2600);
 }

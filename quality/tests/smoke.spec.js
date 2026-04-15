@@ -53,6 +53,50 @@ test('service worker precaches landing and feed styles', async ({ page }) => {
   })).toEqual({ hasLanding: true, hasFeed: true });
 });
 
+test('valid stored session bypasses landing and opens candidate feed', async ({ page }) => {
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/me')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'cand-1', email: 'candidate@example.com', login: 'candidate', role: 'candidate' },
+          profile: { full_name: 'Иван Кандидат', location: 'Москва', edu_place: 'МГУ', vacancies: 'Designer' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([
+          { id: 'cand-2', role: 'candidate', full_name: 'Анна Петрова', location: 'Москва', edu_place: 'МФТИ', vacancies: 'Designer', about: 'Опытный кандидат' },
+        ], 1, 12, 1)),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await page.addInitScript(function () {
+    document.cookie = 'lomo_csrf=test-suite; path=/';
+  });
+  await page.goto('/');
+
+  await expect(page.locator('#screenCandidateFeed')).toHaveClass(/active/);
+  await expect(page.locator('#screenLanding')).not.toHaveClass(/active/);
+  await expect(page.locator('#candidateFeedList')).toContainText('Анна Петрова');
+});
+
 test('candidate login opens feed and paginates server-side', async ({ page }) => {
   let requestedPage = '1';
 
@@ -101,6 +145,10 @@ test('candidate login opens feed and paginates server-side', async ({ page }) =>
   await expect(page.locator('#screenCandidateFeed')).toHaveClass(/active/);
   await expect(page.locator('#candidateFeedList')).toContainText('Анна Петрова');
   await expect(page.locator('#candidateFeedPager')).toContainText('Страница 1 из 2');
+  await expect(page.locator('#candidateFeedPager .pagerNum')).toHaveCount(2);
+  await expect(page.locator('#candidateFeedPager .pagerNum').nth(0)).toBeDisabled();
+  await expect(page.locator('#candidateFeedPager .pagerNum').nth(0)).toHaveText('1');
+  await expect(page.locator('#candidateFeedPager .pagerNum').nth(1)).toHaveText('2');
 
   await page.click('#candidateFeedPager .pagerBtn:text("Далее")');
   await expect(page.locator('#candidateFeedList')).toContainText('Павел Иванов');

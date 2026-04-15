@@ -740,21 +740,61 @@ function deleteOwnAccount(password) {
     });
 
     (async function initEntryFlow() {
+      function routeAutoLoginUser(user) {
+        var isAdmin = state.roleReg === 'ADMIN' || user.role === 'admin';
+        var isEmployer = state.roleReg === 'EMPLOYER' || user.role === 'employer';
+        var attempts = 0;
+
+        function tryRoute() {
+          if (isAdmin) {
+            if (
+              typeof loadAdminQueue === 'function' &&
+              typeof loadAdminUsers === 'function' &&
+              typeof switchAdminTab === 'function'
+            ) {
+              loadAdminQueue();
+              show('adminQueue');
+              return;
+            }
+          } else if (isEmployer) {
+            if (typeof showEmployerDashboard === 'function') {
+              showEmployerDashboard();
+              return;
+            }
+            if (typeof loadEmployerSearch === 'function') {
+              show('employerSearch');
+              return;
+            }
+          } else {
+            if (typeof showEmployeeDashboard === 'function') {
+              showEmployeeDashboard();
+              return;
+            }
+            if (typeof loadCandidateFeed === 'function') {
+              show('candidateFeed');
+              return;
+            }
+          }
+
+          attempts += 1;
+          if (attempts < 20) {
+            setTimeout(tryRoute, 0);
+            return;
+          }
+
+          show('landing');
+        }
+
+        setTimeout(tryRoute, 0);
+      }
+
       var user = false;
       try {
         user = await tryAutoLogin();
       } catch (error) {}
 
-      if (user) {
-        if (state.roleReg === 'ADMIN' || user.role === 'admin') {
-          show('adminQueue');
-          return;
-        }
-        if (state.roleReg === 'EMPLOYER' || user.role === 'employer') {
-          showEmployerDashboard();
-          return;
-        }
-        showEmployeeDashboard();
+      if (user && user.id) {
+        routeAutoLoginUser(user);
         return;
       }
 

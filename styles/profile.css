@@ -761,10 +761,10 @@
       bottom: 32px;
       left: 50%;
       transform: translateX(-50%) translateY(20px);
-      background: rgba(17,17,17,.92);
       color: #fff;
       padding: 10px 20px;
       border-radius: 999px;
+      border: 1px solid transparent;
       font-size: 13px;
       font-weight: 500;
       letter-spacing: .02em;
@@ -773,6 +773,19 @@
       transition: opacity .22s ease, transform .22s ease;
       z-index: 100;
       white-space: nowrap;
+      box-shadow: 0 10px 28px rgba(0,0,0,.14);
+    }
+    .toast.info{
+      background: rgba(14,15,15,.94);
+      border-color: rgba(38,110,120,.24);
+    }
+    .toast.success{
+      background: rgba(21,128,61,.95);
+      border-color: rgba(187,247,208,.42);
+    }
+    .toast.error{
+      background: rgba(185,28,28,.95);
+      border-color: rgba(254,202,202,.42);
     }
     .toast.show{
       opacity: 1;
@@ -835,4 +848,3 @@
       background: rgba(38,110,120,.08) !important;
       border-color: rgba(38,110,120,.35) !important;
     }
-
