@@ -39,15 +39,98 @@ function closeModal() {
   infoModal.setAttribute('aria-hidden', 'true');
 }
 
+function renderModalParagraphs(items, extraClass) {
+  return (items || []).map(function (item) {
+    return '<p class="modalParagraph' + (extraClass ? ' ' + extraClass : '') + '">' + item + '</p>';
+  }).join('');
+}
+
+function renderModalList(items, ordered) {
+  var tag = ordered ? 'ol' : 'ul';
+  return '<' + tag + ' class="modalList">' + (items || []).map(function (item) {
+    return '<li class="modalListItem">' + item + '</li>';
+  }).join('') + '</' + tag + '>';
+}
+
+function renderModalContacts(items, metaText) {
+  return (items || []).map(function (item) {
+    return '<p class="modalParagraph"><span class="modalContactLabel">' + item.label + ':</span> <span class="modalContactValue">' + item.value + '</span></p>';
+  }).join('') + (metaText ? '<p class="modalMeta">' + metaText + '</p>' : '');
+}
+
+function renderFaqItems(items) {
+  return (items || []).map(function (item) {
+    return '<div class="faqItem"><div class="faqQ">' + item.question + '</div><div class="faqA">' + item.answer + '</div></div>';
+  }).join('');
+}
+
+function renderLegalSections(sections, versionText) {
+  return (sections || []).map(function (section) {
+    return '<h3>' + section.title + '</h3><p>' + section.text + '</p>';
+  }).join('') + (versionText ? '<p class="legalVersion">' + versionText + '</p>' : '');
+}
+
 function getModalContent(key) {
   const panels = {
-    how: { title: 'Как работает LOMO', html: '<p style="margin:0 0 10px">LOMO — платформа верификации карьерных данных.</p><ol style="padding-left:18px;margin:0"><li style="margin-bottom:8px">Зарегистрируйтесь как кандидат или работодатель.</li><li style="margin-bottom:8px">Загрузите документы: диплом, трудовую книжку, сертификаты.</li><li style="margin-bottom:8px">Администратор проверяет и ставит отметку ✓ на профиле.</li><li>Работодатели видят верифицированные профили.</li></ol>' },
-    security: { title: 'Безопасность и приватность', html: '<ul style="padding-left:18px;margin:0"><li style="margin-bottom:8px">Документы хранятся на защищённых серверах.</li><li style="margin-bottom:8px">Данные не передаются третьим лицам.</li><li style="margin-bottom:8px">Доступ к файлам только у верификатора.</li><li>Соединение защищено HTTPS.</li></ul>' },
-    terms: { title: 'Условия использования', html: '<ul style="padding-left:18px;margin:0"><li style="margin-bottom:8px">Предоставляйте только достоверные данные.</li><li style="margin-bottom:8px">Запрещено загружать чужие или поддельные документы.</li><li>Нарушение — блокировка аккаунта.</li></ul>' },
-    privacy: { title: 'Политика конфиденциальности', html: '<p style="margin:0 0 10px">Собираем минимум данных: имя, email, документы.</p><p style="margin:0 0 10px">Телефон и email не публикуются публично.</p><p style="margin:0">Удаление аккаунта доступно в личном профиле после подтверждения паролем.</p>' },
-    contacts: { title: 'Контакты', html: '<p style="margin:0 0 10px">Email: <b>support@lomo.website</b></p><p style="margin:0 0 10px">Telegram: <b>@lomo_support</b></p><p style="margin:0 0 16px">Пн–Пт, 9:00–18:00 МСК</p>' },
-    about: { title: 'О проекте LOMO', html: '<p style="margin:0 0 10px">LOMO — платформа верификации карьерных данных для рынка найма.</p><p style="margin:0 0 10px">Кандидаты подтверждают образование и опыт документами, работодатели находят проверенных специалистов.</p><p style="margin:0;color:#888;font-size:13px">Запущен в 2024 году. Верификация — 1–2 рабочих дня.</p>' },
-    faq: { title: 'Частые вопросы', html: '<div class="faqItem"><div class="faqQ">Сколько стоит?</div><div class="faqA">Для кандидатов — бесплатно.</div></div><div class="faqItem"><div class="faqQ">Как долго верификация?</div><div class="faqA">1–2 рабочих дня.</div></div><div class="faqItem"><div class="faqQ">Какие форматы?</div><div class="faqA">PDF, JPG, PNG, DOCX — до 50 МБ.</div></div><div class="faqItem"><div class="faqQ">Видят ли работодатели мои документы?</div><div class="faqA">Нет — только статус ✓ или ✗.</div></div>' },
+    how: {
+      title: 'Как работает LOMO',
+      html: renderModalParagraphs([
+        'LOMO — платформа верификации карьерных данных.',
+      ]) + renderModalList([
+        'Зарегистрируйтесь как кандидат или работодатель.',
+        'Загрузите документы: диплом, трудовую книжку, сертификаты.',
+        'Администратор проверяет и ставит отметку ✓ на профиле.',
+        'Работодатели видят верифицированные профили.',
+      ], true),
+    },
+    security: {
+      title: 'Безопасность и приватность',
+      html: renderModalList([
+        'Документы хранятся на защищённых серверах.',
+        'Данные не передаются третьим лицам.',
+        'Доступ к файлам только у верификатора.',
+        'Соединение защищено HTTPS.',
+      ]),
+    },
+    terms: {
+      title: 'Условия использования',
+      html: renderModalList([
+        'Предоставляйте только достоверные данные.',
+        'Запрещено загружать чужие или поддельные документы.',
+        'Нарушение — блокировка аккаунта.',
+      ]),
+    },
+    privacy: {
+      title: 'Политика конфиденциальности',
+      html: renderModalParagraphs([
+        'Собираем минимум данных: имя, email, документы.',
+        'Телефон и email не публикуются публично.',
+        'Удаление аккаунта доступно в личном профиле после подтверждения паролем.',
+      ]),
+    },
+    contacts: {
+      title: 'Контакты',
+      html: renderModalContacts([
+        { label: 'Email', value: 'support@lomo.website' },
+        { label: 'Telegram', value: '@lomo_support' },
+      ], 'Пн–Пт, 9:00–18:00 МСК'),
+    },
+    about: {
+      title: 'О проекте LOMO',
+      html: renderModalParagraphs([
+        'LOMO — платформа верификации карьерных данных для рынка найма.',
+        'Кандидаты подтверждают образование и опыт документами, работодатели находят проверенных специалистов.',
+      ]) + '<p class="modalMeta">Запущен в 2024 году. Верификация — 1–2 рабочих дня.</p>',
+    },
+    faq: {
+      title: 'Частые вопросы',
+      html: renderFaqItems([
+        { question: 'Сколько стоит?', answer: 'Для кандидатов — бесплатно.' },
+        { question: 'Как долго верификация?', answer: '1–2 рабочих дня.' },
+        { question: 'Какие форматы?', answer: 'PDF, JPG, PNG, DOCX — до 50 МБ.' },
+        { question: 'Видят ли работодатели мои документы?', answer: 'Нет — только статус ✓ или ✗.' },
+      ]),
+    },
   };
 
   return panels[key] || { title: '—', html: '' };
@@ -57,38 +140,33 @@ function openLegalModal(type) {
   const el = document.getElementById('legalModal');
   const title = document.getElementById('legalModalTitle');
   const body = document.getElementById('legalModalBody');
+  const legalPanels = {
+    terms: {
+      title: 'Условия использования',
+      sections: [
+        { title: '1. Общие положения', text: 'Использование платформы LOMO означает согласие с настоящими условиями. LOMO — сервис верификации карьерных данных для рынка найма.' },
+        { title: '2. Пользователь (кандидат)', text: 'Пользователь обязуется загружать только подлинные документы. Загрузка поддельных материалов влечёт блокировку аккаунта и может быть передана правоохранительным органам.' },
+        { title: '3. Работодатель', text: 'Работодатель обязуется использовать данные кандидатов исключительно для целей найма. Передача данных третьим лицам без согласия кандидата запрещена.' },
+        { title: '4. Верификация', text: 'LOMO подтверждает факт предоставленных документов, но не несёт ответственности за достоверность самих сведений в случае предоставления поддельных материалов.' },
+        { title: '5. Изменение условий', text: 'LOMO вправе изменять данные условия, уведомив пользователей за 14 дней до вступления в силу.' },
+      ],
+    },
+    privacy: {
+      title: 'Политика конфиденциальности',
+      sections: [
+        { title: '1. Сбор данных', text: 'LOMO собирает: имя, email, загруженные документы, историю верификаций. Данные необходимы исключительно для работы платформы.' },
+        { title: '2. Хранение', text: 'Документы хранятся в зашифрованном виде. Доступ к файлам — только у модераторов при проверке и у работодателя после явного согласия кандидата.' },
+        { title: '3. Приватность по умолчанию', text: 'Все загруженные файлы — приватны. Работодатель видит только статусы. Доступ к файлам выдаётся кандидатом явно, через систему запросов.' },
+        { title: '4. Удаление данных', text: 'Пользователь вправе удалить свой аккаунт и связанные данные в личном профиле после подтверждения паролем. Отдельные резервные копии могут храниться ограниченное время в рамках инфраструктурной политики.' },
+        { title: '5. Cookies', text: 'LOMO использует только функциональные cookies. Рекламные и аналитические трекеры не используются без явного согласия.' },
+      ],
+    },
+  };
+  const panel = type === 'terms' ? legalPanels.terms : legalPanels.privacy;
+
   if (!el) return;
-  if (type === 'terms') {
-    title.textContent = 'Условия использования';
-    body.innerHTML = `
-      <h3>1. Общие положения</h3>
-      <p>Использование платформы LOMO означает согласие с настоящими условиями. LOMO — сервис верификации карьерных данных для рынка найма.</p>
-      <h3>2. Пользователь (кандидат)</h3>
-      <p>Пользователь обязуется загружать только подлинные документы. Загрузка поддельных материалов влечёт блокировку аккаунта и может быть передана правоохранительным органам.</p>
-      <h3>3. Работодатель</h3>
-      <p>Работодатель обязуется использовать данные кандидатов исключительно для целей найма. Передача данных третьим лицам без согласия кандидата запрещена.</p>
-      <h3>4. Верификация</h3>
-      <p>LOMO подтверждает факт предоставленных документов, но не несёт ответственности за достоверность самих сведений в случае предоставления поддельных материалов.</p>
-      <h3>5. Изменение условий</h3>
-      <p>LOMO вправе изменять данные условия, уведомив пользователей за 14 дней до вступления в силу.</p>
-      <p style="font-size:11px;color:#999;margin-top:16px;">Актуальная версия: апрель 2026.</p>
-    `;
-  } else {
-    title.textContent = 'Политика конфиденциальности';
-    body.innerHTML = `
-      <h3>1. Сбор данных</h3>
-      <p>LOMO собирает: имя, email, загруженные документы, историю верификаций. Данные необходимы исключительно для работы платформы.</p>
-      <h3>2. Хранение</h3>
-      <p>Документы хранятся в зашифрованном виде. Доступ к файлам — только у модераторов при проверке и у работодателя после явного согласия кандидата.</p>
-      <h3>3. Приватность по умолчанию</h3>
-      <p>Все загруженные файлы — приватны. Работодатель видит только статусы. Доступ к файлам выдаётся кандидатом явно, через систему запросов.</p>
-      <h3>4. Удаление данных</h3>
-      <p>Пользователь вправе удалить свой аккаунт и связанные данные в личном профиле после подтверждения паролем. Отдельные резервные копии могут храниться ограниченное время в рамках инфраструктурной политики.</p>
-      <h3>5. Cookies</h3>
-      <p>LOMO использует только функциональные cookies. Рекламные и аналитические трекеры не используются без явного согласия.</p>
-      <p style="font-size:11px;color:#999;margin-top:16px;">Актуальная версия: апрель 2026.</p>
-    `;
-  }
+  title.textContent = panel.title;
+  body.innerHTML = renderLegalSections(panel.sections, 'Актуальная версия: апрель 2026.');
   el.classList.add('open');
   el.setAttribute('aria-hidden', 'false');
 }

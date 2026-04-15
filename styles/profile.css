@@ -728,6 +728,31 @@
       line-height: 1.45;
       color: rgba(0,0,0,.78);
     }
+    .modalParagraph{
+      margin: 0 0 10px;
+    }
+    .modalParagraph:last-child{
+      margin-bottom: 0;
+    }
+    .modalList{
+      padding-left: 18px;
+      margin: 0;
+    }
+    .modalListItem{
+      margin-bottom: 8px;
+    }
+    .modalListItem:last-child{
+      margin-bottom: 0;
+    }
+    .modalContactLabel,
+    .modalContactValue{
+      font-weight: 700;
+    }
+    .modalMeta{
+      margin: 0;
+      color: #888;
+      font-size: 13px;
+    }
     .modalBody h4{
       margin: 14px 0 8px;
       font-size: 13px;
@@ -738,6 +763,9 @@
       padding: 12px 12px;
       background: rgba(255,255,255,.75);
       margin-bottom: 10px;
+    }
+    .faqItem:last-child{
+      margin-bottom: 0;
     }
     .faqQ{ font-weight: 700; margin-bottom: 6px; }
     .faqA{ opacity: .88; }
