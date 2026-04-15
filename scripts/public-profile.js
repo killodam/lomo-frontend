@@ -49,12 +49,11 @@
       var isEmployer = u.role === 'employer';
       var name = escHtml(u.full_name || (isEmployer ? u.company : '') || u.email || '—');
       var initials = name.replace(/&[^;]+;/g,'').split(' ').map(function(s){return s[0]||'';}).join('').slice(0,2).toUpperCase()||'?';
-      var avatarBg = isEmployer ? 'background:linear-gradient(135deg,#0f4c5c,#2a7a8a)' : 'background:linear-gradient(135deg,#2a7a8a,#38b2ac)';
-      var avatarRadius = isEmployer ? '14px' : '50%';
+      var avatarRoleClass = isEmployer ? ' employer' : ' candidate';
       var profileAvatarSrc = safeImageUrl(u.avatar_url);
       var avatarHtml = profileAvatarSrc
-        ? '<img src="'+escHtml(profileAvatarSrc)+'" class="pubProfileAvatarImg" style="border-radius:'+avatarRadius+';">'
-        : '<div class="pubProfileAvatarFallback" style="border-radius:'+avatarRadius+';'+avatarBg+';">'+initials+'</div>';
+        ? '<img src="'+escHtml(profileAvatarSrc)+'" class="pubProfileAvatarImg'+avatarRoleClass+'">'
+        : '<div class="pubProfileAvatarFallback'+avatarRoleClass+'">'+initials+'</div>';
       var verLabels = {edu_status:'Образование',work_status:'Опыт работы',course_status:'Курсы',pass_status:'Паспорт',cv_status:'CV'};
       var verifiedChips = Object.keys(verLabels).filter(function(k){return u[k]==='verified';}).map(function(k){return '<span class="pubVerChip">✓ '+verLabels[k]+'</span>';}).join('');
       var pendingChips = Object.keys(verLabels).filter(function(k){return u[k]==='pending';}).map(function(k){return '<span class="pubVerChip pending">⏳ '+verLabels[k]+'</span>';}).join('');

@@ -132,7 +132,11 @@
     .pubTag{ display:inline-block;background:#f0fdfa;color:#2a7a8a;border:1px solid #d1fae5;padding:3px 10px;border-radius:20px;font-size:12px;margin:2px; }
     .pubTagHiring{ background:#eff6ff;color:#3b82f6;border-color:#bfdbfe; }
     .pubProfileAvatarImg{ width:72px;height:72px;object-fit:cover;box-shadow:0 2px 10px rgba(0,0,0,.15);display:block; }
+    .pubProfileAvatarImg.employer{ border-radius:14px; }
+    .pubProfileAvatarImg.candidate{ border-radius:50%; }
     .pubProfileAvatarFallback{ width:72px;height:72px;color:#fff;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:700;box-shadow:0 2px 10px rgba(0,0,0,.15); }
+    .pubProfileAvatarFallback.employer{ border-radius:14px;background:linear-gradient(135deg,#0f4c5c,#2a7a8a); }
+    .pubProfileAvatarFallback.candidate{ border-radius:50%;background:linear-gradient(135deg,#2a7a8a,#38b2ac); }
     .pubProfileHeadInfo{ flex:1;min-width:0; }
     .pubProfileName{ font-size:22px;font-weight:800;color:#1a1a1a;margin-bottom:4px; }
     .pubProfileRoleTag{ display:inline-flex;align-items:center;font-size:12px;padding:3px 10px;border-radius:20px;font-weight:600;border:1px solid transparent; }
@@ -152,6 +156,8 @@
     .pubProfileFilesState.error{ color:#991b1b; }
     .pubProfileFileRow{ display:flex;align-items:center;gap:8px;margin-bottom:6px; }
     .pubProfileFileName{ font-size:12px;color:#555;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap; }
+    .pubAccessChatRow{ display:flex;justify-content:flex-end;margin-bottom:10px; }
+    .pubAccessButtons{ display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px; }
     .networkStats{ display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:12px; }
     .networkGroup{ display:flex;flex-direction:column;gap:8px; }
     .networkGroup + .networkGroup{ margin-top:8px; }
@@ -165,30 +171,50 @@
     .networkInlineActions{ display:flex;gap:8px;flex-wrap:wrap; }
     /* ── Social cards ── */
     .socialCard{ background:#fff;border:1.5px solid #f0f0f0;border-radius:18px;padding:16px 18px;transition:.15s;box-shadow:0 1px 4px rgba(0,0,0,.04); }
+    .socialCard.clickable{ cursor:pointer; }
     .socialCard:hover{ border-color:rgba(38,110,120,.25);box-shadow:0 4px 18px rgba(38,110,120,.09);transform:translateY(-1px); }
     .scHead{ display:flex;gap:14px;align-items:flex-start; }
+    .scAvatar{ width:54px;height:54px;flex-shrink:0;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.15); }
+    .scAvatar.employer{ border-radius:14px; }
+    .scAvatar.candidate{ border-radius:50%; }
+    .scAvatarImage{ width:100%;height:100%;object-fit:cover;display:block; }
+    .scAvatarFallback{ width:100%;height:100%;font-size:19px;font-weight:700;color:#fff;display:flex;align-items:center;justify-content:center; }
+    .scAvatarFallback.employer{ background:linear-gradient(135deg,#0f4c5c,#2a7a8a); }
+    .scAvatarFallback.candidate{ background:linear-gradient(135deg,#2a7a8a,#38b2ac); }
     .scInfo{ flex:1;min-width:0; }
     .scNameRow{ display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:3px; }
     .scName{ font-size:15px;font-weight:700;color:#1a1a1a; }
     .scVerBadge{ font-size:11px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;padding:2px 8px;border-radius:20px;font-weight:600;white-space:nowrap; }
     .scVerBadge.pending{ background:#fffbeb;color:#d97706;border-color:#fde68a; }
     .scChipRow{ display:flex;flex-wrap:wrap;gap:4px;align-items:center; }
+    .scChipRow.compact{ margin-top:4px; }
+    .scChipRow.regular{ margin-top:6px; }
+    .scChipRow.spacious{ margin-top:8px; }
+    .scChipLabel{ font-size:11px;color:#999;margin-right:4px; }
     .scVerItem{ font-size:11px;background:#f0fdf4;color:#16a34a;border:1px solid #bbf7d0;padding:2px 7px;border-radius:20px; }
     .scProject.hiring{ background:#eff6ff;color:#3b82f6;border-color:#bfdbfe; }
     .scSub{ font-size:12px;color:#888;margin-bottom:3px; }
+    .scSub.compact{ margin-top:4px; }
+    .scSubLink{ color:#2a7a8a;text-decoration:none; }
+    .scSubLink:hover{ text-decoration:underline; }
     .scRoleRow{ margin-top:4px; }
     .scRoleTag{ font-size:11px;padding:2px 9px;border-radius:20px;font-weight:600; }
     .scRoleTag.candidate{ background:#eff6ff;color:#3b82f6;border:1px solid #bfdbfe; }
     .scRoleTag.employer{ background:#f0fdfa;color:#2a7a8a;border:1px solid #d1fae5; }
     .scBody{ margin-top:10px;padding-top:10px;border-top:1px solid #f5f5f5; }
     .scAbout{ font-size:13px;color:#555;line-height:1.4; }
+    .scJobLine.muted{ color:#bbb;font-size:12px; }
     .scFooter{ margin-top:10px; }
     .scProjects{ display:flex;flex-wrap:wrap;gap:4px; }
     .scProject{ font-size:11px;background:#f0fdfa;color:#2a7a8a;border:1px solid #d1fae5;padding:3px 10px;border-radius:20px; }
     .feedTag.ok{ background:#f0fdf4;color:#16a34a;border-color:#bbf7d0; }
     .feedTag.warn{ background:#fffbeb;color:#d97706;border-color:#fde68a; }
     .feedTag.teal{ background:#f0fdfa;color:#2a7a8a;border-color:#d1fae5; }
+    .feedTag.placeholder{ background:#f5f5f5;color:#999;border-color:#e5e7eb; }
     .feedEmpty{ text-align:center;padding:48px 20px;color:#aaa;font-size:14px; }
+    .achRow.alignTop{ align-items:flex-start; }
+    .achMain{ flex:1; }
+    .actionsRow.spaced{ margin-top:10px; }
     /* ── Admin tabs ── */
     .adminTabBtn{ padding:7px 14px;border-radius:20px;border:1px solid #e5e7eb;background:#f9fafb;cursor:pointer;font-size:13px;font-weight:500;transition:.15s;white-space:nowrap; }
     .adminTabBtn.active{ background:#e0f2fe;color:#0369a1;border-color:#bae6fd; }
@@ -271,22 +297,6 @@
     .progressHint.done{ color:#2a7a8a; }
     .progressHint::before{ content:'○'; font-size:10px; color:inherit; }
     .progressHint.done::before{ content:'●'; }
-    .rejectReason{ margin-top:6px; padding:8px 12px; border-radius:10px; background:rgba(239,68,68,.06); border:1px solid rgba(239,68,68,.15); font-size:12px; color:#991b1b; line-height:1.4; }
-    .rejectReasonLabel{ font-size:11px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:#991b1b; margin-bottom:3px; }
-    .privacyToggle{ display:flex; align-items:center; gap:10px; padding:10px 14px; border-radius:12px; background:rgba(235,248,250,.50); border:1px solid rgba(38,110,120,.12); margin-top:8px; cursor:pointer; }
-    .privacyToggle label{ font-size:13px; font-weight:700; color:#1a5c68; cursor:pointer; flex:1; }
-    .privacyToggle input{ accent-color:#2a7a8a; width:16px; height:16px; cursor:pointer; }
-    .levelBadge{ display:inline-block; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:700; }
-    .levelBadge.l1{ background:rgba(245,158,11,.12); color:#92400e; }
-    .levelBadge.l2{ background:rgba(38,110,120,.12); color:#1a5c68; }
-    .levelBadge.l3{ background:rgba(34,197,94,.12); color:#0d7040; }
-    .legalModal{ max-height:70vh; overflow:auto; }
-    .legalModal h3{ font-size:15px; font-weight:700; margin:14px 0 8px; color:#1a1a1a; }
-    .legalModal p{ font-size:13px; line-height:1.55; color:#444; margin-bottom:10px; }
-    .onboardingBanner{ background:rgba(235,248,250,.70); border:1px solid rgba(38,110,120,.15); border-radius:14px; padding:12px 16px; margin-bottom:14px; display:flex; gap:12px; align-items:flex-start; }
-    .onboardingIcon{ font-size:20px; flex-shrink:0; margin-top:2px; }
-    .onboardingText{ font-size:13px; color:#1a5c68; line-height:1.4; font-weight:700; }
-    .onboardingDismiss{ font-size:11px; color:#2a7a8a; cursor:pointer; text-decoration:underline; margin-top:4px; display:block; }
     /* Admin panel */
     .adminCard{ border:1px solid rgba(38,110,120,.12); border-radius:16px; padding:14px 16px; background:rgba(235,248,250,.40); margin-bottom:10px; }
     .adminCardHead{ display:flex; align-items:center; gap:12px; margin-bottom:10px; }

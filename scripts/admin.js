@@ -632,14 +632,14 @@ function loadIncomingRequests() {
           ? '<span class="chip bad">отклонено</span>'
           : '<span class="chip warn">ожидает решения</span>';
       var actions = req.status === 'pending'
-        ? '<div class="actionsRow" style="margin-top:10px;">' +
+        ? '<div class="actionsRow spaced">' +
             '<button type="button" class="pillBtn" data-approve-request="' + req.id + '">Разрешить доступ</button>' +
             '<button type="button" class="pillBtn" data-reject-request="' + req.id + '">Отклонить</button>' +
           '</div>'
         : '';
 
-      return '<div class="achRow" style="align-items:flex-start;">' +
-        '<div style="flex:1;">' +
+      return '<div class="achRow alignTop">' +
+        '<div class="achMain">' +
           '<div class="achTitle">' + docLabel + '</div>' +
           '<div class="achMeta">' + who + ' запрашивает доступ к файлу</div>' +
           actions +
@@ -714,14 +714,14 @@ function renderEmployerAccessPanel(candidateId, requests, files) {
     : '<div class="miniHint">Пока нет файлов с одобренным доступом</div>';
   var canChat = (files && files.length) || (requests || []).some(function (req) { return req.status === 'approved'; });
   var chatActionHtml = canChat
-    ? '<div style="display:flex;justify-content:flex-end;margin-bottom:10px;"><button type="button" class="pillBtn" data-open-chat-user="' + escapeHtml(candidateId) + '">Написать кандидату</button></div>'
+    ? '<div class="pubAccessChatRow"><button type="button" class="pillBtn" data-open-chat-user="' + escapeHtml(candidateId) + '">Написать кандидату</button></div>'
     : '';
 
   box.innerHTML =
     '<div class="pubProfileSection">' +
       '<div class="pubProfileSTitle">Доступ к документам</div>' +
       chatActionHtml +
-      '<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;">' + buttons + '</div>' +
+      '<div class="pubAccessButtons">' + buttons + '</div>' +
       filesHtml +
     '</div>';
 }
@@ -917,7 +917,7 @@ function buildFeedTags(user) {
     else if (status === 'pending') tags.push('<span class="feedTag pending">' + labels[key] + '</span>');
   });
 
-  if (!tags.length) tags.push('<span class="feedTag" style="background:#f5f5f5;color:#999;border-color:#e5e7eb;">Заполняется</span>');
+  if (!tags.length) tags.push('<span class="feedTag placeholder">Заполняется</span>');
   return tags.join('');
 }
 
@@ -1108,8 +1108,7 @@ function buildSocialCard(user) {
   var name = escHtml(user.full_name || (isEmployer ? user.company : '') || user.email || '?');
   var rawName = name.replace(/&[^;]+;/g, '');
   var initials = rawName.split(' ').map(function (segment) { return segment[0] || ''; }).join('').slice(0, 2).toUpperCase() || '?';
-  var avatarBg = isEmployer ? 'background:linear-gradient(135deg,#0f4c5c,#2a7a8a)' : 'background:linear-gradient(135deg,#2a7a8a,#38b2ac)';
-  var avatarRadius = isEmployer ? '14px' : '50%';
+  var avatarRoleClass = isEmployer ? ' employer' : ' candidate';
 
   var verificationStatuses = [user.edu_status, user.work_status, user.course_status, user.pass_status, user.cv_status];
   var verifiedCount = verificationStatuses.filter(function (status) { return status === 'verified'; }).length;
@@ -1131,7 +1130,7 @@ function buildSocialCard(user) {
   if (!isEmployer && user.current_job && user.current_job !== 'Не работаю') {
     jobLine = '<div class="scJobLine">' + escHtml(user.current_job + (user.job_title ? ' · ' + user.job_title : '')) + '</div>';
   } else if (!isEmployer && user.current_job === 'Не работаю') {
-    jobLine = '<div class="scJobLine" style="color:#bbb;font-size:12px">В поиске работы</div>';
+    jobLine = '<div class="scJobLine muted">В поиске работы</div>';
   }
 
   var workExpLine = '';
@@ -1152,12 +1151,12 @@ function buildSocialCard(user) {
   if (isEmployer) {
     var safeWebsite = safeHttpUrl(user.website);
     if (safeWebsite) {
-      extraLines += '<div class="scSub" style="margin-top:4px;"><a href="' + escHtml(safeWebsite) + '" target="_blank" rel="noopener noreferrer" style="color:#2a7a8a;text-decoration:none;">' + escHtml(user.website) + '</a></div>';
+      extraLines += '<div class="scSub compact"><a href="' + escHtml(safeWebsite) + '" target="_blank" rel="noopener noreferrer" class="scSubLink">' + escHtml(user.website) + '</a></div>';
     }
     if (user.needed) {
       var needed = user.needed.split(',').map(function (item) { return item.trim(); }).filter(Boolean).slice(0, 4);
       if (needed.length) {
-        extraLines += '<div class="scChipRow" style="margin-top:8px;"><span style="font-size:11px;color:#999;margin-right:4px;">Ищем:</span>' +
+        extraLines += '<div class="scChipRow spacious"><span class="scChipLabel">Ищем:</span>' +
           needed.map(function (item) { return '<span class="scProject hiring">' + escHtml(item) + '</span>'; }).join('') +
         '</div>';
       }
@@ -1178,14 +1177,14 @@ function buildSocialCard(user) {
       if (user[key] === 'verified') verifiedItems.push(verifiedLabels[key]);
     });
     if (verifiedItems.length) {
-      detailLines += '<div class="scChipRow" style="margin-top:6px;">' +
+      detailLines += '<div class="scChipRow regular">' +
         verifiedItems.map(function (value) { return '<span class="scVerItem">✓ ' + value + '</span>'; }).join('') +
       '</div>';
     }
     if (user.vacancies) {
       var vacancies = user.vacancies.split(',').map(function (item) { return item.trim(); }).filter(Boolean).slice(0, 3);
       if (vacancies.length) {
-        detailLines += '<div class="scChipRow" style="margin-top:4px;"><span style="font-size:11px;color:#999;margin-right:4px;">Ищу:</span>' +
+        detailLines += '<div class="scChipRow compact"><span class="scChipLabel">Ищу:</span>' +
           vacancies.map(function (value) { return '<span class="scProject">' + escHtml(value) + '</span>'; }).join('') +
         '</div>';
       }
@@ -1196,7 +1195,7 @@ function buildSocialCard(user) {
   if (isEmployer && user.active_projects) {
     var projects = user.active_projects.split(';').map(function (item) { return item.trim(); }).filter(Boolean).slice(0, 3);
     if (projects.length) {
-      projectsLine = '<div class="scChipRow" style="margin-top:4px;"><span style="font-size:11px;color:#999;margin-right:4px;">Проекты:</span>' +
+      projectsLine = '<div class="scChipRow compact"><span class="scChipLabel">Проекты:</span>' +
         projects.map(function (value) { return '<span class="scProject">' + escHtml(value) + '</span>'; }).join('') +
       '</div>';
     }
@@ -1206,11 +1205,11 @@ function buildSocialCard(user) {
   var avatarHtml;
   var avatarSrc = safeImageUrl(user.avatar_url);
   if (avatarSrc) {
-    avatarHtml = '<div style="width:54px;height:54px;flex-shrink:0;border-radius:' + avatarRadius + ';overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.15);">' +
-      '<img src="' + escHtml(avatarSrc) + '" style="width:100%;height:100%;object-fit:cover;" onerror="this.style.display=\'none\'">' +
+    avatarHtml = '<div class="scAvatar' + avatarRoleClass + '">' +
+      '<img src="' + escHtml(avatarSrc) + '" class="scAvatarImage" onerror="this.style.display=\'none\'">' +
     '</div>';
   } else {
-    avatarHtml = '<div style="width:54px;height:54px;font-size:19px;font-weight:700;flex-shrink:0;border-radius:' + avatarRadius + ';' + avatarBg + ';color:#fff;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.15);">' + initials + '</div>';
+    avatarHtml = '<div class="scAvatar' + avatarRoleClass + '"><div class="scAvatarFallback' + avatarRoleClass + '">' + initials + '</div></div>';
   }
 
   var uid = String(user.id || user.email || '?');
@@ -1223,7 +1222,7 @@ function buildSocialCard(user) {
     bookmarkBtn = '<button class="scBookmarkBtn' + (isBookmarked ? ' active' : '') + '" type="button" data-bookmark-uid="' + escHtml(uid) + '" aria-pressed="' + (isBookmarked ? 'true' : 'false') + '" title="' + (isBookmarked ? 'Убрать из избранного' : 'Добавить в избранное') + '" aria-label="' + (isBookmarked ? 'Убрать из избранного' : 'Добавить в избранное') + '">★</button>';
   }
 
-  return '<div class="socialCard" data-uid="' + uid + '" style="cursor:pointer;">' +
+  return '<div class="socialCard clickable" data-uid="' + uid + '">' +
     bookmarkBtn +
     '<div class="scHead">' +
       avatarHtml +
