@@ -177,13 +177,6 @@ function escapeHtml(value) {
   });
 }
 
-function linkifyMessage(text) {
-  var escaped = escapeHtml(text);
-  return escaped.replace(/(https?:\/\/[^\s<>"]+)/g, function (url) {
-    return '<a href="' + url + '" target="_blank" rel="noopener noreferrer" class="chatLink">' + url + '</a>';
-  });
-}
-
 function setText(id, value) {
   const el = document.getElementById(id);
   if (el) el.textContent = value;
