@@ -1,5 +1,5 @@
 (function initChatUi() {
-  var FALLBACK_POLL_INTERVAL_MS = 12000;
+  var FALLBACK_POLL_INTERVAL_MS = Math.max(4000, Number(window.LOMO_CONFIG && window.LOMO_CONFIG.CHAT_FALLBACK_POLL_INTERVAL_MS || 6000) || 6000);
   var SOCKET_RECONNECT_BASE_MS = 1500;
   var SOCKET_RECONNECT_MAX_MS = 10000;
   var NEW_MESSAGE_THRESHOLD_PX = 96;
@@ -752,7 +752,7 @@
     updateAutoBadge('Авто', 'fallback');
     var pollCycle = 0;
     chatState.pollingTimer = window.setInterval(function () {
-      if (!shouldEnableChat() || document.hidden) return;
+      if (!shouldEnableChat()) return;
       pollCycle++;
       if (!chatState.pollingInFlight) {
         chatState.pollingInFlight = true;
@@ -760,9 +760,9 @@
           chatState.pollingInFlight = false;
         });
       }
-      // Refresh connection inbox every 3rd cycle (~36s) so pending contact requests
-      // appear automatically even without a WebSocket connection.
-      if (pollCycle % 3 === 0 && !chatState.connectionsInFlight) {
+      // Refresh contact requests every 2nd cycle so badges stay fresh even when
+      // the browser falls back from WebSocket to polling.
+      if (pollCycle % 2 === 0 && !chatState.connectionsInFlight) {
         chatState.connectionsInFlight = true;
         loadConnectionInbox({ silent: !isChatActive() }).catch(function () {}).finally(function () {
           chatState.connectionsInFlight = false;
@@ -899,6 +899,8 @@
         if (chatState.socket !== socket) return;
         chatState.socketMode = 'fallback';
         updateAutoBadge('Авто', 'fallback');
+        startFallbackPolling();
+        scheduleSocketReconnect();
       });
     } catch (error) {
       chatState.socketMode = 'fallback';

@@ -53,6 +53,27 @@ test('service worker precaches landing and feed styles', async ({ page }) => {
   })).toEqual({ hasLanding: true, hasFeed: true });
 });
 
+test('manifest exposes png install icons for Android shells', async ({ page }) => {
+  await page.goto('/');
+  await expect.poll(async () => page.evaluate(async () => {
+    var response = await fetch('/manifest.webmanifest');
+    var data = await response.json();
+    var icons = Array.isArray(data && data.icons) ? data.icons : [];
+    return icons.map(function (icon) {
+      return {
+        src: icon.src,
+        type: icon.type,
+        purpose: icon.purpose || '',
+      };
+    });
+  })).toEqual([
+    { src: '/icons/icon-192.png', type: 'image/png', purpose: 'any' },
+    { src: '/icons/icon-512.png', type: 'image/png', purpose: 'any' },
+    { src: '/icons/icon-maskable-192.png', type: 'image/png', purpose: 'maskable' },
+    { src: '/icons/icon-maskable-512.png', type: 'image/png', purpose: 'maskable' },
+  ]);
+});
+
 test('valid stored session bypasses landing and opens candidate feed', async ({ page }) => {
   await page.route('**/api/**', async (route) => {
     const request = route.request();
@@ -217,6 +238,133 @@ test('candidate feed refreshes silently without page reload', async ({ page }) =
 
   await expect.poll(() => feedCallCount).toBe(2);
   await expect(page.locator('#candidateFeedList')).toContainText('Павел Иванов', { timeout: 3000 });
+});
+
+test('chat badge updates on feed even when websocket falls back to polling', async ({ page }) => {
+  let conversationCalls = 0;
+
+  await page.addInitScript(function () {
+    window.LOMO_CONFIG = Object.assign({}, window.LOMO_CONFIG || {}, { CHAT_FALLBACK_POLL_INTERVAL_MS: 120 });
+
+    function FakeSocket() {
+      this.readyState = FakeSocket.CONNECTING;
+      this._listeners = {};
+      var self = this;
+      window.setTimeout(function () {
+        self.dispatchEvent({ type: 'error' });
+      }, 10);
+    }
+
+    FakeSocket.CONNECTING = 0;
+    FakeSocket.OPEN = 1;
+    FakeSocket.CLOSING = 2;
+    FakeSocket.CLOSED = 3;
+
+    FakeSocket.prototype.addEventListener = function (type, handler) {
+      this._listeners[type] = this._listeners[type] || [];
+      this._listeners[type].push(handler);
+    };
+
+    FakeSocket.prototype.dispatchEvent = function (event) {
+      var handlers = this._listeners[event.type] || [];
+      handlers.forEach(function (handler) { handler(event); });
+    };
+
+    FakeSocket.prototype.close = function () {
+      this.readyState = FakeSocket.CLOSED;
+      this.dispatchEvent({ type: 'close' });
+    };
+
+    window.WebSocket = FakeSocket;
+  });
+
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'cand-1', email: 'candidate@example.com', login: 'candidate', role: 'candidate' },
+          profile: { full_name: 'Иван Кандидат', location: 'Москва', edu_place: 'МГУ', vacancies: 'Designer' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([
+          { id: 'cand-2', role: 'candidate', full_name: 'Анна Петрова', location: 'Москва', edu_place: 'МФТИ', vacancies: 'Designer', about: 'Опытный кандидат' },
+        ], 1, 12, 1)),
+      });
+    }
+
+    if (url.pathname.endsWith('/chat/ws-ticket')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ticket: 'test-ticket', expires_in: 300, ws_path: '/ws/chat' }),
+      });
+    }
+
+    if (url.pathname.endsWith('/chat/conversations')) {
+      conversationCalls += 1;
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([
+          {
+            id: 'chat-1',
+            kind: 'direct',
+            participant_user_id: 'emp-44',
+            participant_role: 'employer',
+            public_id: 'LOMO-EMP00044',
+            full_name: 'Алина HR',
+            company: 'LOMO Labs',
+            location: 'Москва',
+            industry: 'Tech',
+            last_message_body: conversationCalls > 1 ? 'Новое сообщение' : 'Привет!',
+            last_message_created_at: '2026-04-16T12:00:00.000Z',
+            unread_count: conversationCalls > 1 ? 1 : 0,
+          },
+        ], 1, 20, 1)),
+      });
+    }
+
+    if (url.pathname.endsWith('/connections')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ accepted: [], incoming: [], outgoing: [], counts: { accepted: 0, incoming: 0, outgoing: 0 } }),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.evaluate(() => { document.cookie = 'lomo_csrf=test-suite; path=/'; });
+  await page.fill('#loginEmail', 'candidate@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await expect(page.locator('#screenCandidateFeed')).toHaveClass(/active/);
+  await page.evaluate(() => {
+    if (window.LOMO_CHAT_UI && typeof window.LOMO_CHAT_UI.handleScreenChange === 'function') {
+      window.LOMO_CHAT_UI.handleScreenChange('candidateFeed');
+    }
+  });
+  await expect.poll(() => conversationCalls).toBeGreaterThan(1);
+  await expect(page.locator('#screenCandidateFeed [data-next="toChatHub"] .chatNavUnreadBadge')).toHaveText('1');
 });
 
 test('mobile candidate feed supports pull to refresh', async ({ page }) => {
