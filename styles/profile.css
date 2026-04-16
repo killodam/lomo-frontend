@@ -435,6 +435,17 @@
     .statusTag.bad{  background: rgba(239,68,68,.14);  border-color: rgba(239,68,68,.30);  color: rgba(120,0,0,.95); }
     .statusTag.ghost{ background: rgba(0,0,0,.06); border-color: rgba(0,0,0,.10); color: rgba(0,0,0,.65); }
 
+    /* ── Corp email verify row ───────────────────── */
+    .corpVerifyRow{
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 6px 0 2px;
+    }
+    .corpVerifyRow .statusTag{ flex: 0 0 auto; }
+    .corpVerifyRow .pillBtn{ flex: 0 0 auto; }
+
     /* ── Responsive ──────────────────────────────── */
     @media (max-width: 980px){
       .grid3{ grid-template-columns: 1fr 1fr; }

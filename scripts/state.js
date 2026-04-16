@@ -9,6 +9,7 @@ const state = {
   login: '',
   userId: '',
   publicId: '',
+  emailVerified: false,
   connections: {
     accepted: [],
     incoming: [],
@@ -33,6 +34,7 @@ const state = {
     about: '',
     email: '',
     corpEmail: '',
+    corpEmailVerified: false,
     phone: '',
     website: '',
     telegram: '',
@@ -230,6 +232,7 @@ function resetState() {
   state.login = '';
   state.roleReg = null;
   state.publicId = '';
+  state.emailVerified = false;
   state.connections = {
     accepted: [],
     incoming: [],
@@ -254,6 +257,7 @@ function resetState() {
     about: '',
     email: '',
     corpEmail: '',
+    corpEmailVerified: false,
     phone: '',
     website: '',
     telegram: '',

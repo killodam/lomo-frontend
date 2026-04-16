@@ -38,9 +38,74 @@ function deleteOwnAccount(password) {
 
     // ── FORGOT PASSWORD FLOW ──────────────────────────────────
     (function initForgotFlow(){
-      // State for the flow
-      const flowState = { email: '' };
+      // State for the flow: modes are 'forgot' | 'email-verify' | 'corp-email'
+      const flowState = { email: '', code: '', mode: 'forgot', corpEmail: '' };
       const doneTextEl = document.getElementById('doneText');
+
+      function clearCodeCells() {
+        for(let i = 0; i < 6; i++){ const cc = document.getElementById('cc' + i); if(cc) cc.value = ''; }
+        document.querySelectorAll('.codeCell').forEach(c => c.classList.remove('filled', 'active', 'error'));
+      }
+
+      function enterVerifyScreen(opts) {
+        const mode = opts.mode || 'forgot';
+        flowState.mode = mode;
+        if (opts.email !== undefined) flowState.email = opts.email;
+        if (opts.corpEmail !== undefined) flowState.corpEmail = opts.corpEmail;
+
+        const titleEl = document.getElementById('verifyCodeTitle');
+        const subEl = document.getElementById('verifyCodeSub');
+        const backBtn = document.getElementById('verifyBackBtn');
+        const skipBtn = document.getElementById('verifySkipBtn');
+
+        if (titleEl) titleEl.textContent = opts.title || 'Введите код';
+        if (subEl) subEl.textContent = opts.sub || 'Мы отправили 6-значный код. Код действителен 15 минут.';
+
+        if (backBtn) {
+          if (mode === 'email-verify') backBtn.dataset.back = 'toDashboard';
+          else if (mode === 'corp-email') backBtn.dataset.back = 'toEmployerProfileEdit';
+          else backBtn.dataset.back = 'toForgot';
+        }
+        if (skipBtn) skipBtn.classList.toggle('hidden', mode !== 'email-verify');
+
+        clearCodeCells();
+        document.getElementById('verifyCodeError')?.classList.add('hidden');
+        show('verifyCode');
+        setTimeout(() => { document.getElementById('cc0')?.focus(); }, 80);
+      }
+
+      // Expose for use after registration and from employer profile
+      window.lomoStartEmailVerify = function(email) {
+        apiSendVerifyEmail().then(function() {
+          enterVerifyScreen({
+            mode: 'email-verify',
+            email: email,
+            title: 'Подтвердите email',
+            sub: 'Мы отправили 6-значный код на ' + email + '. Код действителен 15 минут.',
+          });
+        }).catch(function() {
+          // Verification unavailable — go to dashboard anyway
+          if(state.roleReg === 'EMPLOYER') showEmployerDashboard();
+          else showEmployeeDashboard();
+        });
+      };
+
+      window.lomoStartCorpEmailVerify = function(corpEmail) {
+        const btn = document.getElementById('btnSendCorpVerify');
+        if(btn){ btn.disabled = true; btn.textContent = 'Отправляем…'; }
+        apiSendCorpEmailVerify().then(function() {
+          enterVerifyScreen({
+            mode: 'corp-email',
+            corpEmail: corpEmail,
+            title: 'Корп. почта',
+            sub: 'Мы отправили 6-значный код на ' + corpEmail + '. Код действителен 15 минут.',
+          });
+        }).catch(function(err) {
+          showToast('Ошибка: ' + safeErrorText(err), 'error');
+        }).finally(function() {
+          if(btn){ btn.disabled = false; btn.textContent = 'Подтвердить почту'; }
+        });
+      };
       function getForgotFlowErrorText(err){
         const msg = safeErrorText(err);
         if(msg === 'Not found' || /API error 404|404/.test(msg)){
@@ -99,16 +164,12 @@ function deleteOwnAccount(password) {
         forgotSubmitBtn.textContent = 'Отправляем…';
         try {
           await apiForgotPassword(emailVal);
-          flowState.email = emailVal;
-          // Update subtitle in verify screen
-          const sub = document.getElementById('verifyCodeSub');
-          if(sub) sub.textContent = `Мы отправили 6-значный код на ${emailVal}. Код действителен 15 минут.`;
-          // Clear code cells
-          for(let i=0;i<6;i++){ const cc=document.getElementById('cc'+i); if(cc) cc.value=''; }
-          document.querySelectorAll('.codeCell').forEach(c=>c.classList.remove('filled','active','error'));
-          document.getElementById('verifyCodeError')?.classList.add('hidden');
-          show('verifyCode');
-          setTimeout(()=>{ document.getElementById('cc0')?.focus(); }, 80);
+          enterVerifyScreen({
+            mode: 'forgot',
+            email: emailVal,
+            title: 'Введите код',
+            sub: `Мы отправили 6-значный код на ${emailVal}. Код действителен 15 минут.`,
+          });
         } catch(err) {
           emailErr.textContent = getForgotFlowErrorText(err);
           emailErr?.classList.remove('hidden');
@@ -121,21 +182,24 @@ function deleteOwnAccount(password) {
 
       // Allow resend
       document.getElementById('resendCodeBtn')?.addEventListener('click', async () => {
-        if(!flowState.email) { show('forgot'); return; }
         const btn = document.getElementById('resendCodeBtn');
         btn.disabled = true;
         btn.textContent = 'Отправляем…';
         try {
-          await apiForgotPassword(flowState.email);
-          // Clear cells & error
-          for(let i=0;i<6;i++){ const cc=document.getElementById('cc'+i); if(cc) cc.value=''; }
-          document.querySelectorAll('.codeCell').forEach(c=>c.classList.remove('filled','active','error'));
+          if(flowState.mode === 'email-verify') {
+            await apiSendVerifyEmail();
+          } else if(flowState.mode === 'corp-email') {
+            await apiSendCorpEmailVerify();
+          } else {
+            if(!flowState.email) { show('forgot'); return; }
+            await apiForgotPassword(flowState.email);
+          }
+          clearCodeCells();
           document.getElementById('verifyCodeError')?.classList.add('hidden');
-          setTimeout(()=>{ document.getElementById('cc0')?.focus(); }, 50);
+          setTimeout(() => { document.getElementById('cc0')?.focus(); }, 50);
         } catch(e) {
-          showToast(getForgotFlowErrorText(e), 'error');
-        }
-        finally {
+          showToast(flowState.mode === 'forgot' ? getForgotFlowErrorText(e) : ('Ошибка: ' + safeErrorText(e)), 'error');
+        } finally {
           btn.disabled = false;
           btn.textContent = 'Отправить повторно';
         }
@@ -200,14 +264,54 @@ function deleteOwnAccount(password) {
         if(code.length < 6){
           document.querySelectorAll('.codeCell').forEach(c=>c.classList.add('error'));
           errEl?.classList.remove('hidden');
-          errEl.textContent = 'Введите все 6 цифр кода.';
+          if(errEl) errEl.textContent = 'Введите все 6 цифр кода.';
           return;
         }
-        // Store validated code, go to reset screen
-        flowState.code = code;
         errEl?.classList.add('hidden');
         document.querySelectorAll('.codeCell').forEach(c=>c.classList.remove('error'));
-        // Pre-clear reset fields
+
+        // ── email-verify mode ──
+        if(flowState.mode === 'email-verify') {
+          const btn = document.getElementById('verifySubmitBtn');
+          btn.disabled = true; btn.textContent = 'Проверяем…';
+          try {
+            await apiConfirmEmail(code);
+            state.emailVerified = true;
+            if(state.roleReg === 'EMPLOYER') showEmployerDashboard();
+            else showEmployeeDashboard();
+          } catch(err) {
+            const msg = safeErrorText(err);
+            if(errEl){ errEl.textContent = /Too many/i.test(msg) ? 'Слишком много попыток. Запросите новый код.' : /expired/i.test(msg) ? 'Срок действия кода истёк. Запросите новый.' : 'Неверный или устаревший код.'; errEl.classList.remove('hidden'); }
+            document.querySelectorAll('.codeCell').forEach(c=>c.classList.add('error'));
+          } finally {
+            btn.disabled = false; btn.textContent = 'Подтвердить';
+          }
+          return;
+        }
+
+        // ── corp-email mode ──
+        if(flowState.mode === 'corp-email') {
+          const btn = document.getElementById('verifySubmitBtn');
+          btn.disabled = true; btn.textContent = 'Проверяем…';
+          try {
+            await apiConfirmCorpEmail(code);
+            state.employer.corpEmailVerified = true;
+            showToast('Корпоративная почта подтверждена ✓', 'success');
+            hydrateEmployerForm();
+            renderRecruiterPublic();
+            show('myEmployerProfile');
+          } catch(err) {
+            const msg = safeErrorText(err);
+            if(errEl){ errEl.textContent = /Too many/i.test(msg) ? 'Слишком много попыток. Запросите новый код.' : /expired/i.test(msg) ? 'Срок действия кода истёк. Запросите новый.' : 'Неверный или устаревший код.'; errEl.classList.remove('hidden'); }
+            document.querySelectorAll('.codeCell').forEach(c=>c.classList.add('error'));
+          } finally {
+            btn.disabled = false; btn.textContent = 'Подтвердить';
+          }
+          return;
+        }
+
+        // ── forgot mode (default): store code, go to reset screen ──
+        flowState.code = code;
         const np = document.getElementById('newPassword');
         const cp = document.getElementById('confirmPassword');
         if(np) np.value='';
@@ -215,6 +319,12 @@ function deleteOwnAccount(password) {
         document.getElementById('strengthFill') && (document.getElementById('strengthFill').style.width='0');
         show('resetPassword');
         setTimeout(()=>{ document.getElementById('newPassword')?.focus(); }, 80);
+      });
+
+      // ── Skip email verification ──────────────────────────────
+      document.getElementById('verifySkipBtn')?.addEventListener('click', () => {
+        if(state.roleReg === 'EMPLOYER') showEmployerDashboard();
+        else showEmployeeDashboard();
       });
 
       // ── STEP 3: Password strength indicator ─────────────────
@@ -412,6 +522,12 @@ function deleteOwnAccount(password) {
         return;
       }
 
+      if(e.target && e.target.id === 'btnSendCorpVerify'){
+        const corpEmail = (document.getElementById('mpECorpEmail')?.value || '').trim();
+        if(!corpEmail){ showToast('Введите корпоративную почту и сохраните профиль', 'info'); return; }
+        if(typeof window.lomoStartCorpEmailVerify === 'function') window.lomoStartCorpEmailVerify(corpEmail);
+        return;
+      }
       if(e.target && e.target.id === 'rpContactBtn'){ openEmployerContact(); return; }
       if(e.target && e.target.id === 'rpDownloadCV'){ downloadRecruiterCV(); return; }
       if(e.target && e.target.id === 'rpCVLink'){ downloadRecruiterCV(); return; }
@@ -521,10 +637,15 @@ function deleteOwnAccount(password) {
               saveToStorage();
               if(role === 'employer'){
                 state.employer.fullName = fullName || state.employer.fullName;
-                showEmployerDashboard();
               } else {
                 state.employee.fullName = fullName || state.employee.fullName;
-                showEmployeeDashboard();
+              }
+              // Trigger email verification after registration
+              if(typeof window.lomoStartEmailVerify === 'function'){
+                window.lomoStartEmailVerify(user.email);
+              } else {
+                if(role === 'employer') showEmployerDashboard();
+                else showEmployeeDashboard();
               }
             } catch(err) {
               showToast('Ошибка: ' + err.message);
@@ -609,7 +730,9 @@ function deleteOwnAccount(password) {
           p.activeProjects    = (document.getElementById('mpEProjects')?.value  || '').trim();
           p.neededSpecialists = (document.getElementById('mpENeeded')?.value    || '').trim();
           p.telegram     = (document.getElementById('mpETelegram')?.value    || '').trim();
-          p.corpEmail    = (document.getElementById('mpECorpEmail')?.value   || '').trim();
+          const newCorpEmail = (document.getElementById('mpECorpEmail')?.value || '').trim();
+          if(newCorpEmail !== p.corpEmail) p.corpEmailVerified = false;
+          p.corpEmail    = newCorpEmail;
           p.phone        = (document.getElementById('mpEPhone')?.value       || '').trim();
           const emailValE = (document.getElementById('mpEEmail')?.value || '').trim();
           if(emailValE) state.email = emailValE;
@@ -744,6 +867,12 @@ function deleteOwnAccount(password) {
         if(where === 'toLoginForm'){ show('loginForm'); return; }
         if(where === 'toForgot'){ show('forgot'); return; }
         if(where === 'toVerifyCode'){ show('verifyCode'); return; }
+        if(where === 'toEmployerProfileEdit'){ show('myEmployerProfile'); return; }
+        if(where === 'toDashboard'){
+          if(state.roleReg === 'EMPLOYER') showEmployerDashboard();
+          else showEmployeeDashboard();
+          return;
+        }
         if(where === 'toPrevFromDone'){ show(state.prevFromDone || 'landing'); return; }
         if(where === 'toRecruiterPublic'){ renderRecruiterPublic(); show('recruiterPublic'); return; }
         if(where === 'toEmployeePublic'){ renderEmployeePublic(); show('employeePublic'); return; }
@@ -764,7 +893,14 @@ function deleteOwnAccount(password) {
       if(screens.recruiterPublic?.classList.contains('active')){ showEmployerDashboard(); return; }
       if(screens.employeePublic?.classList.contains('active')){ showEmployeeDashboard(); return; }
       if(screens.resetPassword?.classList.contains('active')){ show('verifyCode'); return; }
-      if(screens.verifyCode?.classList.contains('active')){ show('forgot'); return; }
+      if(screens.verifyCode?.classList.contains('active')){
+        const backBtn = document.getElementById('verifyBackBtn');
+        const where = backBtn?.dataset?.back || 'toForgot';
+        if(where === 'toDashboard'){ if(state.roleReg === 'EMPLOYER') showEmployerDashboard(); else showEmployeeDashboard(); }
+        else if(where === 'toEmployerProfileEdit'){ show('myEmployerProfile'); }
+        else { show('forgot'); }
+        return;
+      }
       if(screens.forgot?.classList.contains('active')){ show('loginForm'); return; }
       if(screens.regForm?.classList.contains('active')){ show('roleReg'); return; }
       if(screens.roleReg?.classList.contains('active')){ showEntryScreen(); return; }

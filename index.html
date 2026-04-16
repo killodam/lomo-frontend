@@ -324,9 +324,9 @@
 <!-- 4D) VERIFY CODE -->
 <section aria-label="Verify code" class="screen" id="screenVerifyCode">
 <div class="wrap">
-<button aria-label="Back" class="backBtn" data-back="toForgot">← Назад</button>
+<button aria-label="Back" class="backBtn" id="verifyBackBtn" data-back="toForgot">← Назад</button>
 <div class="centerBlock centerBlockLoose">
-  <div class="authFlowTitle">Введите код</div>
+  <div class="authFlowTitle" id="verifyCodeTitle">Введите код</div>
   <div class="authFlowSub" id="verifyCodeSub">Мы отправили 6-значный код на вашу почту. Код действителен 15 минут.</div>
   <div class="codeInputRow" id="codeInputRow">
     <div class="codeCell" data-idx="0"><input id="cc0" maxlength="1" type="text" inputmode="numeric" pattern="[0-9]*"/></div>
@@ -341,6 +341,7 @@
 </div>
 <div class="footerArea">
   <button class="accentBtn nextBtn" id="verifySubmitBtn">Подтвердить</button>
+  <button class="sqBtn ghostBtn hidden" id="verifySkipBtn" type="button">Пропустить</button>
 </div>
 </div>
 </section>
@@ -397,7 +398,7 @@
       <div class="profileMeta"><span id="rpIndustry">Сфера</span></div>
       <div class="profileSub">HR: <span id="rpName">—</span> · <span id="rpTitle">—</span></div>
       <div class="profileSub" id="rpCorpEmail">—</div>
-      <div class="badgeRow"><span class="badge ok">✓ Подтверждённый представитель</span></div>
+      <div class="badgeRow hidden" id="rpCorpEmailBadgeRow"><span class="badge ok">✓ Корп. почта подтверждена</span></div>
     </div>
     <div class="profileSection">
       <div class="profileSectionHead">Основные данные</div>
@@ -480,6 +481,10 @@
         <div class="sqInput"><input id="mpETitle" type="text" placeholder="Должность (HR Manager / Recruiter)" autocomplete="off"></div>
         <div class="sqInput"><input id="mpEEmail" type="email" placeholder="Рабочая почта" autocomplete="off"></div>
         <div class="sqInput"><input id="mpECorpEmail" type="email" placeholder="Корпоративная почта компании" autocomplete="off"></div>
+        <div class="corpVerifyRow" id="corpVerifyRow">
+          <span class="statusTag" id="corpEmailVerifiedStatus">не подтверждена</span>
+          <button type="button" class="pillBtn soft" id="btnSendCorpVerify">Подтвердить почту</button>
+        </div>
         <div class="sqInput"><input id="mpEPhone" type="tel" placeholder="Телефон (+7 900 000-00-00)" autocomplete="off"></div>
         <div class="sqInput"><input id="mpETelegram" type="text" placeholder="Telegram (@username)" autocomplete="off"></div>
       </div>

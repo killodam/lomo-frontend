@@ -98,6 +98,10 @@ function renderRecruiterPublic() {
 
   applyChip('rpCompanyDocChip', p.proofs?.companyDoc?.status);
   setAvatar('rpAvatarImg', p.avatarDataUrl);
+
+  // Corp email verified badge
+  const badgeRow = document.getElementById('rpCorpEmailBadgeRow');
+  if (badgeRow) setHidden(badgeRow, !p.corpEmailVerified);
 }
 
 function renderEmployeePublic() {
@@ -342,6 +346,17 @@ function hydrateEmployerForm() {
   setText('mpEAvatarHint', p.avatarDataUrl ? 'Логотип выбран' : 'Логотип не выбран');
   setStatusTag('companyDocStatusE', p.proofs?.companyDoc?.status || 'не загружено');
   setText('companyDocHintE', p.proofs?.companyDoc?.fileName ? ('Прикреплено: ' + p.proofs.companyDoc.fileName) : 'Файл не выбран');
+
+  // Corp email verification status
+  const corpVerifyRow = document.getElementById('corpVerifyRow');
+  const corpStatusEl = document.getElementById('corpEmailVerifiedStatus');
+  const corpVerifyBtn = document.getElementById('btnSendCorpVerify');
+  if (corpVerifyRow) setHidden(corpVerifyRow, !p.corpEmail);
+  if (corpStatusEl) {
+    corpStatusEl.textContent = p.corpEmailVerified ? 'подтверждена ✓' : 'не подтверждена';
+    corpStatusEl.className = 'statusTag' + (p.corpEmailVerified ? ' ok' : '');
+  }
+  if (corpVerifyBtn) setHidden(corpVerifyBtn, !!p.corpEmailVerified);
 }
 
 function hydrateEmployeeForm() {

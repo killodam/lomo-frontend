@@ -210,6 +210,28 @@ async function apiAdminReject(docId, reason) {
   });
 }
 
+async function apiSendVerifyEmail() {
+  return apiFetch('/auth/send-verify-email', { method: 'POST' });
+}
+
+async function apiConfirmEmail(code) {
+  return apiFetch('/auth/confirm-email', {
+    method: 'POST',
+    body: JSON.stringify({ code }),
+  });
+}
+
+async function apiSendCorpEmailVerify() {
+  return apiFetch('/profile/send-corp-email-verify', { method: 'POST' });
+}
+
+async function apiConfirmCorpEmail(code) {
+  return apiFetch('/profile/confirm-corp-email', {
+    method: 'POST',
+    body: JSON.stringify({ code }),
+  });
+}
+
 async function apiForgotPassword(email) {
   return apiFetch('/auth/forgot-password', {
     method: 'POST',
@@ -324,6 +346,7 @@ function applyProfileToState(user, profile, achievements) {
   state.email = user.email || '';
   state.login = user.login || '';
   state.roleReg = user.role === 'employer' ? 'EMPLOYER' : user.role === 'admin' ? 'ADMIN' : 'EMPLOYEE';
+  state.emailVerified = user.emailVerified || false;
   if (profile && profile.public_id) state.publicId = profile.public_id;
   if (!profile) return;
 
@@ -341,6 +364,7 @@ function applyProfileToState(user, profile, achievements) {
       about: profile.about || '',
       email: profile.email || user.email,
       corpEmail: profile.corp_email || '',
+      corpEmailVerified: profile.corp_email_verified || false,
       phone: profile.phone || '',
       website: profile.website || '',
       telegram: profile.telegram || '',
