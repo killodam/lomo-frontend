@@ -346,7 +346,7 @@ function applyProfileToState(user, profile, achievements) {
   state.email = user.email || '';
   state.login = user.login || '';
   state.roleReg = user.role === 'employer' ? 'EMPLOYER' : user.role === 'admin' ? 'ADMIN' : 'EMPLOYEE';
-  state.emailVerified = user.emailVerified || false;
+  state.emailVerified = !!(user.emailVerified !== undefined ? user.emailVerified : user.email_verified);
   if (profile && profile.public_id) state.publicId = profile.public_id;
   if (!profile) return;
 

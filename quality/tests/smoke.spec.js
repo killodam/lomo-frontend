@@ -118,6 +118,60 @@ test('valid stored session bypasses landing and opens candidate feed', async ({ 
   await expect(page.locator('#candidateFeedList')).toContainText('Анна Петрова');
 });
 
+test('registration starts email verification flow before dashboard', async ({ page }) => {
+  let verifyEmailCalls = 0;
+
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/register')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'cand-new', email: 'new@example.com', login: 'new_candidate', role: 'candidate', emailVerified: false },
+          profile: { public_id: 'LOMO-NEW0001', full_name: 'Новый Пользователь', email: 'new@example.com' },
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/auth/send-verify-email')) {
+      verifyEmailCalls += 1;
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'Verification code sent' }),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await page.goto('/');
+  await page.click('#landingRegBtn');
+  await page.click('#roleChoices [data-value="EMPLOYEE"]');
+  await page.click('#btnRoleNext');
+  await page.fill('#regFirstName', 'Новый');
+  await page.fill('#regLastName', 'Пользователь');
+  await page.fill('#regEmail', 'new@example.com');
+  await page.fill('#regPassword', 'secret123!');
+  await page.fill('#regPasswordConfirm', 'secret123!');
+  await page.check('#consentTerms');
+  await page.check('#consentPd');
+  await page.check('#consentRole');
+  await page.click('#btnRegNext');
+
+  await expect(page.locator('#screenVerifyCode')).toHaveClass(/active/);
+  await expect(page.locator('#verifyCodeTitle')).toContainText('Подтвердите email');
+  await expect(page.locator('#screenCandidateFeed')).not.toHaveClass(/active/);
+  await expect.poll(() => verifyEmailCalls).toBe(1);
+});
+
 test('candidate login opens feed and paginates server-side', async ({ page }) => {
   let requestedPage = '1';
 

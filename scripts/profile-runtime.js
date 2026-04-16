@@ -546,18 +546,107 @@ function wireAvatar(inputId, hintId, imgId, target) {
   input.addEventListener('change', function () {
     const file = input.files && input.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = function () {
-      const dataUrl = String(reader.result || '');
+    if (!/^image\//i.test(file.type || '')) {
+      showToast('Выберите файл изображения', 'error');
+      input.value = '';
+      return;
+    }
+
+    buildAvatarDataUrl(file, function (error, result) {
+      if (error) {
+        showToast(error.message || 'Не удалось обработать изображение', 'error');
+        input.value = '';
+        return;
+      }
+
+      const dataUrl = String(result.dataUrl || '');
+      if (!dataUrl) {
+        showToast('Не удалось обработать изображение', 'error');
+        input.value = '';
+        return;
+      }
+
       if (target === 'employer') state.employer.avatarDataUrl = dataUrl;
       if (target === 'employee') state.employee.avatarDataUrl = dataUrl;
       setAvatar(imgId, dataUrl);
       setText(hintId, 'Фото выбрано: ' + file.name);
       if (target === 'employer') renderRecruiterPublic();
       if (target === 'employee') renderEmployeePublic();
-    };
-    reader.readAsDataURL(file);
+      saveToStorage();
+      if (result.compressed) showToast('Аватар оптимизирован для сохранения', 'info');
+    });
   });
+}
+
+function buildAvatarDataUrl(file, done) {
+  const MAX_DATA_URL_LENGTH = 3 * 1024 * 1024 - 1024;
+  const reader = new FileReader();
+  reader.onerror = function () {
+    done(new Error('Не удалось прочитать изображение'));
+  };
+  reader.onload = function () {
+    const originalDataUrl = String(reader.result || '');
+    if (!originalDataUrl) {
+      done(new Error('Не удалось прочитать изображение'));
+      return;
+    }
+    if (originalDataUrl.length <= MAX_DATA_URL_LENGTH) {
+      done(null, { dataUrl: originalDataUrl, compressed: false });
+      return;
+    }
+
+    const image = new Image();
+    image.onerror = function () {
+      done(new Error('Изображение слишком большое. Попробуйте файл поменьше'));
+    };
+    image.onload = function () {
+      const maxSide = 768;
+      let width = image.naturalWidth || image.width || maxSide;
+      let height = image.naturalHeight || image.height || maxSide;
+      const scale = Math.min(1, maxSide / Math.max(width, height));
+      width = Math.max(1, Math.round(width * scale));
+      height = Math.max(1, Math.round(height * scale));
+
+      const canvas = document.createElement('canvas');
+      canvas.width = width;
+      canvas.height = height;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) {
+        done(new Error('Не удалось обработать изображение'));
+        return;
+      }
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, width, height);
+      ctx.drawImage(image, 0, 0, width, height);
+
+      const preferredType = /image\/(?:png|webp)/i.test(file.type || '') ? file.type : 'image/jpeg';
+      let compressedDataUrl = '';
+
+      try {
+        compressedDataUrl = canvas.toDataURL(preferredType);
+      } catch (error) {}
+
+      if (compressedDataUrl && compressedDataUrl.length <= MAX_DATA_URL_LENGTH) {
+        done(null, { dataUrl: compressedDataUrl, compressed: true });
+        return;
+      }
+
+      let quality = 0.86;
+      while (quality >= 0.46) {
+        compressedDataUrl = canvas.toDataURL('image/jpeg', quality);
+        if (compressedDataUrl.length <= MAX_DATA_URL_LENGTH) {
+          done(null, { dataUrl: compressedDataUrl, compressed: true });
+          return;
+        }
+        quality -= 0.08;
+      }
+
+      done(new Error('Изображение слишком большое. Попробуйте файл поменьше'));
+    };
+    image.src = originalDataUrl;
+  };
+  reader.readAsDataURL(file);
 }
 
 function pickInGroup(groupId, value) {

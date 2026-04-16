@@ -83,7 +83,8 @@ function deleteOwnAccount(password) {
             title: 'Подтвердите email',
             sub: 'Мы отправили 6-значный код на ' + email + '. Код действителен 15 минут.',
           });
-        }).catch(function() {
+        }).catch(function(err) {
+          showToast('Подтверждение почты временно недоступно: ' + safeErrorText(err), 'error');
           // Verification unavailable — go to dashboard anyway
           if(state.roleReg === 'EMPLOYER') showEmployerDashboard();
           else showEmployeeDashboard();
@@ -525,7 +526,22 @@ function deleteOwnAccount(password) {
       if(e.target && e.target.id === 'btnSendCorpVerify'){
         const corpEmail = (document.getElementById('mpECorpEmail')?.value || '').trim();
         if(!corpEmail){ showToast('Введите корпоративную почту и сохраните профиль', 'info'); return; }
-        if(typeof window.lomoStartCorpEmailVerify === 'function') window.lomoStartCorpEmailVerify(corpEmail);
+        (async function () {
+          const previousCorpEmail = state.employer.corpEmail || '';
+          if (getToken()) {
+            try {
+              await apiSaveProfile({ corp_email: corpEmail });
+              state.employer.corpEmail = corpEmail;
+              if (corpEmail !== previousCorpEmail) state.employer.corpEmailVerified = false;
+              saveToStorage();
+              hydrateEmployerForm();
+            } catch (err) {
+              showToast('Не удалось сохранить корпоративную почту: ' + safeErrorText(err), 'error');
+              return;
+            }
+          }
+          if(typeof window.lomoStartCorpEmailVerify === 'function') window.lomoStartCorpEmailVerify(corpEmail);
+        })();
         return;
       }
       if(e.target && e.target.id === 'rpContactBtn'){ openEmployerContact(); return; }

@@ -91,7 +91,13 @@ function saveToStorage() {
       activeProjects: state.employer.activeProjects,
       neededSpecialists: state.employer.neededSpecialists,
       about: state.employer.about,
+      email: state.employer.email,
+      corpEmail: state.employer.corpEmail,
+      corpEmailVerified: !!state.employer.corpEmailVerified,
+      phone: state.employer.phone,
       website: state.employer.website,
+      telegram: state.employer.telegram,
+      avatarDataUrl: state.employer.avatarDataUrl,
       proofs: {
         companyDoc: {
           fileName: state.employer.proofs.companyDoc?.fileName || '',
@@ -106,7 +112,10 @@ function saveToStorage() {
     const employeeSnapshot = {
       fullName: state.employee.fullName,
       city: state.employee.city,
+      phone: state.employee.phone,
       about: state.employee.about,
+      email: state.employee.email,
+      telegram: state.employee.telegram,
       eduPlace: state.employee.eduPlace,
       eduYear: state.employee.eduYear,
       vacancies: state.employee.vacancies,
@@ -114,6 +123,7 @@ function saveToStorage() {
       job_title: state.employee.job_title,
       work_exp: state.employee.work_exp,
       cvPublic: state.employee.cvPublic,
+      avatarDataUrl: state.employee.avatarDataUrl,
       proofs: {
         education: {
           fileName: state.employee.proofs.education.fileName,
@@ -158,6 +168,7 @@ function saveToStorage() {
       JSON.stringify({
         employer: employerSnapshot,
         employee: employeeSnapshot,
+        emailVerified: !!state.emailVerified,
         login: state.login,
         publicId: state.publicId,
       })
@@ -182,13 +193,16 @@ function clearUserStorage(userId) {
 
 function mergeLocalState(userId) {
   const saved = loadUserStorage(userId);
-  const employerFields = ['fullName', 'title', 'company', 'foundedYear', 'location', 'industry', 'products', 'activeProjects', 'neededSpecialists', 'about', 'website'];
-  const employeeFields = ['fullName', 'city', 'about', 'eduPlace', 'eduYear', 'vacancies', 'current_job', 'job_title'];
+  const employerFields = ['fullName', 'title', 'company', 'foundedYear', 'location', 'industry', 'products', 'activeProjects', 'neededSpecialists', 'about', 'email', 'corpEmail', 'phone', 'website', 'telegram', 'avatarDataUrl'];
+  const employeeFields = ['fullName', 'city', 'phone', 'about', 'email', 'telegram', 'eduPlace', 'eduYear', 'vacancies', 'current_job', 'job_title', 'avatarDataUrl'];
 
   if (saved.employer) {
     employerFields.forEach(function (key) {
       if (saved.employer[key] && !state.employer[key]) state.employer[key] = saved.employer[key];
     });
+    if (typeof saved.employer.corpEmailVerified === 'boolean' && !state.employer.corpEmailVerified) {
+      state.employer.corpEmailVerified = saved.employer.corpEmailVerified;
+    }
   }
 
   if (saved.employee) {
@@ -203,6 +217,9 @@ function mergeLocalState(userId) {
     }
   }
 
+  if (typeof saved.emailVerified === 'boolean' && !state.emailVerified) {
+    state.emailVerified = saved.emailVerified;
+  }
   if (saved.login && !state.login) state.login = saved.login;
   if (saved.publicId && !state.publicId) state.publicId = saved.publicId;
 
