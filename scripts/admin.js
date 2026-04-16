@@ -1560,6 +1560,58 @@ function refreshActiveFeed(options) {
   return Promise.resolve(false);
 }
 
+function clearFeedAutoRefreshTimer() {
+  if (!feedAutoRefreshState.timer) return;
+  window.clearTimeout(feedAutoRefreshState.timer);
+  feedAutoRefreshState.timer = null;
+}
+
+function hasRefreshableActiveFeed() {
+  if (isScreenActive('candidateFeed')) {
+    return !!getFeedRefreshTask('candidateFeed', { silent: true });
+  }
+  if (isScreenActive('employerSearch')) {
+    return !!getFeedRefreshTask('employerSearch', { silent: true });
+  }
+  return false;
+}
+
+function canRunFeedAutoRefresh() {
+  return !!state.userId && !document.hidden && hasRefreshableActiveFeed();
+}
+
+function scheduleFeedAutoRefresh(delayMs) {
+  var delay = Number(delayMs);
+  clearFeedAutoRefreshTimer();
+  if (!canRunFeedAutoRefresh() || feedAutoRefreshState.inFlight) return;
+
+  feedAutoRefreshState.timer = window.setTimeout(function () {
+    feedAutoRefreshState.timer = null;
+    refreshActiveFeed({ silent: true }).finally(function () {
+      scheduleFeedAutoRefresh(FEED_AUTO_REFRESH_MS);
+    });
+  }, window.isFinite(delay) && delay >= 0 ? delay : FEED_AUTO_REFRESH_MS);
+}
+
+function syncFeedAutoRefresh(forceRefresh) {
+  if (!canRunFeedAutoRefresh()) {
+    clearFeedAutoRefreshTimer();
+    return;
+  }
+
+  if (forceRefresh && !feedAutoRefreshState.inFlight) {
+    clearFeedAutoRefreshTimer();
+    refreshActiveFeed({ silent: true }).finally(function () {
+      scheduleFeedAutoRefresh(FEED_AUTO_REFRESH_MS);
+    });
+    return;
+  }
+
+  if (!feedAutoRefreshState.timer && !feedAutoRefreshState.inFlight) {
+    scheduleFeedAutoRefresh(FEED_AUTO_REFRESH_MS);
+  }
+}
+
 function getPullRefreshPoint(event) {
   if (event.touches && event.touches[0]) return event.touches[0];
   if (event.changedTouches && event.changedTouches[0]) return event.changedTouches[0];
@@ -1632,6 +1684,7 @@ function releaseFeedPullRefresh() {
     feedPullRefreshState.hideTimer = window.setTimeout(function () {
       resetFeedPullRefreshIndicator(screenEl);
     }, 180);
+    scheduleFeedAutoRefresh(FEED_AUTO_REFRESH_MS);
   });
 }
 
@@ -1697,20 +1750,17 @@ function bindFeedPullRefresh(screenKey) {
 }
 
 (function initFeedAutoRefresh() {
-  if (!feedAutoRefreshState.timer) {
-    feedAutoRefreshState.timer = window.setInterval(function () {
-      refreshActiveFeed({ silent: true });
-    }, FEED_AUTO_REFRESH_MS);
-  }
-
   bindFeedPullRefresh('candidateFeed');
   bindFeedPullRefresh('employerSearch');
+  syncFeedAutoRefresh(false);
 
   window.addEventListener('focus', function () {
-    refreshActiveFeed({ silent: true });
+    syncFeedAutoRefresh(true);
   });
   document.addEventListener('visibilitychange', function () {
-    if (document.hidden) return;
-    refreshActiveFeed({ silent: true });
+    syncFeedAutoRefresh(!document.hidden);
+  });
+  window.addEventListener('lomo:screen-change', function () {
+    syncFeedAutoRefresh(false);
   });
 })();

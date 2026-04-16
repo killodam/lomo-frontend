@@ -1,7 +1,2 @@
-@import "./core.css";
-@import "./profile.css";
-@import "./theme.css";
-@import "./responsive.css";
-@import "./chat.css";
-@import "./landing.css";
-@import "./feed.css";
+/* Legacy stylesheet entrypoint kept for backward compatibility.
+   Primary screens now load CSS directly from index.html to avoid the @import waterfall. */

@@ -25,6 +25,28 @@ const screens = {
   chat: document.getElementById('screenChat'),
   publicProfile: document.getElementById('screenPublicProfile'),
 };
+var activeScreenKey = '';
+
+function emitScreenChange(nextKey, previousKey) {
+  var event;
+  try {
+    if (typeof window.CustomEvent === 'function') {
+      event = new CustomEvent('lomo:screen-change', {
+        detail: {
+          current: nextKey,
+          previous: previousKey || '',
+        },
+      });
+    } else {
+      event = document.createEvent('CustomEvent');
+      event.initCustomEvent('lomo:screen-change', false, false, {
+        current: nextKey,
+        previous: previousKey || '',
+      });
+    }
+    window.dispatchEvent(event);
+  } catch (error) {}
+}
 
 
 function clearScreenInputs(key) {
@@ -51,12 +73,14 @@ function showEntryScreen(options) {
 
 function show(key) {
   var targetKey = key;
+  var previousKey = activeScreenKey;
   Object.entries(screens).forEach(function (entry) {
     var screenKey = entry[0];
     var screen = entry[1];
     setScreenActiveState(screen, screenKey === targetKey);
   });
   if (!screens[targetKey]) return;
+  activeScreenKey = targetKey;
   try { screens[targetKey].scrollTop = 0; } catch (error) {}
   if (typeof closeDrawer === 'function') closeDrawer();
   if (typeof closeModal === 'function') closeModal();
@@ -75,6 +99,7 @@ function show(key) {
   if (window.LOMO_CHAT_UI && typeof window.LOMO_CHAT_UI.handleScreenChange === 'function') {
     window.LOMO_CHAT_UI.handleScreenChange(targetKey);
   }
+  emitScreenChange(targetKey, previousKey);
 }
 
 function goToMyProfile() {
