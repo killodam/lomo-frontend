@@ -370,6 +370,7 @@ function hydrateEmployeeForm() {
   setVal('mpCVacancies', p.vacancies);
   setVal('mpCCurrentJob', p.current_job);
   setVal('mpCJobTitle', p.job_title);
+  setVal('mpCCorpEmail', p.corpEmail);
   var workList = document.getElementById('workExpList');
   if (workList) workList.innerHTML = '';
   if (p.work_exp && p.work_exp.length) setTimeout(function () { loadWorkExpData(p.work_exp); }, 50);
@@ -390,6 +391,14 @@ function hydrateEmployeeForm() {
   const has = p.portfolio && p.portfolio.length;
   setText('portHintC', has ? ('Прикреплено: ' + p.portfolio.length + ' файл(ов)') : 'Файлы не выбраны');
   setStatusTag('portStatusC', has ? 'на рассмотрении' : 'не загружено');
+
+  const corpStatusEl = document.getElementById('corpEmailVerifiedStatusC');
+  const corpVerifyBtn = document.getElementById('btnSendCorpVerifyC');
+  if (corpStatusEl) {
+    corpStatusEl.textContent = p.corpEmailVerified ? 'подтверждена ✓' : 'не подтверждена';
+    corpStatusEl.className = 'statusTag' + (p.corpEmailVerified ? ' ok' : '');
+  }
+  if (corpVerifyBtn) setHidden(corpVerifyBtn, !!p.corpEmailVerified);
 }
 
 function setVal(id, value) {

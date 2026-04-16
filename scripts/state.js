@@ -50,6 +50,8 @@ const state = {
     about: '',
     email: '',
     telegram: '',
+    corpEmail: '',
+    corpEmailVerified: false,
     eduPlace: '',
     eduYear: '',
     vacancies: '',
@@ -116,6 +118,8 @@ function saveToStorage() {
       about: state.employee.about,
       email: state.employee.email,
       telegram: state.employee.telegram,
+      corpEmail: state.employee.corpEmail,
+      corpEmailVerified: !!state.employee.corpEmailVerified,
       eduPlace: state.employee.eduPlace,
       eduYear: state.employee.eduYear,
       vacancies: state.employee.vacancies,
@@ -194,7 +198,7 @@ function clearUserStorage(userId) {
 function mergeLocalState(userId) {
   const saved = loadUserStorage(userId);
   const employerFields = ['fullName', 'title', 'company', 'foundedYear', 'location', 'industry', 'products', 'activeProjects', 'neededSpecialists', 'about', 'email', 'corpEmail', 'phone', 'website', 'telegram', 'avatarDataUrl'];
-  const employeeFields = ['fullName', 'city', 'phone', 'about', 'email', 'telegram', 'eduPlace', 'eduYear', 'vacancies', 'current_job', 'job_title', 'avatarDataUrl'];
+  const employeeFields = ['fullName', 'city', 'phone', 'about', 'email', 'telegram', 'corpEmail', 'eduPlace', 'eduYear', 'vacancies', 'current_job', 'job_title', 'avatarDataUrl'];
 
   if (saved.employer) {
     employerFields.forEach(function (key) {
@@ -209,6 +213,9 @@ function mergeLocalState(userId) {
     employeeFields.forEach(function (key) {
       if (saved.employee[key] && !state.employee[key]) state.employee[key] = saved.employee[key];
     });
+    if (typeof saved.employee.corpEmailVerified === 'boolean' && !state.employee.corpEmailVerified) {
+      state.employee.corpEmailVerified = saved.employee.corpEmailVerified;
+    }
     if (Array.isArray(saved.employee.work_exp) && !state.employee.work_exp.length) {
       state.employee.work_exp = saved.employee.work_exp;
     }
@@ -288,6 +295,8 @@ function resetState() {
     about: '',
     email: '',
     telegram: '',
+    corpEmail: '',
+    corpEmailVerified: false,
     eduPlace: '',
     eduYear: '',
     vacancies: '',

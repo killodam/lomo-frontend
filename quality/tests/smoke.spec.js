@@ -132,6 +132,7 @@ test('registration starts email verification flow before dashboard', async ({ pa
         body: JSON.stringify({
           user: { id: 'cand-new', email: 'new@example.com', login: 'new_candidate', role: 'candidate', emailVerified: false },
           profile: { public_id: 'LOMO-NEW0001', full_name: 'Новый Пользователь', email: 'new@example.com' },
+          emailVerificationSent: true,
         }),
       });
     }
@@ -169,7 +170,7 @@ test('registration starts email verification flow before dashboard', async ({ pa
   await expect(page.locator('#screenVerifyCode')).toHaveClass(/active/);
   await expect(page.locator('#verifyCodeTitle')).toContainText('Подтвердите email');
   await expect(page.locator('#screenCandidateFeed')).not.toHaveClass(/active/);
-  await expect.poll(() => verifyEmailCalls).toBe(1);
+  await expect.poll(() => verifyEmailCalls).toBe(0);
 });
 
 test('candidate login opens feed and paginates server-side', async ({ page }) => {

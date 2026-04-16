@@ -376,6 +376,8 @@ function applyProfileToState(user, profile, achievements) {
       city: profile.location || '',
       phone: profile.phone || '',
       about: profile.about || '',
+      corpEmail: profile.corp_email || '',
+      corpEmailVerified: profile.corp_email_verified || false,
       eduPlace: profile.edu_place || '',
       eduYear: profile.edu_year || '',
       vacancies: profile.vacancies || '',

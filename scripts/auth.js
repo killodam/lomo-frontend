@@ -39,7 +39,7 @@ function deleteOwnAccount(password) {
     // ── FORGOT PASSWORD FLOW ──────────────────────────────────
     (function initForgotFlow(){
       // State for the flow: modes are 'forgot' | 'email-verify' | 'corp-email'
-      const flowState = { email: '', code: '', mode: 'forgot', corpEmail: '' };
+      const flowState = { email: '', code: '', mode: 'forgot', corpEmail: '', corpTarget: 'employer' };
       const doneTextEl = document.getElementById('doneText');
 
       function clearCodeCells() {
@@ -52,6 +52,7 @@ function deleteOwnAccount(password) {
         flowState.mode = mode;
         if (opts.email !== undefined) flowState.email = opts.email;
         if (opts.corpEmail !== undefined) flowState.corpEmail = opts.corpEmail;
+        if (opts.corpTarget !== undefined) flowState.corpTarget = opts.corpTarget;
 
         const titleEl = document.getElementById('verifyCodeTitle');
         const subEl = document.getElementById('verifyCodeSub');
@@ -63,7 +64,7 @@ function deleteOwnAccount(password) {
 
         if (backBtn) {
           if (mode === 'email-verify') backBtn.dataset.back = 'toDashboard';
-          else if (mode === 'corp-email') backBtn.dataset.back = 'toEmployerProfileEdit';
+          else if (mode === 'corp-email') backBtn.dataset.back = flowState.corpTarget === 'employee' ? 'toEmployeeProfileEdit' : 'toEmployerProfileEdit';
           else backBtn.dataset.back = 'toForgot';
         }
         if (skipBtn) skipBtn.classList.toggle('hidden', mode !== 'email-verify');
@@ -75,7 +76,30 @@ function deleteOwnAccount(password) {
       }
 
       // Expose for use after registration and from employer profile
-      window.lomoStartEmailVerify = function(email) {
+      window.lomoStartEmailVerify = function(email, opts) {
+        var options = opts || {};
+
+        if (options.sent === true) {
+          enterVerifyScreen({
+            mode: 'email-verify',
+            email: email,
+            title: 'Подтвердите email',
+            sub: 'Мы отправили 6-значный код на ' + email + '. Код действителен 15 минут.',
+          });
+          return;
+        }
+
+        if (options.sent === false) {
+          showToast('Не удалось отправить код автоматически. Нажмите "Отправить повторно".', 'error');
+          enterVerifyScreen({
+            mode: 'email-verify',
+            email: email,
+            title: 'Подтвердите email',
+            sub: 'Автоматическая отправка не удалась. Нажмите "Отправить повторно", чтобы получить код на ' + email + '.',
+          });
+          return;
+        }
+
         apiSendVerifyEmail().then(function() {
           enterVerifyScreen({
             mode: 'email-verify',
@@ -85,26 +109,32 @@ function deleteOwnAccount(password) {
           });
         }).catch(function(err) {
           showToast('Подтверждение почты временно недоступно: ' + safeErrorText(err), 'error');
-          // Verification unavailable — go to dashboard anyway
-          if(state.roleReg === 'EMPLOYER') showEmployerDashboard();
-          else showEmployeeDashboard();
+          enterVerifyScreen({
+            mode: 'email-verify',
+            email: email,
+            title: 'Подтвердите email',
+            sub: 'Не удалось подтвердить автоматическую отправку. Нажмите "Отправить повторно", чтобы запросить код ещё раз.',
+          });
         });
       };
 
-      window.lomoStartCorpEmailVerify = function(corpEmail) {
-        const btn = document.getElementById('btnSendCorpVerify');
+      window.lomoStartCorpEmailVerify = function(corpEmail, corpTarget) {
+        const target = corpTarget === 'employee' ? 'employee' : 'employer';
+        const btn = document.getElementById(target === 'employee' ? 'btnSendCorpVerifyC' : 'btnSendCorpVerify');
+        const idleLabel = target === 'employee' ? 'Подтвердить место работы' : 'Подтвердить почту';
         if(btn){ btn.disabled = true; btn.textContent = 'Отправляем…'; }
         apiSendCorpEmailVerify().then(function() {
           enterVerifyScreen({
             mode: 'corp-email',
             corpEmail: corpEmail,
+            corpTarget: target,
             title: 'Корп. почта',
             sub: 'Мы отправили 6-значный код на ' + corpEmail + '. Код действителен 15 минут.',
           });
         }).catch(function(err) {
           showToast('Ошибка: ' + safeErrorText(err), 'error');
         }).finally(function() {
-          if(btn){ btn.disabled = false; btn.textContent = 'Подтвердить почту'; }
+          if(btn){ btn.disabled = false; btn.textContent = idleLabel; }
         });
       };
       function getForgotFlowErrorText(err){
@@ -296,11 +326,20 @@ function deleteOwnAccount(password) {
           btn.disabled = true; btn.textContent = 'Проверяем…';
           try {
             await apiConfirmCorpEmail(code);
-            state.employer.corpEmailVerified = true;
-            showToast('Корпоративная почта подтверждена ✓', 'success');
-            hydrateEmployerForm();
-            renderRecruiterPublic();
-            show('myEmployerProfile');
+            if (flowState.corpTarget === 'employee') {
+              state.employee.corpEmailVerified = true;
+              showToast('Место работы подтверждено ✓', 'success');
+              hydrateEmployeeForm();
+              renderEmployeePublic();
+              show('myEmployeeProfile');
+            } else {
+              state.employer.corpEmailVerified = true;
+              showToast('Корпоративная почта подтверждена ✓', 'success');
+              hydrateEmployerForm();
+              renderRecruiterPublic();
+              show('myEmployerProfile');
+            }
+            saveToStorage();
           } catch(err) {
             const msg = safeErrorText(err);
             if(errEl){ errEl.textContent = /Too many/i.test(msg) ? 'Слишком много попыток. Запросите новый код.' : /expired/i.test(msg) ? 'Срок действия кода истёк. Запросите новый.' : 'Неверный или устаревший код.'; errEl.classList.remove('hidden'); }
@@ -540,7 +579,34 @@ function deleteOwnAccount(password) {
               return;
             }
           }
-          if(typeof window.lomoStartCorpEmailVerify === 'function') window.lomoStartCorpEmailVerify(corpEmail);
+          if(typeof window.lomoStartCorpEmailVerify === 'function') window.lomoStartCorpEmailVerify(corpEmail, 'employer');
+        })();
+        return;
+      }
+
+      if(e.target && e.target.id === 'btnSendCorpVerifyC'){
+        const corpEmail = (document.getElementById('mpCCorpEmail')?.value || '').trim();
+        const currentJob = (document.getElementById('mpCCurrentJob')?.value || '').trim();
+        const jobTitle = (document.getElementById('mpCJobTitle')?.value || '').trim();
+        if(!currentJob || /^не работаю$/i.test(currentJob)){ showToast('Укажите текущее место работы для подтверждения', 'info'); return; }
+        if(!corpEmail){ showToast('Введите корпоративную почту для подтверждения места работы', 'info'); return; }
+        (async function () {
+          const previousCorpEmail = state.employee.corpEmail || '';
+          if (getToken()) {
+            try {
+              await apiSaveProfile({ corp_email: corpEmail, current_job: currentJob, job_title: jobTitle });
+              state.employee.current_job = currentJob;
+              state.employee.job_title = jobTitle;
+              state.employee.corpEmail = corpEmail;
+              if (corpEmail !== previousCorpEmail) state.employee.corpEmailVerified = false;
+              saveToStorage();
+              hydrateEmployeeForm();
+            } catch (err) {
+              showToast('Не удалось сохранить корпоративную почту: ' + safeErrorText(err), 'error');
+              return;
+            }
+          }
+          if(typeof window.lomoStartCorpEmailVerify === 'function') window.lomoStartCorpEmailVerify(corpEmail, 'employee');
         })();
         return;
       }
@@ -645,7 +711,9 @@ function deleteOwnAccount(password) {
                   return;
                 }
                 // --- End validation ---
-                const { user, profile } = await apiRegister(email, password, role, fullName);
+                const regResult = await apiRegister(email, password, role, fullName);
+                const user = regResult.user;
+                const profile = regResult.profile;
               state.email = user.email;
               state.login = user.login || '';
               state.roleReg = role === 'employer' ? 'EMPLOYER' : 'EMPLOYEE';
@@ -658,7 +726,9 @@ function deleteOwnAccount(password) {
               }
               // Trigger email verification after registration
               if(typeof window.lomoStartEmailVerify === 'function'){
-                window.lomoStartEmailVerify(user.email);
+                window.lomoStartEmailVerify(user.email, {
+                  sent: regResult.emailVerificationSent === true ? true : (regResult.emailVerificationSent === false ? false : undefined),
+                });
               } else {
                 if(role === 'employer') showEmployerDashboard();
                 else showEmployeeDashboard();
@@ -782,6 +852,9 @@ function deleteOwnAccount(password) {
           p.telegram  = (document.getElementById('mpCTelegram')?.value  || '').trim();
           p.current_job=(document.getElementById('mpCCurrentJob')?document.getElementById('mpCCurrentJob').value:'').trim();
           p.job_title=(document.getElementById('mpCJobTitle')?document.getElementById('mpCJobTitle').value:'').trim();
+          const newCorpEmailC = (document.getElementById('mpCCorpEmail')?.value || '').trim();
+          if(newCorpEmailC !== p.corpEmail) p.corpEmailVerified = false;
+          p.corpEmail = newCorpEmailC;
           p.work_exp=getWorkExpData();
           const emailValC = (document.getElementById('mpCEmail')?.value || '').trim();
           if(emailValC) state.email = emailValC;
@@ -794,7 +867,7 @@ function deleteOwnAccount(password) {
             full_name: p.fullName, location: p.city, phone: p.phone,
             about: p.about, edu_place: p.eduPlace, edu_year: p.eduYear,
             vacancies: p.vacancies, telegram: p.telegram, email: p.email,
-            current_job: p.current_job, job_title: p.job_title, work_exp: p.work_exp,
+            corp_email: p.corpEmail, current_job: p.current_job, job_title: p.job_title, work_exp: p.work_exp,
             cv_public: !!p.cvPublic,
             avatar_url: p.avatarDataUrl || ''
           }).then(()=>showToast('Профиль сохранён ✓')).catch(()=>showToast('Сохранено локально'));
@@ -884,6 +957,7 @@ function deleteOwnAccount(password) {
         if(where === 'toForgot'){ show('forgot'); return; }
         if(where === 'toVerifyCode'){ show('verifyCode'); return; }
         if(where === 'toEmployerProfileEdit'){ show('myEmployerProfile'); return; }
+        if(where === 'toEmployeeProfileEdit'){ show('myEmployeeProfile'); return; }
         if(where === 'toDashboard'){
           if(state.roleReg === 'EMPLOYER') showEmployerDashboard();
           else showEmployeeDashboard();
@@ -914,6 +988,7 @@ function deleteOwnAccount(password) {
         const where = backBtn?.dataset?.back || 'toForgot';
         if(where === 'toDashboard'){ if(state.roleReg === 'EMPLOYER') showEmployerDashboard(); else showEmployeeDashboard(); }
         else if(where === 'toEmployerProfileEdit'){ show('myEmployerProfile'); }
+        else if(where === 'toEmployeeProfileEdit'){ show('myEmployeeProfile'); }
         else { show('forgot'); }
         return;
       }

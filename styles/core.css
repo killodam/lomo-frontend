@@ -129,6 +129,27 @@
       font-size:13px;
     }
     .resendHint button:hover{ text-decoration:underline; }
+    #screenVerifyCode #verifySkipBtn{
+      width:min(320px, 100%);
+      max-width:var(--inW);
+      min-height:52px;
+      height:auto;
+      padding:14px 20px;
+      border-radius:999px;
+      border:1px solid rgba(0,0,0,.12);
+      background:transparent;
+      color:rgba(0,0,0,.72);
+      font-size:15px;
+      font-weight:600;
+      box-shadow:none;
+      margin-top:12px;
+    }
+    #screenVerifyCode #verifySkipBtn:hover{
+      border-color:rgba(38,110,120,.28);
+      color:#1a5c68;
+      background:rgba(38,110,120,.04);
+      transform:none;
+    }
     /* password strength bar */
     .strengthBar{
       width: var(--inW);
