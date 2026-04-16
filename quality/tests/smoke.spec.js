@@ -240,6 +240,58 @@ test('candidate feed refreshes silently without page reload', async ({ page }) =
   await expect(page.locator('#candidateFeedList')).toContainText('Павел Иванов', { timeout: 3000 });
 });
 
+test('forgot password flow reaches success screen after reset', async ({ page }) => {
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/forgot-password')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'If this email is registered, a code has been sent.' }),
+      });
+    }
+
+    if (url.pathname.endsWith('/auth/reset-password')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'Password has been successfully reset' }),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.click('[data-next="toForgot"]');
+  await page.fill('#forgotEmail', 'candidate@example.com');
+  await page.click('#forgotSubmitBtn');
+
+  await expect(page.locator('#screenVerifyCode')).toHaveClass(/active/);
+
+  await page.fill('#cc0', '1');
+  await page.fill('#cc1', '2');
+  await page.fill('#cc2', '3');
+  await page.fill('#cc3', '4');
+  await page.fill('#cc4', '5');
+  await page.fill('#cc5', '6');
+  await page.click('#verifySubmitBtn');
+
+  await expect(page.locator('#screenResetPassword')).toHaveClass(/active/);
+  await page.fill('#newPassword', 'Newsecret12!');
+  await page.fill('#confirmPassword', 'Newsecret12!');
+  await page.click('#resetSubmitBtn');
+
+  await expect(page.locator('#screenDone')).toHaveClass(/active/);
+  await expect(page.locator('#doneText')).toHaveText('Пароль успешно изменён');
+});
+
 test('chat badge updates on feed even when websocket falls back to polling', async ({ page }) => {
   let conversationCalls = 0;
 

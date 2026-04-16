@@ -40,10 +40,14 @@ function deleteOwnAccount(password) {
     (function initForgotFlow(){
       // State for the flow
       const flowState = { email: '' };
+      const doneTextEl = document.getElementById('doneText');
       function getForgotFlowErrorText(err){
         const msg = safeErrorText(err);
         if(msg === 'Not found' || /API error 404|404/.test(msg)){
           return 'Сервис восстановления пароля сейчас обновляется. Попробуйте через пару минут.';
+        }
+        if(/temporarily unavailable/i.test(msg)){
+          return 'Восстановление пароля временно недоступно. Попробуйте позже.';
         }
         if(/Too many reset requests|Too many requests/i.test(msg)){
           return 'Слишком много попыток. Попробуйте чуть позже.';
@@ -63,6 +67,9 @@ function deleteOwnAccount(password) {
         }
         if(/Too many reset attempts|Too many requests/i.test(msg)){
           return 'Слишком много попыток. Попробуйте чуть позже.';
+        }
+        if(/temporarily unavailable/i.test(msg)){
+          return 'Смена пароля временно недоступна. Попробуйте позже.';
         }
         if(/Code expired/i.test(msg)){
           return 'Срок действия кода истёк. Запросите новый код.';
@@ -125,7 +132,9 @@ function deleteOwnAccount(password) {
           document.querySelectorAll('.codeCell').forEach(c=>c.classList.remove('filled','active','error'));
           document.getElementById('verifyCodeError')?.classList.add('hidden');
           setTimeout(()=>{ document.getElementById('cc0')?.focus(); }, 50);
-        } catch(e) {}
+        } catch(e) {
+          showToast(getForgotFlowErrorText(e), 'error');
+        }
         finally {
           btn.disabled = false;
           btn.textContent = 'Отправить повторно';
@@ -240,17 +249,32 @@ function deleteOwnAccount(password) {
           cpInput?.classList.add('inputError'); cpErr?.classList.remove('hidden'); ok=false;
         } else { cpInput?.classList.remove('inputError'); cpErr?.classList.add('hidden'); }
         if(!ok) return;
+        if(!flowState.email){
+          show('forgot');
+          showToast('Сначала запросите код для восстановления', 'info');
+          return;
+        }
+        if(!flowState.code || flowState.code.length !== 6){
+          show('verifyCode');
+          showToast('Сначала подтвердите код из письма', 'info');
+          return;
+        }
         const btn = document.getElementById('resetSubmitBtn');
         btn.disabled = true;
         btn.textContent = 'Сохраняем…';
         try {
           await apiResetPassword(flowState.email, flowState.code, np);
-          // Success!
-          doneTextEl.textContent = 'Пароль успешно изменён';
+          flowState.code = '';
+          if(doneTextEl) doneTextEl.textContent = 'Пароль успешно изменён';
           state.prevFromDone = 'loginForm';
           show('done');
         } catch(err) {
-          // Code was wrong after all — go back to verify
+          const msg = safeErrorText(err);
+          const isCodeError = /Too many invalid code attempts|Code expired|Invalid or expired code|Code must be 6 digits/i.test(msg);
+          if(!isCodeError){
+            showToast(getResetFlowErrorText(err), 'error');
+            return;
+          }
           const errEl = document.getElementById('verifyCodeError');
           if(errEl){ errEl.textContent = getResetFlowErrorText(err); errEl.classList.remove('hidden'); }
           document.querySelectorAll('.codeCell').forEach(c=>c.classList.add('error'));
