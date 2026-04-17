@@ -643,6 +643,71 @@ function deleteOwnAccount(password) {
       
       if(e.target && e.target.id === 'btnShareProfile'){ copyToClipboard(publicProfileUrl()); return; }
       if(e.target && e.target.id === 'btnContactData'){ openMail(); return; }
+
+      const btnOpenAiMatch = e.target.closest('#btnOpenAiMatch');
+      if (btnOpenAiMatch) {
+        document.getElementById('aiMatchTextarea').value = '';
+        document.getElementById('aiMatchInputState').classList.remove('hidden');
+        document.getElementById('aiMatchLoadingState').classList.add('hidden');
+        document.getElementById('aiMatchModal').style.display = 'block';
+        return;
+      }
+
+      const btnCloseAiMatch = e.target.closest('#btnCloseAiMatch');
+      if (btnCloseAiMatch) {
+        document.getElementById('aiMatchModal').style.display = 'none';
+        return;
+      }
+
+      const btnRunAiMatch = e.target.closest('#btnRunAiMatch');
+      if (btnRunAiMatch) {
+        const text = (document.getElementById('aiMatchTextarea').value || '').trim();
+        if(!text) { showToast('Пожалуйста, вставьте текст вакансии', 'error'); return; }
+        
+        document.getElementById('aiMatchInputState').classList.add('hidden');
+        document.getElementById('aiMatchLoadingState').classList.remove('hidden');
+        const statusEl = document.getElementById('aiMatchStatusText');
+        
+        statusEl.textContent = 'Анализ контекста вакансии...';
+        
+        setTimeout(function() {
+          statusEl.textContent = 'Извлечение ключевых навыков и грейда...';
+          setTimeout(function() {
+            statusEl.textContent = 'Поиск по базе кандидатов LOMO...';
+            setTimeout(function() {
+              // Extraction simple logic
+              // 1. Remove stopwords
+              const stopWords = ['и','в','на','с','по','к','для','опыт','работы','лет','мы','ищем','ожидаем','требуется','что','от','вас','будет','плюсом','знание','умение','работа','команде','или','не'];
+              let clean = text.replace(/[.,/#!$%^&*;:{}=\-_`~()]/g,"").replace(/\s{2,}/g," ");
+              const words = clean.split(' ').filter(w => w.trim().length > 1);
+              
+              const keywords = [];
+              words.forEach(w => {
+                const lower = w.toLowerCase();
+                if (!stopWords.includes(lower)) {
+                  // Keep english words, uppercase words or nouns usually
+                  if (/^[a-zA-Z]+$/.test(w) || w[0] === w[0].toUpperCase() || w.length > 5) {
+                    keywords.push(w);
+                  }
+                }
+              });
+              
+              // Top 4 significant keywords
+              const res = keywords.slice(0, 4).join(' ');
+              
+              document.getElementById('aiMatchModal').style.display = 'none';
+              const searchInput = document.getElementById('empSearchName');
+              if (searchInput) searchInput.value = '[AI] ' + res;
+              
+              if (typeof loadEmployerSearch === 'function') {
+                loadEmployerSearch(1);
+              }
+            }, 800);
+          }, 800);
+        }, 800);
+
+        return;
+      }
       if(e.target && e.target.id === 'btnDownloadCV'){ downloadEmployeeCV(); return; }
       const openDocBtn = e.target.closest('[data-open-doc]');
       if(openDocBtn){

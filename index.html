@@ -847,9 +847,12 @@
       <div class="feedSearchHeroInner">
         <h1 class="feedTitle">Поиск кандидатов</h1>
         <p class="feedSub">Верифицированные профили · документы проверены LOMO</p>
-        <div class="feedSearchWrap">
+        <div class="feedSearchWrap hasAiBtn">
           <svg class="feedSearchIco" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-          <input id="empSearchName" type="text" class="feedSearchInput" placeholder="Имя, навык, вакансия, город...">
+          <input id="empSearchName" type="text" class="feedSearchInput" placeholder="Имя, навык, город...">
+          <button id="btnOpenAiMatch" class="feedAiMatchBtn" type="button" aria-label="AI Мэтчинг">
+            <span>✨ AI-Мэтчинг</span>
+          </button>
         </div>
         <div class="empFilterChips">
           <button class="empFilterChip active" data-verified="" type="button">Все кандидаты</button>
@@ -1109,6 +1112,33 @@
     </div>
     <div class="userProfileModalFooter" style="margin-top:0;">
       <button class="userProfileCloseBtn js-close-ats-modal">Закрыть</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- AI MATCH MODAL -->
+<div id="aiMatchModal" class="userProfileModal">
+  <div class="userProfileDialog">
+    <div class="userProfileModalContent">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 5px;">
+        <h3 style="margin:0; font-size:18px; display:flex; align-items:center; gap:6px;">✨ AI-Мэтчинг</h3>
+        <button class="faBtn del" id="btnCloseAiMatch" style="font-size:18px; line-height:1; border:none; background:none; cursor:pointer;" type="button">✕</button>
+      </div>
+      <p class="muted" style="margin-bottom:15px; font-size:13px; line-height:1.4;">
+        Вставьте текст вашей вакансии, требования и задачи. Искусственный интеллект проанализирует контекст и найдет лучших кандидатов.
+      </p>
+      
+      <div id="aiMatchInputState">
+        <textarea id="aiMatchTextarea" class="commonInput" style="height:120px; resize:vertical; margin-bottom:15px;" placeholder="Пример: Ищем Junior Frontend разработчика со знанием React, HTML, CSS и базовым пониманием UI/UX..."></textarea>
+        <button type="button" id="btnRunAiMatch" class="btn primary" style="width:100%; padding:12px; font-weight:600;">Найти идеальных кандидатов</button>
+      </div>
+
+      <div id="aiMatchLoadingState" class="hidden" style="text-align:center; padding: 30px 0;">
+        <div class="spinner" style="margin:0 auto 15px; width:32px; height:32px;"></div>
+        <div id="aiMatchStatusText" style="font-weight:500; color:var(--text); margin-bottom:8px;">Анализ контекста вакансии...</div>
+        <div style="font-size:12px; color:var(--text-muted);">ИИ разбирает требования и грейд</div>
+      </div>
     </div>
   </div>
 </div>
