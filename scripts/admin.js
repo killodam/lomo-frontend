@@ -229,7 +229,7 @@ function queueEmptyState(text) {
 }
 
 // ── INFINITE SCROLL ENGINE ────────────────────────────────────────────────
-function setupInfiniteScroll(listId, observerRef, loadNextPage) {
+function setupInfiniteScroll(listId, observerRef, screenKey, loadNextPage) {
   // Disconnect any previous observer stored in observerRef
   if (observerRef && observerRef.current) {
     observerRef.current.disconnect();
@@ -252,6 +252,7 @@ function setupInfiniteScroll(listId, observerRef, loadNextPage) {
 
   var observer = new IntersectionObserver(function(entries) {
     if (!entries[0].isIntersecting) return;
+    if (screenKey && getScreenScrollTop(screenKey) <= 0) return;
     loadNextPage();
   }, { rootMargin: '200px' });
 
@@ -1000,7 +1001,14 @@ function readBookmarks() {
 
 function writeBookmarks(bookmarks) {
   try {
-    window.localStorage.setItem(getBookmarksStorageKey(), JSON.stringify(bookmarks || {}));
+    var payload = { lists: (bookmarks && bookmarks.lists) ? bookmarks.lists : {} };
+    var defaultItems = payload.lists.default && payload.lists.default.items ? payload.lists.default.items : {};
+
+    Object.keys(defaultItems).forEach(function (uid) {
+      payload[uid] = defaultItems[uid];
+    });
+
+    window.localStorage.setItem(getBookmarksStorageKey(), JSON.stringify(payload));
     return true;
   } catch (error) {
     showToast('Не удалось сохранить избранное', 'error');
@@ -1115,9 +1123,9 @@ function syncChipSelectionInside(container, chipSelector, attributeName, selecte
   });
 }
 
-function getEmployerFilterSelectedValue(rawValue) {
+function getEmployerFilterUiValue(rawValue) {
   var value = String(rawValue || '');
-  return value === 'favorites' ? 'default' : value;
+  return value === 'default' ? 'favorites' : value;
 }
 
 function buildEmployerFilterSignature(lists) {
@@ -1134,8 +1142,9 @@ function buildEmployerFilterChipsHtml(listIds, lists) {
 
   listIds.forEach(function (listId) {
     var list = lists[listId] || {};
+    var filterValue = listId === 'default' ? 'favorites' : listId;
     var icon = listId === 'default' ? '★ ' : '📁 ';
-    html += '<button class="empFilterChip" data-verified="' + escHtml(listId) + '" type="button">' + icon + escHtml(list.name) + '</button>';
+    html += '<button class="empFilterChip" data-verified="' + escHtml(filterValue) + '" type="button">' + icon + escHtml(list.name) + '</button>';
   });
 
   return html;
@@ -1146,7 +1155,8 @@ function buildEmployerFilterOptionsHtml(listIds, lists) {
 
   listIds.forEach(function (listId) {
     var list = lists[listId] || {};
-    html += '<option value="' + escHtml(listId) + '">' + escHtml(list.name) + '</option>';
+    var filterValue = listId === 'default' ? 'favorites' : listId;
+    html += '<option value="' + escHtml(filterValue) + '">' + escHtml(list.name) + '</option>';
   });
 
   return html;
@@ -1163,7 +1173,7 @@ function bindEmployerFilterChipEvents(chipContainer) {
     if (!button || !chipContainer.contains(button)) return;
 
     select = document.getElementById('empSearchVerified');
-    value = getEmployerFilterSelectedValue(button.getAttribute('data-verified') || '');
+    value = button.getAttribute('data-verified') || '';
     syncChipSelectionInside(chipContainer, '.empFilterChip', 'data-verified', value);
 
     if (select) {
@@ -1175,7 +1185,7 @@ function bindEmployerFilterChipEvents(chipContainer) {
 
 function syncEmployerFilterChips() {
   var select = document.getElementById('empSearchVerified');
-  var selectedView = getEmployerFilterSelectedValue(select ? String(select.value || '') : '');
+  var selectedView = getEmployerFilterUiValue(select ? String(select.value || '') : '');
   var chipContainer = document.querySelector('.empFilterChips');
   if (chipContainer) {
     var bookmarks = readBookmarks();
@@ -1219,6 +1229,75 @@ function _isBookmarked(uid) {
 
 var _currentBookmarkUid = null;
 
+function ensureBookmarksDefaultList(bookmarks) {
+  if (!bookmarks.lists) bookmarks.lists = {};
+  if (!bookmarks.lists.default) {
+    bookmarks.lists.default = { id: 'default', name: 'Избранные', items: {} };
+  }
+  if (!bookmarks.lists.default.items) bookmarks.lists.default.items = {};
+  return bookmarks.lists.default;
+}
+
+function addBookmarkToDefault(uid, user) {
+  var bookmarks = readBookmarks();
+  var targetUid = String(uid || '');
+  var defaultList = ensureBookmarksDefaultList(bookmarks);
+
+  defaultList.items[targetUid] = user;
+  if (!writeBookmarks(bookmarks)) return false;
+
+  syncEmployerFilterChips();
+  syncBookmarkButtons(targetUid, true);
+  return true;
+}
+
+function removeBookmarkFromAllLists(uid) {
+  var bookmarks = readBookmarks();
+  var lists = bookmarks.lists || {};
+  var targetUid = String(uid || '');
+  var changed = false;
+
+  Object.keys(lists).forEach(function (listId) {
+    var items = lists[listId] && lists[listId].items;
+    if (!items || !Object.prototype.hasOwnProperty.call(items, targetUid)) return;
+    delete items[targetUid];
+    changed = true;
+  });
+
+  if (!changed) return false;
+  if (!writeBookmarks(bookmarks)) return false;
+
+  syncEmployerFilterChips();
+  syncBookmarkButtons(targetUid, false);
+  return true;
+}
+
+function openBookmarkFolderModal(uid) {
+  var targetUid = String(uid || '');
+  var modal = document.getElementById('atsFolderModal');
+  if (!modal) return false;
+
+  _currentBookmarkUid = targetUid;
+
+  var user = _userCache[targetUid];
+  var titleEl = document.getElementById('atsFolderModalTitle');
+  if (titleEl && user) titleEl.textContent = 'Сохранить: ' + (user.full_name || user.company || user.email);
+  modal.classList.add('open');
+  renderFolderModalLists();
+  return true;
+}
+
+function refreshActiveBookmarkViewAfterToggle() {
+  if (isScreenActive('candidateFeed') && feedState.view === 'favorites') {
+    loadCandidateFeed(feedState.page || 1);
+    return;
+  }
+
+  if (isScreenActive('employerSearch') && (employerSearchState.verified === 'favorites' || employerSearchState.verified === 'default')) {
+    loadEmployerSearch(employerSearchState.page || 1);
+  }
+}
+
 function toggleBookmark(uid, sourceButton, event) {
   if (event && typeof event.stopPropagation === 'function') event.stopPropagation();
   else if (sourceButton && sourceButton.stopPropagation) sourceButton.stopPropagation();
@@ -1229,17 +1308,26 @@ function toggleBookmark(uid, sourceButton, event) {
   }
   
   var targetUid = String(uid || '');
-  _currentBookmarkUid = targetUid;
-  
-  var modal = document.getElementById('atsFolderModal');
-  if (modal) {
-    var user = _userCache[targetUid];
-    var titleEl = document.getElementById('atsFolderModalTitle');
-    if (titleEl && user) titleEl.textContent = 'Сохранить: ' + (user.full_name || user.company || user.email);
-    modal.classList.add('open');
-    renderFolderModalLists();
+  var user = _userCache[targetUid];
+  if (!user) return false;
+
+  if (!_isBookmarked(targetUid)) {
+    if (addBookmarkToDefault(targetUid, user)) {
+      showToast('Добавлено в избранное', 'success');
+    }
+    return false;
   }
-  return false; // Real toggling happens inside modal now
+
+  if (feedState.view === 'favorites' || employerSearchState.verified === 'favorites' || employerSearchState.verified === 'default') {
+    if (removeBookmarkFromAllLists(targetUid)) {
+      showToast('Удалено из избранного', 'info');
+      refreshActiveBookmarkViewAfterToggle();
+    }
+    return false;
+  }
+
+  openBookmarkFolderModal(targetUid);
+  return false;
 }
 
 function closeAtsFolderModal() {
@@ -1598,16 +1686,10 @@ function loadCandidateFeed(page, options) {
     var data = normalizePaginatedResponse(result);
     syncPagerState(feedState, data);
     renderFeedList(data.items || [], isNextPage);
-    // Show pager only on first page or when IntersectionObserver not available
-    if (!window.IntersectionObserver) {
-      renderPager('candidateFeedPager', feedState, loadCandidateFeed, { label: 'профилей' });
-    } else {
-      document.getElementById('candidateFeedPager') && (document.getElementById('candidateFeedPager').innerHTML = '');
-    }
-    // Setup infinite scroll sentinel if there are more pages
+    renderPager('candidateFeedPager', feedState, loadCandidateFeed, { label: 'профилей' });
     if (feedState.page < feedState.totalPages) {
       var ref = { current: _feedScrollObserver };
-      setupInfiniteScroll(listId, ref, function () {
+      setupInfiniteScroll(listId, ref, 'candidateFeed', function () {
         if (feedState.page >= feedState.totalPages) return;
         feedState.page++;
         loadCandidateFeed(feedState.page, { nextPage: true });
@@ -1714,14 +1796,10 @@ function loadEmployerSearch(page, options) {
     var data = normalizePaginatedResponse(result);
     syncPagerState(employerSearchState, data);
     renderEmployerSearch(data.items || [], isNextPage);
-    if (!window.IntersectionObserver) {
-      renderPager('employerCandidatePager', employerSearchState, loadEmployerSearch, { label: 'кандидатов' });
-    } else {
-      document.getElementById('employerCandidatePager') && (document.getElementById('employerCandidatePager').innerHTML = '');
-    }
+    renderPager('employerCandidatePager', employerSearchState, loadEmployerSearch, { label: 'кандидатов' });
     if (employerSearchState.page < employerSearchState.totalPages) {
       var ref = { current: _employerScrollObserver };
-      setupInfiniteScroll(listId, ref, function () {
+      setupInfiniteScroll(listId, ref, 'employerSearch', function () {
         if (employerSearchState.page >= employerSearchState.totalPages) return;
         employerSearchState.page++;
         loadEmployerSearch(employerSearchState.page, { nextPage: true });
