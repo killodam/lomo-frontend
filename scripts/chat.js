@@ -1212,6 +1212,7 @@
     openWithUser: openWithUser,
     goBack: goBack,
     handleScreenChange: handleScreenChange,
+    disconnectAndCleanup: disconnectRealtime,
     refreshConnectionInbox: function () {
       return loadConnectionInbox({ silent: !isChatActive() });
     },

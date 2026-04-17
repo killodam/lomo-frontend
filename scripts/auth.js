@@ -1,4 +1,7 @@
 function logout() {
+  if (window.LOMO_CHAT_UI && typeof window.LOMO_CHAT_UI.disconnectAndCleanup === 'function') {
+    window.LOMO_CHAT_UI.disconnectAndCleanup();
+  }
   saveToStorage();
   apiLogout().catch(function () {});
   clearToken();
@@ -8,6 +11,9 @@ function logout() {
 }
 
 function logoutAllSessions() {
+  if (window.LOMO_CHAT_UI && typeof window.LOMO_CHAT_UI.disconnectAndCleanup === 'function') {
+    window.LOMO_CHAT_UI.disconnectAndCleanup();
+  }
   saveToStorage();
   apiLogoutAll().catch(function () {});
   clearToken();
@@ -1148,9 +1154,12 @@ function deleteOwnAccount(password) {
       } catch (error) {}
 
       // ── B2C PUBLIC PROFILE LINK HANDLING ──
-      var params = new URLSearchParams(window.location.search);
-      var publicProfileId = params.get('profile');
-      
+      // Links are generated as #profile=<id> (hash fragment).
+      // Also support ?profile=<id> (query string) for backward compat.
+      var _hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+      var _queryParams = new URLSearchParams(window.location.search);
+      var publicProfileId = _hashParams.get('profile') || _queryParams.get('profile');
+
       if (publicProfileId && typeof window.openPublicProfileByPublicId === 'function') {
         window.openPublicProfileByPublicId(publicProfileId);
         return;

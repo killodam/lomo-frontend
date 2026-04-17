@@ -692,7 +692,7 @@ function renderEmployerAccessPanel(candidateId, requests, files) {
   var buttons = ['education', 'work', 'courses', 'passport', 'cv'].map(function (type) {
     var file = fileMap[type];
     if (file) {
-      return '<button type="button" class="pillBtn" data-open-doc="' + file.id + '" data-file-name="' + escapeHtml(file.file_name || DOC_TYPE_LABELS[type]) + '">Открыть: ' + escapeHtml(DOC_TYPE_LABELS[type]) + '</button>';
+      return '<button type="button" class="pillBtn" data-open-doc="' + escapeHtml(file.id) + '" data-file-name="' + escapeHtml(file.file_name || DOC_TYPE_LABELS[type]) + '">Открыть: ' + escapeHtml(DOC_TYPE_LABELS[type]) + '</button>';
     }
 
     var req = requestMap[type];
@@ -703,14 +703,14 @@ function renderEmployerAccessPanel(candidateId, requests, files) {
       return '<button type="button" class="pillBtn" disabled>Доступ одобрен: ' + escapeHtml(DOC_TYPE_LABELS[type]) + '</button>';
     }
 
-    return '<button type="button" class="pillBtn" data-request-doc="' + type + '" data-candidate-id="' + candidateId + '">Запросить: ' + escapeHtml(DOC_TYPE_LABELS[type]) + '</button>';
+    return '<button type="button" class="pillBtn" data-request-doc="' + escapeHtml(type) + '" data-candidate-id="' + escapeHtml(candidateId) + '">Запросить: ' + escapeHtml(DOC_TYPE_LABELS[type]) + '</button>';
   }).join('');
 
   var filesHtml = (files && files.length)
     ? files.map(function (file) {
         return '<div class="achRow">' +
           '<div><div class="achTitle">' + escapeHtml(DOC_TYPE_LABELS[file.type] || file.type) + '</div><div class="achMeta">' + escapeHtml(file.file_name || '') + '</div></div>' +
-          '<button type="button" class="miniLink" data-open-doc="' + file.id + '" data-file-name="' + escapeHtml(file.file_name || 'document') + '">Открыть</button>' +
+          '<button type="button" class="miniLink" data-open-doc="' + escapeHtml(file.id) + '" data-file-name="' + escapeHtml(file.file_name || 'document') + '">Открыть</button>' +
         '</div>';
       }).join('')
     : '<div class="miniHint">Пока нет файлов с одобренным доступом</div>';
