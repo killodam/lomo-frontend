@@ -736,6 +736,52 @@
 }
 
 /* ── ATS Folders ── */
+.atsFolderModalContent {
+  padding-bottom: 0;
+}
+
+.atsFolderModalHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 15px;
+}
+
+.atsFolderModalTitle {
+  margin: 0;
+  font-size: 16px;
+}
+
+.atsFolderModalClose {
+  font-size: 18px;
+  line-height: 1;
+}
+
+.atsFolderModalLists {
+  max-height: 250px;
+  overflow-y: auto;
+  margin-bottom: 15px;
+}
+
+.atsFolderCreateRow {
+  display: flex;
+  gap: 8px;
+}
+
+.atsFolderCreateInput {
+  margin: 0;
+}
+
+.atsFolderCreateBtn {
+  white-space: nowrap;
+  padding: 0 16px;
+}
+
+.atsFolderModalFooter {
+  margin-top: 0;
+}
+
 .atsFolderRow {
   display: flex;
   align-items: center;
