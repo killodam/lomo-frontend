@@ -24,6 +24,14 @@ const screens = {
   employerSearch: document.getElementById('screenEmployerSearch'),
   chat: document.getElementById('screenChat'),
   publicProfile: document.getElementById('screenPublicProfile'),
+  // Info screens (burger menu)
+  how: document.getElementById('screenHow'),
+  security: document.getElementById('screenSecurity'),
+  terms: document.getElementById('screenTerms'),
+  privacy: document.getElementById('screenPrivacy'),
+  contacts: document.getElementById('screenContacts'),
+  about: document.getElementById('screenAbout'),
+  faq: document.getElementById('screenFaq'),
 };
 var activeScreenKey = '';
 

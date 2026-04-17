@@ -29,6 +29,7 @@
 <link rel="stylesheet" href="./styles/chat.css"/>
 <link rel="stylesheet" href="./styles/landing.css"/>
 <link rel="stylesheet" href="./styles/feed.css"/>
+<link rel="stylesheet" href="./styles/info-screens.css"/>
 </head>
 <body>
 <div class="stage">
@@ -1157,6 +1158,440 @@
 <!-- TOAST -->
 <div id="toast" class="toast"></div>
 
+<!-- ═══════════════════════════════════════════════════
+     INFO SCREENS — fullscreen pages for burger menu
+     ═══════════════════════════════════════════════════ -->
+
+<!-- SCREEN: HOW IT WORKS -->
+<section id="screenHow" class="screen" aria-label="Как работает LOMO">
+  <div class="infoScreenHeader">
+    <button type="button" class="infoBackBtn" data-info-back>← Назад</button>
+    <span class="infoScreenHeaderTitle">Как работает</span>
+  </div>
+  <div class="infoScreenBody">
+    <div class="pageContent">
+      <div class="infoHero">
+        <div class="infoHeroIcon">⚡</div>
+        <div class="infoHeroTitle">Как работает LOMO</div>
+        <div class="infoHeroSub">Платформа верификации карьерных данных. Три простых шага — и ваш профиль вызывает доверие у работодателей.</div>
+      </div>
+
+      <div class="infoSectionTitle">3 шага до верификации</div>
+      <div id="howSteps">
+        <div class="infoStep">
+          <div class="infoStepNum">1</div>
+          <div>
+            <div class="infoStepTitle">Зарегистрируйтесь</div>
+            <div class="infoStepText">Выберите роль — кандидат или работодатель. Заполните базовый профиль: имя, город, образование. Займёт не более 5 минут.</div>
+          </div>
+        </div>
+        <div class="infoStep">
+          <div class="infoStepNum">2</div>
+          <div>
+            <div class="infoStepTitle">Загрузите документы</div>
+            <div class="infoStepText">Диплом, трудовую книжку, сертификаты — в форматах PDF, JPG, PNG или DOCX. Документы хранятся в зашифрованном виде и видны только верификатору.</div>
+          </div>
+        </div>
+        <div class="infoStep">
+          <div class="infoStepNum">3</div>
+          <div>
+            <div class="infoStepTitle">Получите верификацию</div>
+            <div class="infoStepText">Модератор LOMO проверяет документы в течение 1–2 рабочих дней. После проверки профиль получает отметку ✓ LOMO. Работодатели видят статус, но не сами файлы.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="infoSectionTitle">Для кого LOMO</div>
+      <div class="infoPathGrid">
+        <div class="infoPathCard light">
+          <div class="infoPathTag">Кандидат</div>
+          <div class="infoPathTitle">Один профиль для всех</div>
+          <ul class="infoPathList">
+            <li>Верификация за 1–2 рабочих дня</li>
+            <li>Один профиль для всех откликов</li>
+            <li>Связь и чат с работодателями</li>
+            <li>Опыт и образование с доказательствами</li>
+          </ul>
+        </div>
+        <div class="infoPathCard dark">
+          <div class="infoPathTag">Работодатель</div>
+          <div class="infoPathTitle">Только реальные данные</div>
+          <ul class="infoPathList">
+            <li>Лента проверенных кандидатов</li>
+            <li>Запрос доступа к документам</li>
+            <li>Поиск по навыкам, городу, опыту</li>
+            <li>AI-мэтчинг по тексту вакансии</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="infoCTAWrap">
+        <button type="button" class="infoCTA" id="howCtaBtn">Зарегистрироваться</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCREEN: SECURITY -->
+<section id="screenSecurity" class="screen" aria-label="Безопасность и приватность">
+  <div class="infoScreenHeader">
+    <button type="button" class="infoBackBtn" data-info-back>← Назад</button>
+    <span class="infoScreenHeaderTitle">Безопасность</span>
+  </div>
+  <div class="infoScreenBody">
+    <div class="pageContent">
+      <div class="infoHero">
+        <div class="infoHeroIcon">🔒</div>
+        <div class="infoHeroTitle">Безопасность и приватность</div>
+        <div class="infoHeroSub">Ваши данные и документы защищены на каждом уровне — от хранения до передачи.</div>
+      </div>
+
+      <div class="infoHighlight">
+        <div class="infoHighlightText">🔐 Документы видит только верификатор</div>
+        <div class="infoHighlightSub">Работодатель видит исключительно статус проверки — доступ к файлам выдаётся только с вашего явного согласия через систему запросов.</div>
+      </div>
+
+      <div class="infoSectionTitle">Принципы защиты</div>
+      <div class="infoCardGrid">
+        <div class="infoCard">
+          <div class="infoCardIcon">🔒</div>
+          <div class="infoCardTitle">Хранение</div>
+          <div class="infoCardText">Все документы хранятся в зашифрованном виде. Физический доступ к серверам строго ограничен.</div>
+        </div>
+        <div class="infoCard">
+          <div class="infoCardIcon">🔐</div>
+          <div class="infoCardTitle">Доступ</div>
+          <div class="infoCardText">Принцип минимальных привилегий. Доступ к данным — только у тех, кому он необходим для работы платформы.</div>
+        </div>
+        <div class="infoCard">
+          <div class="infoCardIcon">🌐</div>
+          <div class="infoCardTitle">Передача</div>
+          <div class="infoCardText">Все соединения — только по HTTPS/TLS. Данные не передаются в открытом виде ни при каких условиях.</div>
+        </div>
+        <div class="infoCard">
+          <div class="infoCardIcon">📜</div>
+          <div class="infoCardTitle">Соответствие</div>
+          <div class="infoCardText">Платформа разработана с учётом требований ФЗ-152 «О персональных данных».</div>
+        </div>
+      </div>
+
+      <div class="infoSectionTitle">Технические меры</div>
+      <div class="infoCard">
+        <ul class="infoCheckList">
+          <li>HTTPS/TLS для всех соединений</li>
+          <li>Cookie с флагами HttpOnly и Secure</li>
+          <li>CSRF-защита на всех формах</li>
+          <li>Rate limiting — защита от перебора и атак</li>
+          <li>Audit log — журнал всех действий с данными</li>
+          <li>Автоматическое завершение сессии при неактивности</li>
+        </ul>
+      </div>
+
+      <div class="infoSectionTitle">Ваши права</div>
+      <div class="infoCard">
+        <ul class="infoCheckList">
+          <li>Просматривать все свои данные в профиле</li>
+          <li>Отзывать доступ работодателя к документам в любой момент</li>
+          <li>Удалить аккаунт и все связанные данные через профиль</li>
+          <li>Обратиться с запросом на удаление: <a href="mailto:support@lomo.website" class="infoLink">support@lomo.website</a></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCREEN: TERMS OF USE -->
+<section id="screenTerms" class="screen" aria-label="Условия использования">
+  <div class="infoScreenHeader">
+    <button type="button" class="infoBackBtn" data-info-back>← Назад</button>
+    <span class="infoScreenHeaderTitle">Условия использования</span>
+  </div>
+  <div class="infoScreenBody">
+    <div class="pageContent">
+      <div class="infoHero">
+        <div class="infoHeroIcon">📋</div>
+        <div class="infoHeroTitle">Условия использования</div>
+        <div class="infoHeroSub">Пожалуйста, прочитайте внимательно перед использованием платформы LOMO.</div>
+      </div>
+
+      <div class="legalDate">Последнее обновление: апрель 2026</div>
+
+      <div id="termsAccordion">
+        <div class="accordionItem">
+          <button class="accordionHead" type="button">
+            <span>1. Общие положения</span>
+            <span class="accordionArrow">▾</span>
+          </button>
+          <div class="accordionBody">
+            <div class="accordionBodyInner">
+              Использование платформы LOMO означает согласие с настоящими условиями. LOMO — сервис верификации карьерных данных для рынка найма России и СНГ. Доступ к платформе предоставляется лицам, достигшим 18 лет и принявшим настоящие условия.
+            </div>
+          </div>
+        </div>
+        <div class="accordionItem">
+          <button class="accordionHead" type="button">
+            <span>2. Права и обязанности пользователя</span>
+            <span class="accordionArrow">▾</span>
+          </button>
+          <div class="accordionBody">
+            <div class="accordionBodyInner">
+              Кандидат обязуется загружать только подлинные документы, соответствующие действительным фактам. Работодатель обязуется использовать данные кандидатов исключительно в целях найма. Передача данных третьим лицам без явного согласия кандидата запрещена.
+            </div>
+          </div>
+        </div>
+        <div class="accordionItem">
+          <button class="accordionHead" type="button">
+            <span>3. Запрещённые действия</span>
+            <span class="accordionArrow">▾</span>
+          </button>
+          <div class="accordionBody">
+            <div class="accordionBodyInner">
+              Запрещено: загружать поддельные или чужие документы; создавать несколько аккаунтов; использовать платформу для спама или мошенничества; получать несанкционированный доступ к данным других пользователей; автоматически собирать данные без разрешения (парсинг).
+            </div>
+          </div>
+        </div>
+        <div class="accordionItem">
+          <button class="accordionHead" type="button">
+            <span>4. Ответственность сторон</span>
+            <span class="accordionArrow">▾</span>
+          </button>
+          <div class="accordionBody">
+            <div class="accordionBodyInner">
+              LOMO верифицирует факт предоставленных документов, но не несёт ответственности за профессиональные качества кандидата. При нарушении условий аккаунт блокируется без предупреждения. При загрузке поддельных документов информация может быть передана в правоохранительные органы.
+            </div>
+          </div>
+        </div>
+        <div class="accordionItem">
+          <button class="accordionHead" type="button">
+            <span>5. Изменение условий</span>
+            <span class="accordionArrow">▾</span>
+          </button>
+          <div class="accordionBody">
+            <div class="accordionBodyInner">
+              LOMO вправе изменять настоящие условия с уведомлением пользователей не менее чем за 14 дней до вступления изменений в силу. Продолжение использования платформы после уведомления означает согласие с новой редакцией условий.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button type="button" class="infoAcceptBtn" id="termsAcceptBtn">Принять условия</button>
+    </div>
+  </div>
+</section>
+
+<!-- SCREEN: PRIVACY POLICY -->
+<section id="screenPrivacy" class="screen" aria-label="Политика конфиденциальности">
+  <div class="infoScreenHeader">
+    <button type="button" class="infoBackBtn" data-info-back>← Назад</button>
+    <span class="infoScreenHeaderTitle">Конфиденциальность</span>
+  </div>
+  <div class="infoScreenBody">
+    <div class="pageContent">
+      <div class="infoHero">
+        <div class="infoHeroIcon">🛡️</div>
+        <div class="infoHeroTitle">Политика конфиденциальности</div>
+        <div class="infoHeroSub">Соответствует требованиям Федерального закона № 152-ФЗ «О персональных данных».</div>
+      </div>
+
+      <div class="legalDate">Последнее обновление: апрель 2026</div>
+
+      <div class="infoHighlight">
+        <div class="infoHighlightText">🚫 Мы не продаём ваши данные</div>
+        <div class="infoHighlightSub">Никакая информация о пользователях не передаётся третьим лицам в коммерческих целях. Никогда — это принцип, а не маркетинг.</div>
+      </div>
+
+      <div class="infoCard">
+        <div class="infoCardIcon">📋</div>
+        <div class="infoCardTitle">Какие данные мы собираем</div>
+        <div class="infoCardText">Имя, адрес электронной почты, загруженные документы (диплом, трудовая, сертификаты, паспорт при строгой верификации), история верификаций, данные о текущем месте работы и образовании. Собираем только то, что необходимо для работы платформы.</div>
+      </div>
+
+      <div class="infoCard">
+        <div class="infoCardIcon">⚙️</div>
+        <div class="infoCardTitle">Как мы используем данные</div>
+        <div class="infoCardText">Данные используются исключительно для верификации профиля, отображения статусов в ленте кандидатов и коммуникации между участниками платформы. Мы не используем данные для рекламы.</div>
+      </div>
+
+      <div class="infoCard">
+        <div class="infoCardIcon">🤝</div>
+        <div class="infoCardTitle">Кому передаём данные</div>
+        <div class="infoCardText">Никому в коммерческих целях. Работодатель видит только статусы верификации — без файлов. Доступ к документам предоставляется через систему запросов с вашего явного согласия. В случаях, предусмотренных законом, данные могут передаваться государственным органам.</div>
+      </div>
+
+      <div class="infoCard">
+        <div class="infoCardIcon">⏱️</div>
+        <div class="infoCardTitle">Сроки хранения</div>
+        <div class="infoCardText">Данные хранятся в течение всего времени существования аккаунта. После удаления аккаунта данные удаляются в течение 30 дней. Резервные копии могут храниться ещё до 90 дней в рамках инфраструктурной политики.</div>
+      </div>
+
+      <div class="infoCard">
+        <div class="infoCardIcon">🗑️</div>
+        <div class="infoCardTitle">Как удалить данные</div>
+        <div class="infoCardText">Удалить аккаунт и все связанные данные можно в разделе «Профиль» → «Аккаунт» → «Удалить аккаунт». Потребуется подтверждение паролем. Также можно обратиться на <a href="mailto:support@lomo.website" class="infoLink">support@lomo.website</a>.</div>
+      </div>
+
+      <div class="infoCard">
+        <div class="infoCardIcon">🍪</div>
+        <div class="infoCardTitle">Cookies</div>
+        <div class="infoCardText">LOMO использует только технические cookies, необходимые для работы платформы (сессия, безопасность). Рекламные и аналитические трекеры не используются.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCREEN: CONTACTS -->
+<section id="screenContacts" class="screen" aria-label="Контакты LOMO">
+  <div class="infoScreenHeader">
+    <button type="button" class="infoBackBtn" data-info-back>← Назад</button>
+    <span class="infoScreenHeaderTitle">Контакты</span>
+  </div>
+  <div class="infoScreenBody">
+    <div class="pageContent">
+      <div class="infoHero">
+        <div class="infoHeroIcon">✉️</div>
+        <div class="infoHeroTitle">Контакты</div>
+        <div class="infoHeroSub">Мы всегда рады помочь. Напишите нам любым удобным способом.</div>
+      </div>
+
+      <div class="infoWorkHours">
+        🕒 Пн–Пт, 9:00–18:00 МСК · Обычно отвечаем в течение 2 часов
+      </div>
+
+      <a href="mailto:support@lomo.website" class="contactCard">
+        <div class="contactCardIcon">📧</div>
+        <div>
+          <div class="contactCardTitle">Email</div>
+          <div class="contactCardValue">support@lomo.website</div>
+        </div>
+      </a>
+
+      <a href="https://t.me/lomo_support" target="_blank" rel="noopener noreferrer" class="contactCard">
+        <div class="contactCardIcon">✈️</div>
+        <div>
+          <div class="contactCardTitle">Telegram</div>
+          <div class="contactCardValue">@lomo_support</div>
+        </div>
+      </a>
+
+      <div class="infoCard">
+        <div class="infoCardIcon">🌍</div>
+        <div class="infoCardTitle">Где мы находимся</div>
+        <div class="infoCardText">Мы работаем полностью удалённо по всей России и СНГ. Отсутствие офиса позволяет нам быть гибкими и сосредоточиться на продукте.</div>
+      </div>
+
+      <div class="contactForm">
+        <div class="contactFormTitle">Написать нам</div>
+        <input type="text" class="contactFormInput" placeholder="Ваше имя" autocomplete="off">
+        <input type="email" class="contactFormInput" placeholder="Email для ответа" autocomplete="off">
+        <textarea class="contactFormInput contactFormTextarea" placeholder="Ваше сообщение..."></textarea>
+        <button type="button" class="contactFormBtn" id="contactFormSendBtn">Отправить сообщение</button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCREEN: ABOUT -->
+<section id="screenAbout" class="screen" aria-label="О проекте LOMO">
+  <div class="infoScreenHeader">
+    <button type="button" class="infoBackBtn" data-info-back>← Назад</button>
+    <span class="infoScreenHeaderTitle">О проекте</span>
+  </div>
+  <div class="infoScreenBody">
+    <div class="pageContent">
+      <div class="aboutHero">
+        <div class="aboutHeroLogo">LOMO</div>
+        <div class="aboutHeroTagline">Верификация карьерных данных для рынка найма</div>
+      </div>
+
+      <div class="infoCard">
+        <div class="infoCardIcon">🎯</div>
+        <div class="infoCardTitle">Наша миссия</div>
+        <div class="infoCardText">Сделать карьерные данные проверяемыми и честными. Мы создаём доверие между кандидатами и работодателями — через верификацию реальных документов, а не красивых слов в резюме. По данным исследований, более 40% кандидатов искажают сведения об образовании и опыте работы.</div>
+      </div>
+
+      <div class="infoSectionTitle">История проекта</div>
+      <div class="aboutTimeline">
+        <div class="aboutTimelineItem">
+          <div class="aboutTimelineYear">2024</div>
+          <div class="aboutTimelineText">Идея и первые прототипы. Проблема ложных резюме на рынке найма стала отправной точкой для создания платформы верификации.</div>
+        </div>
+        <div class="aboutTimelineItem">
+          <div class="aboutTimelineYear">2025</div>
+          <div class="aboutTimelineText">Разработка и запуск бета-версии. Первые верифицированные профили, первые работодатели в системе, налажен процесс модерации за 1–2 рабочих дня.</div>
+        </div>
+        <div class="aboutTimelineItem">
+          <div class="aboutTimelineYear">2026</div>
+          <div class="aboutTimelineText">Рост и развитие. AI-мэтчинг для работодателей, расширение команды модераторов, работа с партнёрами.</div>
+        </div>
+      </div>
+
+      <div class="infoSectionTitle">В цифрах</div>
+      <div class="aboutCounters" id="aboutCounters">
+        <div class="aboutCounter">
+          <div class="aboutCounterNum" data-count-to="150" id="counterProfiles">0</div>
+          <div class="aboutCounterLabel">верифицированных профилей</div>
+        </div>
+        <div class="aboutCounter">
+          <div class="aboutCounterNum" data-count-to="2" id="counterDays">0</div>
+          <div class="aboutCounterLabel">дня — срок проверки</div>
+        </div>
+        <div class="aboutCounter">
+          <div class="aboutCounterNum" data-count-to="0" id="counterLeaks">0</div>
+          <div class="aboutCounterLabel">утечек данных</div>
+        </div>
+      </div>
+
+      <div class="infoSectionTitle">Команда</div>
+      <div class="aboutTeamGrid">
+        <div class="aboutTeamCard">
+          <div class="aboutTeamAvatar">ИТ</div>
+          <div class="aboutTeamName">Иван Тихомиров</div>
+          <div class="aboutTeamRole">Основатель, CEO</div>
+        </div>
+        <div class="aboutTeamCard">
+          <div class="aboutTeamAvatar">МД</div>
+          <div class="aboutTeamName">Команда</div>
+          <div class="aboutTeamRole">Разработка и модерация</div>
+        </div>
+      </div>
+
+      <div class="infoCard">
+        <div class="infoCardIcon">🤝</div>
+        <div class="infoCardTitle">Для партнёров</div>
+        <div class="infoCardText">Интеграция LOMO в ваш HR-процесс, корпоративные решения и API-доступ для автоматической верификации. Напишите нам: <a href="mailto:partners@lomo.website" class="infoLink">partners@lomo.website</a></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SCREEN: FAQ -->
+<section id="screenFaq" class="screen" aria-label="Частые вопросы">
+  <div class="infoScreenHeader">
+    <button type="button" class="infoBackBtn" data-info-back>← Назад</button>
+    <span class="infoScreenHeaderTitle">Частые вопросы</span>
+  </div>
+  <div class="infoScreenBody">
+    <div class="pageContent">
+      <div class="infoHero">
+        <div class="infoHeroIcon">💬</div>
+        <div class="infoHeroTitle">Частые вопросы</div>
+        <div class="infoHeroSub">Ответы на самые популярные вопросы о платформе LOMO</div>
+      </div>
+
+      <input type="search" class="faqSearch" id="faqSearchInput" placeholder="🔍 Поиск по вопросам..." autocomplete="off">
+
+      <div class="faqChips">
+        <button class="faqChip active" data-faq-filter="all" type="button">Все</button>
+        <button class="faqChip" data-faq-filter="candidate" type="button">Кандидатам</button>
+        <button class="faqChip" data-faq-filter="employer" type="button">Работодателям</button>
+      </div>
+
+      <div id="faqList"></div>
+      <div class="faqEmpty hidden" id="faqEmpty">Ничего не найдено — попробуйте другой запрос</div>
+    </div>
+  </div>
+</section>
+
 <script src="./config.js"></script>
 <script src="./capacitor.js"></script>
 <script src="./scripts/runtime.js"></script>
@@ -1171,6 +1606,7 @@
 <script src="./scripts/auth-ui.js"></script>
 <script src="./scripts/profile-runtime.js"></script>
 <script src="./scripts/ui-shell.js"></script>
+<script src="./scripts/info-screens.js"></script>
 
 
 </body>

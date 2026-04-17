@@ -1,0 +1,573 @@
+/* ========================================================
+   INFO SCREENS — fullscreen pages for burger menu items
+   ======================================================== */
+
+/* Make info screens behave like profile screens (column layout) */
+#screenFaq.screen,
+#screenAbout.screen,
+#screenContacts.screen,
+#screenHow.screen,
+#screenSecurity.screen,
+#screenTerms.screen,
+#screenPrivacy.screen {
+  align-items: flex-start;
+  justify-content: flex-start;
+  flex-direction: column;
+  background: #f5f8fa;
+}
+
+/* ── Page fade-in animation ── */
+.screen.active .pageContent {
+  animation: pageIn 0.4s ease forwards;
+}
+
+@keyframes pageIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Sticky header ── */
+.infoScreenHeader {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  width: 100%;
+  box-sizing: border-box;
+  background: #fff;
+  border-bottom: 1px solid #e4ecf0;
+  padding: 13px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.infoBackBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  color: #2a7a8a;
+  padding: 5px 10px 5px 0;
+  font-weight: 500;
+  flex-shrink: 0;
+  line-height: 1;
+}
+.infoBackBtn:hover { color: #1d5f6e; }
+
+.infoScreenHeaderTitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #1a2a33;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ── Content area ── */
+.infoScreenBody {
+  width: 100%;
+  flex: 1;
+}
+
+.pageContent {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 28px 20px 60px;
+  box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+  .pageContent { padding: 20px 16px 50px; }
+}
+
+/* ── Hero ── */
+.infoHero { margin-bottom: 28px; }
+.infoHeroIcon { font-size: 38px; margin-bottom: 10px; }
+.infoHeroTitle {
+  font-size: 26px;
+  font-weight: 800;
+  color: #2a7a8a;
+  margin-bottom: 6px;
+  line-height: 1.2;
+  letter-spacing: -0.3px;
+}
+.infoHeroSub {
+  font-size: 15px;
+  color: #5a7a88;
+  line-height: 1.55;
+}
+
+/* ── Section title ── */
+.infoSectionTitle {
+  font-size: 17px;
+  font-weight: 700;
+  color: #1a2a33;
+  margin: 28px 0 14px;
+}
+.infoSectionTitle:first-child { margin-top: 0; }
+
+/* ── Card ── */
+.infoCard {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 2px 14px rgba(42, 122, 138, 0.09);
+  margin-bottom: 14px;
+}
+.infoCardIcon  { font-size: 26px; margin-bottom: 8px; }
+.infoCardTitle { font-size: 15px; font-weight: 700; color: #1a2a33; margin-bottom: 5px; }
+.infoCardText  { font-size: 14px; color: #5a7a88; line-height: 1.55; }
+
+/* stagger delays */
+.infoCard:nth-child(1) { animation-delay: 0.05s; }
+.infoCard:nth-child(2) { animation-delay: 0.10s; }
+.infoCard:nth-child(3) { animation-delay: 0.15s; }
+.infoCard:nth-child(4) { animation-delay: 0.20s; }
+.infoCard:nth-child(5) { animation-delay: 0.25s; }
+.infoCard:nth-child(6) { animation-delay: 0.30s; }
+
+/* 2-column grid */
+.infoCardGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+@media (max-width: 520px) {
+  .infoCardGrid { grid-template-columns: 1fr; }
+}
+.infoCardGrid .infoCard { margin-bottom: 0; }
+
+/* ── Highlight box ── */
+.infoHighlight {
+  background: #eef8fa;
+  border: 2px solid #2a7a8a;
+  border-radius: 16px;
+  padding: 18px 20px;
+  margin-bottom: 22px;
+}
+.infoHighlightText { font-size: 15px; font-weight: 700; color: #1a2a33; margin-bottom: 4px; }
+.infoHighlightSub  { font-size: 13px; color: #4a7a8a; line-height: 1.5; }
+
+/* ── Checklist ── */
+.infoCheckList { list-style: none; padding: 0; margin: 0; }
+.infoCheckList li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: #3a5a68;
+  padding: 9px 0;
+  border-bottom: 1px solid #eef2f5;
+  line-height: 1.45;
+}
+.infoCheckList li:last-child { border-bottom: none; }
+.infoCheckList li::before {
+  content: '✓';
+  color: #2a7a8a;
+  font-weight: 700;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+/* ── Steps (How screen) ── */
+.infoStep {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: 0 2px 14px rgba(42, 122, 138, 0.09);
+  margin-bottom: 12px;
+  opacity: 0;
+  transform: translateY(14px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+.infoStep.visible { opacity: 1; transform: translateY(0); }
+
+.infoStepNum {
+  min-width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #2a7a8a;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.infoStepTitle { font-size: 15px; font-weight: 700; color: #1a2a33; margin-bottom: 4px; }
+.infoStepText  { font-size: 14px; color: #5a7a88; line-height: 1.5; }
+
+/* ── Two-column path cards (How screen) ── */
+.infoPathGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+@media (max-width: 520px) { .infoPathGrid { grid-template-columns: 1fr; } }
+
+.infoPathCard {
+  border-radius: 16px;
+  padding: 18px 20px;
+}
+.infoPathCard.light {
+  background: #fff;
+  box-shadow: 0 2px 14px rgba(42, 122, 138, 0.09);
+}
+.infoPathCard.dark {
+  background: #1a2a33;
+}
+.infoPathTag {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.09em;
+  color: #2a7a8a;
+  margin-bottom: 6px;
+}
+.infoPathCard.dark .infoPathTag { color: #6ec8d5; }
+.infoPathTitle { font-size: 15px; font-weight: 700; color: #1a2a33; margin-bottom: 10px; }
+.infoPathCard.dark .infoPathTitle { color: #fff; }
+.infoPathList { list-style: none; padding: 0; margin: 0; }
+.infoPathList li {
+  font-size: 13px;
+  color: #5a7a88;
+  padding: 4px 0 4px 20px;
+  position: relative;
+  line-height: 1.4;
+}
+.infoPathList li::before { content: '✓'; position: absolute; left: 0; color: #2a7a8a; font-weight: 700; }
+.infoPathCard.dark .infoPathList li { color: #9abfcc; }
+.infoPathCard.dark .infoPathList li::before { color: #6ec8d5; }
+
+/* ── CTA button ── */
+.infoCTAWrap { margin-top: 24px; text-align: center; }
+.infoCTA {
+  display: inline-block;
+  background: #2a7a8a;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px 32px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+.infoCTA:hover { background: #1d5f6e; }
+
+/* ── Accordion ── */
+.accordionItem {
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 1px 8px rgba(42, 122, 138, 0.07);
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.accordionHead {
+  width: 100%;
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 15px 20px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #1a2a33;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  line-height: 1.4;
+}
+.accordionHead:hover { background: #f5f8fa; }
+.accordionArrow {
+  font-size: 12px;
+  color: #2a7a8a;
+  flex-shrink: 0;
+  transition: transform 0.25s;
+  display: inline-block;
+}
+.accordionItem.open .accordionArrow { transform: rotate(180deg); }
+.accordionBody {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.32s ease;
+}
+.accordionBodyInner {
+  padding: 0 20px 16px;
+  font-size: 14px;
+  color: #5a7a88;
+  line-height: 1.65;
+}
+
+/* ── FAQ filter chips ── */
+.faqChips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+}
+.faqChip {
+  background: #eaeff2;
+  border: none;
+  border-radius: 20px;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 500;
+  color: #5a7a88;
+  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
+}
+.faqChip.active,
+.faqChip:hover { background: #2a7a8a; color: #fff; }
+
+/* ── FAQ search ── */
+.faqSearch {
+  width: 100%;
+  border: 1.5px solid #d4e0e6;
+  border-radius: 12px;
+  padding: 12px 16px;
+  font-size: 15px;
+  color: #1a2a33;
+  background: #fff;
+  margin-bottom: 14px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.18s;
+}
+.faqSearch:focus { border-color: #2a7a8a; }
+.faqSearch::placeholder { color: #a0bfc8; }
+
+.faqEmpty {
+  text-align: center;
+  color: #9ab5bf;
+  font-size: 15px;
+  padding: 36px 0;
+}
+.accordionItem.faqHidden { display: none; }
+
+/* ── Contact cards ── */
+.contactCard {
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px 20px;
+  box-shadow: 0 2px 14px rgba(42, 122, 138, 0.09);
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  text-decoration: none;
+  color: inherit;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.contactCard:hover {
+  transform: scale(1.02);
+  box-shadow: 0 6px 22px rgba(42, 122, 138, 0.16);
+}
+.contactCardIcon  { font-size: 30px; flex-shrink: 0; }
+.contactCardTitle { font-size: 15px; font-weight: 700; color: #1a2a33; margin-bottom: 2px; }
+.contactCardValue { font-size: 14px; color: #2a7a8a; }
+
+/* ── Contact form ── */
+.contactForm {
+  background: #fff;
+  border-radius: 16px;
+  padding: 22px 20px;
+  box-shadow: 0 2px 14px rgba(42, 122, 138, 0.09);
+  margin-bottom: 24px;
+}
+.contactFormTitle { font-size: 16px; font-weight: 700; color: #1a2a33; margin-bottom: 14px; }
+.contactFormInput {
+  width: 100%;
+  border: 1.5px solid #d4e0e6;
+  border-radius: 10px;
+  padding: 11px 14px;
+  font-size: 14px;
+  color: #1a2a33;
+  background: #f8fafc;
+  margin-bottom: 10px;
+  box-sizing: border-box;
+  outline: none;
+  font-family: inherit;
+  transition: border-color 0.18s, background 0.18s;
+}
+.contactFormInput:focus { border-color: #2a7a8a; background: #fff; }
+.contactFormInput::placeholder { color: #a0bfc8; }
+.contactFormTextarea { resize: vertical; min-height: 96px; }
+.contactFormBtn {
+  width: 100%;
+  background: #2a7a8a;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 13px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.18s;
+  margin-top: 2px;
+  font-family: inherit;
+}
+.contactFormBtn:hover { background: #1d5f6e; }
+
+/* ── Work hours hint ── */
+.infoWorkHours {
+  background: #eef8fa;
+  border-radius: 12px;
+  padding: 14px 18px;
+  margin-bottom: 18px;
+  font-size: 14px;
+  color: #3a5a68;
+  line-height: 1.5;
+}
+
+/* ── About hero ── */
+.aboutHero {
+  text-align: center;
+  padding: 12px 0 28px;
+}
+.aboutHeroLogo {
+  font-size: 52px;
+  font-weight: 900;
+  color: #2a7a8a;
+  letter-spacing: -2px;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.aboutHeroTagline { font-size: 15px; color: #5a7a88; line-height: 1.5; }
+
+/* ── Animated counters ── */
+.aboutCounters {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 22px;
+}
+@media (max-width: 380px) { .aboutCounters { grid-template-columns: 1fr 1fr; } }
+
+.aboutCounter {
+  background: #fff;
+  border-radius: 16px;
+  padding: 18px 12px;
+  text-align: center;
+  box-shadow: 0 2px 14px rgba(42, 122, 138, 0.09);
+}
+.aboutCounterNum {
+  font-size: 30px;
+  font-weight: 900;
+  color: #2a7a8a;
+  line-height: 1;
+  margin-bottom: 6px;
+  letter-spacing: -1px;
+}
+.aboutCounterLabel { font-size: 11px; color: #7a9aaa; line-height: 1.4; }
+
+/* ── Timeline ── */
+.aboutTimeline {
+  position: relative;
+  padding-left: 26px;
+  margin-bottom: 22px;
+}
+.aboutTimeline::before {
+  content: '';
+  position: absolute;
+  left: 7px;
+  top: 7px;
+  bottom: 7px;
+  width: 2px;
+  background: #d0e8ed;
+}
+.aboutTimelineItem { position: relative; margin-bottom: 18px; }
+.aboutTimelineItem:last-child { margin-bottom: 0; }
+.aboutTimelineItem::before {
+  content: '';
+  position: absolute;
+  left: -21px;
+  top: 5px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #2a7a8a;
+}
+.aboutTimelineYear {
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: #2a7a8a;
+  margin-bottom: 2px;
+}
+.aboutTimelineText { font-size: 14px; color: #3a5a68; line-height: 1.5; }
+
+/* ── Team cards ── */
+.aboutTeamGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 22px;
+}
+.aboutTeamCard {
+  background: #fff;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  box-shadow: 0 2px 14px rgba(42, 122, 138, 0.09);
+}
+.aboutTeamAvatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2a7a8a, #4ab8cc);
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 10px;
+}
+.aboutTeamName { font-size: 14px; font-weight: 700; color: #1a2a33; margin-bottom: 3px; }
+.aboutTeamRole { font-size: 12px; color: #7a9aaa; }
+
+/* ── Legal date ── */
+.legalDate { font-size: 13px; color: #9ab5bf; margin-bottom: 18px; }
+
+/* ── Accept / confirm buttons ── */
+.infoAcceptBtn {
+  display: block;
+  width: 100%;
+  box-sizing: border-box;
+  background: #2a7a8a;
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 14px;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  text-align: center;
+  margin-top: 24px;
+  transition: background 0.18s;
+  font-family: inherit;
+}
+.infoAcceptBtn:hover { background: #1d5f6e; }
+
+/* ── Inline link style ── */
+.infoLink {
+  color: #2a7a8a;
+  text-decoration: underline;
+  cursor: pointer;
+  background: none;
+  border: none;
+  font-size: inherit;
+  padding: 0;
+  font-family: inherit;
+}
+.infoLink:hover { color: #1d5f6e; }

@@ -253,7 +253,11 @@ function bindStaticUiActions() {
 
   document.querySelectorAll('[data-legal-link]').forEach(function (link) {
     link.addEventListener('click', function () {
-      openLegalModal(link.getAttribute('data-legal-link'));
+      if (typeof showInfoScreen === 'function') {
+        showInfoScreen(link.getAttribute('data-legal-link'));
+      } else {
+        openLegalModal(link.getAttribute('data-legal-link'));
+      }
     });
   });
 
@@ -268,11 +272,15 @@ function bindStaticUiActions() {
   bindUiAction('landingRegCandidate', 'click', function () { state.roleReg = 'EMPLOYEE'; show('regForm'); });
   bindUiAction('landingRegEmployer', 'click', function () { state.roleReg = 'EMPLOYER'; show('regForm'); });
 
-  // Landing footer info modals
+  // Landing footer info modals → fullscreen info screens
   document.querySelectorAll('.js-ld-modal').forEach(function (btn) {
     btn.addEventListener('click', function () {
       var key = btn.getAttribute('data-modal-key');
-      openModal(key);
+      if (typeof showInfoScreen === 'function') {
+        showInfoScreen(key);
+      } else {
+        openModal(key);
+      }
     });
   });
 
@@ -305,15 +313,15 @@ if (drawerOverlay) drawerOverlay.addEventListener('click', closeDrawer);
 
 if (drawer) {
   drawer.addEventListener('click', function (event) {
-    const btn = event.target.closest('[data-drawer-open]');
+    var btn = event.target.closest('[data-drawer-open]');
     if (!btn) return;
-    const key = btn.getAttribute('data-drawer-open');
+    var key = btn.getAttribute('data-drawer-open');
     closeDrawer();
-    if (key === 'about') {
-      openModal('about');
-      return;
+    if (typeof showInfoScreen === 'function') {
+      showInfoScreen(key);
+    } else {
+      openModal(key);
     }
-    openModal(key);
   });
 }
 
