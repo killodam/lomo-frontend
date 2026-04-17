@@ -129,12 +129,16 @@
         job_title: u.job_title,
       });
 
+      // Update page title, OG tags and URL for SEO / social sharing
+      if (typeof updatePageSeoForProfile === 'function') updatePageSeoForProfile(u);
+
       show('publicProfile');
       if(canConnect) loadPublicConnectionPanel(u.id);
       if(canEmployerRequest) loadEmployerAccessPanel(u.id);
     }
 
     function closeUserProfile(){
+      if (typeof resetPageSeo === 'function') resetPageSeo();
       closePublicProfile();
     }
 

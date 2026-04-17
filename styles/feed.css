@@ -2,6 +2,14 @@
    LOMO — FEED PAGE STYLES
    ══════════════════════════════════════════════ */
 
+/* Infinite scroll sentinel — invisible trigger element */
+.feedScrollSentinel {
+  height: 1px;
+  width: 100%;
+  pointer-events: none;
+  visibility: hidden;
+}
+
 #screenCandidateFeed {
   align-items: flex-start;
   justify-content: flex-start;

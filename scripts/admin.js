@@ -1,8 +1,11 @@
 var _userCache = {};
 var _connectionsData = { accepted: [], incoming: [], outgoing: [], counts: { accepted: 0, incoming: 0, outgoing: 0 } };
 
-var feedState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '', view: '' };
-var employerSearchState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '', verified: '' };
+var feedState = { page: 1, pageSize: 15, total: 0, totalPages: 0, search: '', view: '' };
+var employerSearchState = { page: 1, pageSize: 15, total: 0, totalPages: 0, search: '', verified: '' };
+// Infinite scroll observers
+var _feedScrollObserver = null;
+var _employerScrollObserver = null;
 var FEED_AUTO_REFRESH_MS = Math.max(10000, Number(window.LOMO_CONFIG && window.LOMO_CONFIG.FEED_AUTO_REFRESH_MS || 30000) || 30000);
 var FEED_PULL_REFRESH_TRIGGER_PX = 78;
 var FEED_PULL_REFRESH_MAX_PX = 132;
@@ -224,6 +227,49 @@ function renderPager(targetId, pagerState, onNavigate, options) {
 function queueEmptyState(text) {
   return '<div class="adminEmptyState">' + escapeHtml(text) + '</div>';
 }
+
+// ── INFINITE SCROLL ENGINE ────────────────────────────────────────────────
+function setupInfiniteScroll(listId, observerRef, loadNextPage) {
+  // Disconnect any previous observer stored in observerRef
+  if (observerRef && observerRef.current) {
+    observerRef.current.disconnect();
+    observerRef.current = null;
+  }
+
+  var el = document.getElementById(listId);
+  if (!el) return;
+
+  // Remove old sentinel if present
+  var old = el.querySelector('.feedScrollSentinel');
+  if (old) old.remove();
+
+  if (!window.IntersectionObserver) return; // safe fallback: old pager still works
+
+  var sentinel = document.createElement('div');
+  sentinel.className = 'feedScrollSentinel';
+  sentinel.setAttribute('aria-hidden', 'true');
+  el.appendChild(sentinel);
+
+  var observer = new IntersectionObserver(function(entries) {
+    if (!entries[0].isIntersecting) return;
+    loadNextPage();
+  }, { rootMargin: '200px' });
+
+  observer.observe(sentinel);
+  observerRef.current = observer;
+}
+
+function teardownInfiniteScroll(observerRef, listId) {
+  if (observerRef && observerRef.current) {
+    observerRef.current.disconnect();
+    observerRef.current = null;
+  }
+  if (listId) {
+    var el = document.getElementById(listId);
+    if (el) { var s = el.querySelector('.feedScrollSentinel'); if (s) s.remove(); }
+  }
+}
+// ─────────────────────────────────────────────────────────────────────────
 
 function upsertConnectionUser(item) {
   if (!item || !item.user_id) return;
@@ -1522,6 +1568,7 @@ function isScreenActive(key) {
 function loadCandidateFeed(page, options) {
   var opts = options || {};
   var isSilent = !!opts.silent;
+  var isNextPage = !!opts.nextPage; // true when triggered by infinite scroll
   if (page) feedState.page = page;
   feedState.search = (document.getElementById('feedSearchInput')?.value || '').trim();
   feedState.view = (document.getElementById('feedViewFilter')?.value || '').trim();
@@ -1532,13 +1579,15 @@ function loadCandidateFeed(page, options) {
   if (!document.getElementById(listId)) return Promise.resolve();
 
   if (feedState.view === 'favorites') {
+    teardownInfiniteScroll({ current: _feedScrollObserver }, listId);
+    _feedScrollObserver = null;
     var bookmarkedUsers = getVisibleBookmarkedUsers(feedState.search);
-    renderFeedList(paginateLocalItems(bookmarkedUsers, feedState));
+    renderFeedList(paginateLocalItems(bookmarkedUsers, feedState), false);
     renderPager('candidateFeedPager', feedState, loadCandidateFeed, { label: 'избранных профилей' });
     return Promise.resolve(bookmarkedUsers);
   }
 
-  if (!isSilent) renderFeedLoadingState(listId, 3);
+  if (!isSilent && !isNextPage) renderFeedLoadingState(listId, 3);
 
   return apiGetFeed({
     page: feedState.page,
@@ -1548,8 +1597,27 @@ function loadCandidateFeed(page, options) {
     var scrollTop = isSilent ? getScreenScrollTop('candidateFeed') : 0;
     var data = normalizePaginatedResponse(result);
     syncPagerState(feedState, data);
-    renderFeedList(data.items || []);
-    renderPager('candidateFeedPager', feedState, loadCandidateFeed, { label: 'профилей' });
+    renderFeedList(data.items || [], isNextPage);
+    // Show pager only on first page or when IntersectionObserver not available
+    if (!window.IntersectionObserver) {
+      renderPager('candidateFeedPager', feedState, loadCandidateFeed, { label: 'профилей' });
+    } else {
+      document.getElementById('candidateFeedPager') && (document.getElementById('candidateFeedPager').innerHTML = '');
+    }
+    // Setup infinite scroll sentinel if there are more pages
+    if (feedState.page < feedState.totalPages) {
+      var ref = { current: _feedScrollObserver };
+      setupInfiniteScroll(listId, ref, function () {
+        if (feedState.page >= feedState.totalPages) return;
+        feedState.page++;
+        loadCandidateFeed(feedState.page, { nextPage: true });
+      });
+      _feedScrollObserver = ref.current;
+    } else {
+      // All pages loaded — remove sentinel
+      teardownInfiniteScroll({ current: _feedScrollObserver }, listId);
+      _feedScrollObserver = null;
+    }
     if (isSilent) restoreScreenScrollTop('candidateFeed', scrollTop);
   }).catch(function (err) {
     if (recoverAuthFlowOnProtectedError(err, {
@@ -1564,11 +1632,14 @@ function loadCandidateFeed(page, options) {
 }
 
 function filterFeed() {
+  // Reset infinite scroll when filter changes
+  teardownInfiniteScroll({ current: _feedScrollObserver }, 'candidateFeedList');
+  _feedScrollObserver = null;
   feedState.page = 1;
   loadCandidateFeed(1);
 }
 
-function renderFeedList(list) {
+function renderFeedList(list, appendMode) {
   var el = document.getElementById('candidateFeedList');
   if (!el) return;
 
@@ -1576,7 +1647,7 @@ function renderFeedList(list) {
     return String(user.id) !== String(state.userId);
   });
 
-  if (!filtered.length) {
+  if (!filtered.length && !appendMode) {
     if (feedState.view === 'favorites') {
       renderFeedEmptyState(
         'candidateFeedList',
@@ -1589,14 +1660,29 @@ function renderFeedList(list) {
     return;
   }
 
-  el.innerHTML = filtered.map(function (user) {
-    return buildSocialCard(user);
-  }).join('');
+  var fragment = document.createDocumentFragment();
+  filtered.forEach(function (user) {
+    var wrapper = document.createElement('div');
+    wrapper.innerHTML = buildSocialCard(user);
+    var card = wrapper.firstElementChild;
+    if (card) fragment.appendChild(card);
+  });
+
+  if (appendMode) {
+    // Remove old sentinel before appending (setupInfiniteScroll will add a new one)
+    var old = el.querySelector('.feedScrollSentinel');
+    if (old) old.remove();
+    el.appendChild(fragment);
+  } else {
+    el.innerHTML = '';
+    el.appendChild(fragment);
+  }
 }
 
 function loadEmployerSearch(page, options) {
   var opts = options || {};
   var isSilent = !!opts.silent;
+  var isNextPage = !!opts.nextPage;
   if (page) employerSearchState.page = page;
   employerSearchState.search = (document.getElementById('empSearchName')?.value || '').trim();
   employerSearchState.verified = (document.getElementById('empSearchVerified')?.value || '').trim();
@@ -1607,15 +1693,16 @@ function loadEmployerSearch(page, options) {
   if (!document.getElementById(listId)) return Promise.resolve();
 
   if (employerSearchState.verified && employerSearchState.verified !== 'verified') {
-    // If it's a specific folder or 'favorites' (which we can alias to 'default' or aggregate)
+    teardownInfiniteScroll({ current: _employerScrollObserver }, listId);
+    _employerScrollObserver = null;
     var bookmarkListId = employerSearchState.verified === 'favorites' ? 'default' : employerSearchState.verified;
     var bookmarkedUsers = filterBookmarkedUsers(getBookmarkedUsersList(bookmarkListId), employerSearchState.search);
-    renderEmployerSearch(paginateLocalItems(bookmarkedUsers, employerSearchState));
+    renderEmployerSearch(paginateLocalItems(bookmarkedUsers, employerSearchState), false);
     renderPager('employerCandidatePager', employerSearchState, loadEmployerSearch, { label: 'сохраненных' });
     return Promise.resolve(bookmarkedUsers);
   }
 
-  if (!isSilent) renderFeedLoadingState(listId, 4);
+  if (!isSilent && !isNextPage) renderFeedLoadingState(listId, 4);
 
   return apiGetCandidates({
     page: employerSearchState.page,
@@ -1626,8 +1713,24 @@ function loadEmployerSearch(page, options) {
     var scrollTop = isSilent ? getScreenScrollTop('employerSearch') : 0;
     var data = normalizePaginatedResponse(result);
     syncPagerState(employerSearchState, data);
-    renderEmployerSearch(data.items || []);
-    renderPager('employerCandidatePager', employerSearchState, loadEmployerSearch, { label: 'кандидатов' });
+    renderEmployerSearch(data.items || [], isNextPage);
+    if (!window.IntersectionObserver) {
+      renderPager('employerCandidatePager', employerSearchState, loadEmployerSearch, { label: 'кандидатов' });
+    } else {
+      document.getElementById('employerCandidatePager') && (document.getElementById('employerCandidatePager').innerHTML = '');
+    }
+    if (employerSearchState.page < employerSearchState.totalPages) {
+      var ref = { current: _employerScrollObserver };
+      setupInfiniteScroll(listId, ref, function () {
+        if (employerSearchState.page >= employerSearchState.totalPages) return;
+        employerSearchState.page++;
+        loadEmployerSearch(employerSearchState.page, { nextPage: true });
+      });
+      _employerScrollObserver = ref.current;
+    } else {
+      teardownInfiniteScroll({ current: _employerScrollObserver }, listId);
+      _employerScrollObserver = null;
+    }
     if (isSilent) restoreScreenScrollTop('employerSearch', scrollTop);
   }).catch(function (err) {
     if (recoverAuthFlowOnProtectedError(err, {
@@ -1642,14 +1745,16 @@ function loadEmployerSearch(page, options) {
 }
 
 function filterEmployerSearch() {
+  teardownInfiniteScroll({ current: _employerScrollObserver }, 'employerCandidateList');
+  _employerScrollObserver = null;
   employerSearchState.page = 1;
   loadEmployerSearch(1);
 }
 
-function renderEmployerSearch(list) {
+function renderEmployerSearch(list, appendMode) {
   var el = document.getElementById('employerCandidateList');
   if (!el) return;
-  if (!list.length) {
+  if (!list.length && !appendMode) {
     if (employerSearchState.verified === 'favorites') {
       renderFeedEmptyState(
         'employerCandidateList',
@@ -1661,9 +1766,23 @@ function renderEmployerSearch(list) {
     renderFeedEmptyState('employerCandidateList', '👤', 'Нет кандидатов по текущему фильтру');
     return;
   }
-  el.innerHTML = list.map(function (candidate) {
-    return buildSocialCard(candidate);
-  }).join('');
+
+  var fragment = document.createDocumentFragment();
+  list.forEach(function (candidate) {
+    var wrapper = document.createElement('div');
+    wrapper.innerHTML = buildSocialCard(candidate);
+    var card = wrapper.firstElementChild;
+    if (card) fragment.appendChild(card);
+  });
+
+  if (appendMode) {
+    var old = el.querySelector('.feedScrollSentinel');
+    if (old) old.remove();
+    el.appendChild(fragment);
+  } else {
+    el.innerHTML = '';
+    el.appendChild(fragment);
+  }
 }
 
 function loadAdminCandidates(page) {

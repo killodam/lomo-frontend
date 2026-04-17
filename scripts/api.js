@@ -72,7 +72,53 @@ function apiTypeToProofKey(type) {
 }
 
 function publicProfileUrlForId(publicId) {
-  return location.href.split('#')[0] + '#profile=' + encodeURIComponent(publicId || '');
+  // Use query string (?profile=) instead of hash (#profile=) so Google
+  // can index public profile pages. Auth.js reads both formats.
+  var base = location.origin + location.pathname;
+  return base + '?profile=' + encodeURIComponent(publicId || '');
+}
+
+function updatePageSeoForProfile(user) {
+  if (!user) return;
+  var isEmployer = user.role === 'employer';
+  var name = String(user.full_name || (isEmployer ? user.company : '') || '').trim();
+  var role = isEmployer ? 'Работодатель' : 'Кандидат';
+  var verCount = ['edu_status','work_status','course_status','pass_status','cv_status']
+    .filter(function(k){ return user[k] === 'verified'; }).length;
+  var verified = verCount > 0 ? ' · ' + verCount + ' документ(а) верифицировано' : '';
+  var title = name ? (name + ' — ' + role + ' на LOMO' + verified) : 'LOMO — Профиль';
+  var desc = name
+    ? (name + ' — верифицированный профиль на платформе LOMO' + (user.vacancies ? '. Ищет: ' + user.vacancies : '') + '.')
+    : 'Верифицированный профиль на LOMO.';
+  var url = user.public_id ? publicProfileUrlForId(user.public_id) : location.href;
+
+  document.title = title;
+  var set = function(id, attr, val) { var el = document.getElementById(id); if (el) el.setAttribute(attr, val); };
+  set('ogTitle',       'content', title);
+  set('ogDescription', 'content', desc);
+  set('ogUrl',         'content', url);
+  set('twitterTitle',  'content', title);
+  set('twitterDesc',   'content', desc);
+  set('canonicalLink', 'href',    url);
+
+  // Update browser URL (no page reload, helps crawler see unique URLs)
+  if (user.public_id && history.replaceState) {
+    history.replaceState(null, title, url);
+  }
+}
+
+function resetPageSeo() {
+  var title = 'LOMO — Верификация документов для HR';
+  var desc  = 'LOMO — платформа верификации карьерных данных. Работодатели находят кандидатов с подтверждёнными документами.';
+  document.title = title;
+  var set = function(id, attr, val) { var el = document.getElementById(id); if (el) el.setAttribute(attr, val); };
+  set('ogTitle',       'content', title);
+  set('ogDescription', 'content', desc);
+  set('ogUrl',         'content', location.origin + location.pathname);
+  set('twitterTitle',  'content', title);
+  set('twitterDesc',   'content', desc);
+  set('canonicalLink', 'href',    location.origin + location.pathname);
+  if (history.replaceState) history.replaceState(null, title, location.origin + location.pathname);
 }
 
 function buildQuery(params = {}) {
