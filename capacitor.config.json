@@ -1,0 +1,19 @@
+{
+  "appId": "com.killodam.lomo",
+  "appName": "LOMO",
+  "webDir": ".",
+  "bundledWebRuntime": true,
+  "server": {
+    "hostname": "localhost",
+    "iosScheme": "capacitor",
+    "androidScheme": "https"
+  },
+  "plugins": {
+    "CapacitorCookies": {
+      "enabled": true
+    },
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}

@@ -418,6 +418,265 @@ function setStatusTag(id, status) {
   else el.classList.add('ghost');
 }
 
+function isNativeCapacitorRuntime() {
+  if (window.LOMO_PUSH && typeof window.LOMO_PUSH.isNativePlatform === 'function') {
+    return !!window.LOMO_PUSH.isNativePlatform();
+  }
+  if (!window.Capacitor) return false;
+  if (typeof window.Capacitor.isNativePlatform === 'function') {
+    return !!window.Capacitor.isNativePlatform();
+  }
+  if (typeof window.Capacitor.getPlatform === 'function') {
+    return window.Capacitor.getPlatform() !== 'web';
+  }
+  return false;
+}
+
+function getCapacitorPlugin(name) {
+  var capacitor = window.Capacitor || {};
+  var plugins = capacitor.Plugins || {};
+  return plugins[name] || null;
+}
+
+function hasNativeFilePicker() {
+  var picker = getCapacitorPlugin('FilePicker');
+  return !!(isNativeCapacitorRuntime() && picker && typeof picker.pickFiles === 'function');
+}
+
+function getPickerOptionsFromInput(input) {
+  return {
+    multiple: !!(input && input.multiple),
+    accept: String(input && input.accept || '')
+      .split(',')
+      .map(function (value) { return value.trim(); })
+      .filter(Boolean),
+  };
+}
+
+function decodeBase64ToBlob(base64, mimeType) {
+  var raw = String(base64 || '');
+  var binary;
+  var bytes;
+  var index;
+
+  if (raw.indexOf(',') >= 0) {
+    raw = raw.split(',').pop();
+  }
+
+  binary = window.atob(raw);
+  bytes = new Uint8Array(binary.length);
+
+  for (index = 0; index < binary.length; index += 1) {
+    bytes[index] = binary.charCodeAt(index);
+  }
+
+  return new Blob([bytes], { type: mimeType || 'application/octet-stream' });
+}
+
+function createNativeFile(blob, fileName, mimeType) {
+  var safeType = mimeType || blob.type || 'application/octet-stream';
+  var safeName = fileName || 'file';
+
+  try {
+    return new File([blob], safeName, { type: safeType });
+  } catch (error) {
+    blob.name = safeName;
+    blob.lastModified = Date.now();
+    return blob;
+  }
+}
+
+function readNativeFileData(path, mimeType) {
+  var filesystem = getCapacitorPlugin('Filesystem');
+  if (!filesystem || typeof filesystem.readFile !== 'function' || !path) {
+    return Promise.resolve(null);
+  }
+
+  return filesystem.readFile({ path: path }).then(function (result) {
+    if (!result || !result.data) return null;
+    return createNativeFile(decodeBase64ToBlob(result.data, mimeType), String(path).split('/').pop() || 'file', mimeType);
+  }).catch(function () {
+    return null;
+  });
+}
+
+function normalizeNativePickedFile(entry, index) {
+  var safeEntry = entry || {};
+  var fileName = safeEntry.name || ('file-' + (index + 1));
+  var mimeType = safeEntry.mimeType || safeEntry.contentType || 'application/octet-stream';
+  var directBlob = safeEntry.blob;
+
+  if (directBlob && typeof Blob !== 'undefined' && directBlob instanceof Blob) {
+    return Promise.resolve(createNativeFile(directBlob, fileName, mimeType));
+  }
+
+  if (safeEntry.data) {
+    return Promise.resolve(createNativeFile(decodeBase64ToBlob(safeEntry.data, mimeType), fileName, mimeType));
+  }
+
+  return readNativeFileData(safeEntry.path || safeEntry.uri, mimeType).then(function (file) {
+    if (!file) return null;
+    if (!file.name) file.name = fileName;
+    return file;
+  });
+}
+
+function pickFilesWithNativePicker(options) {
+  var picker = getCapacitorPlugin('FilePicker');
+  var pickOptions;
+
+  if (!hasNativeFilePicker()) return Promise.resolve(null);
+
+  pickOptions = {
+    multiple: !!(options && options.multiple),
+    readData: true,
+  };
+
+  if (options && options.accept && options.accept.length) {
+    pickOptions.types = options.accept.slice();
+  }
+
+  return picker.pickFiles(pickOptions).then(function (result) {
+    var entries = result && Array.isArray(result.files) ? result.files : [];
+    return Promise.all(entries.map(function (entry, index) {
+      return normalizeNativePickedFile(entry, index);
+    })).then(function (files) {
+      return files.filter(Boolean);
+    });
+  });
+}
+
+function openPickerForInput(input, options, onFiles) {
+  if (!input) return;
+  if (!hasNativeFilePicker()) {
+    input.click();
+    return;
+  }
+
+  pickFilesWithNativePicker(options || getPickerOptionsFromInput(input))
+    .then(function (files) {
+      if (!files || !files.length) return;
+      if (typeof onFiles === 'function') onFiles(files);
+    })
+    .catch(function () {
+      input.click();
+    });
+}
+
+function bindNativeInputPicker(input, onFiles) {
+  if (!input || input.dataset.nativePickerBound) return;
+  input.dataset.nativePickerBound = '1';
+  input.addEventListener('click', function (event) {
+    if (!hasNativeFilePicker()) return;
+    event.preventDefault();
+    openPickerForInput(input, getPickerOptionsFromInput(input), onFiles);
+  });
+}
+
+function handleProofSelection(binding, file) {
+  const name = file ? file.name : '';
+  const proof = state[binding.role].proofs[binding.key];
+  const hintEl = document.getElementById(binding.hint);
+
+  if (!proof) return;
+
+  if (proof.url) {
+    try {
+      URL.revokeObjectURL(proof.url);
+    } catch (error) {}
+  }
+  proof.fileName = name;
+  proof.status = name ? 'на рассмотрении' : 'не загружено';
+  proof.url = name && file ? URL.createObjectURL(file) : '';
+  proof.rejectReason = '';
+
+  if (hintEl) hintEl.textContent = name ? 'Загрузка...' : 'Файл не выбран';
+  setStatusTag(binding.status, proof.status);
+
+  if (binding.role === 'employer') renderRecruiterPublic();
+  if (binding.role === 'employee') renderEmployeePublic();
+  refreshEmployeeCVButton();
+  saveToStorage();
+
+  if (name && file && getToken()) {
+    (async function () {
+      try {
+        const uploaded = await apiUploadFile(file);
+        const apiType = proofKeyToApiType(binding.key);
+        let achId = proof.achievementId;
+        if (!achId) {
+          const ach = await apiCreateAchievement(apiType, DOC_TYPE_LABELS[apiType] || apiType, '');
+          achId = ach.id;
+          proof.achievementId = achId;
+        }
+        const doc = await apiAttachDocument(achId, uploaded.fileUrl, uploaded.fileName);
+        proof.docId = doc?.id || proof.docId;
+        if (hintEl) hintEl.textContent = 'Прикреплено: ' + uploaded.fileName;
+        showToast('Файл загружен ✓ — на рассмотрении');
+        saveToStorage();
+      } catch (error) {
+        if (hintEl) hintEl.textContent = 'Прикреплено: ' + name + ' (локально)';
+        showToast('Файл загружен локально');
+      }
+    })();
+  } else {
+    if (hintEl && name) hintEl.textContent = 'Прикреплено: ' + name;
+    if (name) showToast('Файл загружен ✓');
+  }
+}
+
+function handlePortfolioSelection(files) {
+  const safeFiles = Array.isArray(files) ? files : [];
+  const hint = document.getElementById('portHintC');
+
+  (state.employee.portfolio || []).forEach(function (item) {
+    try {
+      if (item.url) URL.revokeObjectURL(item.url);
+    } catch (error) {}
+  });
+
+  state.employee.portfolio = safeFiles.map(function (file) {
+    return { name: file.name, url: URL.createObjectURL(file) };
+  });
+
+  if (hint) {
+    hint.textContent = safeFiles.length
+      ? ('Прикреплено: ' + safeFiles.length + ' файл(ов)')
+      : 'Файлы не выбраны';
+  }
+
+  setStatusTag('portStatusC', safeFiles.length ? 'на рассмотрении' : 'не загружено');
+  renderEmployeePublic();
+  if (safeFiles.length) showToast('Файл загружен ✓');
+}
+
+function handleAvatarSelection(file, input, hintId, imgId, target) {
+  if (!file) return;
+  if (!/^image\//i.test(file.type || '')) {
+    showToast('Выберите файл изображения', 'error');
+    if (input) input.value = '';
+    return;
+  }
+
+  buildAvatarDataUrl(file, function (error, result) {
+    const dataUrl = String(result && result.dataUrl || '');
+    if (error || !dataUrl) {
+      showToast((error && error.message) || 'Не удалось обработать изображение', 'error');
+      if (input) input.value = '';
+      return;
+    }
+
+    if (target === 'employer') state.employer.avatarDataUrl = dataUrl;
+    if (target === 'employee') state.employee.avatarDataUrl = dataUrl;
+    setAvatar(imgId, dataUrl);
+    setText(hintId, 'Фото выбрано: ' + file.name);
+    if (target === 'employer') renderRecruiterPublic();
+    if (target === 'employee') renderEmployeePublic();
+    saveToStorage();
+    if (result.compressed) showToast('Аватар оптимизирован для сохранения', 'info');
+  });
+}
+
 function wireProofs() {
   const bindings = [
     { role: 'employer', key: 'companyDoc', input: 'fileCompanyDocE', hint: 'companyDocHintE', status: 'companyDocStatusE' },
@@ -431,60 +690,18 @@ function wireProofs() {
   bindings.forEach(function (binding) {
     const inp = document.getElementById(binding.input);
     if (!inp) return;
+    inp._lomoHandleFiles = function (files) {
+      handleProofSelection(binding, files && files[0] ? files[0] : null);
+    };
+
     if (!inp.dataset.proofBound) {
       inp.dataset.proofBound = '1';
       inp.addEventListener('change', function () {
-        const file = inp.files && inp.files[0];
-        const name = file ? file.name : '';
-        const proof = state[binding.role].proofs[binding.key];
-        if (!proof) return;
-
-        if (proof.url) {
-          try {
-            URL.revokeObjectURL(proof.url);
-          } catch (error) {}
-        }
-        proof.fileName = name;
-        proof.status = name ? 'на рассмотрении' : 'не загружено';
-        proof.url = name && file ? URL.createObjectURL(file) : '';
-        proof.rejectReason = '';
-
-        const hintEl = document.getElementById(binding.hint);
-        if (hintEl) hintEl.textContent = name ? 'Загрузка...' : 'Файл не выбран';
-        setStatusTag(binding.status, proof.status);
-
-        if (binding.role === 'employer') renderRecruiterPublic();
-        if (binding.role === 'employee') renderEmployeePublic();
-        refreshEmployeeCVButton();
-        saveToStorage();
-
-        if (name && file && getToken()) {
-          (async function () {
-            try {
-              const uploaded = await apiUploadFile(file);
-              const apiType = proofKeyToApiType(binding.key);
-              let achId = proof.achievementId;
-              if (!achId) {
-                const ach = await apiCreateAchievement(apiType, DOC_TYPE_LABELS[apiType] || apiType, '');
-                achId = ach.id;
-                proof.achievementId = achId;
-              }
-              const doc = await apiAttachDocument(achId, uploaded.fileUrl, uploaded.fileName);
-              proof.docId = doc?.id || proof.docId;
-              if (hintEl) hintEl.textContent = 'Прикреплено: ' + uploaded.fileName;
-              showToast('Файл загружен ✓ — на рассмотрении');
-              saveToStorage();
-            } catch (error) {
-              if (hintEl) hintEl.textContent = 'Прикреплено: ' + name + ' (локально)';
-              showToast('Файл загружен локально');
-            }
-          })();
-        } else {
-          if (hintEl && name) hintEl.textContent = 'Прикреплено: ' + name;
-          if (name) showToast('Файл загружен ✓');
-        }
+        handleProofSelection(binding, inp.files && inp.files[0] ? inp.files[0] : null);
       });
     }
+
+    bindNativeInputPicker(inp, inp._lomoHandleFiles);
 
     const proof = state[binding.role].proofs[binding.key];
     const curName = proof && proof.fileName;
@@ -509,7 +726,9 @@ function wireDropZones() {
     const zone = document.getElementById(zoneId);
     const inp = document.getElementById(inputId);
     if (!zone || !inp) return;
-    zone.addEventListener('click', function () { inp.click(); });
+    zone.addEventListener('click', function () {
+      openPickerForInput(inp, getPickerOptionsFromInput(inp), inp._lomoHandleFiles);
+    });
     zone.addEventListener('dragover', function (event) {
       event.preventDefault();
       zone.classList.add('dropZone--over');
@@ -531,59 +750,22 @@ function wireDropZones() {
 (function wirePortfolio() {
   const inp = document.getElementById('filePortfolioC');
   if (!inp) return;
+  inp._lomoHandleFiles = handlePortfolioSelection;
+  bindNativeInputPicker(inp, inp._lomoHandleFiles);
   inp.addEventListener('change', function () {
-    const files = inp.files ? Array.from(inp.files) : [];
-    (state.employee.portfolio || []).forEach(function (item) {
-      try {
-        if (item.url) URL.revokeObjectURL(item.url);
-      } catch (error) {}
-    });
-    state.employee.portfolio = files.map(function (file) {
-      return { name: file.name, url: URL.createObjectURL(file) };
-    });
-    const hint = document.getElementById('portHintC');
-    if (hint) hint.textContent = files.length ? ('Прикреплено: ' + files.length + ' файл(ов)') : 'Файлы не выбраны';
-    setStatusTag('portStatusC', files.length ? 'на рассмотрении' : 'не загружено');
-    renderEmployeePublic();
-    if (files.length) showToast('Файл загружен ✓');
+    handlePortfolioSelection(inp.files ? Array.from(inp.files) : []);
   });
 })();
 
 function wireAvatar(inputId, hintId, imgId, target) {
   const input = document.getElementById(inputId);
   if (!input) return;
+  input._lomoHandleFiles = function (files) {
+    handleAvatarSelection(files && files[0] ? files[0] : null, input, hintId, imgId, target);
+  };
+  bindNativeInputPicker(input, input._lomoHandleFiles);
   input.addEventListener('change', function () {
-    const file = input.files && input.files[0];
-    if (!file) return;
-    if (!/^image\//i.test(file.type || '')) {
-      showToast('Выберите файл изображения', 'error');
-      input.value = '';
-      return;
-    }
-
-    buildAvatarDataUrl(file, function (error, result) {
-      if (error) {
-        showToast(error.message || 'Не удалось обработать изображение', 'error');
-        input.value = '';
-        return;
-      }
-
-      const dataUrl = String(result.dataUrl || '');
-      if (!dataUrl) {
-        showToast('Не удалось обработать изображение', 'error');
-        input.value = '';
-        return;
-      }
-
-      if (target === 'employer') state.employer.avatarDataUrl = dataUrl;
-      if (target === 'employee') state.employee.avatarDataUrl = dataUrl;
-      setAvatar(imgId, dataUrl);
-      setText(hintId, 'Фото выбрано: ' + file.name);
-      if (target === 'employer') renderRecruiterPublic();
-      if (target === 'employee') renderEmployeePublic();
-      saveToStorage();
-      if (result.compressed) showToast('Аватар оптимизирован для сохранения', 'info');
-    });
+    handleAvatarSelection(input.files && input.files[0] ? input.files[0] : null, input, hintId, imgId, target);
   });
 }
 

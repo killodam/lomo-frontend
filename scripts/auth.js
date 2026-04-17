@@ -2,6 +2,9 @@ function logout() {
   if (window.LOMO_CHAT_UI && typeof window.LOMO_CHAT_UI.disconnectAndCleanup === 'function') {
     window.LOMO_CHAT_UI.disconnectAndCleanup();
   }
+  if (window.LOMO_PUSH && typeof window.LOMO_PUSH.clearSession === 'function') {
+    window.LOMO_PUSH.clearSession();
+  }
   saveToStorage();
   apiLogout().catch(function () {});
   clearToken();
@@ -13,6 +16,9 @@ function logout() {
 function logoutAllSessions() {
   if (window.LOMO_CHAT_UI && typeof window.LOMO_CHAT_UI.disconnectAndCleanup === 'function') {
     window.LOMO_CHAT_UI.disconnectAndCleanup();
+  }
+  if (window.LOMO_PUSH && typeof window.LOMO_PUSH.clearSession === 'function') {
+    window.LOMO_PUSH.clearSession();
   }
   saveToStorage();
   apiLogoutAll().catch(function () {});
@@ -26,12 +32,25 @@ function deleteOwnAccount(password) {
   const userId = state.userId;
   return apiDeleteAccount(password).then(function (result) {
     clearUserStorage(userId);
+    if (window.LOMO_PUSH && typeof window.LOMO_PUSH.clearSession === 'function') {
+      window.LOMO_PUSH.clearSession();
+    }
     clearToken();
     resetState();
     resetDisplay();
     clearAuthInputs();
     return result;
   });
+}
+
+function registerPushAfterAuth(options) {
+  var request = window.LOMO_PUSH && typeof window.LOMO_PUSH.registerAfterLogin === 'function'
+    ? window.LOMO_PUSH.registerAfterLogin(options || {})
+    : null;
+
+  if (request && typeof request.catch === 'function') {
+    request.catch(function () {});
+  }
 }
 
     function clearAuthInputs(){
@@ -818,6 +837,7 @@ function deleteOwnAccount(password) {
               state.roleReg = role === 'employer' ? 'EMPLOYER' : 'EMPLOYEE';
               applyProfileToState(user, profile, []);
               saveToStorage();
+              registerPushAfterAuth({ prompt: true });
               if(role === 'employer'){
                 state.employer.fullName = fullName || state.employer.fullName;
               } else {
@@ -856,6 +876,7 @@ function deleteOwnAccount(password) {
               const { user, profile, achievements } = await apiLogin(loginEmail, loginPwd);
               applyProfileToState(user, profile, achievements || []);
               saveToStorage();
+              registerPushAfterAuth({ prompt: true });
               if(user.role === 'employer'){ showEmployerDashboard(); }
               else if(user.role === 'admin'){ show('adminQueue'); }
               else { showEmployeeDashboard(); }
@@ -1166,6 +1187,7 @@ function deleteOwnAccount(password) {
       }
 
       if (user && user.id) {
+        registerPushAfterAuth({ prompt: false });
         routeAutoLoginUser(user);
         return;
       }

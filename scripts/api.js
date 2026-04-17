@@ -278,6 +278,13 @@ async function apiConfirmCorpEmail(code) {
   });
 }
 
+async function apiSavePushToken(token, platform) {
+  return apiFetch('/profile/push-token', {
+    method: 'POST',
+    body: JSON.stringify({ token, platform }),
+  });
+}
+
 async function apiForgotPassword(email) {
   return apiFetch('/auth/forgot-password', {
     method: 'POST',
