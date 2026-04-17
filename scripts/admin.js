@@ -936,10 +936,21 @@ function getBookmarksStorageKey() {
 function readBookmarks() {
   try {
     var raw = window.localStorage.getItem(getBookmarksStorageKey());
-    var parsed = raw ? JSON.parse(raw) : {};
-    return parsed && typeof parsed === 'object' ? parsed : {};
+    var parsed = raw ? JSON.parse(raw) : null;
+    if (!parsed || typeof parsed !== 'object') parsed = {};
+    
+    // Auto-migrate to Folder format
+    if (!parsed.lists && Object.keys(parsed).length > 0) {
+      var oldItems = Object.assign({}, parsed);
+      parsed = { lists: { 'default': { id: 'default', name: 'Избранные', items: oldItems } } };
+      writeBookmarks(parsed);
+    } else if (!parsed.lists) {
+      parsed = { lists: { 'default': { id: 'default', name: 'Избранные', items: {} } } };
+      writeBookmarks(parsed);
+    }
+    return parsed;
   } catch (error) {
-    return {};
+    return { lists: { 'default': { id: 'default', name: 'Избранные', items: {} } } };
   }
 }
 
@@ -953,10 +964,26 @@ function writeBookmarks(bookmarks) {
   }
 }
 
-function getBookmarkedUsersList() {
+function getBookmarkedUsersList(listId) {
   var bookmarks = readBookmarks();
-  return Object.keys(bookmarks).map(function (uid) {
-    return bookmarks[uid];
+  var lists = bookmarks.lists || {};
+  
+  if (listId && lists[listId]) {
+    return Object.keys(lists[listId].items || {}).map(function (uid) {
+      return lists[listId].items[uid];
+    }).filter(Boolean);
+  }
+  
+  // Aggregate from all lists if no listId provided
+  var allUsers = {};
+  Object.keys(lists).forEach(function (lId) {
+    Object.keys(lists[lId].items || {}).forEach(function (uid) {
+      allUsers[uid] = lists[lId].items[uid];
+    });
+  });
+  
+  return Object.keys(allUsers).map(function (uid) {
+    return allUsers[uid];
   }).filter(Boolean);
 }
 
@@ -1014,8 +1041,8 @@ function paginateLocalItems(items, pagerState) {
   return items.slice(start, start + pagerState.pageSize);
 }
 
-function getVisibleBookmarkedUsers(query) {
-  return filterBookmarkedUsers(getBookmarkedUsersList(), query).filter(function (user) {
+function getVisibleBookmarkedUsers(query, listId) {
+  return filterBookmarkedUsers(getBookmarkedUsersList(listId), query).filter(function (user) {
     return String(user && user.id || user && user.email || '') !== String(state.userId || '');
   });
 }
@@ -1038,9 +1065,44 @@ function syncFeedFilterChips() {
 function syncEmployerFilterChips() {
   var selectedView = '';
   var select = document.getElementById('empSearchVerified');
-
   if (select) selectedView = String(select.value || '');
-  syncChipSelection('.empFilterChip', 'data-verified', selectedView);
+  
+  var chipContainer = document.querySelector('.empFilterChips');
+  if (chipContainer) {
+    // Rebuild chips based on folders
+    var bookmarks = readBookmarks();
+    var lists = bookmarks.lists || {};
+    
+    var html = '<button class="empFilterChip' + (selectedView === '' ? ' active' : '') + '" data-verified="" type="button">Все кандидаты</button>' +
+               '<button class="empFilterChip' + (selectedView === 'verified' ? ' active' : '') + '" data-verified="verified" type="button">✓ Верифицированные</button>';
+               
+    Object.keys(lists).forEach(function(lId) {
+      var isAct = selectedView === lId || (selectedView === 'favorites' && lId === 'default') ? ' active' : '';
+      var icon = lId === 'default' ? '★ ' : '📁 ';
+      html += '<button class="empFilterChip' + isAct + '" data-verified="' + lId + '" type="button">' + icon + escHtml(lists[lId].name) + '</button>';
+    });
+    
+    chipContainer.innerHTML = html;
+    
+    // Add event listeners locally to the newly generated chips
+    chipContainer.querySelectorAll('.empFilterChip').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var val = btn.getAttribute('data-verified') || '';
+        chipContainer.querySelectorAll('.empFilterChip').forEach(function(c) { c.classList.remove('active'); });
+        btn.classList.add('active');
+        if (select) { select.value = val; select.dispatchEvent(new Event('change')); }
+      });
+    });
+    
+    // Also sync the hidden select options
+    if (select) {
+      var opts = '<option value="">Все кандидаты</option><option value="verified">Верифицированные</option>';
+      Object.keys(lists).forEach(function(lId) {
+         opts += '<option value="' + lId +'" ' + (selectedView === lId ? 'selected' : '') + '>' + escHtml(lists[lId].name) + '</option>';
+      });
+      select.innerHTML = opts;
+    }
+  }
 }
 
 function syncBookmarkButtons(uid, isActive) {
@@ -1056,58 +1118,162 @@ function syncBookmarkButtons(uid, isActive) {
 
 function _isBookmarked(uid) {
   var bookmarks = readBookmarks();
-  return !!bookmarks[String(uid || '')];
+  var lists = bookmarks.lists || {};
+  var targetUid = String(uid || '');
+  for (var key in lists) {
+    if (lists[key].items && lists[key].items[targetUid]) return true;
+  }
+  return false;
 }
+
+var _currentBookmarkUid = null;
 
 function toggleBookmark(uid, sourceButton, event) {
-  var targetUid = String(uid || '');
-  var button = sourceButton && sourceButton.nodeType === 1 ? sourceButton : null;
-  var evt = event || (button ? null : sourceButton);
-  var bookmarks;
-  var user;
-  var isActive;
-
-  if (evt && typeof evt.stopPropagation === 'function') evt.stopPropagation();
+  if (event && typeof event.stopPropagation === 'function') event.stopPropagation();
+  else if (sourceButton && sourceButton.stopPropagation) sourceButton.stopPropagation();
+  
   if (!state.userId) {
-    showToast('Войдите в аккаунт, чтобы добавлять избранное', 'error');
+    showToast('Войдите в аккаунт, чтобы сохранять профили', 'error');
     return false;
   }
+  
+  var targetUid = String(uid || '');
+  _currentBookmarkUid = targetUid;
+  
+  var modal = document.getElementById('atsFolderModal');
+  if (modal) {
+    var user = _userCache[targetUid];
+    var titleEl = document.getElementById('atsFolderModalTitle');
+    if (titleEl && user) titleEl.textContent = 'Сохранить: ' + (user.full_name || user.company || user.email);
+    modal.classList.add('open');
+    renderFolderModalLists();
+  }
+  return false; // Real toggling happens inside modal now
+}
 
-  bookmarks = readBookmarks();
+function closeAtsFolderModal() {
+  var modal = document.getElementById('atsFolderModal');
+  if (modal) modal.classList.remove('open');
+}
 
-  if (bookmarks[targetUid]) {
-    delete bookmarks[targetUid];
-    showToast('Удалено из избранного', 'info');
+// Bind close events
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.js-close-ats-modal').forEach(function(btn) {
+    btn.addEventListener('click', closeAtsFolderModal);
+  });
+});
+
+// ── FOLDER MANAGEMENT (ATS) ──
+
+function renderFolderModalLists() {
+  var listEl = document.getElementById('atsFolderModalLists');
+  if (!listEl) return;
+  var bookmarks = readBookmarks();
+  var lists = bookmarks.lists || {};
+  var uid = _currentBookmarkUid;
+  
+  var html = Object.keys(lists).map(function(lId) {
+    var list = lists[lId];
+    var isChecked = !!(list.items && list.items[uid]);
+    var isDefault = lId === 'default';
+    var controls = isDefault ? '' : '<div class="atsFolderActions"><button type="button" class="faBtn edit" onclick="renameAtsFolder(\'' + lId + '\')" title="Переименовать">✎</button><button type="button" class="faBtn del" onclick="deleteAtsFolder(\'' + lId + '\')" title="Удалить">✕</button></div>';
+    
+    return '<div class="atsFolderRow">' +
+      '<label class="atsFolderLabel">' +
+      '<input type="checkbox" onchange="toggleUserInAtsFolder(\'' + lId + '\', this.checked)" ' + (isChecked ? 'checked' : '') + ' tabindex="0">' +
+      '<span class="atsFolderTitle">📁 ' + escHtml(list.name) + ' <span class="atsFolderCount">(' + Object.keys(list.items || {}).length + ')</span></span>' +
+      '</label>' + controls + '</div>';
+  }).join('');
+  
+  listEl.innerHTML = html;
+}
+
+function toggleUserInAtsFolder(listId, isChecked) {
+  var uid = _currentBookmarkUid;
+  if (!uid) return;
+  var user = _userCache[uid];
+  if (!user) return;
+  
+  var bookmarks = readBookmarks();
+  if (!bookmarks.lists[listId].items) bookmarks.lists[listId].items = {};
+  
+  if (isChecked) {
+    bookmarks.lists[listId].items[uid] = user;
+    // showToast('Сохранено в "' + bookmarks.lists[listId].name + '"', 'success');
   } else {
-    user = _userCache[targetUid];
-    if (user) {
-      bookmarks[targetUid] = user;
-      showToast('Добавлено в избранное', 'success');
-    } else {
-      showToast('Не удалось добавить профиль в избранное', 'error');
-      return false;
-    }
+    delete bookmarks.lists[listId].items[uid];
+    // showToast('Удалено из "' + bookmarks.lists[listId].name + '"', 'info');
   }
-
-  if (!writeBookmarks(bookmarks)) return false;
-
-  isActive = !!bookmarks[targetUid];
-  if (button) {
-    button.classList.toggle('active', isActive);
-    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
-    button.setAttribute('title', isActive ? 'Убрать из избранного' : 'Добавить в избранное');
-  }
-  syncBookmarkButtons(targetUid, isActive);
-
-  if (employerSearchState.verified === 'favorites') {
+  writeBookmarks(bookmarks);
+  renderFolderModalLists();
+  syncEmployerFilterChips();
+  
+  var isActive = _isBookmarked(uid);
+  syncBookmarkButtons(uid, isActive);
+  
+  if (employerSearchState.verified === listId || employerSearchState.verified === 'favorites') {
     loadEmployerSearch();
   }
-  if (feedState.view === 'favorites') {
-    loadCandidateFeed(feedState.page);
-  }
-
-  return isActive;
 }
+
+function createNewAtsFolder() {
+  var input = document.getElementById('newAtsFolderName');
+  if (!input) return;
+  var name = input.value.trim();
+  if (!name) { showToast('Введите название папки', 'error'); return; }
+  
+  var bookmarks = readBookmarks();
+  var listId = 'list_' + Math.random().toString(36).substr(2, 9);
+  bookmarks.lists[listId] = { id: listId, name: name, items: {} };
+  writeBookmarks(bookmarks);
+  
+  input.value = '';
+  renderFolderModalLists();
+  syncEmployerFilterChips();
+  showToast('Папка создана', 'success');
+}
+
+function renameAtsFolder(listId) {
+  var bookmarks = readBookmarks();
+  var newName = prompt('Новое название папки:', bookmarks.lists[listId].name);
+  if (newName && newName.trim()) {
+    bookmarks.lists[listId].name = newName.trim();
+    writeBookmarks(bookmarks);
+    renderFolderModalLists();
+    syncEmployerFilterChips();
+    var sel = document.getElementById('empSearchVerified');
+    if (sel && sel.value === listId) {
+      // Re-trigger visual update
+      syncEmployerFilterChips();
+    }
+  }
+}
+
+function deleteAtsFolder(listId) {
+  var bookmarks = readBookmarks();
+  var count = Object.keys(bookmarks.lists[listId].items || {}).length;
+  var msg = count > 0 
+    ? 'Папка "' + bookmarks.lists[listId].name + '" содержит профили (' + count + '). Удалить папку вместе с профилями?' 
+    : 'Удалить пустую папку "' + bookmarks.lists[listId].name + '"?';
+    
+  if (confirm(msg)) {
+    delete bookmarks.lists[listId];
+    writeBookmarks(bookmarks);
+    renderFolderModalLists();
+    syncEmployerFilterChips();
+    
+    var sel = document.getElementById('empSearchVerified');
+    if (sel && sel.value === listId) {
+      sel.value = '';
+      filterEmployerSearch();
+    } else {
+      if (employerSearchState.verified === 'favorites' || String(employerSearchState.verified).startsWith('list_')) {
+        loadEmployerSearch();
+      }
+    }
+  }
+}
+
 
 
 function buildSocialCard(user) {
@@ -1343,10 +1509,12 @@ function loadEmployerSearch(page, options) {
   var listId = 'employerCandidateList';
   if (!document.getElementById(listId)) return Promise.resolve();
 
-  if (employerSearchState.verified === 'favorites') {
-    var bookmarkedUsers = filterBookmarkedUsers(getBookmarkedUsersList(), employerSearchState.search);
+  if (employerSearchState.verified && employerSearchState.verified !== 'verified') {
+    // If it's a specific folder or 'favorites' (which we can alias to 'default' or aggregate)
+    var listId = employerSearchState.verified === 'favorites' ? 'default' : employerSearchState.verified;
+    var bookmarkedUsers = filterBookmarkedUsers(getBookmarkedUsersList(listId), employerSearchState.search);
     renderEmployerSearch(paginateLocalItems(bookmarkedUsers, employerSearchState));
-    renderPager('employerCandidatePager', employerSearchState, loadEmployerSearch, { label: 'избранных' });
+    renderPager('employerCandidatePager', employerSearchState, loadEmployerSearch, { label: 'сохраненных' });
     return Promise.resolve(bookmarkedUsers);
   }
 

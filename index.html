@@ -1093,6 +1093,26 @@
     </div>
   </div>
 </div>
+<!-- ATS FOLDER MODAL -->
+<div id="atsFolderModal" class="userProfileModal">
+  <div class="userProfileDialog">
+    <div class="userProfileModalContent" style="padding-bottom: 0;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 15px;">
+        <h3 id="atsFolderModalTitle" style="margin:0; font-size:16px;">Сохранить профиль</h3>
+        <button class="faBtn del js-close-ats-modal" style="font-size:18px; line-height:1; border:none; background:none; cursor:pointer;">✕</button>
+      </div>
+      <div id="atsFolderModalLists" style="max-height: 250px; overflow-y: auto; margin-bottom: 15px;"></div>
+      <div style="display:flex; gap:8px;">
+        <input type="text" id="newAtsFolderName" class="commonInput" placeholder="Новая папка..." style="margin:0;">
+        <button type="button" class="btn primary" onclick="createNewAtsFolder()" style="white-space:nowrap; padding: 0 16px;">Создать</button>
+      </div>
+    </div>
+    <div class="userProfileModalFooter" style="margin-top:0;">
+      <button class="userProfileCloseBtn js-close-ats-modal">Закрыть</button>
+    </div>
+  </div>
+</div>
+
 <!-- TOAST -->
 <div id="toast" class="toast"></div>
 
