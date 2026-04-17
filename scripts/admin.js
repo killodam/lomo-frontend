@@ -1172,20 +1172,19 @@ function buildSocialCard(user) {
 
   var detailLines = '';
   if (!isEmployer) {
-    var verifiedLabels = {
-      edu_status: 'Образование',
-      work_status: 'Опыт',
-      course_status: 'Курсы',
-      pass_status: 'Паспорт',
-      cv_status: 'CV',
-    };
-    var verifiedItems = [];
-    Object.keys(verifiedLabels).forEach(function (key) {
-      if (user[key] === 'verified') verifiedItems.push(verifiedLabels[key]);
-    });
-    if (verifiedItems.length) {
+    var verifiedData = [];
+    if (user.edu_status === 'verified') verifiedData.push({ label: 'Образование', tool: [user.edu_place, user.edu_year].filter(Boolean).join(', ') || 'Диплом проверен' });
+    if (user.work_status === 'verified') verifiedData.push({ label: 'Опыт', tool: user.work_exp && user.work_exp[0] ? [user.work_exp[0].company, user.work_exp[0].role].filter(Boolean).join(' · ') : 'Стаж подтвержден' });
+    if (user.course_status === 'verified') verifiedData.push({ label: 'Курсы', tool: 'Сертификаты доп. образования проверены' });
+    if (user.pass_status === 'verified') verifiedData.push({ label: 'Паспорт', tool: 'Личность пользователя подтверждена' });
+    if (user.cv_status === 'verified') verifiedData.push({ label: 'CV', tool: 'Резюме соответствует документам' });
+
+    if (verifiedData.length) {
       detailLines += '<div class="scChipRow regular">' +
-        verifiedItems.map(function (value) { return '<span class="scVerItem">✓ ' + value + '</span>'; }).join('') +
+        verifiedData.map(function (item) {
+          var safeTool = escHtml(item.tool).replace(/"/g, '&quot;');
+          return '<span class="scVerItem has-tooltip" data-tooltip="' + safeTool + '">✓ ' + item.label + '</span>'; 
+        }).join('') +
       '</div>';
     }
     if (user.vacancies) {
