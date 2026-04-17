@@ -613,6 +613,34 @@ function deleteOwnAccount(password) {
       if(e.target && e.target.id === 'rpContactBtn'){ openEmployerContact(); return; }
       if(e.target && e.target.id === 'rpDownloadCV'){ downloadRecruiterCV(); return; }
       if(e.target && e.target.id === 'rpCVLink'){ downloadRecruiterCV(); return; }
+      function publicProfileUrl() {
+        return window.location.origin + window.location.pathname + '?profile=' + encodeURIComponent(state.publicId || state.userId);
+      }
+      function copyToClipboard(text) {
+        if(navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(function(){
+            showToast('Публичная ссылка скопирована в буфер обмена!', 'success');
+          }).catch(function(){
+            showToast('Не удалось скопировать ссылку', 'error');
+          });
+        } else {
+          // Fallback
+          var textArea = document.createElement("textarea");
+          textArea.value = text;
+          textArea.style.position = "fixed";
+          document.body.appendChild(textArea);
+          textArea.focus();
+          textArea.select();
+          try {
+            document.execCommand('copy');
+            showToast('Публичная ссылка скопирована в буфер обмена!', 'success');
+          } catch (err) {
+            showToast('Не удалось скопировать ссылку', 'error');
+          }
+          document.body.removeChild(textArea);
+        }
+      }
+      
       if(e.target && e.target.id === 'btnShareProfile'){ copyToClipboard(publicProfileUrl()); return; }
       if(e.target && e.target.id === 'btnContactData'){ openMail(); return; }
       if(e.target && e.target.id === 'btnDownloadCV'){ downloadEmployeeCV(); return; }
@@ -1053,6 +1081,15 @@ function deleteOwnAccount(password) {
       try {
         user = await tryAutoLogin();
       } catch (error) {}
+
+      // ── B2C PUBLIC PROFILE LINK HANDLING ──
+      var params = new URLSearchParams(window.location.search);
+      var publicProfileId = params.get('profile');
+      
+      if (publicProfileId && typeof window.openPublicProfileByPublicId === 'function') {
+        window.openPublicProfileByPublicId(publicProfileId);
+        return;
+      }
 
       if (user && user.id) {
         routeAutoLoginUser(user);

@@ -152,3 +152,16 @@
         }).join('');
       }).catch(function(e){ el.innerHTML='<div class="pubProfileFilesState error">'+escHtml(safeErrorText(e))+'</div>'; });
     }
+
+function openPublicProfileByPublicId(publicId) {
+  apiGetPublicProfile(publicId).then(function(profile){
+    if (!profile) throw new Error('Not found');
+    var u = Object.assign({}, profile, { id: profile.id || publicId, role: profile.role || 'candidate' });
+    _userCache[String(u.id)] = u;
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    openUserProfile(u);
+  }).catch(function(){
+    showToast('Профиль не найден', 'error');
+    show('landing');
+  });
+}

@@ -663,6 +663,9 @@ function handleRequestDecision(requestId, action) {
     showToast(action === 'approve' ? 'Доступ разрешён' : 'Запрос отклонён', action === 'approve' ? 'success' : 'info');
     loadIncomingRequests();
     if (_activePublicProfileUserId) loadEmployerAccessPanel(_activePublicProfileUserId);
+    if (window.LOMO_CHAT_UI && typeof window.LOMO_CHAT_UI.refreshConnectionInbox === 'function') {
+      window.LOMO_CHAT_UI.refreshConnectionInbox();
+    }
   }).catch(function (err) {
     showToast(safeErrorText(err), 'error');
   });

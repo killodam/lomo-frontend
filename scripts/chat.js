@@ -167,7 +167,9 @@
   }
 
   function computeIncomingConnectionTotal() {
-    return Number(state.connections && state.connections.counts && state.connections.counts.incoming || 0);
+    var connCount = Number(state.connections && state.connections.counts && state.connections.counts.incoming || 0);
+    var docCount = (state.documentRequests || []).filter(function(r) { return r.status === 'pending'; }).length;
+    return connCount + docCount;
   }
 
   function normalizeConnectionsPayload(data) {
@@ -236,9 +238,10 @@
     var data = normalizeConnectionsPayload(state.connections);
     var incoming = data.incoming || [];
     var outgoing = data.outgoing || [];
+    var docRequests = (state.documentRequests || []).filter(function(r) { return r.status === 'pending'; });
     var sections = [];
 
-    if (!shouldEnableChat() || (!incoming.length && !outgoing.length)) {
+    if (!shouldEnableChat() || (!incoming.length && !outgoing.length && !docRequests.length)) {
       elements.connectionInbox.classList.add('hidden');
       elements.connectionInbox.innerHTML = '';
       renderHeaderUnreadBadges();
@@ -265,6 +268,26 @@
       );
     }
 
+    function renderDocRequestCard(req) {
+      var who = escapeHtml(req.company || req.employer_name || 'Работодатель');
+      var docLabel = escapeHtml(DOC_TYPE_LABELS && DOC_TYPE_LABELS[req.document_type] ? DOC_TYPE_LABELS[req.document_type] : req.document_type || 'Документ');
+      var avatarHtml = '<div class="chatConnectionAvatar"><span>' + who.slice(0, 2).toUpperCase() + '</span></div>';
+      var actionHtml = 
+        '<button type="button" class="chatConnectionBtn primary" data-approve-request="' + escapeHtml(req.id) + '">Разрешить</button>' +
+        '<button type="button" class="chatConnectionBtn danger" data-reject-request="' + escapeHtml(req.id) + '">Отклонить</button>';
+      
+      return (
+        '<div class="chatConnectionCard incoming">' +
+          avatarHtml +
+          '<div class="chatConnectionBody">' +
+            '<div class="chatConnectionName">' + who + '</div>' +
+            '<div class="chatConnectionMeta">Запрашивает: ' + docLabel + '</div>' +
+            '<div class="chatConnectionActions">' + actionHtml + '</div>' +
+          '</div>' +
+        '</div>'
+      );
+    }
+
     if (incoming.length) {
       sections.push(
         '<div class="chatInboxSection">' +
@@ -274,6 +297,20 @@
           '</div>' +
           incoming.map(function (item) {
             return renderConnectionCard(item, 'incoming');
+          }).join('') +
+        '</div>'
+      );
+    }
+
+    if (docRequests.length) {
+      sections.push(
+        '<div class="chatInboxSection">' +
+          '<div class="chatInboxHeading">' +
+            '<div class="chatInboxTitle">Запросы документов</div>' +
+            '<span class="chatInboxCount">' + escapeHtml(String(docRequests.length)) + '</span>' +
+          '</div>' +
+          docRequests.map(function(item) {
+            return renderDocRequestCard(item);
           }).join('') +
         '</div>'
       );
@@ -660,6 +697,7 @@
   async function loadConnectionInbox(options) {
     if (!shouldEnableChat()) {
       state.connections = normalizeConnectionsPayload();
+      state.documentRequests = [];
       chatState.knownIncomingConnectionIds = [];
       chatState.connectionsSnapshotReady = false;
       renderConnectionInbox();
@@ -669,20 +707,27 @@
     options = options || {};
 
     try {
-      var result = await apiGetConnections();
-      var data = normalizeConnectionsPayload(result);
+      var promises = [apiGetConnections()];
+      if (state.roleReg === 'EMPLOYEE') promises.push(apiGetRequests());
+
+      var result = await Promise.all(promises);
+      var data = normalizeConnectionsPayload(result[0]);
+      var reqs = result[1] || [];
+      
       state.connections = data;
+      state.documentRequests = reqs;
+      
       updateConnectionNotifications(data);
       renderConnectionInbox();
       renderConversationList();
       return data;
     } catch (err) {
       if (!options.silent) {
-        showToast('Не удалось загрузить запросы в контакты: ' + safeErrorText(err), 'error');
+        showToast('Не удалось загрузить данные Inbox: ' + safeErrorText(err), 'error');
       }
       if (elements.connectionInbox && isChatActive()) {
         elements.connectionInbox.classList.remove('hidden');
-        elements.connectionInbox.innerHTML = '<div class="chatConversationEmpty">Не удалось загрузить запросы в контакты</div>';
+        elements.connectionInbox.innerHTML = '<div class="chatConversationEmpty">Не удалось загрузить запросы</div>';
       }
       throw err;
     }
