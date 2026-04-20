@@ -223,6 +223,26 @@ function bindStaticUiActions() {
   });
   bindUiAction('verifyLevelInfoBtn', 'click', function () { openVerifyLevelModal(); });
   bindUiAction('refreshAdminQueueBtn', 'click', function () { loadAdminQueue(); });
+  bindUiAction('adminPreviewCandidateBtn', 'click', function () {
+    show('employerSearch');
+    var btn = document.getElementById('empAdminBackBtn');
+    if (btn) btn.classList.remove('hidden');
+  });
+  bindUiAction('adminPreviewEmployerBtn', 'click', function () {
+    show('candidateFeed');
+    var btn = document.getElementById('feedAdminBackBtn');
+    if (btn) btn.classList.remove('hidden');
+  });
+  bindUiAction('feedAdminBackBtn', 'click', function () {
+    var btn = document.getElementById('feedAdminBackBtn');
+    if (btn) btn.classList.add('hidden');
+    show('adminQueue');
+  });
+  bindUiAction('empAdminBackBtn', 'click', function () {
+    var btn = document.getElementById('empAdminBackBtn');
+    if (btn) btn.classList.add('hidden');
+    show('adminQueue');
+  });
   if (typeof bindAdminRoleChips === 'function') bindAdminRoleChips();
   bindUiAction('pubProfileBackBtn', 'click', function () { closePublicProfile(); });
   bindUiAction('userProfileCloseBtn', 'click', function () { closeUserProfile(); });

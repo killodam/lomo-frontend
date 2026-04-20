@@ -805,6 +805,7 @@
           <span class="feedHeaderWord">LOMO</span>
         </div>
         <nav class="feedHeaderNav">
+          <button type="button" class="feedNavBtn adminBackBtn hidden" id="feedAdminBackBtn">← Админ</button>
           <button type="button" class="feedNavBtn" data-next="toChatHub">Чаты</button>
           <button type="button" class="feedNavBtn accent" id="feedMyProfileBtn">Мой профиль</button>
           <button type="button" class="feedNavBtn ghost" data-next="toAuthFromProfile">Выйти</button>
@@ -853,6 +854,7 @@
           <span class="feedHeaderWord">LOMO</span>
         </div>
         <nav class="feedHeaderNav">
+          <button type="button" class="feedNavBtn adminBackBtn hidden" id="empAdminBackBtn">← Админ</button>
           <button type="button" class="feedNavBtn" data-next="toChatHub">Чаты</button>
           <button type="button" class="feedNavBtn accent" id="searchCompanyProfileBtn">Профиль компании</button>
           <button type="button" class="feedNavBtn ghost" data-next="toAuthFromProfile">Выйти</button>
@@ -992,6 +994,21 @@
       </div>
     </div>
     <div class="centerBlock">
+
+      <!-- Preview bar -->
+      <div class="adminPreviewBar">
+        <div class="adminPreviewLabel">Просмотр платформы</div>
+        <div class="adminPreviewBtns">
+          <button type="button" class="adminPreviewBtn candidate" id="adminPreviewCandidateBtn">
+            <span class="adminPreviewIcon">👤</span>
+            <span class="adminPreviewBtnText"><span class="adminPreviewBtnTitle">Лента кандидатов</span><span class="adminPreviewBtnSub">Как видит работодатель</span></span>
+          </button>
+          <button type="button" class="adminPreviewBtn employer" id="adminPreviewEmployerBtn">
+            <span class="adminPreviewIcon">🏢</span>
+            <span class="adminPreviewBtnText"><span class="adminPreviewBtnTitle">Поиск работы</span><span class="adminPreviewBtnSub">Как видит кандидат</span></span>
+          </button>
+        </div>
+      </div>
 
       <!-- TAB: Documents queue -->
       <div id="adminTabPanelDocs">
