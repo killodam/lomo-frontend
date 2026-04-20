@@ -61,6 +61,43 @@ function registerPushAfterAuth(options) {
       document.querySelectorAll('.codeCell').forEach(c=>c.classList.remove('filled','active','error'));
     }
 
+    // ── AI MATCH MODAL ───────────────────────────────────────
+    function aiMatchOpen() {
+      var ta = document.getElementById('aiMatchTextarea');
+      if (ta) { ta.value = ''; ta.dispatchEvent(new Event('input')); }
+      document.querySelectorAll('.aiMatchTemplateChip').forEach(function(c) { c.classList.remove('active'); });
+      // Reset grade chips
+      document.querySelectorAll('[data-grade]').forEach(function(c) { c.classList.remove('active'); });
+      var defaultGrade = document.querySelector('[data-grade=""]');
+      if (defaultGrade) defaultGrade.classList.add('active');
+      // Reset format chips
+      document.querySelectorAll('[data-format]').forEach(function(c) { c.classList.remove('active'); });
+      var defaultFormat = document.querySelector('[data-format=""]');
+      if (defaultFormat) defaultFormat.classList.add('active');
+      // Reset verified toggle
+      var vt = document.getElementById('aiMatchVerifiedOnly');
+      if (vt) vt.checked = true;
+      document.getElementById('aiMatchInputState').classList.remove('hidden');
+      document.getElementById('aiMatchLoadingState').classList.add('hidden');
+      document.getElementById('aiMatchModal').style.display = 'block';
+      if (ta) setTimeout(function() { ta.focus(); }, 80);
+    }
+
+    // Char counter for AI textarea
+    (function() {
+      document.addEventListener('input', function(e) {
+        if (e.target && e.target.id === 'aiMatchTextarea') {
+          var len = e.target.value.length;
+          var counter = document.getElementById('aiMatchCharCount');
+          if (counter) counter.textContent = len;
+          if (len > 900) counter.style.color = '#ef4444';
+          else if (len > 700) counter.style.color = '#f59e0b';
+          else counter.style.color = '';
+          if (len > 1000) e.target.value = e.target.value.slice(0, 1000);
+        }
+      });
+    })();
+
     // ── FORGOT PASSWORD FLOW ──────────────────────────────────
     (function initForgotFlow(){
       // State for the flow: modes are 'forgot' | 'email-verify' | 'corp-email'
@@ -671,10 +708,7 @@ function registerPushAfterAuth(options) {
 
       const btnOpenAiMatch = e.target.closest('#btnOpenAiMatch');
       if (btnOpenAiMatch) {
-        document.getElementById('aiMatchTextarea').value = '';
-        document.getElementById('aiMatchInputState').classList.remove('hidden');
-        document.getElementById('aiMatchLoadingState').classList.add('hidden');
-        document.getElementById('aiMatchModal').style.display = 'block';
+        aiMatchOpen();
         return;
       }
 
@@ -684,52 +718,120 @@ function registerPushAfterAuth(options) {
         return;
       }
 
+      // Template chips
+      const templateChip = e.target.closest('[data-template]');
+      if (templateChip && templateChip.closest('#aiMatchModal')) {
+        const templates = {
+          frontend: 'Ищем Frontend разработчика. Стек: React, TypeScript, HTML/CSS. Задачи: разработка UI-компонентов, работа с Figma, оптимизация производительности. Опыт от 1 года.',
+          backend: 'Ищем Backend разработчика. Стек: Node.js или Python, PostgreSQL, Docker, REST API. Задачи: разработка микросервисов, работа с БД, интеграции. Опыт от 2 лет.',
+          data: 'Ищем Data Analyst. Инструменты: SQL, Python (pandas, numpy), Tableau или Power BI. Задачи: анализ данных, дашборды, A/B тесты, отчётность для бизнеса.',
+          pm: 'Ищем Product Manager. Опыт: управление продуктом, roadmap, работа с метриками (DAU, retention, LTV). Agile/Scrum. Коммуникация с разработчиками и стейкхолдерами.',
+          design: 'Ищем UX/UI Designer. Инструменты: Figma, принципы дизайн-систем, прототипирование. Задачи: проектирование пользовательских сценариев, работа с командой разработки.',
+          devops: 'Ищем DevOps инженера. Стек: Docker, Kubernetes, CI/CD (GitLab/GitHub Actions), AWS или GCP. Мониторинг: Grafana, Prometheus. Опыт Linux, bash-скриптинг.',
+        };
+        var ta = document.getElementById('aiMatchTextarea');
+        if (ta) {
+          ta.value = templates[templateChip.getAttribute('data-template')] || '';
+          ta.dispatchEvent(new Event('input'));
+        }
+        document.querySelectorAll('.aiMatchTemplateChip').forEach(function(c) { c.classList.remove('active'); });
+        templateChip.classList.add('active');
+        return;
+      }
+
+      // Grade chips
+      const gradeChip = e.target.closest('[data-grade]');
+      if (gradeChip && gradeChip.closest('#aiMatchModal')) {
+        document.querySelectorAll('[data-grade]').forEach(function(c) { c.classList.remove('active'); });
+        gradeChip.classList.add('active');
+        return;
+      }
+
+      // Format chips
+      const formatChip = e.target.closest('[data-format]');
+      if (formatChip && formatChip.closest('#aiMatchModal')) {
+        document.querySelectorAll('[data-format]').forEach(function(c) { c.classList.remove('active'); });
+        formatChip.classList.add('active');
+        return;
+      }
+
       const btnRunAiMatch = e.target.closest('#btnRunAiMatch');
       if (btnRunAiMatch) {
         const text = (document.getElementById('aiMatchTextarea').value || '').trim();
-        if(!text) { showToast('Пожалуйста, вставьте текст вакансии', 'error'); return; }
-        
+        if (!text) { showToast('Опишите кого вы ищете', 'error'); return; }
+
+        const gradeEl = document.querySelector('[data-grade].active');
+        const formatEl = document.querySelector('[data-format].active');
+        const verifiedOnly = document.getElementById('aiMatchVerifiedOnly')?.checked;
+        const selectedGrade = gradeEl ? gradeEl.getAttribute('data-grade') : '';
+        const selectedFormat = formatEl ? formatEl.getAttribute('data-format') : '';
+
         document.getElementById('aiMatchInputState').classList.add('hidden');
         document.getElementById('aiMatchLoadingState').classList.remove('hidden');
         const statusEl = document.getElementById('aiMatchStatusText');
-        
-        statusEl.textContent = 'Анализ контекста вакансии...';
-        
+
+        function setStep(n, msg) {
+          ['aiStep1','aiStep2','aiStep3'].forEach(function(id, i) {
+            var el = document.getElementById(id);
+            if (!el) return;
+            el.classList.toggle('active', i === n - 1);
+            el.classList.toggle('done', i < n - 1);
+          });
+          if (statusEl) statusEl.textContent = msg;
+        }
+
+        setStep(1, 'Анализ текста вакансии...');
         setTimeout(function() {
-          statusEl.textContent = 'Извлечение ключевых навыков и грейда...';
+          setStep(2, 'Извлечение ключевых навыков...');
           setTimeout(function() {
-            statusEl.textContent = 'Поиск по базе кандидатов LOMO...';
+            setStep(3, 'Ранжирование кандидатов...');
             setTimeout(function() {
-              // Extraction simple logic
-              // 1. Remove stopwords
-              const stopWords = ['и','в','на','с','по','к','для','опыт','работы','лет','мы','ищем','ожидаем','требуется','что','от','вас','будет','плюсом','знание','умение','работа','команде','или','не'];
-              let clean = text.replace(/[.,/#!$%^&*;:{}=\-_`~()]/g,"").replace(/\s{2,}/g," ");
-              const words = clean.split(' ').filter(w => w.trim().length > 1);
-              
+              const stopWords = new Set(['и','в','на','с','по','к','для','от','что','мы','вас','или','не','как','при','это','также','будет','ищем','опыт','работы','лет','знание','умение','команде','плюсом','задачи','требования','обязанности','требуется','ожидаем','хотим','будет']);
+              const clean = text.replace(/[.,\/#!$%^&*;:{}=\-_`~()\n]/g, ' ').replace(/\s{2,}/g, ' ');
+              const words = clean.split(' ').filter(function(w) { return w.trim().length > 1; });
+              const seen = {};
               const keywords = [];
-              words.forEach(w => {
+              words.forEach(function(w) {
                 const lower = w.toLowerCase();
-                if (!stopWords.includes(lower)) {
-                  // Keep english words, uppercase words or nouns usually
-                  if (/^[a-zA-Z]+$/.test(w) || w[0] === w[0].toUpperCase() || w.length > 5) {
-                    keywords.push(w);
-                  }
-                }
+                if (stopWords.has(lower) || seen[lower]) return;
+                seen[lower] = true;
+                if (/^[a-zA-Z][a-zA-Z0-9.#+]*$/.test(w) || w.length > 4) keywords.push(w);
               });
-              
-              // Top 4 significant keywords
-              const res = keywords.slice(0, 4).join(' ');
-              
-              document.getElementById('aiMatchModal').style.display = 'none';
-              const searchInput = document.getElementById('empSearchName');
-              if (searchInput) searchInput.value = '[AI] ' + res;
-              
-              if (typeof loadEmployerSearch === 'function') {
-                loadEmployerSearch(1);
+
+              // Auto-detect grade from text if not manually selected
+              let grade = selectedGrade;
+              if (!grade) {
+                const lc = text.toLowerCase();
+                if (/senior|сеньор|сениор/.test(lc)) grade = 'senior';
+                else if (/lead|тимлид|team.?lead/.test(lc)) grade = 'lead';
+                else if (/middle|мидл/.test(lc)) grade = 'middle';
+                else if (/junior|джуниор|джун/.test(lc)) grade = 'junior';
               }
-            }, 800);
-          }, 800);
-        }, 800);
+
+              const parts = [];
+              if (grade) parts.push(grade);
+              if (selectedFormat) parts.push(selectedFormat);
+              keywords.slice(0, 5).forEach(function(k) { parts.push(k); });
+              const query = parts.join(' ');
+
+              document.getElementById('aiMatchModal').style.display = 'none';
+
+              const searchInput = document.getElementById('empSearchName');
+              if (searchInput) searchInput.value = query;
+
+              const verifiedSelect = document.getElementById('empSearchVerified');
+              if (verifiedSelect) verifiedSelect.value = verifiedOnly ? 'verified' : '';
+
+              // Sync verified filter chip
+              document.querySelectorAll('.empFilterChip').forEach(function(chip) {
+                const val = chip.getAttribute('data-verified') || '';
+                chip.classList.toggle('active', val === (verifiedOnly ? 'verified' : ''));
+              });
+
+              if (typeof loadEmployerSearch === 'function') loadEmployerSearch(1);
+            }, 700);
+          }, 700);
+        }, 700);
 
         return;
       }
