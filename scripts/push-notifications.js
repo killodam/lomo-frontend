@@ -78,6 +78,7 @@
 
   function clearSessionState() {
     registerInFlight = false;
+    lastHandledUrl = '';
   }
 
   function toObject(payload) {
@@ -177,7 +178,10 @@
     var data;
 
     if (!url) return false;
-    if (url === lastHandledUrl) return false;
+    if (url === lastHandledUrl) {
+      lastHandledUrl = '';
+      return false;
+    }
 
     parsed = parseUrl(url);
     scheme = String(parsed.protocol || '').replace(/:$/, '');
@@ -308,6 +312,8 @@
 
     if (registerInFlight) return Promise.resolve(false);
     registerInFlight = true;
+    ensureAppListeners();
+    lastHandledUrl = '';
 
     return runPushRegistration(mode)
       .catch(function () {
