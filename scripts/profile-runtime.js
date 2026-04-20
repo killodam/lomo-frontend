@@ -96,6 +96,11 @@ function renderRecruiterPublic() {
     }
   }
 
+  var salaryOfferSec = document.getElementById('rpSalaryOfferSection');
+  var salaryOfferVal = (p.salaryOffer || '').trim();
+  if (salaryOfferSec) salaryOfferSec.style.display = salaryOfferVal ? '' : 'none';
+  setText('rpSalaryOffer', salaryOfferVal);
+
   applyChip('rpCompanyDocChip', p.proofs?.companyDoc?.status);
   setAvatar('rpAvatarImg', p.avatarDataUrl);
 
@@ -124,6 +129,9 @@ function renderEmployeePublic() {
   var salaryVal = (p.salaryExpectations || '').trim();
   if (salarySec) salarySec.style.display = salaryVal ? '' : 'none';
   setText('epSalary', salaryVal || '—');
+
+  var lookingBadge = document.getElementById('epLookingBadge');
+  if (lookingBadge) lookingBadge.classList.toggle('hidden', !p.lookingForWork);
 
   const aboutSec = document.getElementById('epAboutSection');
   setHidden(aboutSec, !p.about);
@@ -343,6 +351,7 @@ function hydrateEmployerForm() {
   setVal('mpEAbout', p.about);
   setVal('mpEProjects', p.activeProjects);
   setVal('mpENeeded', p.neededSpecialists);
+  setVal('mpESalaryOffer', p.salaryOffer);
   setVal('mpEEmail', state.email || p.email);
   setVal('mpECorpEmail', p.corpEmail);
   setVal('mpEPhone', p.phone);
@@ -374,6 +383,8 @@ function hydrateEmployeeForm() {
   setVal('mpCEduYear', p.eduYear);
   setVal('mpCVacancies', p.vacancies);
   setVal('mpCSalary', p.salaryExpectations);
+  var lookingCb = document.getElementById('mpCLookingForWork');
+  if (lookingCb) lookingCb.checked = !!p.lookingForWork;
   setVal('mpCCurrentJob', p.current_job);
   setVal('mpCJobTitle', p.job_title);
   setVal('mpCCorpEmail', p.corpEmail);

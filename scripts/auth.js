@@ -1037,6 +1037,7 @@ function registerPushAfterAuth(options) {
           p.about        = (document.getElementById('mpEAbout')?.value       || '').trim();
           p.activeProjects    = (document.getElementById('mpEProjects')?.value  || '').trim();
           p.neededSpecialists = (document.getElementById('mpENeeded')?.value    || '').trim();
+          p.salaryOffer      = (document.getElementById('mpESalaryOffer')?.value || '').trim();
           p.telegram     = (document.getElementById('mpETelegram')?.value    || '').trim();
           const newCorpEmail = (document.getElementById('mpECorpEmail')?.value || '').trim();
           if(newCorpEmail !== p.corpEmail) p.corpEmailVerified = false;
@@ -1055,6 +1056,7 @@ function registerPushAfterAuth(options) {
             founded_year: p.foundedYear, location: p.location, industry: p.industry,
             products: p.products, website: p.website, about: p.about,
             active_projects: p.activeProjects, needed: p.neededSpecialists,
+            salary_offer: p.salaryOffer,
             telegram: p.telegram, corp_email: p.corpEmail, phone: p.phone, email: p.email,
             avatar_url: p.avatarDataUrl || ''
           }).then(()=>showToast('Профиль сохранён ✓')).catch(e=>showToast('Сохранено локально'));
@@ -1072,6 +1074,7 @@ function registerPushAfterAuth(options) {
           p.eduYear   = (document.getElementById('mpCEduYear')?.value   || '').trim();
           p.vacancies = (document.getElementById('mpCVacancies')?.value || '').trim();
           p.salaryExpectations = (document.getElementById('mpCSalary')?.value || '').trim();
+          p.lookingForWork = !!(document.getElementById('mpCLookingForWork')?.checked);
           p.telegram  = (document.getElementById('mpCTelegram')?.value  || '').trim();
           p.current_job=(document.getElementById('mpCCurrentJob')?document.getElementById('mpCCurrentJob').value:'').trim();
           p.job_title=(document.getElementById('mpCJobTitle')?document.getElementById('mpCJobTitle').value:'').trim();
@@ -1090,6 +1093,7 @@ function registerPushAfterAuth(options) {
             full_name: p.fullName, location: p.city, phone: p.phone,
             about: p.about, edu_place: p.eduPlace, edu_year: p.eduYear,
             vacancies: p.vacancies, salary_expectations: p.salaryExpectations,
+            looking_for_work: p.lookingForWork,
             telegram: p.telegram, email: p.email,
             corp_email: p.corpEmail, current_job: p.current_job, job_title: p.job_title, work_exp: p.work_exp,
             cv_public: !!p.cvPublic,

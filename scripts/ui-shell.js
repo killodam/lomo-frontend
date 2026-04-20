@@ -244,6 +244,7 @@ function bindStaticUiActions() {
     show('adminQueue');
   });
   if (typeof bindAdminRoleChips === 'function') bindAdminRoleChips();
+  if (typeof bindEmpExtraFilters === 'function') bindEmpExtraFilters();
   bindUiAction('pubProfileBackBtn', 'click', function () { closePublicProfile(); });
   bindUiAction('userProfileCloseBtn', 'click', function () { closeUserProfile(); });
 

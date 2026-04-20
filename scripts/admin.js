@@ -2,7 +2,7 @@ var _userCache = {};
 var _connectionsData = { accepted: [], incoming: [], outgoing: [], counts: { accepted: 0, incoming: 0, outgoing: 0 } };
 
 var feedState = { page: 1, pageSize: 15, total: 0, totalPages: 0, search: '', view: '' };
-var employerSearchState = { page: 1, pageSize: 15, total: 0, totalPages: 0, search: '', verified: '' };
+var employerSearchState = { page: 1, pageSize: 15, total: 0, totalPages: 0, search: '', verified: '', lookingFilter: '', salaryMaxFilter: '' };
 // Infinite scroll observers
 var _feedScrollObserver = null;
 var _employerScrollObserver = null;
@@ -1594,6 +1594,14 @@ function buildSocialCard(user) {
     ? '<span class="scSalaryBadge">💰 ' + escHtml(user.salary_expectations) + '</span>'
     : '';
 
+  var lookingBadge = (!isEmployer && user.looking_for_work)
+    ? '<span class="scLookingBadge">🟢 Активно ищет</span>'
+    : '';
+
+  var salaryOfferBadge = (isEmployer && user.salary_offer)
+    ? '<span class="scSalaryOfferBadge">💼 ' + escHtml(user.salary_offer) + '</span>'
+    : '';
+
   var aboutSnippet = user.about
     ? '<div class="scAbout">' + escHtml(user.about.slice(0, 120)) + (user.about.length > 120 ? '…' : '') + '</div>'
     : '';
@@ -1651,7 +1659,7 @@ function buildSocialCard(user) {
     }
   }
 
-  var hasBody = aboutSnippet || jobLine || workExpLine || extraLines || detailLines || projectsLine || salaryBadge;
+  var hasBody = aboutSnippet || jobLine || workExpLine || extraLines || detailLines || projectsLine || salaryBadge || lookingBadge || salaryOfferBadge;
   var avatarHtml;
   var avatarSrc = safeImageUrl(user.avatar_url);
   if (avatarSrc) {
@@ -1682,7 +1690,10 @@ function buildSocialCard(user) {
         '<div class="scRoleRow">' + roleTag + '</div>' +
       '</div>' +
     '</div>' +
-    (hasBody ? '<div class="scBody">' + (salaryBadge ? '<div class="scSalaryRow">' + salaryBadge + '</div>' : '') + (aboutSnippet || '') + jobLine + workExpLine + extraLines + detailLines + projectsLine + '</div>' : '') +
+    (hasBody ? '<div class="scBody">' +
+      ((lookingBadge || salaryBadge || salaryOfferBadge) ? '<div class="scBadgeRow">' + lookingBadge + salaryBadge + salaryOfferBadge + '</div>' : '') +
+      (aboutSnippet || '') + jobLine + workExpLine + extraLines + detailLines + projectsLine +
+    '</div>' : '') +
     '</div>';
 }
 
@@ -1808,6 +1819,41 @@ function renderFeedList(list, appendMode) {
   }
 }
 
+function bindEmpExtraFilters() {
+  document.querySelectorAll('[data-looking]').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      document.querySelectorAll('[data-looking]').forEach(function(c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+      employerSearchState.lookingFilter = chip.getAttribute('data-looking') || '';
+      filterEmployerSearch();
+    });
+  });
+  document.querySelectorAll('[data-salary-max]').forEach(function(chip) {
+    chip.addEventListener('click', function() {
+      document.querySelectorAll('[data-salary-max]').forEach(function(c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+      employerSearchState.salaryMaxFilter = chip.getAttribute('data-salary-max') || '';
+      filterEmployerSearch();
+    });
+  });
+}
+
+function applyEmpExtraFilters(users) {
+  var lf = employerSearchState.lookingFilter;
+  var sm = employerSearchState.salaryMaxFilter ? parseInt(employerSearchState.salaryMaxFilter, 10) : 0;
+  return users.filter(function(u) {
+    if (lf === 'yes' && !u.looking_for_work) return false;
+    if (sm > 0 && u.salary_expectations) {
+      var match = String(u.salary_expectations).replace(/\s/g, '').match(/(\d+)/);
+      if (match) {
+        var minSalary = parseInt(match[1], 10);
+        if (minSalary > sm) return false;
+      }
+    }
+    return true;
+  });
+}
+
 function updateEmpSearchMeta(total) {
   var badge = document.getElementById('empSearchCountBadge');
   var clearBtn = document.getElementById('empClearSearchBtn');
@@ -1853,7 +1899,8 @@ function loadEmployerSearch(page, options) {
     var scrollTop = isSilent ? getScreenScrollTop('employerSearch') : 0;
     var data = normalizePaginatedResponse(result);
     syncPagerState(employerSearchState, data);
-    renderEmployerSearch(data.items || [], isNextPage);
+    var filteredItems = applyEmpExtraFilters(data.items || []);
+    renderEmployerSearch(filteredItems, isNextPage);
     updateEmpSearchMeta(data.total || 0);
     renderPager('employerCandidatePager', employerSearchState, loadEmployerSearch, { label: 'кандидатов' });
     if (employerSearchState.page < employerSearchState.totalPages) {

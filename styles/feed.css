@@ -939,6 +939,120 @@
 }
 
 /* ══════════════════════════════════════════════
+   CANDIDATE STATUS + SALARY BADGES
+   ══════════════════════════════════════════════ */
+
+/* "В поиске работы" toggle in edit form */
+.lookingToggleRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  background: linear-gradient(135deg, rgba(34,197,94,.06) 0%, rgba(34,197,94,.03) 100%);
+  border: 1px solid rgba(34,197,94,.2);
+  border-radius: 12px;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: background .18s;
+}
+.lookingToggleRow:hover { background: rgba(34,197,94,.09); }
+.lookingToggleText { display: flex; flex-direction: column; gap: 2px; }
+.lookingToggleTitle { font-size: 14px; font-weight: 600; color: #0e0f0f; }
+.lookingToggleSub { font-size: 12px; color: #888; }
+.lookingToggleControl { position: relative; flex-shrink: 0; }
+.lookingToggleInput { position: absolute; opacity: 0; width: 0; height: 0; }
+.lookingToggleTrack {
+  display: block; width: 44px; height: 24px;
+  background: #ddd; border-radius: 999px; position: relative;
+  cursor: pointer; transition: background .2s;
+}
+.lookingToggleThumb {
+  position: absolute; top: 3px; left: 3px;
+  width: 18px; height: 18px; background: #fff;
+  border-radius: 50%; transition: transform .2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,.2);
+}
+.lookingToggleInput:checked ~ .lookingToggleTrack { background: #22c55e; }
+.lookingToggleInput:checked ~ .lookingToggleTrack .lookingToggleThumb { transform: translateX(20px); }
+
+/* "Активно ищет" badge on public profile */
+.lookingBadge {
+  background: rgba(34,197,94,.12) !important;
+  color: #15803d !important;
+  border: 1px solid rgba(34,197,94,.3) !important;
+  font-weight: 600 !important;
+}
+
+/* Salary/looking badges on social cards */
+.scBadgeRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.scLookingBadge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  background: rgba(34,197,94,.10); color: #15803d;
+  border: 1px solid rgba(34,197,94,.25);
+}
+
+.scSalaryOfferBadge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600;
+  background: rgba(99,102,241,.10); color: #4338ca;
+  border: 1px solid rgba(99,102,241,.22);
+}
+
+/* Employer salary offer on recruiter public profile */
+.rpSalaryOfferBadge {
+  display: inline-flex; align-items: center;
+  padding: 6px 16px; border-radius: 999px; font-size: 14px; font-weight: 600;
+  background: rgba(99,102,241,.10); color: #4338ca;
+  border: 1px solid rgba(99,102,241,.22);
+}
+
+/* Extra filters row in employer search */
+.empExtraFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 10px 0 2px;
+  border-top: 1px solid rgba(0,0,0,.06);
+  margin-top: 6px;
+}
+
+.empExtraFilterGroup {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.empExtraFilterLabel {
+  font-size: 11px;
+  font-weight: 700;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: .06em;
+  white-space: nowrap;
+}
+
+.empExtraChips { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.empExtraChip {
+  padding: 5px 12px; border-radius: 999px;
+  border: 1px solid rgba(0,0,0,.11); background: #fff;
+  color: #555; font-size: 12px; font-weight: 500; cursor: pointer;
+  transition: all .16s;
+}
+.empExtraChip:hover { border-color: rgba(38,110,120,.3); color: #1a5c68; background: rgba(38,110,120,.05); }
+.empExtraChip.active { background: #0e0f0f; color: #fff; border-color: #0e0f0f; }
+.empExtraChip[data-looking="yes"].active { background: rgba(34,197,94,.15); color: #15803d; border-color: rgba(34,197,94,.4); }
+
+/* ══════════════════════════════════════════════
    AI MATCH MODAL — Premium redesign
    ══════════════════════════════════════════════ */
 

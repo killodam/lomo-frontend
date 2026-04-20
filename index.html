@@ -434,6 +434,10 @@
       <div class="profileSectionHead hidden" id="rpNeededTitle">Кого ищем</div>
       <div class="tagRow" id="rpNeededTags"></div>
     </div>
+    <div class="profileSection cond" id="rpSalaryOfferSection">
+      <div class="profileSectionHead">Зарплатная вилка</div>
+      <div class="rpSalaryOfferBadge" id="rpSalaryOffer"></div>
+    </div>
     <div class="profileSection">
       <div class="profileSectionHead">Верификация</div>
       <div class="achList">
@@ -518,6 +522,7 @@
       <div class="formCol">
         <div class="sqInput"><input id="mpEProjects" type="text" placeholder="Актуальные направления через «;» (ML-платформа; Аналитика)" autocomplete="off"></div>
         <div class="sqInput"><input id="mpENeeded" type="text" placeholder="Кого ищем через «,» (Backend, Data Analyst, PM)" autocomplete="off"></div>
+        <div class="sqInput"><input id="mpESalaryOffer" type="text" placeholder="Зарплатная вилка (80 000 — 150 000 ₽)" autocomplete="off"></div>
       </div>
     </div>
     <div class="profileEditSection">
@@ -598,6 +603,16 @@
         <div class="sqInput"><input id="mpCVacancies" type="text" placeholder="Какие вакансии ищу (Data Analyst, Product)" autocomplete="off"></div>
         <div class="sqInput"><input id="mpCSalary" type="text" placeholder="Зарплатные ожидания (от 120 000 ₽)" autocomplete="off"></div>
       </div>
+      <label class="lookingToggleRow" id="lookingToggleRowC">
+        <span class="lookingToggleText">
+          <span class="lookingToggleTitle">🟢 Активно ищу работу</span>
+          <span class="lookingToggleSub">Покажет зелёный статус компаниям в поиске</span>
+        </span>
+        <span class="lookingToggleControl">
+          <input type="checkbox" id="mpCLookingForWork" class="lookingToggleInput">
+          <span class="lookingToggleTrack"><span class="lookingToggleThumb"></span></span>
+        </span>
+      </label>
     </div>
     <div class="profileEditSection">
       <div class="profileSectionHead">Текущее место работы</div>
@@ -716,7 +731,10 @@
       <div class="profileSub" id="epEmail">email@example.com</div>
       <div class="profileSub hidden" id="epPhone"></div>
       <div class="profileSub" id="epTg">@telegram</div>
-      <div class="badgeRow"><span class="badge ok">Профиль кандидата</span></div>
+      <div class="badgeRow">
+        <span class="badge ok">Профиль кандидата</span>
+        <span class="badge lookingBadge hidden" id="epLookingBadge">🟢 Активно ищет работу</span>
+      </div>
     </div>
     <div class="profileSection profileProgress" id="epProgress">
       <div class="progressBar"><div class="progressFill" id="epProgressFill"></div></div>
@@ -883,6 +901,24 @@
             <button class="empFilterChip" data-verified="favorites" type="button">★ Избранные</button>
           </div>
           <button type="button" class="empClearBtn hidden" id="empClearSearchBtn">✕ Сбросить</button>
+        </div>
+        <div class="empExtraFilters">
+          <div class="empExtraFilterGroup">
+            <span class="empExtraFilterLabel">Статус</span>
+            <div class="empExtraChips">
+              <button class="empExtraChip active" data-looking="" type="button">Все кандидаты</button>
+              <button class="empExtraChip" data-looking="yes" type="button">🟢 Активно ищут</button>
+            </div>
+          </div>
+          <div class="empExtraFilterGroup">
+            <span class="empExtraFilterLabel">Бюджет</span>
+            <div class="empExtraChips">
+              <button class="empExtraChip active" data-salary-max="" type="button">Любой</button>
+              <button class="empExtraChip" data-salary-max="80000" type="button">до 80к</button>
+              <button class="empExtraChip" data-salary-max="120000" type="button">до 120к</button>
+              <button class="empExtraChip" data-salary-max="200000" type="button">до 200к</button>
+            </div>
+          </div>
         </div>
         <select id="empSearchVerified" class="hidden">
           <option value="">Все кандидаты</option>
