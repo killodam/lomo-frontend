@@ -865,3 +865,75 @@
   background: #fee2e2;
   color: #dc2626;
 }
+
+/* ══════════════════════════════════════════════
+   EMPLOYER SEARCH — Enhanced UI
+   ══════════════════════════════════════════════ */
+
+.empSearchTitleRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
+}
+
+.empSearchBadge {
+  display: inline-flex;
+  align-items: center;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(38,110,120,.10);
+  color: #1a5c68;
+  letter-spacing: .01em;
+}
+
+.empFilterRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+
+.empClearBtn {
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(0,0,0,.14);
+  background: transparent;
+  color: #666;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all .18s;
+  white-space: nowrap;
+}
+
+.empClearBtn:hover {
+  background: rgba(239,68,68,.07);
+  border-color: rgba(239,68,68,.3);
+  color: #dc2626;
+}
+
+.empClearBtn.hidden { display: none; }
+
+/* Salary badge on social cards */
+.scSalaryRow {
+  margin-bottom: 6px;
+}
+
+.scSalaryBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  background: rgba(245,158,11,.10);
+  color: #b45309;
+  border: 1px solid rgba(245,158,11,.22);
+}

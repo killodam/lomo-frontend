@@ -969,6 +969,7 @@ function registerPushAfterAuth(options) {
           p.eduPlace  = (document.getElementById('mpCEduPlace')?.value  || '').trim();
           p.eduYear   = (document.getElementById('mpCEduYear')?.value   || '').trim();
           p.vacancies = (document.getElementById('mpCVacancies')?.value || '').trim();
+          p.salaryExpectations = (document.getElementById('mpCSalary')?.value || '').trim();
           p.telegram  = (document.getElementById('mpCTelegram')?.value  || '').trim();
           p.current_job=(document.getElementById('mpCCurrentJob')?document.getElementById('mpCCurrentJob').value:'').trim();
           p.job_title=(document.getElementById('mpCJobTitle')?document.getElementById('mpCJobTitle').value:'').trim();
@@ -986,7 +987,8 @@ function registerPushAfterAuth(options) {
           if(getToken()) apiSaveProfile({
             full_name: p.fullName, location: p.city, phone: p.phone,
             about: p.about, edu_place: p.eduPlace, edu_year: p.eduYear,
-            vacancies: p.vacancies, telegram: p.telegram, email: p.email,
+            vacancies: p.vacancies, salary_expectations: p.salaryExpectations,
+            telegram: p.telegram, email: p.email,
             corp_email: p.corpEmail, current_job: p.current_job, job_title: p.job_title, work_exp: p.work_exp,
             cv_public: !!p.cvPublic,
             avatar_url: p.avatarDataUrl || ''

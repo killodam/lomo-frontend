@@ -120,6 +120,11 @@ function renderEmployeePublic() {
     setHidden(phoneEl, !p.phone);
   }
 
+  var salarySec = document.getElementById('epSalarySection');
+  var salaryVal = (p.salaryExpectations || '').trim();
+  if (salarySec) salarySec.style.display = salaryVal ? '' : 'none';
+  setText('epSalary', salaryVal || '—');
+
   const aboutSec = document.getElementById('epAboutSection');
   setHidden(aboutSec, !p.about);
   const aboutEl = document.getElementById('epAbout');
@@ -368,6 +373,7 @@ function hydrateEmployeeForm() {
   setVal('mpCEduPlace', p.eduPlace);
   setVal('mpCEduYear', p.eduYear);
   setVal('mpCVacancies', p.vacancies);
+  setVal('mpCSalary', p.salaryExpectations);
   setVal('mpCCurrentJob', p.current_job);
   setVal('mpCJobTitle', p.job_title);
   setVal('mpCCorpEmail', p.corpEmail);

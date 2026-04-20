@@ -398,3 +398,27 @@
     .statusBadge.warn{ background:rgba(245,158,11,.12); color:#92400e; }
     .statusBadge.ok{ background:rgba(34,197,94,.12); color:#0d7040; }
     .statusBadge.bad{ background:rgba(239,68,68,.12); color:#991b1b; }
+
+    /* ── Admin role filter chips ── */
+    .adminRoleFilterRow{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px; }
+    .adminRoleChip{ padding:6px 16px; border-radius:999px; border:1px solid rgba(0,0,0,.12); background:#fff; color:#555; font-size:13px; font-weight:500; cursor:pointer; transition:all .18s; }
+    .adminRoleChip:hover{ border-color:rgba(38,110,120,.32); color:#1a5c68; background:rgba(38,110,120,.06); }
+    .adminRoleChip.active{ background:#0e0f0f; color:#fff; border-color:#0e0f0f; }
+
+    /* ── Role tag colors ── */
+    .adminUsersRoleTag.employee{ background:rgba(59,130,246,.10); color:#1d4ed8; }
+    .adminUsersRoleTag.employer{ background:rgba(38,110,120,.12); color:#1a5c68; }
+    .adminUsersRoleTag.admin{ background:rgba(139,92,246,.10); color:#6d28d9; }
+
+    /* ── User name cell ── */
+    .adminUserNameCell{ display:flex; flex-direction:column; gap:2px; }
+    .adminUserEmail{ font-size:13px; color:#0e0f0f; font-weight:500; }
+    .adminUserName{ font-size:12px; color:#888; }
+
+    /* ── Online status ── */
+    .adminUserActivity{ display:flex; align-items:center; gap:6px; }
+    .adminOnlineDot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+    .adminOnlineDot.online{ background:#22c55e; box-shadow:0 0 0 2px rgba(34,197,94,.25); }
+    .adminOnlineDot.offline{ background:#d1d5db; }
+    .adminActivityText{ font-size:12px; color:#888; }
+    .adminActivityText.online{ color:#16a34a; font-weight:600; }

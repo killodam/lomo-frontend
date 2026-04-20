@@ -434,6 +434,7 @@ function applyProfileToState(user, profile, achievements) {
       eduPlace: profile.edu_place || '',
       eduYear: profile.edu_year || '',
       vacancies: profile.vacancies || '',
+      salaryExpectations: profile.salary_expectations || '',
       current_job: profile.current_job || '',
       job_title: profile.job_title || '',
       work_exp: Array.isArray(profile.work_exp) ? profile.work_exp : [],

@@ -223,6 +223,7 @@ function bindStaticUiActions() {
   });
   bindUiAction('verifyLevelInfoBtn', 'click', function () { openVerifyLevelModal(); });
   bindUiAction('refreshAdminQueueBtn', 'click', function () { loadAdminQueue(); });
+  if (typeof bindAdminRoleChips === 'function') bindAdminRoleChips();
   bindUiAction('pubProfileBackBtn', 'click', function () { closePublicProfile(); });
   bindUiAction('userProfileCloseBtn', 'click', function () { closeUserProfile(); });
 
@@ -239,6 +240,11 @@ function bindStaticUiActions() {
 
   const employerSearchInput = document.getElementById('empSearchName');
   if (employerSearchInput) employerSearchInput.addEventListener('input', function () { debouncedFilterEmployerSearch(); });
+  bindUiAction('empClearSearchBtn', 'click', function () {
+    var inp = document.getElementById('empSearchName');
+    if (inp) { inp.value = ''; }
+    if (typeof filterEmployerSearch === 'function') filterEmployerSearch();
+  });
 
   bindChipFilter('.empFilterChip', 'empSearchVerified', 'data-verified', filterEmployerSearch);
 

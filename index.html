@@ -596,6 +596,7 @@
         </div>
         <div class="sqInput"><input id="mpCEduYear" type="text" placeholder="Год окончания (2026)" autocomplete="off"></div>
         <div class="sqInput"><input id="mpCVacancies" type="text" placeholder="Какие вакансии ищу (Data Analyst, Product)" autocomplete="off"></div>
+        <div class="sqInput"><input id="mpCSalary" type="text" placeholder="Зарплатные ожидания (от 120 000 ₽)" autocomplete="off"></div>
       </div>
     </div>
     <div class="profileEditSection">
@@ -737,6 +738,10 @@
       <div class="profileSectionHead">Ищу вакансии</div>
       <div class="profileAbout" id="epVacancies">—</div>
     </div>
+    <div class="profileSection" id="epSalarySection">
+      <div class="profileSectionHead">Зарплатные ожидания</div>
+      <div class="profileAbout" id="epSalary">—</div>
+    </div>
     <div class="profileSection">
       <div class="profileSectionHead blockTitleInlineAction">
         Подтверждения
@@ -857,19 +862,25 @@
 
     <div class="feedSearchHero empSearchHero">
       <div class="feedSearchHeroInner">
-        <h1 class="feedTitle">Поиск кандидатов</h1>
+        <div class="empSearchTitleRow">
+          <h1 class="feedTitle">Поиск кандидатов</h1>
+          <span class="empSearchBadge" id="empSearchCountBadge"></span>
+        </div>
         <p class="feedSub">Верифицированные профили · документы проверены LOMO</p>
         <div class="feedSearchWrap hasAiBtn">
           <svg class="feedSearchIco" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-          <input id="empSearchName" type="text" class="feedSearchInput" placeholder="Имя, навык, город...">
+          <input id="empSearchName" type="text" class="feedSearchInput" placeholder="Имя, навык, город, ВУЗ...">
           <button id="btnOpenAiMatch" class="feedAiMatchBtn" type="button" aria-label="AI Мэтчинг">
             <span>✨ AI-Мэтчинг</span>
           </button>
         </div>
-        <div class="empFilterChips">
-          <button class="empFilterChip active" data-verified="" type="button">Все кандидаты</button>
-          <button class="empFilterChip" data-verified="verified" type="button">✓ Верифицированные</button>
-          <button class="empFilterChip" data-verified="favorites" type="button">★ Избранные</button>
+        <div class="empFilterRow">
+          <div class="empFilterChips">
+            <button class="empFilterChip active" data-verified="" type="button">Все</button>
+            <button class="empFilterChip" data-verified="verified" type="button">✓ Верифицированные</button>
+            <button class="empFilterChip" data-verified="favorites" type="button">★ Избранные</button>
+          </div>
+          <button type="button" class="empClearBtn hidden" id="empClearSearchBtn">✕ Сбросить</button>
         </div>
         <select id="empSearchVerified" class="hidden">
           <option value="">Все кандидаты</option>
@@ -1020,6 +1031,11 @@
         <div class="adminSectionHead adminSectionHeadWrap">
           <div class="adminSectionTitle">Все пользователи</div>
           <input id="adminUserSearch" type="text" placeholder="Поиск по email или имени..." class="sqInput adminSearchInput wide">
+        </div>
+        <div class="adminRoleFilterRow">
+          <button class="adminRoleChip active" data-admin-role-filter="" type="button">Все</button>
+          <button class="adminRoleChip" data-admin-role-filter="employee" type="button">👤 Кандидаты</button>
+          <button class="adminRoleChip" data-admin-role-filter="employer" type="button">🏢 Работодатели</button>
         </div>
         <div id="adminUsersList"><div class="adminListLoading compact">Загрузка...</div></div>
         <div id="adminUsersPager" class="pager"></div>

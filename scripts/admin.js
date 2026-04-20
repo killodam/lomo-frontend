@@ -15,7 +15,7 @@ var employerFilterUiState = { signature: '' };
 var adminQueueState = { page: 1, pageSize: 20, total: 0, totalPages: 0 };
 var adminCandidateState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '' };
 var adminEmployerState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '' };
-var adminUsersState = { page: 1, pageSize: 20, total: 0, totalPages: 0, search: '' };
+var adminUsersState = { page: 1, pageSize: 20, total: 0, totalPages: 0, search: '', roleFilter: '' };
 
 function recoverAuthFlowOnProtectedError(err, options) {
   var message = safeErrorText(err);
@@ -581,6 +581,29 @@ function loadAdminQueue(page) {
   });
 }
 
+function bindAdminRoleChips() {
+  var chips = document.querySelectorAll('[data-admin-role-filter]');
+  chips.forEach(function (chip) {
+    chip.addEventListener('click', function () {
+      chips.forEach(function (c) { c.classList.remove('active'); });
+      chip.classList.add('active');
+      adminUsersState.roleFilter = chip.getAttribute('data-admin-role-filter') || '';
+      loadAdminUsers(1);
+    });
+  });
+}
+
+function formatLastSeen(lastSeen) {
+  if (!lastSeen) return null;
+  var ts = new Date(lastSeen).getTime();
+  if (isNaN(ts)) return null;
+  var diffMin = (Date.now() - ts) / 60000;
+  if (diffMin < 5) return 'online';
+  if (diffMin < 60) return Math.floor(diffMin) + ' мин назад';
+  if (diffMin < 1440) return Math.floor(diffMin / 60) + ' ч назад';
+  return Math.floor(diffMin / 1440) + ' дн назад';
+}
+
 function loadAdminUsers(page) {
   if (!getToken()) return;
   if (page) adminUsersState.page = page;
@@ -595,8 +618,13 @@ function loadAdminUsers(page) {
     search: adminUsersState.search,
   }).then(function (result) {
     var data = normalizePaginatedResponse(result);
-    var users = data.items || [];
+    var allUsers = data.items || [];
     syncPagerState(adminUsersState, data);
+
+    var roleFilter = adminUsersState.roleFilter;
+    var users = roleFilter
+      ? allUsers.filter(function (u) { return (u.role || '').toLowerCase() === roleFilter; })
+      : allUsers;
 
     var listEl = document.getElementById('adminUsersList');
     if (!listEl) return;
@@ -612,9 +640,9 @@ function loadAdminUsers(page) {
     table.className = 'adminUsersTable';
     table.innerHTML =
       '<thead><tr class="adminUsersHeadRow">' +
-        '<th class="adminUsersHeadCell">Email</th>' +
-        '<th class="adminUsersHeadCell">Имя / Компания</th>' +
+        '<th class="adminUsersHeadCell">Пользователь</th>' +
         '<th class="adminUsersHeadCell">Роль</th>' +
+        '<th class="adminUsersHeadCell">Активность</th>' +
         '<th class="adminUsersHeadCell">Действия</th>' +
       '</tr></thead>';
 
@@ -622,10 +650,25 @@ function loadAdminUsers(page) {
     users.forEach(function (user) {
       var tr = document.createElement('tr');
       tr.className = 'adminUsersRow';
+
+      var roleLabel = user.role === 'employer' ? 'Работодатель' : user.role === 'employee' ? 'Кандидат' : user.role === 'admin' ? 'Админ' : (user.role || '—');
+      var roleClass = user.role === 'employer' ? 'employer' : user.role === 'employee' ? 'employee' : user.role === 'admin' ? 'admin' : '';
+      var displayName = escapeHtml(user.full_name || user.company || '');
+      var displayEmail = escapeHtml(user.email || '—');
+      var lastSeenText = formatLastSeen(user.last_seen);
+      var isOnline = lastSeenText === 'online';
+      var onlineDot = '<span class="adminOnlineDot ' + (isOnline ? 'online' : 'offline') + '"></span>';
+      var activityText = isOnline ? 'Онлайн' : (lastSeenText || 'Нет данных');
+
       tr.innerHTML =
-        '<td class="adminUsersCell">' + escapeHtml(user.email || '—') + '</td>' +
-        '<td class="adminUsersCell">' + escapeHtml(user.full_name || user.company || '—') + '</td>' +
-        '<td class="adminUsersCell"><span class="adminUsersRoleTag">' + escapeHtml(user.role || '—') + '</span></td>' +
+        '<td class="adminUsersCell">' +
+          '<div class="adminUserNameCell">' +
+            '<div class="adminUserEmail">' + displayEmail + '</div>' +
+            (displayName ? '<div class="adminUserName">' + displayName + '</div>' : '') +
+          '</div>' +
+        '</td>' +
+        '<td class="adminUsersCell"><span class="adminUsersRoleTag ' + roleClass + '">' + roleLabel + '</span></td>' +
+        '<td class="adminUsersCell"><div class="adminUserActivity">' + onlineDot + '<span class="adminActivityText ' + (isOnline ? 'online' : '') + '">' + escapeHtml(activityText) + '</span></div></td>' +
         '<td class="adminUsersCell" id="uactions_' + user.id + '"></td>';
 
       var actionsCell = tr.querySelector('#uactions_' + user.id);
@@ -1547,6 +1590,10 @@ function buildSocialCard(user) {
     }).join('') + '</div>';
   }
 
+  var salaryBadge = (!isEmployer && user.salary_expectations)
+    ? '<span class="scSalaryBadge">💰 ' + escHtml(user.salary_expectations) + '</span>'
+    : '';
+
   var aboutSnippet = user.about
     ? '<div class="scAbout">' + escHtml(user.about.slice(0, 120)) + (user.about.length > 120 ? '…' : '') + '</div>'
     : '';
@@ -1604,7 +1651,7 @@ function buildSocialCard(user) {
     }
   }
 
-  var hasBody = aboutSnippet || jobLine || workExpLine || extraLines || detailLines || projectsLine;
+  var hasBody = aboutSnippet || jobLine || workExpLine || extraLines || detailLines || projectsLine || salaryBadge;
   var avatarHtml;
   var avatarSrc = safeImageUrl(user.avatar_url);
   if (avatarSrc) {
@@ -1635,7 +1682,7 @@ function buildSocialCard(user) {
         '<div class="scRoleRow">' + roleTag + '</div>' +
       '</div>' +
     '</div>' +
-    (hasBody ? '<div class="scBody">' + (aboutSnippet || '') + jobLine + workExpLine + extraLines + detailLines + projectsLine + '</div>' : '') +
+    (hasBody ? '<div class="scBody">' + (salaryBadge ? '<div class="scSalaryRow">' + salaryBadge + '</div>' : '') + (aboutSnippet || '') + jobLine + workExpLine + extraLines + detailLines + projectsLine + '</div>' : '') +
     '</div>';
 }
 
@@ -1761,6 +1808,17 @@ function renderFeedList(list, appendMode) {
   }
 }
 
+function updateEmpSearchMeta(total) {
+  var badge = document.getElementById('empSearchCountBadge');
+  var clearBtn = document.getElementById('empClearSearchBtn');
+  var searchVal = (document.getElementById('empSearchName')?.value || '').trim();
+  if (badge) {
+    badge.textContent = total > 0 ? total + ' кандидатов' : '';
+    badge.style.display = total > 0 ? '' : 'none';
+  }
+  if (clearBtn) clearBtn.classList.toggle('hidden', !searchVal);
+}
+
 function loadEmployerSearch(page, options) {
   var opts = options || {};
   var isSilent = !!opts.silent;
@@ -1796,6 +1854,7 @@ function loadEmployerSearch(page, options) {
     var data = normalizePaginatedResponse(result);
     syncPagerState(employerSearchState, data);
     renderEmployerSearch(data.items || [], isNextPage);
+    updateEmpSearchMeta(data.total || 0);
     renderPager('employerCandidatePager', employerSearchState, loadEmployerSearch, { label: 'кандидатов' });
     if (employerSearchState.page < employerSearchState.totalPages) {
       var ref = { current: _employerScrollObserver };
