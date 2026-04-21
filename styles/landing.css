@@ -599,7 +599,7 @@
 .ldSteps {
   max-width: 1040px;
   margin: 0 auto;
-  padding: 0 48px 72px;
+  padding: 56px 48px 72px;
   box-sizing: border-box;
   width: 100%;
 }
