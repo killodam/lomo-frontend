@@ -980,12 +980,10 @@
             </div>
           </div>
           <div class="empExtraFilterGroup">
-            <span class="empExtraFilterLabel">Бюджет</span>
-            <div class="empExtraChips">
-              <button class="empExtraChip active" data-salary-max="" type="button">Любой</button>
-              <button class="empExtraChip" data-salary-max="80000" type="button">до 80к</button>
-              <button class="empExtraChip" data-salary-max="120000" type="button">до 120к</button>
-              <button class="empExtraChip" data-salary-max="200000" type="button">до 200к</button>
+            <span class="empExtraFilterLabel">Бюджет до (₽)</span>
+            <div class="empSalaryInputWrap">
+              <input id="empSalaryMaxInput" type="number" min="0" step="5000" placeholder="Любой" class="empSalaryInput">
+              <button id="empSalaryMaxClear" type="button" class="empSalaryInputClear hidden" aria-label="Сбросить">×</button>
             </div>
           </div>
         </div>

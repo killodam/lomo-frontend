@@ -1834,27 +1834,35 @@ function bindEmpExtraFilters() {
       filterEmployerSearch();
     });
   });
-  document.querySelectorAll('[data-salary-max]').forEach(function(chip) {
-    chip.addEventListener('click', function() {
-      document.querySelectorAll('[data-salary-max]').forEach(function(c) { c.classList.remove('active'); });
-      chip.classList.add('active');
-      employerSearchState.salaryMaxFilter = chip.getAttribute('data-salary-max') || '';
+
+  var salaryInput = document.getElementById('empSalaryMaxInput');
+  var salaryClear = document.getElementById('empSalaryMaxClear');
+  if (salaryInput) {
+    salaryInput.addEventListener('input', function() {
+      employerSearchState.salaryMaxFilter = (salaryInput.value || '').trim();
+      if (salaryClear) salaryClear.classList.toggle('hidden', !salaryInput.value);
       filterEmployerSearch();
     });
-  });
+  }
+  if (salaryClear) {
+    salaryClear.addEventListener('click', function() {
+      if (salaryInput) salaryInput.value = '';
+      employerSearchState.salaryMaxFilter = '';
+      salaryClear.classList.add('hidden');
+      filterEmployerSearch();
+    });
+  }
 }
 
 function applyEmpExtraFilters(users) {
   var lf = employerSearchState.lookingFilter;
-  var sm = employerSearchState.salaryMaxFilter ? parseInt(employerSearchState.salaryMaxFilter, 10) : 0;
+  var rawSm = (document.getElementById('empSalaryMaxInput')?.value || employerSearchState.salaryMaxFilter || '').trim();
+  var sm = rawSm ? parseInt(rawSm, 10) : 0;
   return users.filter(function(u) {
     if (lf === 'yes' && !u.looking_for_work) return false;
     if (sm > 0 && u.salary_expectations) {
       var match = String(u.salary_expectations).replace(/\s/g, '').match(/(\d+)/);
-      if (match) {
-        var minSalary = parseInt(match[1], 10);
-        if (minSalary > sm) return false;
-      }
+      if (match && parseInt(match[1], 10) > sm) return false;
     }
     return true;
   });

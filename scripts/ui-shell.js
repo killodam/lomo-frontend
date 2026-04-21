@@ -390,3 +390,6 @@ if (verifyLevelModalEl) {
 }
 
 bindStaticUiActions();
+
+// Sweep stale storage left from previous sessions (no keepUserId = clean all lomo_ localStorage keys now)
+if (typeof pruneStaleLocalStorage === 'function') pruneStaleLocalStorage(null);

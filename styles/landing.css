@@ -605,12 +605,25 @@
 }
 
 .ldSectionLabel {
-  font-size: 11.5px;
-  font-weight: 650;
-  letter-spacing: 0.1em;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #a0a0a0;
-  margin-bottom: 22px;
+  color: #26707a;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.ldSectionLabel::before {
+  content: '';
+  display: block;
+  width: 28px;
+  height: 2px;
+  background: #26707a;
+  border-radius: 2px;
+  flex-shrink: 0;
 }
 
 .ldStepsGrid {

@@ -42,8 +42,8 @@ function logout() {
   if (window.LOMO_PUSH && typeof window.LOMO_PUSH.clearSession === 'function') {
     window.LOMO_PUSH.clearSession();
   }
-  saveToStorage();
   apiLogout().catch(function () {});
+  clearUserStorage(userId);
   pruneStaleLocalStorage(null);
   clearToken();
   resetState();
@@ -52,14 +52,15 @@ function logout() {
 }
 
 function logoutAllSessions() {
+  var userId = state.userId;
   if (window.LOMO_CHAT_UI && typeof window.LOMO_CHAT_UI.disconnectAndCleanup === 'function') {
     window.LOMO_CHAT_UI.disconnectAndCleanup();
   }
   if (window.LOMO_PUSH && typeof window.LOMO_PUSH.clearSession === 'function') {
     window.LOMO_PUSH.clearSession();
   }
-  saveToStorage();
   apiLogoutAll().catch(function () {});
+  clearUserStorage(userId);
   pruneStaleLocalStorage(null);
   clearToken();
   resetState();
@@ -409,8 +410,14 @@ function registerPushAfterAuth(options) {
           try {
             await apiConfirmEmail(code);
             state.emailVerified = true;
-            if(state.roleReg === 'EMPLOYER') showEmployerDashboard();
-            else showEmployeeDashboard();
+            if(state.isNewReg) {
+              state.isNewReg = false;
+              showOnboardingScreen(state.roleReg === 'EMPLOYER' ? 'employer' : 'candidate');
+            } else if(state.roleReg === 'EMPLOYER') {
+              showEmployerDashboard();
+            } else {
+              showEmployeeDashboard();
+            }
           } catch(err) {
             const msg = safeErrorText(err);
             if(errEl){ errEl.textContent = /Too many/i.test(msg) ? 'Слишком много попыток. Запросите новый код.' : /expired/i.test(msg) ? 'Срок действия кода истёк. Запросите новый.' : 'Неверный или устаревший код.'; errEl.classList.remove('hidden'); }
@@ -984,6 +991,7 @@ function registerPushAfterAuth(options) {
               } else {
                 state.employee.fullName = fullName || state.employee.fullName;
               }
+              state.isNewReg = true;
               // Trigger email verification after registration
               if(typeof window.lomoStartEmailVerify === 'function'){
                 window.lomoStartEmailVerify(user.email, {
