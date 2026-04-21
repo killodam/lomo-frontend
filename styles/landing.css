@@ -360,6 +360,241 @@
   color: #a0a0a0;
 }
 
+/* ══════════════════════════════════════
+   AI Matching landing block
+   ══════════════════════════════════════ */
+
+.ldAi {
+  background: linear-gradient(160deg, #080d0f 0%, #0e1e24 50%, #0a1a20 100%);
+  padding: 72px 48px;
+  overflow: hidden;
+  position: relative;
+}
+
+.ldAiInner {
+  max-width: 1040px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 64px;
+  align-items: center;
+}
+
+/* Copy */
+.ldAiPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 14px;
+  border-radius: 999px;
+  background: rgba(245,200,50,.12);
+  color: #f5c832;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .05em;
+  text-transform: uppercase;
+  margin-bottom: 18px;
+  border: 1px solid rgba(245,200,50,.22);
+}
+
+.ldAiH {
+  font-size: 34px;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.18;
+  margin-bottom: 16px;
+  letter-spacing: -.02em;
+}
+
+.ldAiSub {
+  font-size: 15px;
+  color: rgba(255,255,255,.55);
+  line-height: 1.65;
+  margin-bottom: 24px;
+}
+
+.ldAiList {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ldAiList li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: rgba(255,255,255,.75);
+  line-height: 1.4;
+}
+
+.ldAiCheck {
+  color: #2dd4bf;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.ldAiBtn {
+  display: inline-flex;
+  align-items: center;
+  padding: 13px 28px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(135deg, #f5c832 0%, #f0a020 100%);
+  color: #0e0f0f;
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s;
+  letter-spacing: .01em;
+}
+.ldAiBtn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(245,200,50,.35);
+}
+
+/* Demo card */
+.ldAiDemo {
+  position: relative;
+}
+
+.ldAiGlow {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  background: radial-gradient(ellipse, rgba(42,122,138,.25) 0%, transparent 70%);
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ldAiDemoCard {
+  background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 18px;
+  padding: 20px;
+  backdrop-filter: blur(12px);
+  position: relative;
+  z-index: 1;
+}
+
+.ldAiDemoHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+
+.ldAiDemoStar { font-size: 18px; filter: drop-shadow(0 0 6px rgba(245,200,50,.7)); }
+.ldAiDemoTitle { font-size: 15px; font-weight: 700; color: #fff; }
+
+.ldAiDemoInput {
+  background: rgba(255,255,255,.06);
+  border: 1px solid rgba(255,255,255,.1);
+  border-radius: 10px;
+  padding: 12px 14px;
+  font-size: 12.5px;
+  color: rgba(255,255,255,.6);
+  line-height: 1.5;
+  margin-bottom: 12px;
+  font-style: italic;
+}
+
+.ldAiDemoFilters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.ldAiDemoChip {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,.15);
+  color: rgba(255,255,255,.45);
+  font-size: 11px;
+  font-weight: 500;
+}
+.ldAiDemoChip.active {
+  background: rgba(42,122,138,.25);
+  border-color: rgba(42,122,138,.5);
+  color: #2dd4bf;
+}
+
+.ldAiDemoResults {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.ldAiDemoResult {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,.05);
+  border-radius: 12px;
+  padding: 10px 12px;
+  transition: background .2s;
+}
+.ldAiDemoResult:hover { background: rgba(255,255,255,.09); }
+.ldAiDemoResultMuted { opacity: .65; }
+
+.ldAiDemoAv {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.ldAiDemoInfo { flex: 1; min-width: 0; }
+
+.ldAiDemoName {
+  font-size: 13px;
+  font-weight: 600;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.ldAiVerBadge {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  background: rgba(34,197,94,.15);
+  color: #4ade80;
+  font-weight: 600;
+  border: 1px solid rgba(34,197,94,.25);
+}
+
+.ldAiDemoMeta {
+  font-size: 11px;
+  color: rgba(255,255,255,.4);
+  margin-top: 2px;
+}
+
+.ldAiDemoScore {
+  font-size: 14px;
+  font-weight: 800;
+  color: #2dd4bf;
+  flex-shrink: 0;
+  min-width: 38px;
+  text-align: right;
+}
+
 /* ── Steps ── */
 .ldSteps {
   max-width: 1040px;
@@ -678,5 +913,19 @@
 
   .ldFooterLinks {
     justify-content: center;
+  }
+
+  .ldAiInner {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    padding: 48px 20px 56px;
+  }
+
+  .ldAiH {
+    font-size: 28px;
+  }
+
+  .ldAiDemo {
+    display: none;
   }
 }
