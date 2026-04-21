@@ -1,4 +1,41 @@
+function pruneStaleLocalStorage(keepUserId) {
+  try {
+    var toRemove = [];
+    for (var i = 0; i < window.localStorage.length; i++) {
+      var k = window.localStorage.key(i);
+      if (!k || !k.startsWith('lomo_')) continue;
+      var isOwnFav = keepUserId && k === 'lomo_favs_' + keepUserId;
+      var isOwnPush = keepUserId && k.startsWith('lomo_push_token:') && k.endsWith(':' + keepUserId);
+      if (!isOwnFav && !isOwnPush) toRemove.push(k);
+    }
+    toRemove.forEach(function (k) { window.localStorage.removeItem(k); });
+  } catch (e) {}
+}
+
+function showOnboardingScreen(role) {
+  var titleEl = document.getElementById('doneOnboardTitle');
+  var stepsEl = document.getElementById('doneOnboardSteps');
+  var onboard = document.getElementById('doneOnboard');
+  var doneText = document.getElementById('doneText');
+  var doneCta = document.getElementById('doneCta');
+  if (!onboard) {
+    if (role === 'employer') showEmployerDashboard(); else showEmployeeDashboard();
+    return;
+  }
+  var steps = role === 'employer'
+    ? ['Заполните профиль компании', 'Верифицируйте корпоративную почту', 'Ищите кандидатов через поиск', 'Используйте AI-Мэтчинг для подбора']
+    : ['Заполните профиль — имя, город, навыки', 'Загрузите документы для верификации', 'Отметьте «В поиске работы» — вас найдут работодатели', 'Следите за уведомлениями'];
+  if (doneText) doneText.textContent = role === 'employer' ? 'ДОБРО ПОЖАЛОВАТЬ В LOMO' : 'РЕГИСТРАЦИЯ ЗАВЕРШЕНА';
+  if (titleEl) titleEl.textContent = role === 'employer' ? 'Что делать дальше?' : 'Как начать работу?';
+  if (stepsEl) stepsEl.innerHTML = steps.map(function (s) { return '<li>' + s + '</li>'; }).join('');
+  if (doneCta) doneCta.textContent = role === 'employer' ? 'Создать профиль компании' : 'Заполнить профиль';
+  onboard.classList.remove('hidden');
+  state.prevFromDone = role === 'employer' ? 'employerSearch' : 'candidateFeed';
+  show('done');
+}
+
 function logout() {
+  var userId = state.userId;
   if (window.LOMO_CHAT_UI && typeof window.LOMO_CHAT_UI.disconnectAndCleanup === 'function') {
     window.LOMO_CHAT_UI.disconnectAndCleanup();
   }
@@ -7,6 +44,7 @@ function logout() {
   }
   saveToStorage();
   apiLogout().catch(function () {});
+  pruneStaleLocalStorage(null);
   clearToken();
   resetState();
   resetDisplay();
@@ -22,6 +60,7 @@ function logoutAllSessions() {
   }
   saveToStorage();
   apiLogoutAll().catch(function () {});
+  pruneStaleLocalStorage(null);
   clearToken();
   resetState();
   resetDisplay();
@@ -951,8 +990,7 @@ function registerPushAfterAuth(options) {
                   sent: regResult.emailVerificationSent === true ? true : (regResult.emailVerificationSent === false ? false : undefined),
                 });
               } else {
-                if(role === 'employer') showEmployerDashboard();
-                else showEmployeeDashboard();
+                showOnboardingScreen(role);
               }
             } catch(err) {
               showToast('Ошибка: ' + err.message);
@@ -978,6 +1016,7 @@ function registerPushAfterAuth(options) {
               const { user, profile, achievements } = await apiLogin(loginEmail, loginPwd);
               applyProfileToState(user, profile, achievements || []);
               saveToStorage();
+              pruneStaleLocalStorage(user.id);
               registerPushAfterAuth({ prompt: true });
               if(user.role === 'employer'){ showEmployerDashboard(); }
               else if(user.role === 'admin'){ show('adminQueue'); }

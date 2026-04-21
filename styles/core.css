@@ -614,6 +614,35 @@
       text-align:center;
       max-width: 80vw;
     }
+    .doneOnboard {
+      background: rgba(38,112,122,.07);
+      border: 1.5px solid rgba(38,112,122,.18);
+      border-radius: 14px;
+      padding: 20px 24px;
+      text-align: left;
+      max-width: min(400px, 86vw);
+      width: 100%;
+    }
+    .doneOnboardTitle {
+      font-weight: 700;
+      font-size: 14px;
+      color: #1a5c68;
+      margin-bottom: 12px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+    .doneOnboardSteps {
+      margin: 0;
+      padding-left: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .doneOnboardSteps li {
+      font-size: 14px;
+      color: var(--label);
+      line-height: 1.45;
+    }
 
     @media (min-width: 1200px){
       :root{

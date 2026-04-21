@@ -308,6 +308,31 @@
   background: rgba(245, 158, 11, 0.18);
 }
 
+.feedVerifiedChip {
+  padding: 7px 16px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all .18s;
+  font-family: inherit;
+  border: 1.5px solid rgba(38,110,120,.25);
+  background: transparent;
+  color: #1a5c68;
+  white-space: nowrap;
+}
+
+.feedVerifiedChip:hover {
+  background: rgba(38,110,120,.08);
+  border-color: rgba(38,110,120,.4);
+}
+
+.feedVerifiedChip.active {
+  background: #1a5c68;
+  color: #fff;
+  border-color: #1a5c68;
+}
+
 /* ── Feed Content ── */
 .feedContent {
   flex: 1;

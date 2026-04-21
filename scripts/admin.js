@@ -1,7 +1,7 @@
 var _userCache = {};
 var _connectionsData = { accepted: [], incoming: [], outgoing: [], counts: { accepted: 0, incoming: 0, outgoing: 0 } };
 
-var feedState = { page: 1, pageSize: 15, total: 0, totalPages: 0, search: '', view: '' };
+var feedState = { page: 1, pageSize: 15, total: 0, totalPages: 0, search: '', view: '', verified: '' };
 var employerSearchState = { page: 1, pageSize: 15, total: 0, totalPages: 0, search: '', verified: '', lookingFilter: '', salaryMaxFilter: '' };
 // Infinite scroll observers
 var _feedScrollObserver = null;
@@ -1152,9 +1152,13 @@ function syncChipSelection(chipSelector, attributeName, selectedValue) {
 function syncFeedFilterChips() {
   var selectedView = '';
   var select = document.getElementById('feedViewFilter');
-
   if (select) selectedView = String(select.value || '');
   syncChipSelection('.feedFilterChip', 'data-feed-view', selectedView);
+
+  var selectedVerified = '';
+  var verSelect = document.getElementById('feedVerifiedFilter');
+  if (verSelect) selectedVerified = String(verSelect.value || '');
+  syncChipSelection('.feedVerifiedChip', 'data-feed-verified', selectedVerified);
 }
 
 function syncChipSelectionInside(container, chipSelector, attributeName, selectedValue) {
@@ -1718,6 +1722,7 @@ function loadCandidateFeed(page, options) {
   if (page) feedState.page = page;
   feedState.search = (document.getElementById('feedSearchInput')?.value || '').trim();
   feedState.view = (document.getElementById('feedViewFilter')?.value || '').trim();
+  feedState.verified = (document.getElementById('feedVerifiedFilter')?.value || '').trim();
 
   syncFeedFilterChips();
 
@@ -1739,6 +1744,7 @@ function loadCandidateFeed(page, options) {
     page: feedState.page,
     pageSize: feedState.pageSize,
     search: feedState.search,
+    verified: feedState.verified || undefined,
   }).then(function (result) {
     var scrollTop = isSilent ? getScreenScrollTop('candidateFeed') : 0;
     var data = normalizePaginatedResponse(result);

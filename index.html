@@ -906,10 +906,15 @@
         <div class="feedFilterChips">
           <button class="feedFilterChip active" data-feed-view="" type="button">Все профили</button>
           <button class="feedFilterChip" data-feed-view="favorites" type="button">★ Избранные</button>
+          <button class="feedVerifiedChip" data-feed-verified="" type="button">✓ Верифицированные</button>
         </div>
         <select id="feedViewFilter" class="hidden">
           <option value="">Все профили</option>
           <option value="favorites">Избранное</option>
+        </select>
+        <select id="feedVerifiedFilter" class="hidden">
+          <option value=""></option>
+          <option value="verified">verified</option>
         </select>
       </div>
     </div>
@@ -1162,14 +1167,18 @@
   </div>
 </section>
 
-<!-- DONE -->
+<!-- DONE / ONBOARDING -->
 <section aria-label="Completed" class="screen" id="screenDone">
 <div class="wrap">
 <button aria-label="Back" class="backBtn" data-back="toPrevFromDone">← Назад</button>
 <div class="doneWrap">
-  <div class="doneCheck">✓</div>
+  <div class="doneCheck" id="doneCheck">✓</div>
   <div class="doneText" id="doneText">ВХОД ВЫПОЛНЕН</div>
-  <button class="accentBtn nextBtn" data-next="toDashboard">Перейти к профилю</button>
+  <div class="doneOnboard hidden" id="doneOnboard">
+    <div class="doneOnboardTitle" id="doneOnboardTitle"></div>
+    <ol class="doneOnboardSteps" id="doneOnboardSteps"></ol>
+  </div>
+  <button class="accentBtn nextBtn" data-next="toDashboard" id="doneCta">Перейти к профилю</button>
 </div>
 </div>
 </section>

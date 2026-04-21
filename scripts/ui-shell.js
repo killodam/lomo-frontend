@@ -258,6 +258,7 @@ function bindStaticUiActions() {
   if (feedSearchInput) feedSearchInput.addEventListener('input', function () { debouncedFilterFeed(); });
 
   bindChipFilter('.feedFilterChip', 'feedViewFilter', 'data-feed-view', filterFeed);
+  bindChipFilter('.feedVerifiedChip', 'feedVerifiedFilter', 'data-feed-verified', filterFeed);
 
   const employerSearchInput = document.getElementById('empSearchName');
   if (employerSearchInput) employerSearchInput.addEventListener('input', function () { debouncedFilterEmployerSearch(); });
