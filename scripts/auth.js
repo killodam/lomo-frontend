@@ -119,6 +119,8 @@ function registerPushAfterAuth(options) {
       if (vt) vt.checked = true;
       document.getElementById('aiMatchInputState').classList.remove('hidden');
       document.getElementById('aiMatchLoadingState').classList.add('hidden');
+      var _rs = document.getElementById('aiMatchResultsState');
+      if (_rs) _rs.classList.add('hidden');
       document.getElementById('aiMatchModal').style.display = 'block';
       if (ta) setTimeout(function() { ta.focus(); }, 80);
     }
@@ -801,86 +803,6 @@ function registerPushAfterAuth(options) {
         return;
       }
 
-      const btnRunAiMatch = e.target.closest('#btnRunAiMatch');
-      if (btnRunAiMatch) {
-        const text = (document.getElementById('aiMatchTextarea').value || '').trim();
-        if (!text) { showToast('Опишите кого вы ищете', 'error'); return; }
-
-        const gradeEl = document.querySelector('[data-grade].active');
-        const formatEl = document.querySelector('[data-format].active');
-        const verifiedOnly = document.getElementById('aiMatchVerifiedOnly')?.checked;
-        const selectedGrade = gradeEl ? gradeEl.getAttribute('data-grade') : '';
-        const selectedFormat = formatEl ? formatEl.getAttribute('data-format') : '';
-
-        document.getElementById('aiMatchInputState').classList.add('hidden');
-        document.getElementById('aiMatchLoadingState').classList.remove('hidden');
-        const statusEl = document.getElementById('aiMatchStatusText');
-
-        function setStep(n, msg) {
-          ['aiStep1','aiStep2','aiStep3'].forEach(function(id, i) {
-            var el = document.getElementById(id);
-            if (!el) return;
-            el.classList.toggle('active', i === n - 1);
-            el.classList.toggle('done', i < n - 1);
-          });
-          if (statusEl) statusEl.textContent = msg;
-        }
-
-        setStep(1, 'Анализ текста вакансии...');
-        setTimeout(function() {
-          setStep(2, 'Извлечение ключевых навыков...');
-          setTimeout(function() {
-            setStep(3, 'Ранжирование кандидатов...');
-            setTimeout(function() {
-              const stopWords = new Set(['и','в','на','с','по','к','для','от','что','мы','вас','или','не','как','при','это','также','будет','ищем','опыт','работы','лет','знание','умение','команде','плюсом','задачи','требования','обязанности','требуется','ожидаем','хотим','будет']);
-              const clean = text.replace(/[.,\/#!$%^&*;:{}=\-_`~()\n]/g, ' ').replace(/\s{2,}/g, ' ');
-              const words = clean.split(' ').filter(function(w) { return w.trim().length > 1; });
-              const seen = {};
-              const keywords = [];
-              words.forEach(function(w) {
-                const lower = w.toLowerCase();
-                if (stopWords.has(lower) || seen[lower]) return;
-                seen[lower] = true;
-                if (/^[a-zA-Z][a-zA-Z0-9.#+]*$/.test(w) || w.length > 4) keywords.push(w);
-              });
-
-              // Auto-detect grade from text if not manually selected
-              let grade = selectedGrade;
-              if (!grade) {
-                const lc = text.toLowerCase();
-                if (/senior|сеньор|сениор/.test(lc)) grade = 'senior';
-                else if (/lead|тимлид|team.?lead/.test(lc)) grade = 'lead';
-                else if (/middle|мидл/.test(lc)) grade = 'middle';
-                else if (/junior|джуниор|джун/.test(lc)) grade = 'junior';
-              }
-
-              const parts = [];
-              if (grade) parts.push(grade);
-              if (selectedFormat) parts.push(selectedFormat);
-              keywords.slice(0, 5).forEach(function(k) { parts.push(k); });
-              const query = parts.join(' ');
-
-              document.getElementById('aiMatchModal').style.display = 'none';
-
-              const searchInput = document.getElementById('empSearchName');
-              if (searchInput) searchInput.value = query;
-
-              const verifiedSelect = document.getElementById('empSearchVerified');
-              if (verifiedSelect) verifiedSelect.value = verifiedOnly ? 'verified' : '';
-
-              // Sync verified filter chip
-              document.querySelectorAll('.empFilterChip').forEach(function(chip) {
-                const val = chip.getAttribute('data-verified') || '';
-                chip.classList.toggle('active', val === (verifiedOnly ? 'verified' : ''));
-              });
-
-              if (typeof loadEmployerSearch === 'function') loadEmployerSearch(1);
-            }, 700);
-          }, 700);
-        }, 700);
-
-        return;
-      }
       if(e.target && e.target.id === 'btnDownloadCV'){ downloadEmployeeCV(); return; }
       const openDocBtn = e.target.closest('[data-open-doc]');
       if(openDocBtn){

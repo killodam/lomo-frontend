@@ -1517,3 +1517,175 @@
   .aiMatchStep { padding: 0 12px; }
   .aiMatchStep span { font-size: 10px; }
 }
+
+/* ── AI MATCH RESULTS ─────────────────────────────────────────────────── */
+#aiMatchResultsState { display: flex; flex-direction: column; min-height: 0; }
+#aiMatchResultsState.hidden { display: none; }
+
+.aiMatchResultsToolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 24px 12px;
+  border-bottom: 1px solid #f0f0f0;
+  flex-shrink: 0;
+}
+.aiMatchBackBtn {
+  background: none;
+  border: none;
+  color: #2a7a8a;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 4px 0;
+}
+.aiMatchBackBtn:hover { text-decoration: underline; }
+.aiMatchResultCount {
+  font-size: 12px;
+  color: #888;
+  font-weight: 500;
+}
+.aiMatchResultsList {
+  overflow-y: auto;
+  max-height: 440px;
+  padding: 8px 0;
+}
+.aiMatchEmpty {
+  padding: 40px 24px;
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Result cards */
+.aiResultCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 14px 24px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.aiResultCard:hover { background: #f7fafa; }
+.aiResultCard + .aiResultCard { border-top: 1px solid #f3f3f3; }
+
+.aiResultScore {
+  flex-shrink: 0;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+}
+.aiScore--high { background: #e6f4f1; color: #1a7a5e; }
+.aiScore--mid  { background: #fef3e2; color: #b06a00; }
+.aiScore--low  { background: #f5f5f5; color: #888; }
+
+.aiResultAvatarWrap {
+  position: relative;
+  flex-shrink: 0;
+}
+.aiResultAvatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.aiResultAvatarFallback {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #2a7a8a, #1a5a6a);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  font-weight: 700;
+}
+.aiResultVerifiedBadge {
+  position: absolute;
+  bottom: -2px;
+  right: -2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #2a7a8a;
+  color: #fff;
+  font-size: 9px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #fff;
+}
+
+.aiResultInfo { flex: 1; min-width: 0; }
+.aiResultName {
+  font-size: 14px;
+  font-weight: 700;
+  color: #111;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.aiResultMeta {
+  font-size: 12px;
+  color: #666;
+  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.aiResultTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 5px;
+}
+.aiResultTag {
+  font-size: 11px;
+  padding: 2px 7px;
+  background: #f0f0f0;
+  color: #555;
+  border-radius: 10px;
+  text-transform: capitalize;
+}
+.aiResultSkills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 5px;
+}
+.aiResultSkillTag {
+  font-size: 11px;
+  padding: 2px 7px;
+  background: #e8f4f5;
+  color: #2a7a8a;
+  border-radius: 10px;
+  font-weight: 500;
+}
+.aiResultOverlap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 5px;
+}
+.aiResultOverlapTag {
+  font-size: 10px;
+  padding: 1px 6px;
+  background: #fff3e0;
+  color: #b06a00;
+  border-radius: 8px;
+  font-weight: 600;
+}
+
+@media (max-width: 560px) {
+  .aiMatchResultsToolbar { padding: 12px 16px 10px; }
+  .aiResultCard { padding: 12px 16px; }
+  .aiMatchResultsList { max-height: 55vh; }
+}
