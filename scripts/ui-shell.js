@@ -245,8 +245,10 @@ function bindStaticUiActions() {
   });
   if (typeof bindAdminRoleChips === 'function') bindAdminRoleChips();
   if (typeof bindEmpExtraFilters === 'function') bindEmpExtraFilters();
-  bindUiAction('pubProfileBackBtn', 'click', function () { closePublicProfile(); });
-  bindUiAction('userProfileCloseBtn', 'click', function () { closeUserProfile(); });
+  bindUiAction('pubProfileBackBtn', 'click', function () {
+    if (typeof closeUserProfile === 'function') closeUserProfile();
+    else closePublicProfile();
+  });
 
   const eduInput = document.getElementById('mpCEduPlace');
   if (eduInput) eduInput.addEventListener('input', function () { filterUniList(eduInput.value); });
@@ -319,12 +321,6 @@ function bindStaticUiActions() {
     });
   });
 
-  const userProfileModal = document.getElementById('userProfileModal');
-  if (userProfileModal) {
-    userProfileModal.addEventListener('click', function (event) {
-      if (event.target === userProfileModal) closeUserProfile();
-    });
-  }
 }
 
 function showEmployerDashboard() {

@@ -989,33 +989,6 @@ document.addEventListener('click', function (event) {
   }
 });
 
-function buildFeedTags(user) {
-  var tags = [];
-  var statuses = {
-    education: user.edu_status,
-    work: user.work_status,
-    courses: user.course_status,
-    passport: user.pass_status,
-    cv: user.cv_status,
-  };
-  var labels = {
-    education: 'Образование',
-    work: 'Опыт',
-    courses: 'Курсы',
-    passport: 'Паспорт',
-    cv: 'CV',
-  };
-
-  Object.keys(statuses).forEach(function (key) {
-    var status = statuses[key];
-    if (status === 'verified') tags.push('<span class="feedTag verified">' + labels[key] + '</span>');
-    else if (status === 'pending') tags.push('<span class="feedTag pending">' + labels[key] + '</span>');
-  });
-
-  if (!tags.length) tags.push('<span class="feedTag placeholder">Заполняется</span>');
-  return tags.join('');
-}
-
 // ── BOOKMARKS LOGIC ───────────────────────────────────────
 function getBookmarksStorageKey() {
   return 'lomo_favs_' + String(state.userId || 'anon');
