@@ -908,3 +908,137 @@
   .chatHeaderWord { font-size: 14px; }
   .chatConnectionCard { padding: 11px; }
 }
+
+/* ── CONVERSATION SEARCH ───────────────────────────────────────────────── */
+.chatSearchWrap {
+  padding: 8px 12px 4px;
+  flex-shrink: 0;
+}
+.chatSearchInput {
+  width: 100%;
+  height: 34px;
+  padding: 0 12px;
+  border: 1px solid #e8e8e8;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: inherit;
+  color: #222;
+  background: #f8fafa;
+  outline: none;
+  box-sizing: border-box;
+  transition: border-color .15s, background .15s;
+}
+.chatSearchInput:focus {
+  border-color: #2a7a8a;
+  background: #fff;
+}
+.chatSearchInput::placeholder { color: #aaa; }
+/* hide browser clear button inconsistencies */
+.chatSearchInput::-webkit-search-cancel-button { -webkit-appearance: none; }
+
+/* ── TYPING INDICATOR ──────────────────────────────────────────────────── */
+.chatTypingIndicator {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 20px 2px;
+  font-size: 12px;
+  color: #888;
+  min-height: 22px;
+  flex-shrink: 0;
+}
+.chatTypingIndicator.hidden { display: none; }
+.chatTypingText { font-style: italic; }
+
+.chatTypingDots {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.chatTypingDots span {
+  display: block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: #2a7a8a;
+  animation: chatTypingBounce 1.2s infinite ease-in-out;
+}
+.chatTypingDots span:nth-child(2) { animation-delay: .2s; }
+.chatTypingDots span:nth-child(3) { animation-delay: .4s; }
+
+@keyframes chatTypingBounce {
+  0%, 60%, 100% { transform: translateY(0); opacity: .4; }
+  30%            { transform: translateY(-4px); opacity: 1; }
+}
+
+/* ── DATE SEPARATORS ───────────────────────────────────────────────────── */
+.chatDateSep {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 8px;
+  user-select: none;
+}
+.chatDateSep::before,
+.chatDateSep::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #ececec;
+}
+.chatDateSep span {
+  font-size: 11px;
+  color: #aaa;
+  font-weight: 600;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+
+/* ── READ RECEIPT TICKS ────────────────────────────────────────────────── */
+.chatTick {
+  display: inline-block;
+  font-size: 11px;
+  margin-left: 4px;
+  color: rgba(255,255,255,.45);
+  font-weight: 600;
+  vertical-align: middle;
+  letter-spacing: -1px;
+}
+.chatTick.read {
+  color: #7ee8c8;
+}
+
+/* ── LOAD EARLIER BUTTON ───────────────────────────────────────────────── */
+.chatLoadEarlierWrap {
+  display: flex;
+  justify-content: center;
+  padding: 8px 0 16px;
+}
+.chatLoadEarlierBtn {
+  background: none;
+  border: 1px solid #d8d8d8;
+  border-radius: 20px;
+  padding: 6px 18px;
+  font-size: 12px;
+  color: #2a7a8a;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background .15s, border-color .15s;
+}
+.chatLoadEarlierBtn:hover {
+  background: #f0f8f9;
+  border-color: #2a7a8a;
+}
+
+/* ── AUTO-GROW TEXTAREA ────────────────────────────────────────────────── */
+.chatComposerInput {
+  max-height: 120px;
+  overflow-y: auto;
+  resize: none;
+}
+
+@media (max-width: 640px) {
+  .chatSearchWrap { padding: 6px 10px 2px; }
+  .chatTypingIndicator { padding: 4px 16px 0; }
+}

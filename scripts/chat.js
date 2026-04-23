@@ -21,6 +21,10 @@
     newestWhileAwayCount: 0,
     knownIncomingConnectionIds: [],
     connectionsSnapshotReady: false,
+    messagePageByConversation: {},
+    messageTotalPagesByConversation: {},
+    typingTimers: {},
+    typingDebounce: null,
   };
 
   var elements = {
@@ -42,6 +46,8 @@
     backToListBtn: document.getElementById('chatBackToListBtn'),
     openProfileBtn: document.getElementById('chatOpenProfileBtn'),
     connectionInbox: document.getElementById('chatConnectionInbox'),
+    searchInput: document.getElementById('chatSearchInput'),
+    typingIndicator: document.getElementById('chatTypingIndicator'),
   };
 
   var CHAT_ATTACHMENT_TOKEN_RE = /\[\[attachment\|([^\]|]+)\|([^\]]+)\]\]/;
@@ -112,6 +118,7 @@
       last_message_created_at: raw.last_message_created_at || raw.last_message_at || '',
       last_message_author_id: raw.last_message_author_id || '',
       unread_count: Number(raw.unread_count || 0),
+      other_last_read_at: raw.other_last_read_at || '',
     };
 
     if (normalized.participant_user_id) {
@@ -476,7 +483,11 @@
 
   function renderConversationList() {
     if (!elements.list) return;
-    var conversations = Array.isArray(state.chat.conversations) ? state.chat.conversations : [];
+    var allConversations = Array.isArray(state.chat.conversations) ? state.chat.conversations : [];
+    var searchQ = (elements.searchInput && elements.searchInput.value || '').toLowerCase().trim();
+    var conversations = searchQ
+      ? allConversations.filter(function (c) { return participantName(c).toLowerCase().indexOf(searchQ) >= 0; })
+      : allConversations;
     var unreadTotal = computeUnreadTotal();
     var incomingTotal = computeIncomingConnectionTotal();
 
@@ -574,17 +585,57 @@
       return;
     }
 
-    elements.messages.innerHTML = messages.map(function (message) {
+    var otherReadTs = activeConversation.other_last_read_at
+      ? new Date(activeConversation.other_last_read_at).getTime()
+      : 0;
+    var lastDateStr = null;
+    var now = new Date();
+    var todayStr = now.toDateString();
+    var yesterdayStr = new Date(now.getTime() - 86400000).toDateString();
+
+    var msgPage = chatState.messagePageByConversation[conversationId] || 1;
+    var msgTotalPages = chatState.messageTotalPagesByConversation[conversationId] || 1;
+    var loadEarlierHtml = (msgTotalPages > 1 && msgPage < msgTotalPages)
+      ? '<div class="chatLoadEarlierWrap"><button type="button" class="chatLoadEarlierBtn" id="chatLoadEarlierBtn">Загрузить ранние сообщения</button></div>'
+      : '';
+
+    var bubbles = [];
+    messages.forEach(function (message) {
+      var msgDate = new Date(message.created_at);
+      var dateKey = msgDate.toDateString();
+      if (dateKey !== lastDateStr) {
+        lastDateStr = dateKey;
+        var label = dateKey === todayStr ? 'Сегодня'
+          : dateKey === yesterdayStr ? 'Вчера'
+          : msgDate.toLocaleDateString('ru-RU', { day: 'numeric', month: 'long' });
+        bubbles.push('<div class="chatDateSep"><span>' + escapeHtml(label) + '</span></div>');
+      }
       var mine = String(message.author_user_id) === String(state.userId || '');
-      return (
+      var tickHtml = '';
+      if (mine) {
+        var msgTs = new Date(message.created_at).getTime();
+        var isRead = otherReadTs >= msgTs;
+        tickHtml = '<span class="chatTick' + (isRead ? ' read' : '') + '">✓✓</span>';
+      }
+      bubbles.push(
         '<div class="chatBubbleRow' + (mine ? ' mine' : '') + '">' +
           '<div class="chatBubble' + (mine ? ' mine' : '') + '">' +
             '<div class="chatBubbleText">' + renderMessageBodyHtml(message.body) + '</div>' +
-            '<div class="chatBubbleMeta">' + escapeHtml(formatChatTime(message.created_at)) + '</div>' +
+            '<div class="chatBubbleMeta">' + escapeHtml(formatChatTime(message.created_at)) + tickHtml + '</div>' +
           '</div>' +
         '</div>'
       );
-    }).join('');
+    });
+
+    elements.messages.innerHTML = loadEarlierHtml + bubbles.join('');
+
+    var loadEarlierBtn = document.getElementById('chatLoadEarlierBtn');
+    if (loadEarlierBtn) {
+      loadEarlierBtn.addEventListener('click', function () {
+        var nextPage = (chatState.messagePageByConversation[conversationId] || 1) + 1;
+        loadMessages(conversationId, { page: nextPage, prepend: true, silent: true });
+      });
+    }
 
     if (shouldStickToBottom) {
       scrollMessagesToBottom(options.smooth ? 'smooth' : 'auto');
@@ -748,19 +799,39 @@
     }
 
     try {
-      var result = await apiGetChatMessages(conversationId, { page: 1, pageSize: 50 });
+      var page = options.page || 1;
+      var result = await apiGetChatMessages(conversationId, { page: page, pageSize: 50 });
       var data = normalizePaginatedResponse(result);
-      state.chat.messagesByConversation[String(conversationId)] = (data.items || []).map(normalizeMessage).filter(Boolean);
+      var newMessages = (data.items || []).map(normalizeMessage).filter(Boolean);
+      var convKey = String(conversationId);
+
+      if (options.prepend && page > 1) {
+        var existing = Array.isArray(state.chat.messagesByConversation[convKey]) ? state.chat.messagesByConversation[convKey] : [];
+        state.chat.messagesByConversation[convKey] = newMessages.concat(existing);
+      } else {
+        state.chat.messagesByConversation[convKey] = newMessages;
+      }
+      chatState.messagePageByConversation[convKey] = page;
+      chatState.messageTotalPagesByConversation[convKey] = data.totalPages || 1;
+
       var activeConversation = findConversation(conversationId);
       if (activeConversation) activeConversation.unread_count = 0;
       renderConversationList();
       if (isChatActive() && String(state.chat.activeConversationId || '') === String(conversationId || '')) {
+        var prevOffset = elements.messages ? elements.messages.scrollHeight - elements.messages.scrollTop : 0;
         renderThread({
-          forceScrollBottom: !!options.forceScrollBottom,
+          forceScrollBottom: !!options.forceScrollBottom && !options.prepend,
           smooth: !!options.smooth || options.reason === 'message-created',
         });
+        if (options.prepend) {
+          requestAnimationFrame(function () {
+            if (elements.messages) {
+              elements.messages.scrollTop = elements.messages.scrollHeight - prevOffset;
+            }
+          });
+        }
       }
-      return state.chat.messagesByConversation[String(conversationId)];
+      return state.chat.messagesByConversation[convKey];
     } catch (err) {
       if (handleProtectedError(err)) return [];
       if (elements.messages && isChatActive()) {
@@ -775,6 +846,7 @@
     if (!conversationId) return;
     state.chat.activeConversationId = conversationId;
     resetNewMessagesIndicator();
+    if (elements.typingIndicator) elements.typingIndicator.classList.add('hidden');
     renderConversationList();
     await loadMessages(conversationId, { silent: false, forceScrollBottom: true });
   }
@@ -872,6 +944,39 @@
     }, 120);
   }
 
+  function sendTypingSignal() {
+    var conversationId = state.chat.activeConversationId;
+    if (!conversationId || !chatState.socket || chatState.socket.readyState !== window.WebSocket.OPEN) return;
+    var conversation = findConversation(conversationId);
+    if (!conversation || !conversation.participant_user_id) return;
+    if (chatState.typingDebounce) return;
+    try {
+      chatState.socket.send(JSON.stringify({
+        type: 'chat.typing',
+        conversation_id: conversationId,
+        recipient_user_id: conversation.participant_user_id,
+      }));
+    } catch (e) {}
+    chatState.typingDebounce = setTimeout(function () { chatState.typingDebounce = null; }, 2500);
+  }
+
+  function handleTypingIndicator(payload) {
+    var convId = String(payload.conversation_id || '');
+    var fromUser = String(payload.from_user_id || '');
+    if (!convId || String(state.chat.activeConversationId) !== convId) return;
+    var conversation = findConversation(convId);
+    if (!conversation || String(conversation.participant_user_id) !== fromUser) return;
+    if (!elements.typingIndicator) return;
+    elements.typingIndicator.innerHTML =
+      '<span class="chatTypingDots"><span></span><span></span><span></span></span>' +
+      '<span class="chatTypingText">' + escapeHtml(participantName(conversation)) + ' печатает...</span>';
+    elements.typingIndicator.classList.remove('hidden');
+    if (chatState.typingTimers[convId]) clearTimeout(chatState.typingTimers[convId]);
+    chatState.typingTimers[convId] = setTimeout(function () {
+      if (elements.typingIndicator) elements.typingIndicator.classList.add('hidden');
+    }, 3500);
+  }
+
   function handleSocketPayload(raw) {
     try {
       var payload = JSON.parse(String(raw || '{}'));
@@ -882,6 +987,10 @@
         return;
       }
       if (payload.type === 'chat.pong') return;
+      if (payload.type === 'chat.typing') {
+        handleTypingIndicator(payload);
+        return;
+      }
       if (payload.type === 'chat.sync') {
         if (String(payload.reason || '').indexOf('connection-') === 0) scheduleConnectionInboxSync({ loud: !isChatActive() });
         else scheduleConversationSync(payload);
@@ -1157,6 +1266,26 @@
     elements.composer.addEventListener('submit', function (event) {
       event.preventDefault();
       sendMessage();
+    });
+  }
+
+  if (elements.input) {
+    elements.input.addEventListener('input', function () {
+      this.style.height = 'auto';
+      this.style.height = Math.min(this.scrollHeight, 120) + 'px';
+      sendTypingSignal();
+    });
+    elements.input.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+  }
+
+  if (elements.searchInput) {
+    elements.searchInput.addEventListener('input', function () {
+      renderConversationList();
     });
   }
 
