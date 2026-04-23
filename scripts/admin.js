@@ -3,14 +3,8 @@ var _connectionsData = { accepted: [], incoming: [], outgoing: [], counts: { acc
 
 var feedState = { page: 1, pageSize: 15, total: 0, totalPages: 0, search: '', view: '', verified: '' };
 var employerSearchState = { page: 1, pageSize: 15, total: 0, totalPages: 0, search: '', verified: '', lookingFilter: '', salaryMaxFilter: '' };
-// Infinite scroll observers
 var _feedScrollObserver = null;
 var _employerScrollObserver = null;
-var FEED_AUTO_REFRESH_MS = Math.max(10000, Number(window.LOMO_CONFIG && window.LOMO_CONFIG.FEED_AUTO_REFRESH_MS || 30000) || 30000);
-var FEED_PULL_REFRESH_TRIGGER_PX = 78;
-var FEED_PULL_REFRESH_MAX_PX = 132;
-var feedAutoRefreshState = { timer: null, inFlight: false };
-var feedPullRefreshState = { screenKey: '', screenEl: null, startY: 0, distance: 0, dragging: false, armed: false, hideTimer: null };
 var employerFilterUiState = { signature: '' };
 var adminQueueState = { page: 1, pageSize: 20, total: 0, totalPages: 0 };
 var adminCandidateState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '' };
@@ -584,6 +578,8 @@ function loadAdminQueue(page) {
 function bindAdminRoleChips() {
   var chips = document.querySelectorAll('[data-admin-role-filter]');
   chips.forEach(function (chip) {
+    if (chip.dataset.bound === '1') return;
+    chip.dataset.bound = '1';
     chip.addEventListener('click', function () {
       chips.forEach(function (c) { c.classList.remove('active'); });
       chip.classList.add('active');
@@ -989,132 +985,6 @@ document.addEventListener('click', function (event) {
   }
 });
 
-// ── BOOKMARKS LOGIC ───────────────────────────────────────
-function getBookmarksStorageKey() {
-  return 'lomo_favs_' + String(state.userId || 'anon');
-}
-
-function readBookmarks() {
-  try {
-    var raw = window.localStorage.getItem(getBookmarksStorageKey());
-    var parsed = raw ? JSON.parse(raw) : null;
-    if (!parsed || typeof parsed !== 'object') parsed = {};
-    
-    // Auto-migrate to Folder format
-    if (!parsed.lists && Object.keys(parsed).length > 0) {
-      var oldItems = Object.assign({}, parsed);
-      parsed = { lists: { 'default': { id: 'default', name: 'Избранные', items: oldItems } } };
-      writeBookmarks(parsed);
-    } else if (!parsed.lists) {
-      parsed = { lists: { 'default': { id: 'default', name: 'Избранные', items: {} } } };
-      writeBookmarks(parsed);
-    }
-    return parsed;
-  } catch (error) {
-    return { lists: { 'default': { id: 'default', name: 'Избранные', items: {} } } };
-  }
-}
-
-function writeBookmarks(bookmarks) {
-  try {
-    var payload = { lists: (bookmarks && bookmarks.lists) ? bookmarks.lists : {} };
-    var defaultItems = payload.lists.default && payload.lists.default.items ? payload.lists.default.items : {};
-
-    Object.keys(defaultItems).forEach(function (uid) {
-      payload[uid] = defaultItems[uid];
-    });
-
-    window.localStorage.setItem(getBookmarksStorageKey(), JSON.stringify(payload));
-    return true;
-  } catch (error) {
-    showToast('Не удалось сохранить избранное', 'error');
-    return false;
-  }
-}
-
-function getBookmarkedUsersList(listId) {
-  var bookmarks = readBookmarks();
-  var lists = bookmarks.lists || {};
-  
-  if (listId && lists[listId]) {
-    return Object.keys(lists[listId].items || {}).map(function (uid) {
-      return lists[listId].items[uid];
-    }).filter(Boolean);
-  }
-  
-  // Aggregate from all lists if no listId provided
-  var allUsers = {};
-  Object.keys(lists).forEach(function (lId) {
-    Object.keys(lists[lId].items || {}).forEach(function (uid) {
-      allUsers[uid] = lists[lId].items[uid];
-    });
-  });
-  
-  return Object.keys(allUsers).map(function (uid) {
-    return allUsers[uid];
-  }).filter(Boolean);
-}
-
-function buildBookmarkSearchText(user) {
-  var parts = [
-    user && user.full_name,
-    user && user.email,
-    user && user.location,
-    user && user.edu_place,
-    user && user.edu_year,
-    user && user.vacancies,
-    user && user.about,
-    user && user.current_job,
-    user && user.job_title,
-    user && user.company,
-    user && user.industry,
-  ];
-
-  if (Array.isArray(user && user.work_exp)) {
-    user.work_exp.forEach(function (item) {
-      if (!item) return;
-      parts.push(item.company, item.role, item.period, item.desc);
-    });
-  }
-
-  return parts.filter(Boolean).join(' ').toLowerCase();
-}
-
-function filterBookmarkedUsers(list, query) {
-  var normalizedQuery = String(query || '').trim().toLowerCase();
-  if (!normalizedQuery) return list.slice();
-
-  return list.filter(function (user) {
-    return buildBookmarkSearchText(user).indexOf(normalizedQuery) !== -1;
-  });
-}
-
-function paginateLocalItems(items, pagerState) {
-  var total = items.length;
-  var totalPages = total ? Math.ceil(total / pagerState.pageSize) : 0;
-  var safePage = pagerState.page || 1;
-  var start;
-
-  if (totalPages && safePage > totalPages) safePage = totalPages;
-  if (!totalPages) safePage = 1;
-
-  pagerState.page = safePage;
-  start = (safePage - 1) * pagerState.pageSize;
-  syncPagerState(pagerState, {
-    total: total,
-    page: safePage,
-    pageSize: pagerState.pageSize,
-    totalPages: totalPages,
-  });
-  return items.slice(start, start + pagerState.pageSize);
-}
-
-function getVisibleBookmarkedUsers(query, listId) {
-  return filterBookmarkedUsers(getBookmarkedUsersList(listId), query).filter(function (user) {
-    return String(user && user.id || user && user.email || '') !== String(state.userId || '');
-  });
-}
-
 function syncChipSelection(chipSelector, attributeName, selectedValue) {
   var normalizedValue = String(selectedValue || '');
   document.querySelectorAll(chipSelector).forEach(function (chip) {
@@ -1143,11 +1013,6 @@ function syncChipSelectionInside(container, chipSelector, attributeName, selecte
   });
 }
 
-function getEmployerFilterUiValue(rawValue) {
-  var value = String(rawValue || '');
-  return value === 'default' ? 'favorites' : value;
-}
-
 function buildEmployerFilterSignature(lists) {
   return Object.keys(lists || {}).map(function (listId) {
     var list = lists[listId] || {};
@@ -1162,7 +1027,7 @@ function buildEmployerFilterChipsHtml(listIds, lists) {
 
   listIds.forEach(function (listId) {
     var list = lists[listId] || {};
-    var filterValue = listId === 'default' ? 'favorites' : listId;
+    var filterValue = getBookmarkFilterValueForListId(listId);
     var icon = listId === 'default' ? '★ ' : '📁 ';
     html += '<button class="empFilterChip" data-verified="' + escHtml(filterValue) + '" type="button">' + icon + escHtml(list.name) + '</button>';
   });
@@ -1175,7 +1040,7 @@ function buildEmployerFilterOptionsHtml(listIds, lists) {
 
   listIds.forEach(function (listId) {
     var list = lists[listId] || {};
-    var filterValue = listId === 'default' ? 'favorites' : listId;
+    var filterValue = getBookmarkFilterValueForListId(listId);
     html += '<option value="' + escHtml(filterValue) + '">' + escHtml(list.name) + '</option>';
   });
 
@@ -1205,7 +1070,7 @@ function bindEmployerFilterChipEvents(chipContainer) {
 
 function syncEmployerFilterChips() {
   var select = document.getElementById('empSearchVerified');
-  var selectedView = getEmployerFilterUiValue(select ? String(select.value || '') : '');
+  var selectedView = normalizeBookmarkFilterValue(select ? String(select.value || '') : '');
   var chipContainer = document.querySelector('.empFilterChips');
   if (chipContainer) {
     var bookmarks = readBookmarks();
@@ -1248,15 +1113,6 @@ function _isBookmarked(uid) {
 }
 
 var _currentBookmarkUid = null;
-
-function ensureBookmarksDefaultList(bookmarks) {
-  if (!bookmarks.lists) bookmarks.lists = {};
-  if (!bookmarks.lists.default) {
-    bookmarks.lists.default = { id: 'default', name: 'Избранные', items: {} };
-  }
-  if (!bookmarks.lists.default.items) bookmarks.lists.default.items = {};
-  return bookmarks.lists.default;
-}
 
 function addBookmarkToDefault(uid, user) {
   var bookmarks = readBookmarks();
@@ -1308,12 +1164,12 @@ function openBookmarkFolderModal(uid) {
 }
 
 function refreshActiveBookmarkViewAfterToggle() {
-  if (isScreenActive('candidateFeed') && feedState.view === 'favorites') {
+  if (isScreenActive('candidateFeed') && isBookmarkFavoritesFilter(feedState.view)) {
     loadCandidateFeed(feedState.page || 1);
     return;
   }
 
-  if (isScreenActive('employerSearch') && (employerSearchState.verified === 'favorites' || employerSearchState.verified === 'default')) {
+  if (isScreenActive('employerSearch') && isBookmarkFavoritesFilter(employerSearchState.verified)) {
     loadEmployerSearch(employerSearchState.page || 1);
   }
 }
@@ -1338,7 +1194,7 @@ function toggleBookmark(uid, sourceButton, event) {
     return false;
   }
 
-  if (feedState.view === 'favorites' || employerSearchState.verified === 'favorites' || employerSearchState.verified === 'default') {
+  if (isBookmarkFavoritesFilter(feedState.view) || isBookmarkFavoritesFilter(employerSearchState.verified)) {
     if (removeBookmarkFromAllLists(targetUid)) {
       showToast('Удалено из избранного', 'info');
       refreshActiveBookmarkViewAfterToggle();
@@ -1448,10 +1304,8 @@ function toggleUserInAtsFolder(listId, isChecked) {
   
   if (isChecked) {
     bookmarks.lists[listId].items[uid] = user;
-    // showToast('Сохранено в "' + bookmarks.lists[listId].name + '"', 'success');
   } else {
     delete bookmarks.lists[listId].items[uid];
-    // showToast('Удалено из "' + bookmarks.lists[listId].name + '"', 'info');
   }
   if (!writeBookmarks(bookmarks)) return;
   renderFolderModalLists();
@@ -1460,7 +1314,7 @@ function toggleUserInAtsFolder(listId, isChecked) {
   var isActive = _isBookmarked(uid);
   syncBookmarkButtons(uid, isActive);
   
-  if (employerSearchState.verified === listId || employerSearchState.verified === 'favorites') {
+  if (normalizeBookmarkFilterValue(employerSearchState.verified) === normalizeBookmarkFilterValue(listId) || isBookmarkFavoritesFilter(employerSearchState.verified)) {
     loadEmployerSearch();
   }
 }
@@ -1491,11 +1345,6 @@ function renameAtsFolder(listId) {
     if (!writeBookmarks(bookmarks)) return;
     renderFolderModalLists();
     syncEmployerFilterChips();
-    var sel = document.getElementById('empSearchVerified');
-    if (sel && sel.value === listId) {
-      // Re-trigger visual update
-      syncEmployerFilterChips();
-    }
   }
 }
 
@@ -1518,7 +1367,7 @@ function deleteAtsFolder(listId) {
       sel.value = '';
       filterEmployerSearch();
     } else {
-      if (employerSearchState.verified === 'favorites' || String(employerSearchState.verified).startsWith('list_')) {
+      if (isBookmarkFolderFilter(employerSearchState.verified)) {
         loadEmployerSearch();
       }
     }
@@ -1526,153 +1375,6 @@ function deleteAtsFolder(listId) {
 }
 
 
-
-function buildSocialCard(user) {
-  var isEmployer = user.role === 'employer';
-  var name = escHtml(user.full_name || (isEmployer ? user.company : '') || user.email || '?');
-  var rawName = name.replace(/&[^;]+;/g, '');
-  var initials = rawName.split(' ').map(function (segment) { return segment[0] || ''; }).join('').slice(0, 2).toUpperCase() || '?';
-  var avatarRoleClass = isEmployer ? ' employer' : ' candidate';
-
-  var verificationStatuses = [user.edu_status, user.work_status, user.course_status, user.pass_status, user.cv_status];
-  var verifiedCount = verificationStatuses.filter(function (status) { return status === 'verified'; }).length;
-  var pendingCount = verificationStatuses.filter(function (status) { return status === 'pending'; }).length;
-  var verificationBadge = verifiedCount > 0
-    ? '<span class="scVerBadge">✓ LOMO ' + verifiedCount + '</span>'
-    : (pendingCount > 0 ? '<span class="scVerBadge pending">Проверяется</span>' : '');
-
-  var roleTag = isEmployer
-    ? '<span class="scRoleTag employer">Работодатель</span>'
-    : '<span class="scRoleTag candidate">Кандидат</span>';
-
-  var subParts = isEmployer
-    ? [user.industry, user.location].filter(Boolean)
-    : [user.edu_place, user.edu_year, user.location].filter(Boolean);
-  var subLine = subParts.length ? '<div class="scSub">' + escHtml(subParts.join(' · ')) + '</div>' : '';
-
-  var jobLine = '';
-  if (!isEmployer && user.current_job && user.current_job !== 'Не работаю') {
-    jobLine = '<div class="scJobLine">' + escHtml(user.current_job + (user.job_title ? ' · ' + user.job_title : '')) + '</div>';
-  } else if (!isEmployer && user.current_job === 'Не работаю') {
-    jobLine = '<div class="scJobLine muted">В поиске работы</div>';
-  }
-
-  var workExpLine = '';
-  if (!isEmployer && user.work_exp && user.work_exp.length) {
-    workExpLine = '<div class="scWorkExp">' + user.work_exp.slice(0, 2).map(function (item) {
-      return '<div class="scExpItem"><span class="scExpCo">' + escHtml(item.company || '') + '</span>' +
-        (item.role ? ' <span class="scExpRole">· ' + escHtml(item.role) + '</span>' : '') +
-        (item.period ? ' <span class="scExpPeriod">' + escHtml(item.period) + '</span>' : '') +
-      '</div>';
-    }).join('') + '</div>';
-  }
-
-  var salaryBadge = (!isEmployer && user.salary_expectations)
-    ? '<span class="scSalaryBadge">💰 ' + escHtml(user.salary_expectations) + '</span>'
-    : '';
-
-  var lookingBadge = (!isEmployer && user.looking_for_work)
-    ? '<span class="scLookingBadge">🟢 Активно ищет</span>'
-    : '';
-
-  var salaryOfferBadge = (isEmployer && user.salary_offer)
-    ? '<span class="scSalaryOfferBadge">💼 ' + escHtml(user.salary_offer) + '</span>'
-    : '';
-
-  var aboutSnippet = user.about
-    ? '<div class="scAbout">' + escHtml(user.about.slice(0, 120)) + (user.about.length > 120 ? '…' : '') + '</div>'
-    : '';
-
-  var extraLines = '';
-  if (isEmployer) {
-    var safeWebsite = safeHttpUrl(user.website);
-    if (safeWebsite) {
-      extraLines += '<div class="scSub compact"><a href="' + escHtml(safeWebsite) + '" target="_blank" rel="noopener noreferrer" class="scSubLink">' + escHtml(user.website) + '</a></div>';
-    }
-    if (user.needed) {
-      var needed = user.needed.split(',').map(function (item) { return item.trim(); }).filter(Boolean).slice(0, 4);
-      if (needed.length) {
-        extraLines += '<div class="scChipRow spacious"><span class="scChipLabel">Ищем:</span>' +
-          needed.map(function (item) { return '<span class="scProject hiring">' + escHtml(item) + '</span>'; }).join('') +
-        '</div>';
-      }
-    }
-  }
-
-  var detailLines = '';
-  if (!isEmployer) {
-    var verifiedData = [];
-    if (user.edu_status === 'verified') verifiedData.push({ label: 'Образование', tool: [user.edu_place, user.edu_year].filter(Boolean).join(', ') || 'Диплом проверен' });
-    if (user.work_status === 'verified') verifiedData.push({ label: 'Опыт', tool: user.work_exp && user.work_exp[0] ? [user.work_exp[0].company, user.work_exp[0].role].filter(Boolean).join(' · ') : 'Стаж подтвержден' });
-    if (user.course_status === 'verified') verifiedData.push({ label: 'Курсы', tool: 'Сертификаты доп. образования проверены' });
-    if (user.pass_status === 'verified') verifiedData.push({ label: 'Паспорт', tool: 'Личность пользователя подтверждена' });
-    if (user.cv_status === 'verified') verifiedData.push({ label: 'CV', tool: 'Резюме соответствует документам' });
-
-    if (verifiedData.length) {
-      detailLines += '<div class="scChipRow regular">' +
-        verifiedData.map(function (item) {
-          var safeTool = escHtml(item.tool).replace(/"/g, '&quot;');
-          return '<span class="scVerItem has-tooltip" data-tooltip="' + safeTool + '">✓ ' + item.label + '</span>'; 
-        }).join('') +
-      '</div>';
-    }
-    if (user.vacancies) {
-      var vacancies = user.vacancies.split(',').map(function (item) { return item.trim(); }).filter(Boolean).slice(0, 3);
-      if (vacancies.length) {
-        detailLines += '<div class="scChipRow compact"><span class="scChipLabel">Ищу:</span>' +
-          vacancies.map(function (value) { return '<span class="scProject">' + escHtml(value) + '</span>'; }).join('') +
-        '</div>';
-      }
-    }
-  }
-
-  var projectsLine = '';
-  if (isEmployer && user.active_projects) {
-    var projects = user.active_projects.split(';').map(function (item) { return item.trim(); }).filter(Boolean).slice(0, 3);
-    if (projects.length) {
-      projectsLine = '<div class="scChipRow compact"><span class="scChipLabel">Проекты:</span>' +
-        projects.map(function (value) { return '<span class="scProject">' + escHtml(value) + '</span>'; }).join('') +
-      '</div>';
-    }
-  }
-
-  var hasBody = aboutSnippet || jobLine || workExpLine || extraLines || detailLines || projectsLine || salaryBadge || lookingBadge || salaryOfferBadge;
-  var avatarHtml;
-  var avatarSrc = safeImageUrl(user.avatar_url);
-  if (avatarSrc) {
-    avatarHtml = '<div class="scAvatar' + avatarRoleClass + '">' +
-      '<img src="' + escHtml(avatarSrc) + '" class="scAvatarImage" onerror="this.style.display=\'none\'">' +
-    '</div>';
-  } else {
-    avatarHtml = '<div class="scAvatar' + avatarRoleClass + '"><div class="scAvatarFallback' + avatarRoleClass + '">' + initials + '</div></div>';
-  }
-
-  var uid = String(user.id || user.email || '?');
-  _userCache[uid] = user;
-
-  // Bookmarking button for signed-in users
-  var bookmarkBtn = '';
-  if (state.userId) {
-    var isBookmarked = _isBookmarked(uid);
-    bookmarkBtn = '<button class="scBookmarkBtn' + (isBookmarked ? ' active' : '') + '" type="button" data-bookmark-uid="' + escHtml(uid) + '" aria-pressed="' + (isBookmarked ? 'true' : 'false') + '" title="' + (isBookmarked ? 'Убрать из избранного' : 'Добавить в избранное') + '" aria-label="' + (isBookmarked ? 'Убрать из избранного' : 'Добавить в избранное') + '">★</button>';
-  }
-
-  return '<div class="socialCard clickable" data-uid="' + uid + '">' +
-    bookmarkBtn +
-    '<div class="scHead">' +
-      avatarHtml +
-      '<div class="scInfo">' +
-        '<div class="scNameRow"><span class="scName">' + name + '</span>' + verificationBadge + '</div>' +
-        subLine +
-        '<div class="scRoleRow">' + roleTag + '</div>' +
-      '</div>' +
-    '</div>' +
-    (hasBody ? '<div class="scBody">' +
-      ((lookingBadge || salaryBadge || salaryOfferBadge) ? '<div class="scBadgeRow">' + lookingBadge + salaryBadge + salaryOfferBadge + '</div>' : '') +
-      (aboutSnippet || '') + jobLine + workExpLine + extraLines + detailLines + projectsLine +
-    '</div>' : '') +
-    '</div>';
-}
 
 function getScreenScrollTop(key) {
   if (!screens || !screens[key]) return 0;
@@ -1686,6 +1388,18 @@ function restoreScreenScrollTop(key, scrollTop) {
 
 function isScreenActive(key) {
   return !!(screens && screens[key] && screens[key].classList.contains('active'));
+}
+
+function appendSocialCard(fragment, user) {
+  var card = typeof createSocialCardElement === 'function' ? createSocialCardElement(user) : null;
+
+  if (!card && typeof buildSocialCard === 'function') {
+    var wrapper = document.createElement('div');
+    wrapper.innerHTML = buildSocialCard(user);
+    card = wrapper.firstElementChild;
+  }
+
+  if (card) fragment.appendChild(card);
 }
 
 function loadCandidateFeed(page, options) {
@@ -1702,7 +1416,7 @@ function loadCandidateFeed(page, options) {
   var listId = 'candidateFeedList';
   if (!document.getElementById(listId)) return Promise.resolve();
 
-  if (feedState.view === 'favorites') {
+  if (isBookmarkFavoritesFilter(feedState.view)) {
     teardownInfiniteScroll({ current: _feedScrollObserver }, listId);
     _feedScrollObserver = null;
     var bookmarkedUsers = getVisibleBookmarkedUsers(feedState.search);
@@ -1767,7 +1481,7 @@ function renderFeedList(list, appendMode) {
   });
 
   if (!filtered.length && !appendMode) {
-    if (feedState.view === 'favorites') {
+    if (isBookmarkFavoritesFilter(feedState.view)) {
       renderFeedEmptyState(
         'candidateFeedList',
         '★',
@@ -1781,10 +1495,7 @@ function renderFeedList(list, appendMode) {
 
   var fragment = document.createDocumentFragment();
   filtered.forEach(function (user) {
-    var wrapper = document.createElement('div');
-    wrapper.innerHTML = buildSocialCard(user);
-    var card = wrapper.firstElementChild;
-    if (card) fragment.appendChild(card);
+    appendSocialCard(fragment, user);
   });
 
   if (appendMode) {
@@ -1800,6 +1511,8 @@ function renderFeedList(list, appendMode) {
 
 function bindEmpExtraFilters() {
   document.querySelectorAll('[data-looking]').forEach(function(chip) {
+    if (chip.dataset.bound === '1') return;
+    chip.dataset.bound = '1';
     chip.addEventListener('click', function() {
       document.querySelectorAll('[data-looking]').forEach(function(c) { c.classList.remove('active'); });
       chip.classList.add('active');
@@ -1810,14 +1523,16 @@ function bindEmpExtraFilters() {
 
   var salaryInput = document.getElementById('empSalaryMaxInput');
   var salaryClear = document.getElementById('empSalaryMaxClear');
-  if (salaryInput) {
+  if (salaryInput && salaryInput.dataset.bound !== '1') {
+    salaryInput.dataset.bound = '1';
     salaryInput.addEventListener('input', function() {
       employerSearchState.salaryMaxFilter = (salaryInput.value || '').trim();
       if (salaryClear) salaryClear.classList.toggle('hidden', !salaryInput.value);
       filterEmployerSearch();
     });
   }
-  if (salaryClear) {
+  if (salaryClear && salaryClear.dataset.bound !== '1') {
+    salaryClear.dataset.bound = '1';
     salaryClear.addEventListener('click', function() {
       if (salaryInput) salaryInput.value = '';
       employerSearchState.salaryMaxFilter = '';
@@ -1868,7 +1583,7 @@ function loadEmployerSearch(page, options) {
   if (employerSearchState.verified && employerSearchState.verified !== 'verified') {
     teardownInfiniteScroll({ current: _employerScrollObserver }, listId);
     _employerScrollObserver = null;
-    var bookmarkListId = employerSearchState.verified === 'favorites' ? 'default' : employerSearchState.verified;
+    var bookmarkListId = getBookmarkListIdFromFilter(employerSearchState.verified);
     var bookmarkedUsers = filterBookmarkedUsers(getBookmarkedUsersList(bookmarkListId), employerSearchState.search);
     renderEmployerSearch(paginateLocalItems(bookmarkedUsers, employerSearchState), false);
     renderPager('employerCandidatePager', employerSearchState, loadEmployerSearch, { label: 'сохраненных' });
@@ -1926,7 +1641,7 @@ function renderEmployerSearch(list, appendMode) {
   var el = document.getElementById('employerCandidateList');
   if (!el) return;
   if (!list.length && !appendMode) {
-    if (employerSearchState.verified === 'favorites') {
+    if (isBookmarkFavoritesFilter(employerSearchState.verified)) {
       renderFeedEmptyState(
         'employerCandidateList',
         '★',
@@ -1940,10 +1655,7 @@ function renderEmployerSearch(list, appendMode) {
 
   var fragment = document.createDocumentFragment();
   list.forEach(function (candidate) {
-    var wrapper = document.createElement('div');
-    wrapper.innerHTML = buildSocialCard(candidate);
-    var card = wrapper.firstElementChild;
-    if (card) fragment.appendChild(card);
+    appendSocialCard(fragment, candidate);
   });
 
   if (appendMode) {
@@ -2031,11 +1743,6 @@ function switchAdminTab(tab) {
   if (tab === 'users') loadAdminUsers();
 }
 
-function loadAdminFeedTab(tab) {
-  if (tab === 'candidates') loadAdminCandidates();
-  if (tab === 'employers') loadAdminEmployers();
-}
-
 function filterAdminCandidates() {
   adminCandidateState.page = 1;
   loadAdminCandidates(1);
@@ -2053,10 +1760,13 @@ function renderAdminCandidates(list, emptyText) {
     el.innerHTML = '<div class="adminEmptyState">' + escapeHtml(emptyText || 'Нет кандидатов') + '</div>';
     return;
   }
-  el.innerHTML = list.map(function (candidate) {
+  el.innerHTML = '';
+  var fragment = document.createDocumentFragment();
+  list.forEach(function (candidate) {
     candidate.role = candidate.role || 'candidate';
-    return buildSocialCard(candidate);
-  }).join('');
+    appendSocialCard(fragment, candidate);
+  });
+  el.appendChild(fragment);
 }
 
 function renderAdminEmployers(list, emptyText) {
@@ -2066,255 +1776,10 @@ function renderAdminEmployers(list, emptyText) {
     el.innerHTML = '<div class="adminEmptyState">' + escapeHtml(emptyText || 'Нет работодателей') + '</div>';
     return;
   }
-  el.innerHTML = list.map(function (user) {
-    return buildSocialCard(user);
-  }).join('');
-}
-
-function getFeedRefreshTask(screenKey, options) {
-  var opts = options || {};
-  var silent = opts.silent !== false;
-
-  if (screenKey === 'candidateFeed' && feedState.view !== 'favorites') {
-    return function () { return loadCandidateFeed(feedState.page, { silent: silent }); };
-  }
-
-  if (screenKey === 'employerSearch' && employerSearchState.verified !== 'favorites') {
-    return function () { return loadEmployerSearch(employerSearchState.page, { silent: silent }); };
-  }
-
-  return null;
-}
-
-function refreshFeedScreen(screenKey, options) {
-  var task = getFeedRefreshTask(screenKey, options);
-  if (!state.userId || !task || feedAutoRefreshState.inFlight) return Promise.resolve(false);
-
-  feedAutoRefreshState.inFlight = true;
-  return Promise.resolve(task()).then(function () {
-    return true;
-  }).catch(function () {
-    return false;
-  }).finally(function () {
-    feedAutoRefreshState.inFlight = false;
+  el.innerHTML = '';
+  var fragment = document.createDocumentFragment();
+  list.forEach(function (user) {
+    appendSocialCard(fragment, user);
   });
+  el.appendChild(fragment);
 }
-
-function refreshActiveFeed(options) {
-  if (!state.userId) return Promise.resolve(false);
-
-  if (isScreenActive('candidateFeed') && feedState.view !== 'favorites') {
-    return refreshFeedScreen('candidateFeed', options);
-  }
-
-  if (isScreenActive('employerSearch') && employerSearchState.verified !== 'favorites') {
-    return refreshFeedScreen('employerSearch', options);
-  }
-
-  return Promise.resolve(false);
-}
-
-function clearFeedAutoRefreshTimer() {
-  if (!feedAutoRefreshState.timer) return;
-  window.clearTimeout(feedAutoRefreshState.timer);
-  feedAutoRefreshState.timer = null;
-}
-
-function hasRefreshableActiveFeed() {
-  if (isScreenActive('candidateFeed')) {
-    return !!getFeedRefreshTask('candidateFeed', { silent: true });
-  }
-  if (isScreenActive('employerSearch')) {
-    return !!getFeedRefreshTask('employerSearch', { silent: true });
-  }
-  return false;
-}
-
-function canRunFeedAutoRefresh() {
-  return !!state.userId && !document.hidden && hasRefreshableActiveFeed();
-}
-
-function scheduleFeedAutoRefresh(delayMs) {
-  var delay = Number(delayMs);
-  clearFeedAutoRefreshTimer();
-  if (!canRunFeedAutoRefresh() || feedAutoRefreshState.inFlight) return;
-
-  feedAutoRefreshState.timer = window.setTimeout(function () {
-    feedAutoRefreshState.timer = null;
-    refreshActiveFeed({ silent: true }).finally(function () {
-      scheduleFeedAutoRefresh(FEED_AUTO_REFRESH_MS);
-    });
-  }, window.isFinite(delay) && delay >= 0 ? delay : FEED_AUTO_REFRESH_MS);
-}
-
-function syncFeedAutoRefresh(forceRefresh) {
-  if (!canRunFeedAutoRefresh()) {
-    clearFeedAutoRefreshTimer();
-    return;
-  }
-
-  if (forceRefresh && !feedAutoRefreshState.inFlight) {
-    clearFeedAutoRefreshTimer();
-    refreshActiveFeed({ silent: true }).finally(function () {
-      scheduleFeedAutoRefresh(FEED_AUTO_REFRESH_MS);
-    });
-    return;
-  }
-
-  if (!feedAutoRefreshState.timer && !feedAutoRefreshState.inFlight) {
-    scheduleFeedAutoRefresh(FEED_AUTO_REFRESH_MS);
-  }
-}
-
-function getPullRefreshPoint(event) {
-  if (event.touches && event.touches[0]) return event.touches[0];
-  if (event.changedTouches && event.changedTouches[0]) return event.changedTouches[0];
-  return null;
-}
-
-function isPullRefreshBlockedTarget(target) {
-  if (!target || typeof target.closest !== 'function') return false;
-  return !!target.closest('input, textarea, select, button, a, label');
-}
-
-function ensureFeedPullRefreshIndicator(screenEl) {
-  if (!screenEl) return null;
-  var existing = screenEl.querySelector('.feedPullRefresh');
-  if (existing) return existing;
-
-  var indicator = document.createElement('div');
-  indicator.className = 'feedPullRefresh';
-  indicator.setAttribute('aria-hidden', 'true');
-  indicator.innerHTML = '<span class="feedPullRefreshLabel">Потяните вниз, чтобы обновить</span>';
-  screenEl.appendChild(indicator);
-  return indicator;
-}
-
-function updateFeedPullRefreshIndicator(screenEl, mode, distance) {
-  var indicator = ensureFeedPullRefreshIndicator(screenEl);
-  if (!indicator) return;
-
-  var label = indicator.querySelector('.feedPullRefreshLabel');
-  var offset = mode === 'loading'
-    ? 14
-    : Math.max(-14, Math.min(24, Math.round(Number(distance || 0) / 3) - 10));
-
-  indicator.className = 'feedPullRefresh' + (mode === 'hidden' ? '' : ' visible') + (mode === 'ready' ? ' ready' : '') + (mode === 'loading' ? ' loading' : '');
-  indicator.style.transform = 'translate(-50%, ' + offset + 'px)';
-
-  if (label) {
-    if (mode === 'ready') label.textContent = 'Отпустите, чтобы обновить';
-    else if (mode === 'loading') label.textContent = 'Обновляем ленту…';
-    else label.textContent = 'Потяните вниз, чтобы обновить';
-  }
-}
-
-function resetFeedPullRefreshIndicator(screenEl) {
-  window.clearTimeout(feedPullRefreshState.hideTimer);
-  updateFeedPullRefreshIndicator(screenEl, 'hidden', 0);
-}
-
-function releaseFeedPullRefresh() {
-  var screenEl = feedPullRefreshState.screenEl;
-  var screenKey = feedPullRefreshState.screenKey;
-  var shouldRefresh = !!(screenEl && feedPullRefreshState.dragging && feedPullRefreshState.armed);
-
-  feedPullRefreshState.screenKey = '';
-  feedPullRefreshState.screenEl = null;
-  feedPullRefreshState.startY = 0;
-  feedPullRefreshState.distance = 0;
-  feedPullRefreshState.dragging = false;
-  feedPullRefreshState.armed = false;
-
-  if (!screenEl) return;
-  if (!shouldRefresh) {
-    resetFeedPullRefreshIndicator(screenEl);
-    return;
-  }
-
-  updateFeedPullRefreshIndicator(screenEl, 'loading', FEED_PULL_REFRESH_TRIGGER_PX);
-  refreshFeedScreen(screenKey, { silent: true }).finally(function () {
-    window.clearTimeout(feedPullRefreshState.hideTimer);
-    feedPullRefreshState.hideTimer = window.setTimeout(function () {
-      resetFeedPullRefreshIndicator(screenEl);
-    }, 180);
-    scheduleFeedAutoRefresh(FEED_AUTO_REFRESH_MS);
-  });
-}
-
-function bindFeedPullRefresh(screenKey) {
-  var screenEl = screens && screens[screenKey];
-  if (!screenEl || screenEl.dataset.pullRefreshBound === '1') return;
-
-  ensureFeedPullRefreshIndicator(screenEl);
-
-  screenEl.addEventListener('touchstart', function (event) {
-    var point;
-    if (!isScreenActive(screenKey) || screenEl.scrollTop > 0 || feedAutoRefreshState.inFlight) return;
-    if (isPullRefreshBlockedTarget(event.target) || !getFeedRefreshTask(screenKey, { silent: true })) return;
-
-    point = getPullRefreshPoint(event);
-    if (!point) return;
-
-    window.clearTimeout(feedPullRefreshState.hideTimer);
-    feedPullRefreshState.screenKey = screenKey;
-    feedPullRefreshState.screenEl = screenEl;
-    feedPullRefreshState.startY = point.clientY;
-    feedPullRefreshState.distance = 0;
-    feedPullRefreshState.dragging = true;
-    feedPullRefreshState.armed = false;
-    updateFeedPullRefreshIndicator(screenEl, 'pull', 0);
-  }, { passive: true });
-
-  screenEl.addEventListener('touchmove', function (event) {
-    var point;
-    var deltaY;
-    var distance;
-    if (!feedPullRefreshState.dragging || feedPullRefreshState.screenEl !== screenEl) return;
-    if (screenEl.scrollTop > 0) {
-      releaseFeedPullRefresh();
-      return;
-    }
-
-    point = getPullRefreshPoint(event);
-    if (!point) return;
-
-    deltaY = point.clientY - feedPullRefreshState.startY;
-    if (deltaY <= 0) {
-      resetFeedPullRefreshIndicator(screenEl);
-      return;
-    }
-
-    if (event.cancelable) event.preventDefault();
-    distance = Math.min(FEED_PULL_REFRESH_MAX_PX, Math.round(deltaY * 0.65));
-    feedPullRefreshState.distance = distance;
-    feedPullRefreshState.armed = distance >= FEED_PULL_REFRESH_TRIGGER_PX;
-    updateFeedPullRefreshIndicator(screenEl, feedPullRefreshState.armed ? 'ready' : 'pull', distance);
-  }, { passive: false });
-
-  screenEl.addEventListener('touchend', function () {
-    releaseFeedPullRefresh();
-  });
-
-  screenEl.addEventListener('touchcancel', function () {
-    releaseFeedPullRefresh();
-  });
-
-  screenEl.dataset.pullRefreshBound = '1';
-}
-
-(function initFeedAutoRefresh() {
-  bindFeedPullRefresh('candidateFeed');
-  bindFeedPullRefresh('employerSearch');
-  syncFeedAutoRefresh(false);
-
-  window.addEventListener('focus', function () {
-    syncFeedAutoRefresh(true);
-  });
-  document.addEventListener('visibilitychange', function () {
-    syncFeedAutoRefresh(!document.hidden);
-  });
-  window.addEventListener('lomo:screen-change', function () {
-    syncFeedAutoRefresh(false);
-  });
-})();

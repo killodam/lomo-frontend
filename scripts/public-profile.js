@@ -1,22 +1,3 @@
-    function escHtml(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
-    function safeErrorText(err){ return (err && err.message) ? String(err.message) : String(err || 'Неизвестная ошибка'); }
-    function safeHttpUrl(value){
-      var src = String(value || '').trim();
-      if(!src) return '';
-      try{
-        var parsed = new URL(src, location.origin);
-        var isLocal = parsed.protocol === 'http:' && (parsed.hostname === 'localhost' || parsed.hostname === '127.0.0.1');
-        if(parsed.protocol === 'https:' || isLocal) return parsed.href;
-      }catch(e){}
-      return '';
-    }
-    function safeImageUrl(value){
-      var src = String(value || '').trim();
-      if(!src) return '';
-      if(/^data:image\/(?:png|jpeg|jpg|webp|gif);base64,[a-z0-9+/=\s]+$/i.test(src)) return src;
-      return safeHttpUrl(src);
-    }
-
     // Track where we came from to go back
     var _profileFromScreen = 'landing';
     var _activePublicProfileUserId = '';

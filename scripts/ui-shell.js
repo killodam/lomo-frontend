@@ -188,27 +188,6 @@ function handleLogoutToLanding(action) {
   showEntryScreen();
 }
 
-function bindChipFilter(chipSelector, selectId, attributeName, handler) {
-  var select = document.getElementById(selectId);
-
-  if (select) {
-    select.addEventListener('change', function () {
-      handler();
-    });
-  }
-
-  document.querySelectorAll(chipSelector).forEach(function (chip) {
-    chip.addEventListener('click', function () {
-      document.querySelectorAll(chipSelector).forEach(function (currentChip) {
-        currentChip.classList.remove('active');
-      });
-      chip.classList.add('active');
-      if (select) select.value = chip.getAttribute(attributeName) || '';
-      handler();
-    });
-  });
-}
-
 function bindStaticUiActions() {
   bindUiAction('feedMyProfileBtn', 'click', function () { goToMyProfile(); });
   bindUiAction('searchCompanyProfileBtn', 'click', function () { goToMyProfile(); });
@@ -243,8 +222,6 @@ function bindStaticUiActions() {
     if (btn) btn.classList.add('hidden');
     show('adminQueue');
   });
-  if (typeof bindAdminRoleChips === 'function') bindAdminRoleChips();
-  if (typeof bindEmpExtraFilters === 'function') bindEmpExtraFilters();
   bindUiAction('pubProfileBackBtn', 'click', function () {
     if (typeof closeUserProfile === 'function') closeUserProfile();
     else closePublicProfile();
@@ -255,31 +232,6 @@ function bindStaticUiActions() {
 
   const currentJobInput = document.getElementById('mpCCurrentJob');
   if (currentJobInput) currentJobInput.addEventListener('input', function () { filterJobList(currentJobInput.value); });
-
-  const feedSearchInput = document.getElementById('feedSearchInput');
-  if (feedSearchInput) feedSearchInput.addEventListener('input', function () { debouncedFilterFeed(); });
-
-  bindChipFilter('.feedFilterChip', 'feedViewFilter', 'data-feed-view', filterFeed);
-  bindChipFilter('.feedVerifiedChip', 'feedVerifiedFilter', 'data-feed-verified', filterFeed);
-
-  const employerSearchInput = document.getElementById('empSearchName');
-  if (employerSearchInput) employerSearchInput.addEventListener('input', function () { debouncedFilterEmployerSearch(); });
-  bindUiAction('empClearSearchBtn', 'click', function () {
-    var inp = document.getElementById('empSearchName');
-    if (inp) { inp.value = ''; }
-    if (typeof filterEmployerSearch === 'function') filterEmployerSearch();
-  });
-
-  bindChipFilter('.empFilterChip', 'empSearchVerified', 'data-verified', filterEmployerSearch);
-
-  const adminCandSearch = document.getElementById('adminCandSearch');
-  if (adminCandSearch) adminCandSearch.addEventListener('input', function () { debouncedFilterAdminCandidates(); });
-
-  const adminEmpSearch = document.getElementById('adminEmpSearch');
-  if (adminEmpSearch) adminEmpSearch.addEventListener('input', function () { debouncedFilterAdminEmployers(); });
-
-  const adminUserSearch = document.getElementById('adminUserSearch');
-  if (adminUserSearch) adminUserSearch.addEventListener('input', function () { loadAdminUsers(1); });
 
   document.querySelectorAll('[data-legal-link]').forEach(function (link) {
     link.addEventListener('click', function () {
@@ -312,12 +264,6 @@ function bindStaticUiActions() {
       } else {
         openModal(key);
       }
-    });
-  });
-
-  document.querySelectorAll('[data-admin-tab]').forEach(function (button) {
-    button.addEventListener('click', function () {
-      switchAdminTab(button.getAttribute('data-admin-tab'));
     });
   });
 
