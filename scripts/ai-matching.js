@@ -209,34 +209,45 @@
 
   // ── RENDER ───────────────────────────────────────────────────────────────
 
+  function esc(s) {
+    if (!s) return '';
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+  }
+
   function renderCard(r) {
     var c = r.candidate;
     var scoreClass = r.score >= 70 ? 'aiScore--high' : r.score >= 40 ? 'aiScore--mid' : 'aiScore--low';
     var skills = Array.isArray(c.skills) ? c.skills
       : (typeof c.skills === 'string' ? c.skills.split(/[,;]+/).map(function (s) { return s.trim(); }) : []);
+    var uid = esc(c.user_id || c.id || '');
     var avatar = c.avatar_url
-      ? '<img class="aiResultAvatar" src="' + c.avatar_url + '" alt="" loading="lazy">'
-      : '<div class="aiResultAvatarFallback">' + (c.full_name || 'U').charAt(0).toUpperCase() + '</div>';
+      ? '<img class="aiResultAvatar" src="' + esc(c.avatar_url) + '" alt="" loading="lazy">'
+      : '<div class="aiResultAvatarFallback">' + esc((c.full_name || 'U').charAt(0).toUpperCase()) + '</div>';
     var verified = c.is_verified ? '<span class="aiResultVerifiedBadge">✓</span>' : '';
     var tags = [
-      c.grade ? '<span class="aiResultTag">' + c.grade + '</span>' : '',
-      c.work_format ? '<span class="aiResultTag">' + c.work_format + '</span>' : '',
+      c.grade ? '<span class="aiResultTag">' + esc(c.grade) + '</span>' : '',
+      c.work_format ? '<span class="aiResultTag">' + esc(c.work_format) + '</span>' : '',
     ].filter(Boolean).join('');
     var skillTags = skills.slice(0, 4).map(function (s) {
-      return '<span class="aiResultSkillTag">' + s + '</span>';
+      return '<span class="aiResultSkillTag">' + esc(s) + '</span>';
     }).join('');
     var overlapHtml = r.overlap.length
       ? '<div class="aiResultOverlap">' + r.overlap.map(function (t) {
-          return '<span class="aiResultOverlapTag">' + t + '</span>';
+          return '<span class="aiResultOverlapTag">' + esc(t) + '</span>';
         }).join('') + '</div>'
       : '';
 
-    return '<div class="aiResultCard" data-user-id="' + (c.user_id || c.id || '') + '">' +
+    return '<div class="aiResultCard" data-user-id="' + uid + '">' +
       '<div class="aiResultScore ' + scoreClass + '">' + r.score + '</div>' +
       '<div class="aiResultAvatarWrap">' + avatar + verified + '</div>' +
       '<div class="aiResultInfo">' +
-        '<div class="aiResultName">' + (c.full_name || 'Кандидат') + '</div>' +
-        '<div class="aiResultMeta">' + (c.title || '') + '</div>' +
+        '<div class="aiResultName">' + esc(c.full_name || 'Кандидат') + '</div>' +
+        '<div class="aiResultMeta">' + esc(c.title || '') + '</div>' +
         (tags ? '<div class="aiResultTags">' + tags + '</div>' : '') +
         (skillTags ? '<div class="aiResultSkills">' + skillTags + '</div>' : '') +
         overlapHtml +
