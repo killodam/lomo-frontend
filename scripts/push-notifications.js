@@ -4,6 +4,15 @@
   var appListenersReady = false;
   var registerInFlight = false;
   var lastHandledUrl = '';
+  var TRUSTED_LINK_HOSTS = {
+    'localhost': true,
+    '127.0.0.1': true,
+    'lomo.work': true,
+    'www.lomo.work': true,
+    'lomo.website': true,
+    'www.lomo.website': true,
+    'lomo-frontend.vercel.app': true,
+  };
 
   function getCapacitor() {
     return window.Capacitor || null;
@@ -169,6 +178,13 @@
     return data;
   }
 
+  function isTrustedWebLink(parsed) {
+    var host = String(parsed && parsed.hostname || '').toLowerCase();
+    if (!host) return false;
+    if (TRUSTED_LINK_HOSTS[host]) return true;
+    return host === String(window.location.hostname || '').toLowerCase();
+  }
+
   function handleDeepLinkUrl(url) {
     var parsed;
     var scheme;
@@ -186,6 +202,7 @@
     parsed = parseUrl(url);
     scheme = String(parsed.protocol || '').replace(/:$/, '');
     if (scheme !== 'lomo' && scheme !== 'http' && scheme !== 'https') return false;
+    if ((scheme === 'http' || scheme === 'https') && !isTrustedWebLink(parsed)) return false;
 
     lastHandledUrl = String(url);
     host = String(parsed.hostname || '').replace(/:.*$/, '');
