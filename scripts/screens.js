@@ -35,6 +35,21 @@ const screens = {
 };
 var activeScreenKey = '';
 
+var _RESTORABLE_SCREENS = ['candidateFeed','employerSearch','adminQueue','myEmployeeProfile','myEmployerProfile','chat','recruiterPublic','employeePublic'];
+
+function saveLastScreen(key) {
+  if (_RESTORABLE_SCREENS.indexOf(key) === -1) return;
+  try { sessionStorage.setItem('lomo_screen', key); } catch(e) {}
+}
+
+function getLastScreen() {
+  try { return sessionStorage.getItem('lomo_screen') || ''; } catch(e) { return ''; }
+}
+
+function clearLastScreen() {
+  try { sessionStorage.removeItem('lomo_screen'); } catch(e) {}
+}
+
 function emitScreenChange(nextKey, previousKey) {
   var event;
   try {
@@ -89,6 +104,7 @@ function show(key) {
   });
   if (!screens[targetKey]) return;
   activeScreenKey = targetKey;
+  saveLastScreen(targetKey);
   try { screens[targetKey].scrollTop = 0; } catch (error) {}
   if (typeof closeDrawer === 'function') closeDrawer();
   if (typeof closeModal === 'function') closeModal();

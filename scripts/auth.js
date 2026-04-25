@@ -45,6 +45,7 @@ function logout() {
   apiLogout().catch(function () {});
   clearUserStorage(userId);
   pruneStaleLocalStorage(null);
+  if (typeof clearLastScreen === 'function') clearLastScreen();
   clearToken();
   resetState();
   resetDisplay();
@@ -62,6 +63,7 @@ function logoutAllSessions() {
   apiLogoutAll().catch(function () {});
   clearUserStorage(userId);
   pruneStaleLocalStorage(null);
+  if (typeof clearLastScreen === 'function') clearLastScreen();
   clearToken();
   resetState();
   resetDisplay();
@@ -1222,7 +1224,39 @@ function getPasswordPolicyError(password) {
         var isEmployer = state.roleReg === 'EMPLOYER' || user.role === 'employer';
         var attempts = 0;
 
+        var savedScreen = typeof getLastScreen === 'function' ? getLastScreen() : '';
+        var canRestore = savedScreen && (function() {
+          if (isAdmin) return savedScreen === 'adminQueue';
+          if (isEmployer) return ['myEmployerProfile','recruiterPublic','employerSearch','chat'].indexOf(savedScreen) !== -1;
+          return ['myEmployeeProfile','employeePublic','candidateFeed','chat'].indexOf(savedScreen) !== -1;
+        })();
+
+        function tryRestoreScreen() {
+          if (savedScreen === 'recruiterPublic') {
+            if (typeof renderRecruiterPublic === 'function') { renderRecruiterPublic(); show('recruiterPublic'); return true; }
+          } else if (savedScreen === 'employeePublic') {
+            if (typeof renderEmployeePublic === 'function') { renderEmployeePublic(); show('employeePublic'); return true; }
+          } else if (savedScreen === 'adminQueue') {
+            if (typeof loadAdminQueue === 'function' && typeof loadAdminUsers === 'function' && typeof switchAdminTab === 'function') {
+              loadAdminQueue(); show('adminQueue'); return true;
+            }
+          } else if (savedScreen === 'employerSearch') {
+            if (typeof showEmployerDashboard === 'function') { showEmployerDashboard(); return true; }
+          } else if (savedScreen === 'candidateFeed') {
+            if (typeof showEmployeeDashboard === 'function') { showEmployeeDashboard(); return true; }
+          } else if (screens[savedScreen]) {
+            show(savedScreen); return true;
+          }
+          return false;
+        }
+
         function tryRoute() {
+          if (canRestore) {
+            if (tryRestoreScreen()) return;
+            attempts += 1;
+            if (attempts < 20) { setTimeout(tryRoute, 0); return; }
+          }
+
           if (isAdmin) {
             if (
               typeof loadAdminQueue === 'function' &&
