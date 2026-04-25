@@ -368,43 +368,6 @@
   color: #a0a0a0;
 }
 
-/* ── Stat strip ── */
-.ldStats {
-  display: flex;
-  align-items: center;
-  gap: 20px;
-  margin-top: 24px;
-  animation: ldFadeUp 0.45s 0.36s ease both;
-}
-
-.ldStat {
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-}
-
-.ldStatNum {
-  font-size: 18px;
-  font-weight: 800;
-  color: #0e0f0f;
-  letter-spacing: -0.6px;
-  line-height: 1.1;
-}
-
-.ldStatLabel {
-  font-size: 10.5px;
-  color: #a0a0a0;
-  font-weight: 500;
-  text-transform: uppercase;
-  letter-spacing: .06em;
-}
-
-.ldStatDiv {
-  width: 1px;
-  height: 30px;
-  background: rgba(0,0,0,.1);
-  flex-shrink: 0;
-}
 
 /* ── Niches section ── */
 .ldNiches {
@@ -1056,10 +1019,6 @@
 
   .ldNiche {
     padding: 22px 18px;
-  }
-
-  .ldStats {
-    gap: 14px;
   }
 
   .ldH1 {
