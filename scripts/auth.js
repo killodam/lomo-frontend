@@ -93,6 +93,14 @@ function registerPushAfterAuth(options) {
   }
 }
 
+function getPasswordPolicyError(password) {
+  var value = String(password || '');
+  if (value.length < 8) return 'Пароль — минимум 8 символов';
+  if (!/[a-zA-Zа-яёА-ЯЁ]/.test(value)) return 'Добавьте в пароль хотя бы одну букву';
+  if (!/\d|[^a-zA-Zа-яёА-ЯЁ\s]/.test(value)) return 'Добавьте цифру или спецсимвол';
+  return '';
+}
+
     function clearAuthInputs(){
       ['regFirstName','regLastName','regEmail','regPassword','regPasswordConfirm','loginEmail','loginPassword','forgotEmail','newPassword','confirmPassword']
         .forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
@@ -485,9 +493,10 @@ function registerPushAfterAuth(options) {
         let score = 0;
         if(val.length >= 8) score++;
         if(val.length >= 12) score++;
+        if(/[a-zа-яё]/i.test(val)) score++;
         if(/[A-Z]/.test(val)) score++;
-        if(/[0-9]/.test(val)) score++;
-        if(/[^a-zA-Z0-9]/.test(val)) score++;
+        if(/\d|[^a-zA-Zа-яёА-ЯЁ\s]/.test(val)) score++;
+        if(/[^a-zA-Zа-яёА-ЯЁ0-9\s]/.test(val)) score++;
         const pct = Math.min(100, score * 22);
         fill.style.width = pct + '%';
         fill.style.background = score <= 1 ? '#ef4444' : score <= 2 ? '#f59e0b' : score <= 3 ? '#84cc16' : '#22c55e';
@@ -502,8 +511,11 @@ function registerPushAfterAuth(options) {
         const npErr = document.getElementById('newPasswordError');
         const cpErr = document.getElementById('confirmPasswordError');
         let ok = true;
-        if(np.length < 8){
-          npInput?.classList.add('inputError'); npErr?.classList.remove('hidden'); ok=false;
+        const passwordError = getPasswordPolicyError(np);
+        if(passwordError){
+          npInput?.classList.add('inputError');
+          if(npErr){ npErr.textContent = passwordError; npErr.classList.remove('hidden'); }
+          ok=false;
         } else { npInput?.classList.remove('inputError'); npErr?.classList.add('hidden'); }
         if(np !== cp){
           cpInput?.classList.add('inputError'); cpErr?.classList.remove('hidden'); ok=false;
@@ -889,7 +901,8 @@ function registerPushAfterAuth(options) {
                 if (!firstName && !lastName) { if(btn) btn.disabled = false; showToast('Введите имя'); return; }
                 const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
                 if (!emailRe.test(email)) { if(btn) btn.disabled = false; showToast('Некорректный email'); return; }
-                if (!password || password.length < 8) { if(btn) btn.disabled = false; showToast('Пароль — минимум 8 символов'); return; }
+                const passwordPolicyError = getPasswordPolicyError(password);
+                if (passwordPolicyError) { if(btn) btn.disabled = false; showToast(passwordPolicyError); return; }
                 const confirmError = document.getElementById('regPasswordConfirmError');
                 if(confirmError) confirmError.classList.add('hidden');
                 if (password !== passwordConfirm) {

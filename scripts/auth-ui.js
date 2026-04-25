@@ -65,8 +65,8 @@ if (regPasswordEl) {
     }
     let score = 0;
     if (val.length >= 8) score += 1;
-    if (/\d/.test(val)) score += 1;
-    if (/[^a-zA-Z0-9]/.test(val)) score += 1;
+    if (/[a-zA-Zа-яёА-ЯЁ]/.test(val)) score += 1;
+    if (/\d|[^a-zA-Zа-яёА-ЯЁ\s]/.test(val)) score += 1;
     if (score === 1) {
       fill.style.width = '33%';
       fill.style.background = '#ef4444';
