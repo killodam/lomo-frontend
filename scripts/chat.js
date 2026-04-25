@@ -5,7 +5,7 @@
   var NEW_MESSAGE_THRESHOLD_PX = 96;
 
   var chatState = {
-    previousScreen: 'auth',
+    previousScreen: '',
     pollingTimer: null,
     pollingInFlight: false,
     connectionsInFlight: false,

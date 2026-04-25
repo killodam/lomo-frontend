@@ -111,7 +111,15 @@
         if (u.vacancies) {
           candidateSections += '<div class="pubProfileSection"><div class="pubProfileSTitle">Ищет работу</div><div class="pubProfileText pubProfileTextAccent">'+escHtml(u.vacancies)+'</div></div>';
         }
-        if (u.work_exp) {
+        var workExpArr = Array.isArray(u.work_exp) ? u.work_exp : [];
+        if (workExpArr.length) {
+          var workExpLines = workExpArr.map(function(e) {
+            return [e.company, e.role, e.period].filter(Boolean).join(' · ');
+          }).filter(Boolean).join('\n');
+          if (workExpLines) {
+            candidateSections += '<div class="pubProfileSection"><div class="pubProfileSTitle">Опыт работы</div><div class="pubProfileText" style="white-space:pre-line">'+escHtml(workExpLines)+'</div></div>';
+          }
+        } else if (typeof u.work_exp === 'string' && u.work_exp) {
           candidateSections += '<div class="pubProfileSection"><div class="pubProfileSTitle">Опыт работы</div><div class="pubProfileText">'+escHtml(u.work_exp)+'</div></div>';
         }
       }

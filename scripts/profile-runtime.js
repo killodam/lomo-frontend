@@ -387,6 +387,15 @@ function hydrateEmployeeForm() {
   if (lookingCb) lookingCb.checked = !!p.lookingForWork;
   setVal('mpCCurrentJob', p.current_job);
   setVal('mpCJobTitle', p.job_title);
+  var epJobSection = document.getElementById('epJobSection');
+  var epJobLine = document.getElementById('epJobLine');
+  if (epJobLine) {
+    var jobComp = (p.current_job && p.current_job !== 'Не работаю') ? p.current_job : '';
+    var jobRole = p.job_title || '';
+    var jobText = [jobComp, jobRole].filter(Boolean).join(' · ');
+    epJobLine.textContent = jobText || '—';
+    if (epJobSection) epJobSection.style.display = jobText ? '' : 'none';
+  }
   setVal('mpCCorpEmail', p.corpEmail);
   var workList = document.getElementById('workExpList');
   if (workList) workList.innerHTML = '';
