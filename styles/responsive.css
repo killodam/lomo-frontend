@@ -171,6 +171,15 @@
         max-width: 100%;
       }
 
+      .pubProfileBanner { height: 72px; }
+      .pubProfileHeroRow { margin-top: -36px; padding: 0 16px; }
+      .pubProfileAvatarImg,
+      .pubProfileAvatarFallback { width: 72px; height: 72px; font-size: 24px; }
+      .pubProfileBody { padding: 0 16px 20px; }
+      .pubProfileName { font-size: 19px; }
+      .pubProfileBadges { gap: 5px; }
+      .pubSkillChip { font-size: 12px; padding: 4px 10px; }
+
       .profileCard{
         width:min(100%, calc(100vw - 24px));
         padding:16px;
