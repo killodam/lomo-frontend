@@ -1282,12 +1282,15 @@
         <div class="aiMatchSection">
           <div class="aiMatchSectionLabel">Быстрый старт</div>
           <div class="aiMatchTemplateChips">
+            <button type="button" class="aiMatchTemplateChip" data-template="finanalyst">💰 Финансовый аналитик</button>
+            <button type="button" class="aiMatchTemplateChip" data-template="accountant">📒 Бухгалтер</button>
+            <button type="button" class="aiMatchTemplateChip" data-template="economist">📈 Экономист</button>
             <button type="button" class="aiMatchTemplateChip" data-template="frontend">⚛️ Frontend</button>
             <button type="button" class="aiMatchTemplateChip" data-template="backend">⚙️ Backend</button>
             <button type="button" class="aiMatchTemplateChip" data-template="data">📊 Data Analyst</button>
-            <button type="button" class="aiMatchTemplateChip" data-template="pm">🎯 Product Manager</button>
-            <button type="button" class="aiMatchTemplateChip" data-template="design">🎨 Designer</button>
-            <button type="button" class="aiMatchTemplateChip" data-template="devops">🛠 DevOps</button>
+            <button type="button" class="aiMatchTemplateChip" data-template="hr">👥 HR-менеджер</button>
+            <button type="button" class="aiMatchTemplateChip" data-template="marketing">📢 Маркетолог</button>
+            <button type="button" class="aiMatchTemplateChip" data-template="pm">🎯 Продакт</button>
           </div>
         </div>
 
@@ -1295,7 +1298,7 @@
         <div class="aiMatchSection">
           <div class="aiMatchSectionLabel">Описание вакансии <span class="aiMatchRequired">*</span></div>
           <div class="aiMatchTextareaWrap">
-            <textarea id="aiMatchTextarea" class="aiMatchTextarea" placeholder="Опишите кого ищете: роль, стек, задачи, опыт...&#10;&#10;Пример: Ищем Middle Frontend разработчика. Стек: React, TypeScript. Задачи: разработка UI, код-ревью."></textarea>
+            <textarea id="aiMatchTextarea" class="aiMatchTextarea" placeholder="Опишите кого ищете: роль, навыки, задачи, опыт...&#10;&#10;Пример: Ищем финансового аналитика с опытом в МСФО и бюджетировании. Или: Frontend-разработчик, React, от 2 лет."></textarea>
             <div class="aiMatchCharCount"><span id="aiMatchCharCount">0</span> / 1000</div>
           </div>
         </div>
@@ -1307,13 +1310,13 @@
 
             <div class="aiMatchFilterRow">
               <div class="aiMatchFilterGroup">
-                <div class="aiMatchFilterMini">Грейд</div>
+                <div class="aiMatchFilterMini">Уровень опыта</div>
                 <div class="aiMatchChipRow">
                   <button type="button" class="aiMatchChip active" data-grade="">Любой</button>
-                  <button type="button" class="aiMatchChip" data-grade="junior">Junior</button>
-                  <button type="button" class="aiMatchChip" data-grade="middle">Middle</button>
-                  <button type="button" class="aiMatchChip" data-grade="senior">Senior</button>
-                  <button type="button" class="aiMatchChip" data-grade="lead">Lead</button>
+                  <button type="button" class="aiMatchChip" data-grade="junior">Начинающий</button>
+                  <button type="button" class="aiMatchChip" data-grade="middle">Специалист</button>
+                  <button type="button" class="aiMatchChip" data-grade="senior">Старший</button>
+                  <button type="button" class="aiMatchChip" data-grade="lead">Руководитель</button>
                 </div>
               </div>
             </div>

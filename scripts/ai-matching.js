@@ -53,6 +53,30 @@
     // misc
     'апи': 'api', 'скрам': 'scrum', 'канбан': 'kanban',
     'агайл': 'agile', 'ci': 'cicd', 'cd': 'cicd', 'ci/cd': 'cicd',
+    // ── Finance & Economics ──
+    '1с': '1c', 'мсфо': 'ifrs', 'рсбу': 'gaap', 'ifrs': 'ifrs',
+    'финансист': 'финансы', 'финансовый': 'финансы', 'финансовая': 'финансы',
+    'бухгалтер': 'бухгалтерия', 'бухгалтерский': 'бухгалтерия', 'бухучет': 'бухгалтерия',
+    'налоговый': 'налоги', 'налогообложение': 'налоги', 'ндс': 'налоги', 'ндфл': 'налоги',
+    'экономист': 'экономика', 'экономический': 'экономика',
+    'казначей': 'казначейство', 'pl': 'p&l', 'ebitda': 'ebitda', 'dcf': 'dcf',
+    'бюджетирование': 'бюджет', 'бюджетный': 'бюджет',
+    'аудитор': 'аудит', 'аудиторский': 'аудит',
+    'отчетность': 'отчётность', 'отчёт': 'отчётность',
+    'себестоимост': 'себестоимость', 'ценообразование': 'ценообразование',
+    'дебиторка': 'дебиторская', 'кредиторка': 'кредиторская',
+    // ── HR ──
+    'рекрутер': 'рекрутинг', 'рекрутмент': 'рекрутинг', 'подбор': 'рекрутинг',
+    'кадровик': 'кадры', 'кадровый': 'кадры', 'кадровое': 'кадры',
+    'онбординг': 'адаптация', 'hrbp': 'hr', 'hrd': 'hr',
+    // ── Marketing ──
+    'маркетолог': 'маркетинг', 'маркетинговый': 'маркетинг',
+    'таргетолог': 'таргет', 'таргетированный': 'таргет',
+    'контентщик': 'контент', 'копирайтер': 'контент',
+    'smm-менеджер': 'smm', 'seo-специалист': 'seo',
+    // ── Legal ──
+    'юрист': 'право', 'юридический': 'право', 'правовой': 'право',
+    'договорной': 'договор', 'договорная': 'договор',
   };
 
   // ── IMPLIED SKILLS ──────────────────────────────────────────────────────
@@ -94,6 +118,18 @@
                  'okr','product','analyst','management'],
     testing:    ['testing','selenium','cypress','jest','pytest','playwright',
                  'postman','qa'],
+    // ── Non-IT clusters ──────────────────────────────────────────────────
+    finance:    ['финансы','бухгалтерия','налоги','аудит','ifrs','gaap','1c',
+                 'бюджет','казначейство','p&l','ebitda','dcf','отчётность',
+                 'excel','powerpoint','управленческий','себестоимость','capex','opex'],
+    economics:  ['экономика','статистика','эконометрика','планирование','прогнозирование',
+                 'ценообразование','kpi','моделирование','анализ','показатель'],
+    hr:         ['hr','рекрутинг','кадры','адаптация','обучение','мотивация',
+                 'оценка','персонал','трудовой','кадровое'],
+    marketing:  ['маркетинг','реклама','seo','smm','контент','бренд','digital',
+                 'таргет','контекст','cpa','ctr','roi','crm','email'],
+    legal:      ['право','договор','суд','арбитраж','корпоративный','претензия',
+                 'гражданский','трудовой','юридический','нормативный'],
   };
 
   // Build flat set of all known skills once
@@ -137,6 +173,19 @@
     'testing': 'QA/Testing', 'cicd': 'CI/CD', 'devops': 'DevOps',
     'swift': 'Swift', 'kotlin': 'Kotlin', 'flutter': 'Flutter',
     'reactnative': 'React Native', 'product': 'Product', 'analyst': 'Аналитика',
+    // Finance & Economics
+    'финансы': 'Финансы', 'бухгалтерия': 'Бухгалтерия', 'налоги': 'Налоги',
+    'аудит': 'Аудит', 'ifrs': 'МСФО', 'gaap': 'РСБУ', '1c': '1С',
+    'бюджет': 'Бюджетирование', 'казначейство': 'Казначейство',
+    'отчётность': 'Отчётность', 'экономика': 'Экономика',
+    'себестоимость': 'Себестоимость', 'ebitda': 'EBITDA', 'p&l': 'P&L',
+    // HR
+    'hr': 'HR', 'рекрутинг': 'Рекрутинг', 'кадры': 'Кадры', 'адаптация': 'Адаптация',
+    // Marketing
+    'маркетинг': 'Маркетинг', 'seo': 'SEO', 'smm': 'SMM', 'таргет': 'Таргет',
+    'контент': 'Контент', 'реклама': 'Реклама',
+    // Legal
+    'право': 'Право', 'договор': 'Договорная работа',
   };
 
   function displayToken(t) {
@@ -307,13 +356,55 @@
     return scores; // returns {domain: hitCount}
   }
 
+  // ── CANDIDATE NORMALISATION ──────────────────────────────────────────────
+  // Maps API field names to what the engine expects, computes is_verified.
+
+  function parseSkillsField(raw) {
+    if (Array.isArray(raw)) return raw.filter(Boolean);
+    if (typeof raw === 'string' && raw) {
+      if (raw.charAt(0) === '{') {
+        return raw.slice(1, -1).split(',').map(function(s){ return s.trim().replace(/^"|"$/g,''); }).filter(Boolean);
+      }
+      return raw.split(/[,;]+/).map(function(s){ return s.trim(); }).filter(Boolean);
+    }
+    return [];
+  }
+
+  function normalizeCandidate(c) {
+    var statuses = [c.edu_status, c.work_status, c.course_status, c.pass_status, c.cv_status];
+    var verCount = statuses.filter(function(s){ return s === 'verified'; }).length;
+    var workExpText = '';
+    if (Array.isArray(c.work_exp)) {
+      workExpText = c.work_exp.map(function(e){
+        return [e.role, e.company, e.desc].filter(Boolean).join(' ');
+      }).join(' ');
+    }
+    return Object.assign({}, c, {
+      skills:             parseSkillsField(c.skills),
+      is_verified:        verCount > 0,
+      verification_level: verCount,
+      user_id:            c.id,
+      // field name aliases for buildCandidateText
+      _work_exp_text:     workExpText,
+    });
+  }
+
   // ── SCORING ──────────────────────────────────────────────────────────────
 
   function buildCandidateText(c) {
-    var skills = Array.isArray(c.skills) ? c.skills.join(' ')
-      : (typeof c.skills === 'string' ? c.skills : '');
-    return [c.full_name, c.title, skills, c.bio, c.city, c.grade, c.work_format]
-      .filter(Boolean).join(' ');
+    var skills = Array.isArray(c.skills) ? c.skills.join(' ') : '';
+    return [
+      c.full_name,
+      c.job_title, c.current_job,       // API field names (profile.js)
+      c.title,                           // fallback legacy
+      skills,
+      c.about, c.bio,                    // bio = legacy fallback
+      c.vacancies,                       // what the candidate is looking for
+      c.location, c.city,
+      c.grade, c.work_format,
+      c.edu_place,
+      c._work_exp_text,
+    ].filter(Boolean).join(' ');
   }
 
   function scoreOne(jobTok, jobTF, jobGrade, jobFormat, jobDomains, salaryBudget, opts, c) {
@@ -488,9 +579,10 @@
       .then(function (r) { return r.json(); })
       .then(function (data) {
         var list = Array.isArray(data) ? data : (data.candidates || data.data || data.items || []);
+        var normalized = list.map(normalizeCandidate);
         window.__lomoCache = window.__lomoCache || {};
-        window.__lomoCache.candidatesEntry = { data: list, ts: Date.now() };
-        return list;
+        window.__lomoCache.candidatesEntry = { data: normalized, ts: Date.now() };
+        return normalized;
       });
   }
 
