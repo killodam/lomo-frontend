@@ -336,8 +336,6 @@ async function downloadRecruiterCV() {
   }
 }
 
-function refreshRecruiterCVButton() {}
-
 function hydrateEmployerForm() {
   const p = state.employer;
   setVal('mpEFullName', p.fullName);

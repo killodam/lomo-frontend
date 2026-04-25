@@ -233,10 +233,6 @@ async function apiAttachDocument(achievement_id, file_url, file_name) {
   });
 }
 
-async function apiGetAchievements() {
-  return apiFetch('/achievements');
-}
-
 async function apiAdminQueue(params = {}) {
   return apiFetch('/admin/queue' + buildQuery(params));
 }
