@@ -88,47 +88,76 @@
       <div>
         <div class="ldPill"><span class="ldPillDot"></span>Верификация карьерных данных</div>
         <h1 class="ldH1">Ваш профиль.<br><span>Подтверждённый.</span></h1>
-        <p class="ldSub">Загрузите документы один раз — работодатели сами найдут вас. Образование и опыт, подкреплённые реальными доказательствами.</p>
+        <p class="ldSub">Для IT-специалистов, финансистов и экономистов. Загрузите документы один раз — работодатели найдут вас сами.</p>
         <div class="ldBtns">
           <button id="landingRegBtn2" class="ldBtnPrimary">Зарегистрироваться</button>
+        </div>
+        <div class="ldStats">
+          <div class="ldStat"><span class="ldStatNum">2 400+</span><span class="ldStatLabel">специалистов</span></div>
+          <div class="ldStatDiv"></div>
+          <div class="ldStat"><span class="ldStatNum">24ч</span><span class="ldStatLabel">верификация</span></div>
+          <div class="ldStatDiv"></div>
+          <div class="ldStat"><span class="ldStatNum">3</span><span class="ldStatLabel">отрасли</span></div>
         </div>
       </div>
 
       <div class="ldVisual">
         <div class="ldCard">
           <div class="ldCardTop">
-            <div class="ldAvatar">АВ</div>
+            <div class="ldAvatar" style="background:linear-gradient(135deg,#1a5c68,#0e3a42);color:#fff;border-color:rgba(26,92,104,.4)">АС</div>
             <div>
-              <div class="ldCardName">Алексей Волков</div>
+              <div class="ldCardName">Анна Соколова</div>
               <span class="ldVerBadge">✓ LOMO 3</span>
             </div>
           </div>
           <div class="ldDetails">
-            <div class="ldDetail"><span class="ldDetailIco">🎓</span>МГУ им. Ломоносова · 2021</div>
+            <div class="ldDetail"><span class="ldDetailIco">🎓</span>ВШЭ · Экономический · 2020</div>
             <div class="ldDetail"><span class="ldDetailIco">📍</span>Москва</div>
-            <div class="ldDetail"><span class="ldDetailIco">💼</span>Яндекс · Product Manager</div>
+            <div class="ldDetail"><span class="ldDetailIco">💼</span>Сбер · Финансовый аналитик</div>
           </div>
           <div class="ldChips">
             <span class="ldChip">✓ Образование</span>
             <span class="ldChip">✓ Опыт работы</span>
-            <span class="ldChip">✓ CV</span>
+            <span class="ldChip">✓ МСФО</span>
           </div>
         </div>
         <div class="ldMiniRow">
           <div class="ldMiniCard">
-            <div class="ldMiniAv">МТ</div>
+            <div class="ldMiniAv" style="background:linear-gradient(135deg,#2a7a8a,#0e3a42);color:#fff">АК</div>
             <div>
-              <div class="ldMiniName">Марина Тихова</div>
-              <div class="ldMiniSub">✓ LOMO 2 · ВШЭ</div>
+              <div class="ldMiniName">Артём Козлов</div>
+              <div class="ldMiniSub">✓ LOMO 2 · Frontend · ИТМО</div>
             </div>
           </div>
           <div class="ldMiniCard">
-            <div class="ldMiniAv">ДН</div>
+            <div class="ldMiniAv" style="background:linear-gradient(135deg,#7c3aed,#4c1d95);color:#fff">МС</div>
             <div>
-              <div class="ldMiniName">Данила Нестеров</div>
-              <div class="ldMiniSub">✓ LOMO 1 · УрФУ</div>
+              <div class="ldMiniName">Мария Степанова</div>
+              <div class="ldMiniSub">✓ LOMO 1 · Экономист · РЭУ</div>
             </div>
           </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Niches -->
+    <div class="ldNiches">
+      <div class="ldSectionLabel">Для кого</div>
+      <div class="ldNichesGrid">
+        <div class="ldNiche">
+          <div class="ldNicheIcon">💻</div>
+          <div class="ldNicheH">IT & Tech</div>
+          <div class="ldNicheP">Разработчики, Data-аналитики, DevOps и PM — верификация стека, образования и опыта.</div>
+        </div>
+        <div class="ldNiche ldNicheAccent">
+          <div class="ldNicheIcon">💰</div>
+          <div class="ldNicheH">Финансы</div>
+          <div class="ldNicheP">Аналитики, бухгалтеры, аудиторы МСФО — подтверждённые дипломы и опыт в отрасли.</div>
+        </div>
+        <div class="ldNiche">
+          <div class="ldNicheIcon">📊</div>
+          <div class="ldNicheH">Экономика</div>
+          <div class="ldNicheP">Экономисты, плановики, финансисты — профиль с верифицированным образованием и карьерой.</div>
         </div>
       </div>
     </div>
@@ -143,9 +172,9 @@
           <h2 class="ldAiH">Опишите кого ищете — ИИ найдёт за секунды</h2>
           <p class="ldAiSub">Никаких ручных фильтров. Вставьте текст вакансии — алгоритм анализирует стек, грейд и контекст и ранжирует верифицированных кандидатов по степени совпадения.</p>
           <ul class="ldAiList">
-            <li><span class="ldAiCheck">✓</span> Парсинг роли, грейда и навыков из текста</li>
+            <li><span class="ldAiCheck">✓</span> Парсинг роли, уровня и навыков из текста вакансии</li>
             <li><span class="ldAiCheck">✓</span> Фильтр: только верифицированные / удалённо / офис</li>
-            <li><span class="ldAiCheck">✓</span> Быстрые шаблоны: Frontend, Backend, Data, PM</li>
+            <li><span class="ldAiCheck">✓</span> Шаблоны для IT, Финансов, Экономики, HR и других</li>
             <li><span class="ldAiCheck">✓</span> Мгновенный результат — без ожидания</li>
           </ul>
           <button class="ldAiBtn" id="ldAiRegBtn">Найти кандидатов с AI →</button>
@@ -158,36 +187,36 @@
               <span class="ldAiDemoStar">✨</span>
               <span class="ldAiDemoTitle">AI-Мэтчинг</span>
             </div>
-            <div class="ldAiDemoInput">Ищем Middle Frontend разработчика. Стек: React, TypeScript. Задачи: разработка UI, код-ревью, работа с Figma...</div>
+            <div class="ldAiDemoInput">Ищем финансового аналитика. Опыт с МСФО, 1С, Excel. Банковский сектор, Москва или удалённо...</div>
             <div class="ldAiDemoFilters">
-              <span class="ldAiDemoChip active">Middle</span>
+              <span class="ldAiDemoChip active">💰 Финансы</span>
               <span class="ldAiDemoChip active">✓ Верифицированные</span>
               <span class="ldAiDemoChip">🌐 Удалённо</span>
             </div>
             <div class="ldAiDemoResults">
               <div class="ldAiDemoResult">
-                <div class="ldAiDemoAv" style="background:linear-gradient(135deg,#2a7a8a,#0e3a42)">АВ</div>
+                <div class="ldAiDemoAv" style="background:linear-gradient(135deg,#1a5c68,#0e3a42)">АС</div>
                 <div class="ldAiDemoInfo">
-                  <div class="ldAiDemoName">Алексей Волков <span class="ldAiVerBadge">✓ LOMO 3</span></div>
-                  <div class="ldAiDemoMeta">React · TypeScript · МГУ 2021</div>
+                  <div class="ldAiDemoName">Анна Соколова <span class="ldAiVerBadge">✓ LOMO 3</span></div>
+                  <div class="ldAiDemoMeta">МСФО · 1С · ВШЭ 2020</div>
                 </div>
-                <div class="ldAiDemoScore" style="--pct:94">94%</div>
+                <div class="ldAiDemoScore" style="--pct:96">96%</div>
               </div>
               <div class="ldAiDemoResult">
-                <div class="ldAiDemoAv" style="background:linear-gradient(135deg,#7c3aed,#4c1d95)">МТ</div>
+                <div class="ldAiDemoAv" style="background:linear-gradient(135deg,#7c3aed,#4c1d95)">МК</div>
                 <div class="ldAiDemoInfo">
-                  <div class="ldAiDemoName">Марина Тихова <span class="ldAiVerBadge">✓ LOMO 2</span></div>
-                  <div class="ldAiDemoMeta">React · Node.js · ВШЭ 2022</div>
+                  <div class="ldAiDemoName">Максим Козлов <span class="ldAiVerBadge">✓ LOMO 2</span></div>
+                  <div class="ldAiDemoMeta">Финансовый анализ · Excel · РЭУ 2021</div>
                 </div>
-                <div class="ldAiDemoScore" style="--pct:87">87%</div>
+                <div class="ldAiDemoScore" style="--pct:88">88%</div>
               </div>
               <div class="ldAiDemoResult ldAiDemoResultMuted">
                 <div class="ldAiDemoAv" style="background:linear-gradient(135deg,#f59e0b,#92400e)">ДН</div>
                 <div class="ldAiDemoInfo">
-                  <div class="ldAiDemoName">Данила Нестеров <span class="ldAiVerBadge">✓ LOMO 1</span></div>
-                  <div class="ldAiDemoMeta">Vue · TypeScript · УрФУ 2020</div>
+                  <div class="ldAiDemoName">Диана Новикова <span class="ldAiVerBadge">✓ LOMO 1</span></div>
+                  <div class="ldAiDemoMeta">Аудит · ACCA · УрФУ 2019</div>
                 </div>
-                <div class="ldAiDemoScore" style="--pct:81">81%</div>
+                <div class="ldAiDemoScore" style="--pct:79">79%</div>
               </div>
             </div>
           </div>
