@@ -1655,6 +1655,20 @@
   border-radius: 10px;
   text-transform: capitalize;
 }
+.aiResultTagActive {
+  font-size: 11px;
+  padding: 2px 7px;
+  background: #e6f7f0;
+  color: #1a7a5e;
+  border-radius: 10px;
+  font-weight: 600;
+}
+.aiResultSalary {
+  font-size: 11px;
+  color: #2a7a8a;
+  font-weight: 600;
+  margin-top: 2px;
+}
 .aiResultSkills {
   display: flex;
   flex-wrap: wrap;
