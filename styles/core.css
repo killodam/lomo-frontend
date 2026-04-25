@@ -272,6 +272,107 @@
       text-decoration: underline;
     }
 
+    /* ── Registration step 2 title ───────────────────── */
+    .regFormTitle{
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: -.025em;
+      color: rgba(0,0,0,.88);
+      text-align: center;
+      margin-bottom: -4px;
+    }
+
+    /* ── Consent box card ───────────────────────────── */
+    .consentBox{
+      width: var(--inW);
+      background: #fff;
+      border: 1.5px solid rgba(0,0,0,.09);
+      border-radius: 20px;
+      padding: 16px 20px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+      box-shadow: 0 1px 4px rgba(0,0,0,.03);
+      margin-bottom: 8px;
+    }
+    .consentBox.error{
+      border-color: rgba(220,38,38,.35);
+      background: rgba(220,38,38,.02);
+    }
+    .consentTitle{
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+      color: rgba(38,110,120,.75);
+    }
+    .consentItem{
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      cursor: pointer;
+    }
+    .consentItem input[type="checkbox"]{
+      appearance: none;
+      -webkit-appearance: none;
+      width: 20px;
+      height: 20px;
+      min-width: 20px;
+      border-radius: 7px;
+      border: 1.5px solid rgba(0,0,0,.18);
+      background: #f9fafb;
+      cursor: pointer;
+      position: relative;
+      margin-top: 1px;
+      transition: border-color .15s ease, background .15s ease, box-shadow .15s ease;
+      flex-shrink: 0;
+    }
+    .consentItem input[type="checkbox"]:checked{
+      background: #26707a;
+      border-color: #26707a;
+      box-shadow: 0 2px 8px rgba(38,112,122,.25);
+    }
+    .consentItem input[type="checkbox"]:checked::after{
+      content: '';
+      position: absolute;
+      left: 5px;
+      top: 2px;
+      width: 6px;
+      height: 10px;
+      border: 2px solid #fff;
+      border-top: 0;
+      border-left: 0;
+      transform: rotate(42deg);
+    }
+    .consentItem:hover input[type="checkbox"]:not(:checked){
+      border-color: rgba(38,110,120,.4);
+      background: #f0fdfa;
+    }
+    .consentText{
+      font-size: 13px;
+      color: rgba(0,0,0,.70);
+      line-height: 1.5;
+      padding-top: 1px;
+    }
+    .consentError{
+      font-size: 12px;
+      color: #dc2626;
+      font-weight: 600;
+      display: none;
+      margin-top: -2px;
+    }
+
+    /* ── Password strength label ─────────────────────── */
+    .strengthLabel{
+      font-size: 12px;
+      font-weight: 600;
+      width: var(--inW);
+      padding-left: 4px;
+      min-height: 16px;
+      margin-top: -8px;
+      transition: color .2s ease;
+    }
+
     .choiceRow{
       display:flex;
       gap: var(--gapX);
@@ -492,6 +593,16 @@
     .linkBtn{
       touch-action: manipulation;
       -webkit-tap-highlight-color: transparent;
+    }
+
+    #screenRegForm .wrap{
+      gap: 14px;
+      padding-bottom: 110px;
+      padding-top: 64px;
+      justify-content: flex-start;
+    }
+    #screenRegForm .centerBlock{
+      gap: 14px;
     }
 
     #screenLoginForm .backBtn,
