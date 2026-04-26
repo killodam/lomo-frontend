@@ -845,7 +845,10 @@ function updateProfileProgress() {
   var anyProof = Object.values(p.proofs).some(function (proof) { return proof.fileName; });
   if (anyProof) score += 1; else hints.push({ text: 'Загрузите хотя бы один документ' });
 
-  var anyVerified = Object.values(p.proofs).some(function (proof) { return proof.status === 'подтверждено'; });
+  var anyVerified = Object.values(p.proofs).some(function (proof) {
+    var status = String(proof && proof.status || '').toLowerCase();
+    return status === 'verified' || status.includes('подтверж') || status.includes('одобр');
+  });
   if (anyVerified) score += 1; else hints.push({ text: 'Получите первое подтверждение' });
 
   if (p.proofs.cv.fileName) score += 1; else hints.push({ text: 'Загрузите резюме (CV)' });
@@ -1002,6 +1005,7 @@ function syncFeedFilterChips() {
   var verSelect = document.getElementById('feedVerifiedFilter');
   if (verSelect) selectedVerified = String(verSelect.value || '');
   syncChipSelection('.feedVerifiedChip', 'data-feed-verified', selectedVerified);
+  syncChipSelection('.feedRoleChip', 'data-role-filter', feedState.roleFilter || '');
 }
 
 function syncChipSelectionInside(container, chipSelector, attributeName, selectedValue) {
@@ -1431,6 +1435,7 @@ function loadCandidateFeed(page, options) {
     page: feedState.page,
     pageSize: feedState.pageSize,
     search: feedState.search,
+    role: feedState.roleFilter || undefined,
     verified: feedState.verified || undefined,
   }).then(function (result) {
     var scrollTop = isSilent ? getScreenScrollTop('candidateFeed') : 0;

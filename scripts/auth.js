@@ -977,9 +977,11 @@ function getPasswordPolicyError(password) {
         }
 
         if(route === 'toEmployerProfile'){
+          const gotoTab = next.getAttribute('data-goto-tab') || '';
           if (typeof resetDisplay === 'function') resetDisplay();
           hydrateEmployerForm();
           show('myEmployerProfile');
+          if (gotoTab && typeof activateProfileTab === 'function') activateProfileTab('screenMyEmployerProfile', gotoTab);
           setTimeout(() => {
             wireProofs();
             wireDropZones();
@@ -989,9 +991,11 @@ function getPasswordPolicyError(password) {
         }
 
         if(route === 'toEmployeeProfile'){
+          const gotoTab = next.getAttribute('data-goto-tab') || '';
           if (typeof resetDisplay === 'function') resetDisplay();
           hydrateEmployeeForm();
           show('myEmployeeProfile');
+          if (gotoTab && typeof activateProfileTab === 'function') activateProfileTab('screenMyEmployeeProfile', gotoTab);
           setTimeout(() => {
             wireProofs();
             wireDropZones();

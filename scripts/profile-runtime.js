@@ -21,6 +21,15 @@ function applyChip(elId, status) {
   }
 }
 
+function isVerifiedProofStatus(status) {
+  var safeStatus = String(status || '').toLowerCase();
+  return safeStatus === 'verified' || safeStatus.includes('подтверж') || safeStatus.includes('одобр');
+}
+
+function isProofVerified(proof) {
+  return !!(proof && isVerifiedProofStatus(proof.status));
+}
+
 function setHidden(target, isHidden) {
   const el = typeof target === 'string' ? document.getElementById(target) : target;
   if (!el) return null;
@@ -108,7 +117,7 @@ function renderRecruiterPublic() {
   const badgeRow = document.getElementById('rpCorpEmailBadgeRow');
   if (badgeRow) setHidden(badgeRow, !p.corpEmailVerified);
 
-  var rpIsVerified = p.proofs?.companyDoc?.status === 'одобрено';
+  var rpIsVerified = isProofVerified(p.proofs?.companyDoc);
   if (typeof showVerifBannerIfNeeded === 'function') showVerifBannerIfNeeded('rpVerifBanner', rpIsVerified);
 }
 
@@ -192,7 +201,7 @@ function renderEmployeePublic() {
 
   var epProofs = p.proofs || {};
   var epIsVerified = ['education','work','courses','passport'].some(function (k) {
-    return epProofs[k] && epProofs[k].status === 'одобрено';
+    return isProofVerified(epProofs[k]);
   });
   if (typeof showVerifBannerIfNeeded === 'function') showVerifBannerIfNeeded('epVerifBanner', epIsVerified);
 }
@@ -919,8 +928,8 @@ function initProfileTabs(screenId) {
     var targetId = tab.getAttribute('data-tab');
     var allTabs = screen.querySelectorAll('.profileTab');
     var allPanes = screen.querySelectorAll('.profileTabPane');
-    for (var i = 0; i < allTabs.length; i++) allTabs[i].classList.remove('active');
-    for (var i = 0; i < allPanes.length; i++) allPanes[i].hidden = true;
+    for (var tabIndex = 0; tabIndex < allTabs.length; tabIndex++) allTabs[tabIndex].classList.remove('active');
+    for (var paneIndex = 0; paneIndex < allPanes.length; paneIndex++) allPanes[paneIndex].hidden = true;
     tab.classList.add('active');
     var pane = document.getElementById(targetId);
     if (pane) pane.hidden = false;
@@ -934,8 +943,20 @@ function resetProfileTabs(screenId) {
   if (!screen) return;
   var allTabs = screen.querySelectorAll('.profileTab');
   var allPanes = screen.querySelectorAll('.profileTabPane');
-  for (var i = 0; i < allTabs.length; i++) allTabs[i].classList.toggle('active', i === 0);
-  for (var i = 0; i < allPanes.length; i++) allPanes[i].hidden = i !== 0;
+  for (var tabIndex = 0; tabIndex < allTabs.length; tabIndex++) allTabs[tabIndex].classList.toggle('active', tabIndex === 0);
+  for (var paneIndex = 0; paneIndex < allPanes.length; paneIndex++) allPanes[paneIndex].hidden = paneIndex !== 0;
+}
+
+function activateProfileTab(screenId, targetId) {
+  var screen = document.getElementById(screenId);
+  if (!screen || !targetId) return;
+  var tabs = screen.querySelectorAll('.profileTab');
+  for (var tabIndex = 0; tabIndex < tabs.length; tabIndex++) {
+    if (tabs[tabIndex].getAttribute('data-tab') === targetId) {
+      tabs[tabIndex].click();
+      return;
+    }
+  }
 }
 
 initProfileTabs('screenMyEmployeeProfile');

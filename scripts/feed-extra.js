@@ -9,8 +9,9 @@ function initFeedMainTabs() {
   var vacPane = document.getElementById('feedTabVacancies');
 
   tabsBar.addEventListener('click', function (e) {
-    var btn = e.target;
+    var btn = e.target && e.target.closest ? e.target.closest('[data-main-tab]') : null;
     if (!btn || !btn.getAttribute('data-main-tab')) return;
+    if (!tabsBar.contains(btn)) return;
     var tab = btn.getAttribute('data-main-tab');
     var btns = tabsBar.querySelectorAll('.feedMainTab');
     for (var i = 0; i < btns.length; i++) btns[i].classList.remove('active');
@@ -30,8 +31,9 @@ function initRoleFilterChips() {
   var container = document.getElementById('feedRoleChips');
   if (!container) return;
   container.addEventListener('click', function (e) {
-    var btn = e.target;
+    var btn = e.target && e.target.closest ? e.target.closest('[data-role-filter]') : null;
     if (!btn || !btn.hasAttribute('data-role-filter')) return;
+    if (!container.contains(btn)) return;
     var chips = container.querySelectorAll('.feedRoleChip');
     for (var i = 0; i < chips.length; i++) chips[i].classList.remove('active');
     btn.classList.add('active');
@@ -55,20 +57,6 @@ function initVerifBanner(bannerId, closeId) {
     try { sessionStorage.setItem('lomo_verif_banner_closed_' + bannerId, '1'); } catch (e) {}
   });
 
-  var deepLink = banner.querySelector('[data-goto-tab]');
-  if (deepLink) {
-    deepLink.addEventListener('click', function () {
-      var targetScreen = deepLink.getAttribute('data-next');
-      var tab = deepLink.getAttribute('data-goto-tab');
-      if (targetScreen && typeof show === 'function') {
-        show(targetScreen === 'toEmployeeProfile' ? 'myEmployeeProfile' : 'myEmployerProfile');
-      }
-      if (tab) {
-        var tabEl = document.getElementById(tab);
-        if (tabEl) tabEl.click();
-      }
-    });
-  }
 }
 
 function showVerifBannerIfNeeded(bannerId, hasVerification) {

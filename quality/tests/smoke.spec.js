@@ -295,6 +295,62 @@ test('candidate feed refreshes silently without page reload', async ({ page }) =
   await expect(page.locator('#candidateFeedList')).toContainText('Павел Иванов', { timeout: 3000 });
 });
 
+test('candidate feed role chips request server-side role filter', async ({ page }) => {
+  const requestedRoles = [];
+
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'cand-1', email: 'candidate@example.com', login: 'candidate', role: 'candidate' },
+          profile: { full_name: 'Иван Кандидат', location: 'Москва', edu_place: 'МГУ', vacancies: 'Product Designer' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      const role = url.searchParams.get('role') || '';
+      requestedRoles.push(role);
+      const item = role === 'employer'
+        ? { id: 'emp-2', role: 'employer', full_name: 'LOMO HR', company: 'LOMO HR', industry: 'HR Tech', needed: 'Frontend' }
+        : { id: 'cand-2', role: 'candidate', full_name: 'Анна Петрова', location: 'Москва', edu_place: 'МФТИ', vacancies: 'Designer' };
+
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([item], 1, 15, 1)),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.fill('#loginEmail', 'candidate@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await expect(page.locator('#candidateFeedList')).toContainText('Анна Петрова');
+
+  await page.click('[data-role-filter="employer"]');
+  await expect.poll(() => requestedRoles[requestedRoles.length - 1]).toBe('employer');
+  await expect(page.locator('#candidateFeedList')).toContainText('LOMO HR');
+
+  await page.click('[data-role-filter="candidate"]');
+  await expect.poll(() => requestedRoles[requestedRoles.length - 1]).toBe('candidate');
+  await expect(page.locator('#candidateFeedList')).toContainText('Анна Петрова');
+});
+
 test('forgot password flow reaches success screen after reset', async ({ page }) => {
   await page.route('**/api/**', async (route) => {
     const request = route.request();
@@ -1903,4 +1959,58 @@ test('candidate feed header profile button opens public profile screen', async (
   await page.click('#feedMyProfileBtn');
   await expect(page.locator('#screenEmployeePublic')).toHaveClass(/active/);
   await expect(page.locator('#epName')).toContainText('Иван Кандидат');
+});
+
+test('candidate verification banner opens document edit tab', async ({ page }) => {
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'cand-12', email: 'candidate@example.com', role: 'candidate' },
+          profile: {
+            full_name: 'Иван Кандидат',
+            public_id: 'LOMO-CAND0012',
+            location: 'Москва',
+            edu_place: 'МГУ',
+            vacancies: 'Designer',
+          },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([], 1, 15, 0)),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.evaluate(() => { document.cookie = 'lomo_csrf=test-suite; path=/'; });
+  await page.fill('#loginEmail', 'candidate@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await page.click('#feedMyProfileBtn');
+  await expect(page.locator('#screenEmployeePublic')).toHaveClass(/active/);
+  await expect(page.locator('#epVerifBanner')).toBeVisible();
+
+  await page.click('#epVerifBanner [data-goto-tab="tabCDocs"]');
+  await expect(page.locator('#screenMyEmployeeProfile')).toHaveClass(/active/);
+  await expect(page.locator('#screenMyEmployeeProfile .profileTab[data-tab="tabCDocs"]')).toHaveClass(/active/);
+  await expect(page.locator('#tabCDocs')).toBeVisible();
 });
