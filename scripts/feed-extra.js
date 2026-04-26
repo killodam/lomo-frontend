@@ -88,38 +88,43 @@ function animateCounter(el, target, duration) {
 }
 
 function initLandingCounter() {
+  var usersEl = document.getElementById('ldCountUsers');
   var profilesEl = document.getElementById('ldCountProfiles');
   var companiesEl = document.getElementById('ldCountCompanies');
-  if (!profilesEl || !companiesEl) return;
+  if (!profilesEl && !companiesEl) return;
 
   var triggered = false;
-  function runCounters(profiles, companies) {
+  function runCounters(total, verified, companies) {
     if (triggered) return;
     triggered = true;
-    animateCounter(profilesEl, profiles, 900);
-    animateCounter(companiesEl, companies, 600);
+    if (usersEl) animateCounter(usersEl, total, 800);
+    if (profilesEl) animateCounter(profilesEl, verified, 900);
+    if (companiesEl) animateCounter(companiesEl, companies, 600);
   }
 
   function fetchAndRun() {
     var base = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
     fetch(base + '/public/stats')
-      .then(function (r) { return r.ok ? r.json() : Promise.reject(); })
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
       .then(function (data) {
-        runCounters(data.verifiedProfiles || 0, data.companies || 0);
+        runCounters(data.totalUsers || 0, data.verifiedProfiles || 0, data.companies || 0);
       })
       .catch(function () {
-        runCounters(0, 0);
+        if (usersEl) usersEl.textContent = '—';
+        if (profilesEl) profilesEl.textContent = '—';
+        if (companiesEl) companiesEl.textContent = '—';
       });
   }
 
+  var anchor = usersEl || profilesEl;
   if ('IntersectionObserver' in window) {
     var obs = new IntersectionObserver(function (entries) {
       if (entries[0].isIntersecting) {
         fetchAndRun();
         obs.disconnect();
       }
-    }, { threshold: 0.3 });
-    obs.observe(profilesEl);
+    }, { threshold: 0.2 });
+    obs.observe(anchor);
   } else {
     fetchAndRun();
   }
