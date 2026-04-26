@@ -107,6 +107,9 @@ function renderRecruiterPublic() {
   // Corp email verified badge
   const badgeRow = document.getElementById('rpCorpEmailBadgeRow');
   if (badgeRow) setHidden(badgeRow, !p.corpEmailVerified);
+
+  var rpIsVerified = p.proofs?.companyDoc?.status === 'одобрено';
+  if (typeof showVerifBannerIfNeeded === 'function') showVerifBannerIfNeeded('rpVerifBanner', rpIsVerified);
 }
 
 function renderEmployeePublic() {
@@ -186,6 +189,12 @@ function renderEmployeePublic() {
   } else if (cvDownBtn && (p.proofs?.cv?.docId || p.proofs?.cv?.url)) {
     cvDownBtn.classList.remove('hidden');
   }
+
+  var epProofs = p.proofs || {};
+  var epIsVerified = ['education','work','courses','passport'].some(function (k) {
+    return epProofs[k] && epProofs[k].status === 'одобрено';
+  });
+  if (typeof showVerifBannerIfNeeded === 'function') showVerifBannerIfNeeded('epVerifBanner', epIsVerified);
 }
 
 function escapeHtml(value) {

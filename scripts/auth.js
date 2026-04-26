@@ -13,23 +13,17 @@ function pruneStaleLocalStorage(keepUserId) {
 }
 
 function showOnboardingScreen(role) {
-  var titleEl = document.getElementById('doneOnboardTitle');
-  var stepsEl = document.getElementById('doneOnboardSteps');
-  var onboard = document.getElementById('doneOnboard');
-  var doneText = document.getElementById('doneText');
-  var doneCta = document.getElementById('doneCta');
-  if (!onboard) {
-    if (role === 'employer') showEmployerDashboard(); else showEmployeeDashboard();
-    return;
+  var candidateView = document.getElementById('doneViewCandidate');
+  var employerView = document.getElementById('doneViewEmployer');
+  if (candidateView && employerView) {
+    if (role === 'employer') {
+      candidateView.classList.add('hidden');
+      employerView.classList.remove('hidden');
+    } else {
+      candidateView.classList.remove('hidden');
+      employerView.classList.add('hidden');
+    }
   }
-  var steps = role === 'employer'
-    ? ['Заполните профиль компании', 'Верифицируйте корпоративную почту', 'Ищите кандидатов через поиск', 'Используйте AI-Мэтчинг для подбора']
-    : ['Заполните профиль — имя, город, навыки', 'Загрузите документы для верификации', 'Отметьте «В поиске работы» — вас найдут работодатели', 'Следите за уведомлениями'];
-  if (doneText) doneText.textContent = role === 'employer' ? 'ДОБРО ПОЖАЛОВАТЬ В LOMO' : 'РЕГИСТРАЦИЯ ЗАВЕРШЕНА';
-  if (titleEl) titleEl.textContent = role === 'employer' ? 'Что делать дальше?' : 'Как начать работу?';
-  if (stepsEl) stepsEl.innerHTML = steps.map(function (s) { return '<li>' + s + '</li>'; }).join('');
-  if (doneCta) doneCta.textContent = role === 'employer' ? 'Создать профиль компании' : 'Заполнить профиль';
-  onboard.classList.remove('hidden');
   state.prevFromDone = role === 'employer' ? 'employerSearch' : 'candidateFeed';
   show('done');
 }

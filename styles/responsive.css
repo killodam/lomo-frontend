@@ -522,3 +522,47 @@ body { padding-bottom: 0; }
 .pagerEllipsis {
   padding: 0 2px;
 }
+
+/* ── Desktop layout ≥1024px ─────────────────────────────────────── */
+@media (min-width: 1024px) {
+  /* Feed: 2-col grid + sidebar */
+  #screenCandidateFeed .feedContent,
+  #screenEmployerSearch .feedContent {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: 24px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 24px;
+    align-items: start;
+  }
+
+  /* Sidebar stub — desktop only */
+  #feedDesktopSidebar,
+  #empSearchDesktopSidebar {
+    display: block;
+  }
+
+  /* Vacancy grid bumps to 2 cols */
+  .vacancyGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Profiles max-width */
+  #screenMyEmployeeProfile .wrap,
+  #screenMyEmployerProfile .wrap,
+  #screenEmployeePublic .wrap,
+  #screenRecruiterPublic .wrap {
+    max-width: 720px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  /* Feed hero centering */
+  #screenCandidateFeed .feedSearchHeroInner,
+  #screenEmployerSearch .feedSearchHeroInner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+}

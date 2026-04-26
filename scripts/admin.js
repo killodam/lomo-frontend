@@ -1,7 +1,7 @@
 var _userCache = {};
 var _connectionsData = { accepted: [], incoming: [], outgoing: [], counts: { accepted: 0, incoming: 0, outgoing: 0 } };
 
-var feedState = { page: 1, pageSize: 15, total: 0, totalPages: 0, search: '', view: '', verified: '' };
+var feedState = { page: 1, pageSize: 15, total: 0, totalPages: 0, search: '', view: '', verified: '', roleFilter: '' };
 var employerSearchState = { page: 1, pageSize: 15, total: 0, totalPages: 0, search: '', verified: '', lookingFilter: '', salaryMaxFilter: '' };
 var _feedScrollObserver = null;
 var _employerScrollObserver = null;
@@ -1477,7 +1477,11 @@ function renderFeedList(list, appendMode) {
   if (!el) return;
 
   var filtered = list.filter(function (user) {
-    return String(user.id) !== String(state.userId);
+    if (String(user.id) === String(state.userId)) return false;
+    var rf = feedState.roleFilter || '';
+    if (rf === 'candidate' && user.role !== 'candidate') return false;
+    if (rf === 'employer' && user.role !== 'employer') return false;
+    return true;
   });
 
   if (!filtered.length && !appendMode) {

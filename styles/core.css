@@ -779,3 +779,166 @@
         --gapX: 32px;
       }
     }
+
+/* ── Verification banner ─────────────────────────────────────────── */
+.verifBanner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: #FFF8E1;
+  border-bottom: 1.5px solid #FFE082;
+  padding: 10px 16px;
+  position: sticky;
+  top: 0;
+  z-index: 40;
+}
+.verifBanner.hidden { display: none; }
+.verifBannerLeft {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+.verifBannerIco {
+  font-size: 20px;
+  flex-shrink: 0;
+}
+.verifBannerText {
+  font-size: 13px;
+  color: #78350f;
+  font-weight: 500;
+  line-height: 1.4;
+}
+.verifBannerBtn {
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: #f59e0b;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: background .15s;
+}
+.verifBannerBtn:hover { background: #d97706; }
+.verifBannerClose {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #92400e;
+  cursor: pointer;
+  flex-shrink: 0;
+  padding: 0 4px;
+  line-height: 1;
+}
+.verifBannerClose:hover { color: #78350f; }
+
+/* ── screenDone redesign ─────────────────────────────────────────── */
+.doneWrapNew {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 70vh;
+  padding: 32px 20px 48px;
+}
+.doneView {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: 480px;
+  animation: doneSlideIn .5s cubic-bezier(.22,.68,0,1.2) both;
+}
+.doneView.hidden { display: none !important; }
+
+@keyframes doneSlideIn {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.doneIconBig {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  background: #0e7490;
+  color: #fff;
+  font-size: 34px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  box-shadow: 0 8px 24px rgba(14,116,144,.28);
+  animation: donePop .55s cubic-bezier(.22,.68,0,1.4) .1s both;
+}
+.doneIconBig.doneIconEmployer {
+  background: linear-gradient(135deg,#0e7490,#155e75);
+}
+@keyframes donePop {
+  from { transform: scale(0.4); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+.doneTitle {
+  font-size: 22px;
+  font-weight: 800;
+  color: #0e0f0f;
+  text-align: center;
+  letter-spacing: -.5px;
+  margin: 0;
+}
+.doneSub {
+  font-size: 14px;
+  color: #6b7280;
+  text-align: center;
+  line-height: 1.55;
+  max-width: 360px;
+  margin: 0;
+}
+.doneCtaBtn {
+  margin-top: 12px;
+  padding: 14px 32px;
+  border-radius: 999px;
+  font-size: 15px;
+  font-weight: 700;
+  min-width: 220px;
+}
+
+/* 3-step cards for employer onboarding */
+.doneStepsCards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 4px;
+}
+.doneStepCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  background: rgba(14,116,144,.05);
+  border: 1.5px solid rgba(14,116,144,.14);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.doneStepIcon {
+  font-size: 22px;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.doneStepH {
+  font-size: 14px;
+  font-weight: 700;
+  color: #0e0f0f;
+  margin-bottom: 3px;
+}
+.doneStepP {
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.4;
+}

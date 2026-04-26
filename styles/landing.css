@@ -1026,3 +1026,68 @@
     letter-spacing: -1.8px;
   }
 }
+
+/* ── Landing counters ────────────────────────────────────────────── */
+.ldCounters {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-top: 20px;
+}
+.ldCounter {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 24px;
+}
+.ldCounter:first-child { padding-left: 0; }
+.ldCounterNum {
+  font-size: 36px;
+  font-weight: 800;
+  color: #0e7490;
+  letter-spacing: -1px;
+  line-height: 1;
+}
+.ldCounterLabel {
+  font-size: 12px;
+  color: #6b7280;
+  margin-top: 2px;
+  text-align: center;
+}
+.ldCounterDiv {
+  width: 1px;
+  height: 40px;
+  background: #e5e7eb;
+}
+
+/* ── Landing step animation ──────────────────────────────────────── */
+.ldStepArrow {
+  display: none;
+}
+.ldStepAnim {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity .5s ease, transform .5s ease;
+}
+.ldStepAnim.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.ldStepAnim:nth-child(2) { transition-delay: .12s; }
+.ldStepAnim:nth-child(4) { transition-delay: .24s; }
+
+@media (min-width: 640px) {
+  .ldStepArrow {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    color: #d1d5db;
+    font-weight: 300;
+    flex-shrink: 0;
+    padding-top: 12px;
+  }
+  .ldCounters { justify-content: flex-start; }
+  .ldCounter { align-items: flex-start; }
+  .ldCounterLabel { text-align: left; }
+}

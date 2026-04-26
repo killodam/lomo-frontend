@@ -92,6 +92,11 @@
         <div class="ldBtns">
           <button id="landingRegBtn2" class="ldBtnPrimary">Зарегистрироваться</button>
         </div>
+        <div class="ldCounters">
+          <div class="ldCounter"><span class="ldCounterNum" id="ldCountProfiles">0</span><span class="ldCounterLabel">верифицированных профилей</span></div>
+          <div class="ldCounterDiv"></div>
+          <div class="ldCounter"><span class="ldCounterNum" id="ldCountCompanies">0</span><span class="ldCounterLabel">компаний</span></div>
+        </div>
       </div>
 
       <div class="ldVisual">
@@ -219,20 +224,22 @@
     </div>
 
     <!-- Steps -->
-    <div class="ldSteps">
+    <div class="ldSteps" id="ldStepsSection">
       <div class="ldSectionLabel">Как это работает</div>
       <div class="ldStepsGrid">
-        <div class="ldStep">
+        <div class="ldStep ldStepAnim">
           <div class="ldStepNum">1</div>
           <div class="ldStepH">Создайте профиль</div>
           <div class="ldStepP">Заполните данные об образовании, опыте и навыках — займёт 5 минут.</div>
+          <div class="ldStepArrow" aria-hidden="true">→</div>
         </div>
-        <div class="ldStep">
+        <div class="ldStep ldStepAnim">
           <div class="ldStepNum">2</div>
           <div class="ldStepH">Загрузите документы</div>
           <div class="ldStepP">Диплом, трудовую книжку, сертификаты — в любом формате.</div>
+          <div class="ldStepArrow" aria-hidden="true">→</div>
         </div>
-        <div class="ldStep">
+        <div class="ldStep ldStepAnim">
           <div class="ldStepNum">3</div>
           <div class="ldStepH">Получите верификацию</div>
           <div class="ldStepP">Модератор проверит за 1–2 дня. Профиль получает отметку ✓ LOMO.</div>
@@ -491,6 +498,11 @@
     <div class="avatarCircle xl"><img id="rpAvatarImg" class="avatarImg hidden" alt="avatar"/></div>
   </div>
   <div class="profilePageBody">
+    <div class="verifBanner hidden" id="rpVerifBanner">
+      <div class="verifBannerLeft"><span class="verifBannerIco">⚡</span><div><div class="verifBannerText">Верифицируйте компанию — кандидаты охотнее откликаются на проверенные вакансии</div></div></div>
+      <button type="button" class="verifBannerBtn" data-next="toEmployerProfile" data-goto-tab="tabEDocs">Верифицировать</button>
+      <button type="button" class="verifBannerClose" id="rpVerifBannerClose" aria-label="Закрыть">×</button>
+    </div>
     <div class="profileIdentity">
       <div class="profileName" id="rpCompanyName">Название компании</div>
       <div class="profileMeta"><span id="rpIndustry">Сфера</span></div>
@@ -834,6 +846,11 @@
     <div class="avatarCircle xl"><img id="epAvatarImg" class="avatarImg hidden" alt="avatar"/></div>
   </div>
   <div class="profilePageBody">
+    <div class="verifBanner hidden" id="epVerifBanner">
+      <div class="verifBannerLeft"><span class="verifBannerIco">⚡</span><div><div class="verifBannerText">Верифицируйте профиль — работодатели видят только подтверждённых кандидатов</div></div></div>
+      <button type="button" class="verifBannerBtn" data-next="toEmployeeProfile" data-goto-tab="tabCDocs">Загрузить документы</button>
+      <button type="button" class="verifBannerClose" id="epVerifBannerClose" aria-label="Закрыть">×</button>
+    </div>
     <div class="profileIdentity">
       <div class="profileName" id="epName">Имя Фамилия</div>
       <div class="profileMeta" id="epCity"></div>
@@ -944,33 +961,72 @@
       </div>
     </header>
 
-    <div class="feedSearchHero">
-      <div class="feedSearchHeroInner">
-        <h1 class="feedTitle">Лента LOMO</h1>
-        <p class="feedSub">Верифицированные профили · кандидаты и компании</p>
-        <div class="feedSearchWrap">
-          <svg class="feedSearchIco" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
-          <input id="feedSearchInput" type="text" class="feedSearchInput" placeholder="Имя, университет, навык, город...">
+    <!-- Main tabs: People / Vacancies -->
+    <div class="feedMainTabs" id="feedMainTabs">
+      <button class="feedMainTab active" data-main-tab="people" type="button">👤 Люди</button>
+      <button class="feedMainTab" data-main-tab="vacancies" type="button">💼 Вакансии</button>
+    </div>
+
+    <!-- People tab -->
+    <div id="feedTabPeople">
+      <div class="feedSearchHero">
+        <div class="feedSearchHeroInner">
+          <h1 class="feedTitle">Лента LOMO</h1>
+          <p class="feedSub">Верифицированные профили · кандидаты и компании</p>
+          <div class="feedSearchWrap">
+            <svg class="feedSearchIco" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <input id="feedSearchInput" type="text" class="feedSearchInput" placeholder="Имя, университет, навык, город...">
+          </div>
+          <div class="feedRoleChips" id="feedRoleChips">
+            <button class="feedRoleChip active" data-role-filter="" type="button">Все</button>
+            <button class="feedRoleChip" data-role-filter="candidate" type="button">Только кандидаты</button>
+            <button class="feedRoleChip" data-role-filter="employer" type="button">Только компании</button>
+          </div>
+          <div class="feedFilterChips">
+            <button class="feedFilterChip active" data-feed-view="" type="button">Все профили</button>
+            <button class="feedFilterChip" data-feed-view="favorites" type="button">★ Избранные</button>
+            <button class="feedVerifiedChip" data-feed-verified="" type="button">✓ Верифицированные</button>
+          </div>
+          <select id="feedViewFilter" class="hidden">
+            <option value="">Все профили</option>
+            <option value="favorites">Избранное</option>
+          </select>
+          <select id="feedVerifiedFilter" class="hidden">
+            <option value=""></option>
+            <option value="verified">verified</option>
+          </select>
         </div>
-        <div class="feedFilterChips">
-          <button class="feedFilterChip active" data-feed-view="" type="button">Все профили</button>
-          <button class="feedFilterChip" data-feed-view="favorites" type="button">★ Избранные</button>
-          <button class="feedVerifiedChip" data-feed-verified="" type="button">✓ Верифицированные</button>
-        </div>
-        <select id="feedViewFilter" class="hidden">
-          <option value="">Все профили</option>
-          <option value="favorites">Избранное</option>
-        </select>
-        <select id="feedVerifiedFilter" class="hidden">
-          <option value=""></option>
-          <option value="verified">verified</option>
-        </select>
+      </div>
+      <div class="feedContent">
+        <div id="candidateFeedList" class="feedListWrap"></div>
+        <div id="candidateFeedPager" class="pager"></div>
       </div>
     </div>
 
-    <div class="feedContent">
-      <div id="candidateFeedList" class="feedListWrap"></div>
-      <div id="candidateFeedPager" class="pager"></div>
+    <!-- Vacancies tab -->
+    <div id="feedTabVacancies" class="hidden">
+      <div class="feedSearchHero">
+        <div class="feedSearchHeroInner">
+          <h1 class="feedTitle">Вакансии</h1>
+          <p class="feedSub">Открытые позиции от верифицированных компаний</p>
+          <div class="feedRoleChips" id="vacFormatChips">
+            <button class="feedRoleChip active" data-vac-format="" type="button">Все</button>
+            <button class="feedRoleChip" data-vac-format="remote" type="button">Удалённо</button>
+            <button class="feedRoleChip" data-vac-format="office" type="button">Офис</button>
+            <button class="feedRoleChip" data-vac-format="hybrid" type="button">Гибрид</button>
+          </div>
+          <div class="feedRoleChips" id="vacGradeChips">
+            <button class="feedRoleChip active" data-vac-grade="" type="button">Любой грейд</button>
+            <button class="feedRoleChip" data-vac-grade="junior" type="button">Junior</button>
+            <button class="feedRoleChip" data-vac-grade="middle" type="button">Middle</button>
+            <button class="feedRoleChip" data-vac-grade="senior" type="button">Senior</button>
+            <button class="feedRoleChip" data-vac-grade="lead" type="button">Lead</button>
+          </div>
+        </div>
+      </div>
+      <div class="feedContent">
+        <div id="vacancyFeedList" class="feedListWrap vacancyGrid"></div>
+      </div>
     </div>
 
   </div>
@@ -1223,14 +1279,45 @@
 <section aria-label="Completed" class="screen" id="screenDone">
 <div class="wrap">
 <button aria-label="Back" class="backBtn" data-back="toPrevFromDone">← Назад</button>
-<div class="doneWrap">
-  <div class="doneCheck" id="doneCheck">✓</div>
-  <div class="doneText" id="doneText">ВХОД ВЫПОЛНЕН</div>
-  <div class="doneOnboard hidden" id="doneOnboard">
-    <div class="doneOnboardTitle" id="doneOnboardTitle"></div>
-    <ol class="doneOnboardSteps" id="doneOnboardSteps"></ol>
+<div class="doneWrap doneWrapNew">
+
+  <!-- Candidate welcome (default) -->
+  <div class="doneView" id="doneViewCandidate">
+    <div class="doneIconBig">✓</div>
+    <div class="doneTitle" id="doneText">Добро пожаловать в LOMO!</div>
+    <div class="doneSub">Ваш аккаунт создан. Заполните профиль и загрузите документы для верификации.</div>
+    <div class="doneOnboard hidden" id="doneOnboard">
+      <div class="doneOnboardTitle" id="doneOnboardTitle"></div>
+      <ol class="doneOnboardSteps" id="doneOnboardSteps"></ol>
+    </div>
+    <button class="accentBtn doneCtaBtn" data-next="toDashboard" id="doneCta">Перейти в профиль →</button>
   </div>
-  <button class="accentBtn nextBtn" data-next="toDashboard" id="doneCta">Перейти к профилю</button>
+
+  <!-- Employer welcome (shown via JS) -->
+  <div class="doneView hidden" id="doneViewEmployer">
+    <div class="doneIconBig doneIconEmployer">🏢</div>
+    <div class="doneTitle">Добро пожаловать в LOMO!</div>
+    <div class="doneSub">Как работает верификация кандидатов</div>
+    <div class="doneStepsCards">
+      <div class="doneStepCard">
+        <div class="doneStepIcon">📄</div>
+        <div class="doneStepH">Кандидат загружает документы</div>
+        <div class="doneStepP">Диплом, трудовая книжка, сертификаты — в цифровом формате</div>
+      </div>
+      <div class="doneStepCard">
+        <div class="doneStepIcon">✅</div>
+        <div class="doneStepH">Модератор LOMO проверяет</div>
+        <div class="doneStepP">Сверяем с реестрами, ставим отметку LOMO 1 / 2 / 3</div>
+      </div>
+      <div class="doneStepCard">
+        <div class="doneStepIcon">🔍</div>
+        <div class="doneStepH">Вы видите только проверенных</div>
+        <div class="doneStepP">Никаких фейков — только реальные данные</div>
+      </div>
+    </div>
+    <button class="accentBtn doneCtaBtn" data-next="toDashboard" id="doneCtaEmployer">Найти кандидатов →</button>
+  </div>
+
 </div>
 </div>
 </section>
@@ -1893,6 +1980,7 @@
 <script src="./scripts/admin-ui-bindings.js"></script>
 <script src="./scripts/info-screens.js"></script>
 <script src="./scripts/ai-matching.js"></script>
+<script src="./scripts/feed-extra.js"></script>
 
 
 </body>
