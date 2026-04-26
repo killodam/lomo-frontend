@@ -983,6 +983,7 @@ function getPasswordPolicyError(password) {
         }
 
         if(route === 'toEmployerProfile'){
+          if (typeof resetDisplay === 'function') resetDisplay();
           hydrateEmployerForm();
           show('myEmployerProfile');
           setTimeout(() => {
@@ -994,6 +995,7 @@ function getPasswordPolicyError(password) {
         }
 
         if(route === 'toEmployeeProfile'){
+          if (typeof resetDisplay === 'function') resetDisplay();
           hydrateEmployeeForm();
           show('myEmployeeProfile');
           setTimeout(() => {

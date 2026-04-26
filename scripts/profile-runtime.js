@@ -337,6 +337,7 @@ async function downloadRecruiterCV() {
 }
 
 function hydrateEmployerForm() {
+  resetProfileTabs('screenMyEmployerProfile');
   const p = state.employer;
   setVal('mpEFullName', p.fullName);
   setVal('mpETitle', p.title);
@@ -372,6 +373,7 @@ function hydrateEmployerForm() {
 }
 
 function hydrateEmployeeForm() {
+  resetProfileTabs('screenMyEmployeeProfile');
   const p = state.employee;
   setVal('mpCFullName', p.fullName);
   setVal('mpCCity', p.city);
@@ -897,3 +899,35 @@ function debouncedFilterFeed() { _debouncedFilterFeed(); }
 function debouncedFilterEmployerSearch() { _debouncedFilterEmployerSearch(); }
 function debouncedFilterAdminCandidates() { _debouncedFilterAdminCandidates(); }
 function debouncedFilterAdminEmployers() { _debouncedFilterAdminEmployers(); }
+
+// ── Profile edit tabs ─────────────────────────────────────────────────────
+function initProfileTabs(screenId) {
+  var screen = document.getElementById(screenId);
+  if (!screen) return;
+  screen.addEventListener('click', function(e) {
+    var tab = e.target && e.target.closest ? e.target.closest('.profileTab') : null;
+    if (!tab || !screen.contains(tab)) return;
+    var targetId = tab.getAttribute('data-tab');
+    var allTabs = screen.querySelectorAll('.profileTab');
+    var allPanes = screen.querySelectorAll('.profileTabPane');
+    for (var i = 0; i < allTabs.length; i++) allTabs[i].classList.remove('active');
+    for (var i = 0; i < allPanes.length; i++) allPanes[i].hidden = true;
+    tab.classList.add('active');
+    var pane = document.getElementById(targetId);
+    if (pane) pane.hidden = false;
+    var bar = screen.querySelector('.profileEditStickyBar');
+    if (bar) bar.scrollIntoView({ block: 'nearest' });
+  });
+}
+
+function resetProfileTabs(screenId) {
+  var screen = document.getElementById(screenId);
+  if (!screen) return;
+  var allTabs = screen.querySelectorAll('.profileTab');
+  var allPanes = screen.querySelectorAll('.profileTabPane');
+  for (var i = 0; i < allTabs.length; i++) allTabs[i].classList.toggle('active', i === 0);
+  for (var i = 0; i < allPanes.length; i++) allPanes[i].hidden = i !== 0;
+}
+
+initProfileTabs('screenMyEmployeeProfile');
+initProfileTabs('screenMyEmployerProfile');

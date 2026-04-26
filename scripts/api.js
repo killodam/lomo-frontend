@@ -443,6 +443,20 @@ function applyProfileToState(user, profile, achievements) {
     });
   }
 
+  // Always reset proofs before applying — prevents cross-user data leakage when
+  // a new user authenticates without a full logout clearing the previous state.
+  if (user.role === 'employer') {
+    state.employer.proofs = { companyDoc: emptyProof() };
+  } else {
+    state.employee.proofs = {
+      education: emptyProof(),
+      work: emptyProof(),
+      courses: emptyProof(),
+      passport: emptyProof(),
+      cv: emptyProof(),
+    };
+  }
+
   if (achievements && achievements.length) {
     const target = user.role === 'employer' ? state.employer : state.employee;
     achievements.forEach((achievement) => {

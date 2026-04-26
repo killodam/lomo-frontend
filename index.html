@@ -561,83 +561,94 @@
       <span class="profileHeaderTitle">Профиль компании</span>
     </div>
   </header>
+  <div class="profileEditStickyBar">
+    <div class="profileEditTabBtns">
+      <button class="profileTab active" data-tab="tabECompany">Компания</button>
+      <button class="profileTab" data-tab="tabEContacts">Контакты</button>
+      <button class="profileTab" data-tab="tabEDocs">Документы</button>
+    </div>
+    <div class="profileEditStickyActions">
+      <button type="button" class="accentBtn pillCTA" data-next="saveEmployerProfile">Сохранить</button>
+      <button type="button" class="sqBtn sm ghostBtn" data-back="toRecruiterPublic">Назад</button>
+    </div>
+  </div>
   <div class="profileEditBody">
-    <div class="profileEditSection">
-      <div class="profileSectionHead">Логотип компании</div>
-      <div class="profileEditAvatar">
-        <div class="avatarCircle lg"><img id="mpEAvatarImg" class="avatarImg hidden" alt="avatar"/></div>
-        <div class="avatarEdit">
-          <div class="avatarEditActions">
-            <label class="pillBtn soft">Загрузить логотип<input id="mpEAvatar" class="fileHidden" type="file" accept="image/*"/></label>
-            <button type="button" class="pillBtn" id="btnRemoveEAvatar">Удалить</button>
+    <div id="tabECompany" class="profileTabPane">
+      <div class="profileEditSection">
+        <div class="profileSectionHead">Логотип компании</div>
+        <div class="profileEditAvatar">
+          <div class="avatarCircle lg"><img id="mpEAvatarImg" class="avatarImg hidden" alt="avatar"/></div>
+          <div class="avatarEdit">
+            <div class="avatarEditActions">
+              <label class="pillBtn soft">Загрузить логотип<input id="mpEAvatar" class="fileHidden" type="file" accept="image/*"/></label>
+              <button type="button" class="pillBtn" id="btnRemoveEAvatar">Удалить</button>
+            </div>
+            <div class="miniHint" id="mpEAvatarHint">Логотип не выбран</div>
           </div>
-          <div class="miniHint" id="mpEAvatarHint">Логотип не выбран</div>
+        </div>
+      </div>
+      <div class="profileEditSection">
+        <div class="profileSectionHead">О компании</div>
+        <div class="formCol">
+          <div class="sqInput"><input id="mpECompany" type="text" placeholder="Название компании" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpEFoundedYear" type="text" placeholder="Год основания (например: 2018)" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpELocation" type="text" placeholder="Локация (например: Москва, удалёнка)" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpEIndustry" type="text" placeholder="Сфера (например: B2B SaaS, финтех)" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpEWebsite" type="text" placeholder="Сайт компании (company.ru)" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpEProducts" type="text" placeholder="Продукты / чем занимаемся" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpEAbout" type="text" placeholder="О компании — 2–3 предложения" autocomplete="off"></div>
+        </div>
+      </div>
+      <div class="profileEditSection">
+        <div class="profileSectionHead">Направления и поиск</div>
+        <div class="formCol">
+          <div class="sqInput"><input id="mpEProjects" type="text" placeholder="Актуальные направления через «;» (ML-платформа; Аналитика)" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpENeeded" type="text" placeholder="Кого ищем через «,» (Backend, Data Analyst, PM)" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpESalaryOffer" type="text" placeholder="Зарплатная вилка (80 000 — 150 000 ₽)" autocomplete="off"></div>
         </div>
       </div>
     </div>
-    <div class="profileEditSection">
-      <div class="profileSectionHead">Контактное лицо (HR)</div>
-      <div class="formCol">
-        <div class="sqInput"><input id="mpEFullName" type="text" placeholder="ФИО рекрутера / HR" autocomplete="off"></div>
-        <div class="sqInput"><input id="mpETitle" type="text" placeholder="Должность (HR Manager / Recruiter)" autocomplete="off"></div>
-        <div class="sqInput"><input id="mpEEmail" type="email" placeholder="Рабочая почта" autocomplete="off"></div>
-        <div class="sqInput"><input id="mpECorpEmail" type="email" placeholder="Корпоративная почта компании" autocomplete="off"></div>
-        <div class="corpVerifyRow" id="corpVerifyRow">
-          <span class="statusTag" id="corpEmailVerifiedStatus">не подтверждена</span>
-          <button type="button" class="pillBtn soft" id="btnSendCorpVerify">Подтвердить почту</button>
-        </div>
-        <div class="sqInput"><input id="mpEPhone" type="tel" placeholder="Телефон (+7 900 000-00-00)" autocomplete="off"></div>
-        <div class="sqInput"><input id="mpETelegram" type="text" placeholder="Telegram (@username)" autocomplete="off"></div>
-      </div>
-    </div>
-    <div class="profileEditSection">
-      <div class="profileSectionHead">О компании</div>
-      <div class="formCol">
-        <div class="sqInput"><input id="mpECompany" type="text" placeholder="Название компании" autocomplete="off"></div>
-        <div class="sqInput"><input id="mpEFoundedYear" type="text" placeholder="Год основания (например: 2018)" autocomplete="off"></div>
-        <div class="sqInput"><input id="mpELocation" type="text" placeholder="Локация (например: Москва, удалёнка)" autocomplete="off"></div>
-        <div class="sqInput"><input id="mpEIndustry" type="text" placeholder="Сфера (например: B2B SaaS, финтех)" autocomplete="off"></div>
-        <div class="sqInput"><input id="mpEWebsite" type="text" placeholder="Сайт компании (company.ru)" autocomplete="off"></div>
-        <div class="sqInput"><input id="mpEProducts" type="text" placeholder="Продукты / чем занимаемся" autocomplete="off"></div>
-        <div class="sqInput"><input id="mpEAbout" type="text" placeholder="О компании — 2–3 предложения" autocomplete="off"></div>
-      </div>
-    </div>
-    <div class="profileEditSection">
-      <div class="profileSectionHead">Направления и поиск</div>
-      <div class="formCol">
-        <div class="sqInput"><input id="mpEProjects" type="text" placeholder="Актуальные направления через «;» (ML-платформа; Аналитика)" autocomplete="off"></div>
-        <div class="sqInput"><input id="mpENeeded" type="text" placeholder="Кого ищем через «,» (Backend, Data Analyst, PM)" autocomplete="off"></div>
-        <div class="sqInput"><input id="mpESalaryOffer" type="text" placeholder="Зарплатная вилка (80 000 — 150 000 ₽)" autocomplete="off"></div>
-      </div>
-    </div>
-    <div class="profileEditSection">
-      <div class="profileSectionHead">Верификация компании</div>
-      <div class="verifyGrid verifyGridSingleColumn">
-        <div class="miniCard">
-          <div class="miniTop">
-            <div class="miniLabel">Документы компании / ИНН</div>
-            <span class="statusTag" id="companyDocStatusE">не загружено</span>
-            <button type="button" class="miniLink" data-del="employer:companyDoc">Удалить</button>
+    <div id="tabEContacts" class="profileTabPane" hidden>
+      <div class="profileEditSection">
+        <div class="profileSectionHead">Контактное лицо (HR)</div>
+        <div class="formCol">
+          <div class="sqInput"><input id="mpEFullName" type="text" placeholder="ФИО рекрутера / HR" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpETitle" type="text" placeholder="Должность (HR Manager / Recruiter)" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpEEmail" type="email" placeholder="Рабочая почта" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpECorpEmail" type="email" placeholder="Корпоративная почта компании" autocomplete="off"></div>
+          <div class="corpVerifyRow" id="corpVerifyRow">
+            <span class="statusTag" id="corpEmailVerifiedStatus">не подтверждена</span>
+            <button type="button" class="pillBtn soft" id="btnSendCorpVerify">Подтвердить почту</button>
           </div>
-          <div class="dropZone" id="dropZoneCompanyDocE">Нажмите или перетащите файл</div>
-          <input class="fileInput" id="fileCompanyDocE" type="file" accept=".pdf,.doc,.docx,image/*"/>
-          <div class="miniHint" id="companyDocHintE">Файл не выбран</div>
+          <div class="sqInput"><input id="mpEPhone" type="tel" placeholder="Телефон (+7 900 000-00-00)" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpETelegram" type="text" placeholder="Telegram (@username)" autocomplete="off"></div>
         </div>
       </div>
     </div>
-    <div class="profileEditSection">
-      <div class="actionsRow">
-        <button type="button" class="accentBtn pillCTA" data-next="saveEmployerProfile">Сохранить профиль</button>
-        <button type="button" class="sqBtn sm ghostBtn" data-back="toRecruiterPublic">Вернуться</button>
+    <div id="tabEDocs" class="profileTabPane" hidden>
+      <div class="profileEditSection">
+        <div class="profileSectionHead">Верификация компании</div>
+        <div class="verifyGrid verifyGridSingleColumn">
+          <div class="miniCard">
+            <div class="miniTop">
+              <div class="miniLabel">Документы компании / ИНН</div>
+              <span class="statusTag" id="companyDocStatusE">не загружено</span>
+              <button type="button" class="miniLink" data-del="employer:companyDoc">Удалить</button>
+            </div>
+            <div class="dropZone" id="dropZoneCompanyDocE">Нажмите или перетащите файл</div>
+            <input class="fileInput" id="fileCompanyDocE" type="file" accept=".pdf,.doc,.docx,image/*"/>
+            <div class="miniHint" id="companyDocHintE">Файл не выбран</div>
+          </div>
+        </div>
       </div>
-    </div>
-    <div class="profileEditSection">
-      <div class="profileSectionHead">Аккаунт</div>
-      <div class="dangerZoneCard">
-        <div class="dangerZoneText">Удаление аккаунта необратимо. Будут удалены профиль, документы, запросы доступа и активные сессии.</div>
-        <div class="dangerZoneRow">
-          <div class="sqInput"><input id="deleteAccountPasswordE" type="password" placeholder="Введите пароль для подтверждения" autocomplete="current-password"></div>
-          <button type="button" class="pillBtn dangerPill" data-next="deleteOwnAccount">Удалить аккаунт</button>
+      <div class="profileEditSection">
+        <div class="profileSectionHead">Аккаунт</div>
+        <div class="dangerZoneCard">
+          <div class="dangerZoneText">Удаление аккаунта необратимо. Будут удалены профиль, документы, запросы доступа и активные сессии.</div>
+          <div class="dangerZoneRow">
+            <div class="sqInput"><input id="deleteAccountPasswordE" type="password" placeholder="Введите пароль для подтверждения" autocomplete="current-password"></div>
+            <button type="button" class="pillBtn dangerPill" data-next="deleteOwnAccount">Удалить аккаунт</button>
+          </div>
         </div>
       </div>
     </div>
@@ -652,141 +663,155 @@
       <span class="profileHeaderTitle">Личный профиль</span>
     </div>
   </header>
+  <div class="profileEditStickyBar">
+    <div class="profileEditTabBtns">
+      <button class="profileTab active" data-tab="tabCMain">Основное</button>
+      <button class="profileTab" data-tab="tabCExp">Опыт</button>
+      <button class="profileTab" data-tab="tabCDocs">Документы</button>
+      <button class="profileTab" data-tab="tabCPriv">Приватность</button>
+    </div>
+    <div class="profileEditStickyActions">
+      <button type="button" class="accentBtn pillCTA" data-next="saveEmployeeProfile">Сохранить</button>
+      <button type="button" class="sqBtn sm ghostBtn" data-back="toEmployeePublic">Назад</button>
+    </div>
+  </div>
   <div class="profileEditBody">
-    <div class="profileEditSection">
-      <div class="profileSectionHead">Фото профиля</div>
-      <div class="profileEditAvatar">
-        <div class="avatarCircle lg"><img id="mpCAvatarImg" class="avatarImg hidden" alt="avatar"/></div>
-        <div class="avatarEdit">
-          <div class="avatarEditActions">
-            <label class="pillBtn soft">Загрузить фото<input id="mpCAvatar" class="fileHidden" type="file" accept="image/*"/></label>
-            <button type="button" class="pillBtn" id="btnRemoveCAvatar">Удалить фото</button>
+    <div id="tabCMain" class="profileTabPane">
+      <div class="profileEditSection">
+        <div class="profileSectionHead">Фото профиля</div>
+        <div class="profileEditAvatar">
+          <div class="avatarCircle lg"><img id="mpCAvatarImg" class="avatarImg hidden" alt="avatar"/></div>
+          <div class="avatarEdit">
+            <div class="avatarEditActions">
+              <label class="pillBtn soft">Загрузить фото<input id="mpCAvatar" class="fileHidden" type="file" accept="image/*"/></label>
+              <button type="button" class="pillBtn" id="btnRemoveCAvatar">Удалить фото</button>
+            </div>
+            <div class="miniHint" id="mpCAvatarHint">Фото не выбрано</div>
           </div>
-          <div class="miniHint" id="mpCAvatarHint">Фото не выбрано</div>
         </div>
       </div>
-    </div>
-    <div class="profileEditSection">
-      <div class="profileSectionHead">Личные данные</div>
-      <div class="formCol">
-        <div class="sqInput"><input id="mpCFullName" type="text" placeholder="Имя и фамилия" autocomplete="off"></div>
-        <div class="sqInput"><input id="mpCCity" type="text" placeholder="Город (например: Москва)" autocomplete="off"></div>
-        <div class="sqInput"><input id="mpCPhone" type="tel" placeholder="Телефон (+7 900 000-00-00)" autocomplete="off"></div>
-        <div class="sqInput"><input id="mpCEmail" type="email" placeholder="Почта" autocomplete="off"></div>
-        <div class="sqInput"><input id="mpCTelegram" type="text" placeholder="Telegram (@username)" autocomplete="off"></div>
-        <div class="sqInput"><input id="mpCAbout" type="text" placeholder="О себе — кратко (2–3 предложения)" autocomplete="off"></div>
-      </div>
-    </div>
-    <div class="profileEditSection">
-      <div class="profileSectionHead">Образование</div>
-      <div class="formCol">
-        <div class="sqInput uniWrap">
-          <input id="mpCEduPlace" type="text" placeholder="Место обучения — начните вводить" autocomplete="off">
-          <div class="uniDropdown" id="uniDropdown"></div>
-        </div>
-        <div class="sqInput"><input id="mpCEduYear" type="text" placeholder="Год окончания (2026)" autocomplete="off"></div>
-        <div class="sqInput"><input id="mpCVacancies" type="text" placeholder="Какие вакансии ищу (Data Analyst, Product)" autocomplete="off"></div>
-        <div class="sqInput"><input id="mpCSalary" type="text" placeholder="Зарплатные ожидания (от 120 000 ₽)" autocomplete="off"></div>
-      </div>
-      <label class="lookingToggleRow" id="lookingToggleRowC">
-        <span class="lookingToggleText">
-          <span class="lookingToggleTitle">🟢 Активно ищу работу</span>
-          <span class="lookingToggleSub">Покажет зелёный статус компаниям в поиске</span>
-        </span>
-        <span class="lookingToggleControl">
-          <input type="checkbox" id="mpCLookingForWork" class="lookingToggleInput">
-          <span class="lookingToggleTrack"><span class="lookingToggleThumb"></span></span>
-        </span>
-      </label>
-    </div>
-    <div class="profileEditSection">
-      <div class="profileSectionHead">Текущее место работы</div>
-      <div class="formCol">
-        <div class="sqInput uniWrap">
-          <input id="mpCCurrentJob" type="text" placeholder="Компания — начните вводить или «Не работаю»" autocomplete="off">
-          <div class="uniDropdown" id="jobDropdown"></div>
-        </div>
-        <div class="sqInput"><input id="mpCJobTitle" type="text" placeholder="Должность (например: Product Manager)" autocomplete="off"></div>
-        <div class="sqInput"><input id="mpCCorpEmail" type="email" placeholder="Корпоративная почта для подтверждения места работы" autocomplete="off"></div>
-        <div class="corpVerifyRow" id="corpVerifyRowC">
-          <span class="statusTag" id="corpEmailVerifiedStatusC">не подтверждена</span>
-          <button type="button" class="pillBtn soft" id="btnSendCorpVerifyC">Подтвердить место работы</button>
+      <div class="profileEditSection">
+        <div class="profileSectionHead">Личные данные</div>
+        <div class="formCol">
+          <div class="sqInput"><input id="mpCFullName" type="text" placeholder="Имя и фамилия" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpCCity" type="text" placeholder="Город (например: Москва)" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpCPhone" type="tel" placeholder="Телефон (+7 900 000-00-00)" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpCEmail" type="email" placeholder="Почта" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpCTelegram" type="text" placeholder="Telegram (@username)" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpCAbout" type="text" placeholder="О себе — кратко (2–3 предложения)" autocomplete="off"></div>
         </div>
       </div>
-    </div>
-    <div class="profileEditSection">
-      <div class="profileSectionHead">Опыт работы</div>
-      <div class="formCol" id="workExpList"></div>
-      <button type="button" class="addExpBtn" id="addWorkExpBtn">+ Добавить место работы</button>
-    </div>
-    <div class="profileEditSection">
-      <div class="profileSectionHead">Портфолио (файлы / фото)</div>
-      <div class="miniCard">
-        <div class="miniTop">
-          <div class="miniLabel">Загрузить файлы</div>
-          <span class="statusTag ghost" id="portStatusC">не загружено</span>
-          <button type="button" class="miniLink" data-del="employee:portfolio">Удалить</button>
+      <div class="profileEditSection">
+        <div class="profileSectionHead">Образование и поиск</div>
+        <div class="formCol">
+          <div class="sqInput uniWrap">
+            <input id="mpCEduPlace" type="text" placeholder="Место обучения — начните вводить" autocomplete="off">
+            <div class="uniDropdown" id="uniDropdown"></div>
+          </div>
+          <div class="sqInput"><input id="mpCEduYear" type="text" placeholder="Год окончания (2026)" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpCVacancies" type="text" placeholder="Какие вакансии ищу (Data Analyst, Product)" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpCSalary" type="text" placeholder="Зарплатные ожидания (от 120 000 ₽)" autocomplete="off"></div>
         </div>
-        <div class="dropZone" id="dropZonePortfolio">Нажмите или перетащите файлы</div>
-        <input class="fileInput" id="filePortfolioC" type="file" multiple accept="image/*,.pdf,.doc,.docx"/>
-        <div class="miniHint" id="portHintC">Файлы не выбраны</div>
+        <label class="lookingToggleRow" id="lookingToggleRowC">
+          <span class="lookingToggleText">
+            <span class="lookingToggleTitle">🟢 Активно ищу работу</span>
+            <span class="lookingToggleSub">Покажет зелёный статус компаниям в поиске</span>
+          </span>
+          <span class="lookingToggleControl">
+            <input type="checkbox" id="mpCLookingForWork" class="lookingToggleInput">
+            <span class="lookingToggleTrack"><span class="lookingToggleThumb"></span></span>
+          </span>
+        </label>
       </div>
     </div>
-    <div class="profileEditSection">
-      <div class="profileSectionHead">Подтверждения</div>
-      <div class="verifyGrid">
+    <div id="tabCExp" class="profileTabPane" hidden>
+      <div class="profileEditSection">
+        <div class="profileSectionHead">Текущее место работы</div>
+        <div class="formCol">
+          <div class="sqInput uniWrap">
+            <input id="mpCCurrentJob" type="text" placeholder="Компания — начните вводить или «Не работаю»" autocomplete="off">
+            <div class="uniDropdown" id="jobDropdown"></div>
+          </div>
+          <div class="sqInput"><input id="mpCJobTitle" type="text" placeholder="Должность (например: Product Manager)" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpCCorpEmail" type="email" placeholder="Корпоративная почта для подтверждения места работы" autocomplete="off"></div>
+          <div class="corpVerifyRow" id="corpVerifyRowC">
+            <span class="statusTag" id="corpEmailVerifiedStatusC">не подтверждена</span>
+            <button type="button" class="pillBtn soft" id="btnSendCorpVerifyC">Подтвердить место работы</button>
+          </div>
+        </div>
+      </div>
+      <div class="profileEditSection">
+        <div class="profileSectionHead">Опыт работы</div>
+        <div class="formCol" id="workExpList"></div>
+        <button type="button" class="addExpBtn" id="addWorkExpBtn">+ Добавить место работы</button>
+      </div>
+      <div class="profileEditSection">
+        <div class="profileSectionHead">Портфолио (файлы / фото)</div>
         <div class="miniCard">
-          <div class="miniTop"><div class="miniLabel">Образование</div><span class="statusTag" id="eduStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:education">Удалить</button></div>
-          <div class="dropZone" id="dropZoneEduC">Нажмите или перетащите файл</div>
-          <input class="fileInput" id="fileEduC" type="file" accept=".pdf,.doc,.docx,image/*"/>
-          <div class="miniHint" id="eduHintC">Файл не выбран</div>
-        </div>
-        <div class="miniCard">
-          <div class="miniTop"><div class="miniLabel">Опыт работы</div><span class="statusTag" id="workStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:work">Удалить</button></div>
-          <div class="dropZone" id="dropZoneWorkC">Нажмите или перетащите файл</div>
-          <input class="fileInput" id="fileWorkC" type="file" accept=".pdf,.doc,.docx,image/*"/>
-          <div class="miniHint" id="workHintC">Файл не выбран</div>
-        </div>
-        <div class="miniCard">
-          <div class="miniTop"><div class="miniLabel">Курсы / сертификаты</div><span class="statusTag" id="courseStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:courses">Удалить</button></div>
-          <div class="dropZone" id="dropZoneCourseC">Нажмите или перетащите файл</div>
-          <input class="fileInput" id="fileCourseC" type="file" accept=".pdf,.doc,.docx,image/*"/>
-          <div class="miniHint" id="courseHintC">Файл не выбран</div>
-        </div>
-        <div class="miniCard">
-          <div class="miniTop"><div class="miniLabel">Паспорт (разворот)</div><span class="statusTag" id="passStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:passport">Удалить</button></div>
-          <div class="dropZone" id="dropZonePassC">Нажмите или перетащите файл</div>
-          <input class="fileInput" id="filePassC" type="file" accept=".pdf,.doc,.docx,image/*"/>
-          <div class="miniHint" id="passHintC">Файл не выбран</div>
-        </div>
-        <div class="miniCard">
-          <div class="miniTop"><div class="miniLabel">Резюме / CV (публично)</div><span class="statusTag" id="cvStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:cv">Удалить</button></div>
-          <div class="dropZone" id="dropZoneCVC">Нажмите или перетащите файл</div>
-          <input class="fileInput" id="fileCVC" type="file" accept=".pdf,.doc,.docx,image/*"/>
-          <div class="miniHint" id="cvHintC">Файл не выбран</div>
+          <div class="miniTop">
+            <div class="miniLabel">Загрузить файлы</div>
+            <span class="statusTag ghost" id="portStatusC">не загружено</span>
+            <button type="button" class="miniLink" data-del="employee:portfolio">Удалить</button>
+          </div>
+          <div class="dropZone" id="dropZonePortfolio">Нажмите или перетащите файлы</div>
+          <input class="fileInput" id="filePortfolioC" type="file" multiple accept="image/*,.pdf,.doc,.docx"/>
+          <div class="miniHint" id="portHintC">Файлы не выбраны</div>
         </div>
       </div>
     </div>
-    <div class="profileEditSection">
-      <div class="profileSectionHead">Приватность</div>
-      <label class="privacyToggle" id="cvPrivacyToggle">
-        <input type="checkbox" id="cvPublicToggle"/>
-        <span id="cvPrivacyLabel">CV скрыто (по умолчанию)</span>
-      </label>
-    </div>
-    <div class="profileEditSection">
-      <div class="actionsRow">
-        <button type="button" class="accentBtn pillCTA" data-next="saveEmployeeProfile">Сохранить профиль</button>
-        <button type="button" class="sqBtn sm ghostBtn" data-back="toEmployeePublic">Вернуться</button>
+    <div id="tabCDocs" class="profileTabPane" hidden>
+      <div class="profileEditSection">
+        <div class="profileSectionHead">Подтверждения</div>
+        <div class="verifyGrid">
+          <div class="miniCard">
+            <div class="miniTop"><div class="miniLabel">Образование</div><span class="statusTag" id="eduStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:education">Удалить</button></div>
+            <div class="dropZone" id="dropZoneEduC">Нажмите или перетащите файл</div>
+            <input class="fileInput" id="fileEduC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+            <div class="miniHint" id="eduHintC">Файл не выбран</div>
+          </div>
+          <div class="miniCard">
+            <div class="miniTop"><div class="miniLabel">Опыт работы</div><span class="statusTag" id="workStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:work">Удалить</button></div>
+            <div class="dropZone" id="dropZoneWorkC">Нажмите или перетащите файл</div>
+            <input class="fileInput" id="fileWorkC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+            <div class="miniHint" id="workHintC">Файл не выбран</div>
+          </div>
+          <div class="miniCard">
+            <div class="miniTop"><div class="miniLabel">Курсы / сертификаты</div><span class="statusTag" id="courseStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:courses">Удалить</button></div>
+            <div class="dropZone" id="dropZoneCourseC">Нажмите или перетащите файл</div>
+            <input class="fileInput" id="fileCourseC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+            <div class="miniHint" id="courseHintC">Файл не выбран</div>
+          </div>
+          <div class="miniCard">
+            <div class="miniTop"><div class="miniLabel">Паспорт (разворот)</div><span class="statusTag" id="passStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:passport">Удалить</button></div>
+            <div class="dropZone" id="dropZonePassC">Нажмите или перетащите файл</div>
+            <input class="fileInput" id="filePassC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+            <div class="miniHint" id="passHintC">Файл не выбран</div>
+          </div>
+          <div class="miniCard">
+            <div class="miniTop"><div class="miniLabel">Резюме / CV (публично)</div><span class="statusTag" id="cvStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:cv">Удалить</button></div>
+            <div class="dropZone" id="dropZoneCVC">Нажмите или перетащите файл</div>
+            <input class="fileInput" id="fileCVC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+            <div class="miniHint" id="cvHintC">Файл не выбран</div>
+          </div>
+        </div>
       </div>
     </div>
-    <div class="profileEditSection">
-      <div class="profileSectionHead">Аккаунт</div>
-      <div class="dangerZoneCard">
-        <div class="dangerZoneText">Удаление аккаунта необратимо. Будут удалены профиль, документы, запросы доступа и активные сессии.</div>
-        <div class="dangerZoneRow">
-          <div class="sqInput"><input id="deleteAccountPasswordC" type="password" placeholder="Введите пароль для подтверждения" autocomplete="current-password"></div>
-          <button type="button" class="pillBtn dangerPill" data-next="deleteOwnAccount">Удалить аккаунт</button>
+    <div id="tabCPriv" class="profileTabPane" hidden>
+      <div class="profileEditSection">
+        <div class="profileSectionHead">Приватность</div>
+        <label class="privacyToggle" id="cvPrivacyToggle">
+          <input type="checkbox" id="cvPublicToggle"/>
+          <span id="cvPrivacyLabel">CV скрыто (по умолчанию)</span>
+        </label>
+      </div>
+      <div class="profileEditSection">
+        <div class="profileSectionHead">Аккаунт</div>
+        <div class="dangerZoneCard">
+          <div class="dangerZoneText">Удаление аккаунта необратимо. Будут удалены профиль, документы, запросы доступа и активные сессии.</div>
+          <div class="dangerZoneRow">
+            <div class="sqInput"><input id="deleteAccountPasswordC" type="password" placeholder="Введите пароль для подтверждения" autocomplete="current-password"></div>
+            <button type="button" class="pillBtn dangerPill" data-next="deleteOwnAccount">Удалить аккаунт</button>
+          </div>
         </div>
       </div>
     </div>

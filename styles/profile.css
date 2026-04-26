@@ -125,11 +125,69 @@
     .profileSection.cond{ display: none; }
     .profileSection.cond:has(.profileSectionHead:not(.hidden)){ display: flex; }
 
+    /* ── Profile edit sticky bar (tabs + actions) ── */
+    .profileEditStickyBar{
+      position: sticky;
+      top: 58px;
+      z-index: 99;
+      background: rgba(248,249,249,.97);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-bottom: 1px solid rgba(38,110,120,.10);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 8px 20px;
+      flex-shrink: 0;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .profileEditTabBtns{
+      display: flex;
+      gap: 4px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+    .profileEditTabBtns::-webkit-scrollbar{ display: none; }
+    .profileTab{
+      padding: 6px 14px;
+      border-radius: 20px;
+      border: 1.5px solid rgba(38,110,120,.22);
+      background: #fff;
+      font-size: 12px;
+      font-weight: 600;
+      color: rgba(0,0,0,.50);
+      cursor: pointer;
+      white-space: nowrap;
+      transition: background 150ms, color 150ms, border-color 150ms;
+    }
+    .profileTab.active{
+      background: #2a7a8a;
+      color: #fff;
+      border-color: #2a7a8a;
+    }
+    .profileEditStickyActions{
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-shrink: 0;
+    }
+    /* Tab panes */
+    .profileTabPane{
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .profileTabPane[hidden]{ display: none !important; }
+
     /* ── Edit profile page body ──────────────────── */
     .profileEditBody{
       width: min(860px, 92vw);
       margin: 0 auto;
-      padding: 20px 0 88px;
+      padding: 16px 0 60px;
       display: flex;
       flex-direction: column;
       gap: 14px;
@@ -462,6 +520,10 @@
       .profileSection,
       .profileEditSection{ border-radius: 16px; }
       .profileHeaderInner{ padding: 0 14px; }
+      .profileEditStickyBar{ flex-wrap: wrap; row-gap: 6px; padding: 8px 14px; }
+      .profileEditStickyActions{ order: 0; width: 100%; justify-content: flex-end; }
+      .profileEditTabBtns{ order: 1; flex: 1 0 100%; }
+      .profileTab{ font-size: 11px; padding: 5px 10px; }
     }
     @media (max-width: 540px){
       .profileEditAvatar{ flex-direction: column; align-items: flex-start; }
