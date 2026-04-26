@@ -597,12 +597,16 @@
 
     #screenRegForm .wrap{
       gap: 14px;
-      padding-bottom: 110px;
+      padding-bottom: 0;
       padding-top: 64px;
       justify-content: flex-start;
     }
     #screenRegForm .centerBlock{
       gap: 14px;
+    }
+    #screenRegForm .footerArea{
+      position: static;
+      padding: 8px 0 40px;
     }
 
     #screenLoginForm .backBtn,
