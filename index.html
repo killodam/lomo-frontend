@@ -1393,10 +1393,11 @@
           </select>
         </div>
         <div class="sqInput"><input id="jobInputCity" type="text" placeholder="Город (необязательно)" autocomplete="off"></div>
+        <div class="jobSalaryLabel">Зарплата (₽/мес)</div>
         <div class="jobSalaryRow">
-          <div class="sqInput salaryInput"><input id="jobInputSalaryFrom" type="number" placeholder="Зарплата от" min="0" max="9999999"></div>
+          <div class="sqInput salaryInput"><input id="jobInputSalaryFrom" type="number" placeholder="от" min="0" max="9999999" inputmode="numeric"></div>
           <span class="jobSalaryDash">—</span>
-          <div class="sqInput salaryInput"><input id="jobInputSalaryTo" type="number" placeholder="до (₽/мес)" min="0" max="9999999"></div>
+          <div class="sqInput salaryInput"><input id="jobInputSalaryTo" type="number" placeholder="до" min="0" max="9999999" inputmode="numeric"></div>
         </div>
       </div>
     </div>
@@ -1407,11 +1408,11 @@
     </div>
     <div class="profileEditSection">
       <div class="profileSectionHead">Описание</div>
-      <div class="sqInput"><textarea id="jobInputDescription" placeholder="Задачи, требования, условия — чем подробнее, тем лучше" rows="5" style="resize:vertical"></textarea></div>
+      <div class="sqInput"><textarea id="jobInputDescription" placeholder="Задачи, требования, условия — чем подробнее, тем лучше" rows="5"></textarea></div>
     </div>
     <div class="profileEditSection">
       <div class="jobFormActions">
-        <button type="button" class="accentBtn pillCTA" id="jobBtnPublish">Опубликовать</button>
+        <button type="button" class="accentBtn" id="jobBtnPublish">Опубликовать</button>
         <button type="button" class="sqBtn ghostBtn" id="jobBtnDraft">Сохранить черновик</button>
       </div>
     </div>
