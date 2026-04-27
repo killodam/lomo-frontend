@@ -291,7 +291,7 @@ function openJobForm(job) {
   setJobFormVal('jobInputDescription', job ? (job.description || '') : '');
 
   renderSkillTags();
-  if (typeof show === 'function') show('screenPostJob');
+  if (typeof show === 'function') show('postJob');
 }
 
 function setJobFormVal(id, val) {
@@ -350,7 +350,7 @@ function initJobForm() {
   if (saveBtn)   saveBtn.addEventListener('click', function() { submitJobForm('active'); });
   if (draftBtn)  draftBtn.addEventListener('click', function() { submitJobForm('draft'); });
   if (cancelBtn) cancelBtn.addEventListener('click', function() {
-    if (typeof show === 'function') show('screenMyJobs');
+    if (typeof show === 'function') show('myJobs');
   });
 }
 
@@ -400,13 +400,52 @@ function submitJobForm(statusVal) {
     .then(function(d) {
       if (d.id) {
         showToast(statusVal === 'active' ? 'Вакансия опубликована!' : 'Черновик сохранён', 'ok');
-        if (typeof show === 'function') show('screenMyJobs');
+        if (typeof show === 'function') show('myJobs');
         loadMyJobs();
       } else {
         showToast(d.error || 'Ошибка сохранения', 'error');
       }
     })
     .catch(function() { showToast('Ошибка сети', 'error'); });
+}
+
+// ── Recruiter public profile jobs ─────────────────────────────────────────────
+
+function loadRecruiterProfileJobs() {
+  var list = document.getElementById('rpJobsList');
+  if (!list) return;
+  list.innerHTML = '<div class="feedLoading">Загрузка...</div>';
+
+  var base = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
+  fetch(base + '/jobs/my', {
+    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('lomo_token') || '') }
+  })
+    .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
+    .then(function(jobs) {
+      var active = (jobs || []).filter(function(j) { return j.status === 'active'; });
+      var section = document.getElementById('rpJobsSection');
+      if (section) section.classList.toggle('hidden', active.length === 0);
+      if (!active.length) { list.innerHTML = ''; return; }
+      list.innerHTML = active.map(function(j) {
+        var sal = jobSalary(j.salary_from, j.salary_to);
+        return '<div class="myJobRow">'
+          + '<div class="myJobInfo">'
+            + '<div class="myJobTitle">' + jobEsc(j.title) + '</div>'
+            + '<div class="myJobMeta">'
+              + '<span>' + jobEsc(j.direction) + '</span> · '
+              + '<span>' + jobEsc(j.format) + '</span>'
+              + (sal ? ' · <span>' + sal + '</span>' : '')
+            + '</div>'
+          + '</div>'
+        + '</div>';
+      }).join('');
+    })
+    .catch(function() {
+      var list2 = document.getElementById('rpJobsList');
+      if (list2) list2.innerHTML = '';
+      var section = document.getElementById('rpJobsSection');
+      if (section) section.classList.add('hidden');
+    });
 }
 
 // ── Toast helper (fallback if not defined globally) ───────────────────────────
@@ -445,7 +484,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // navigate to My Jobs
     if (e.target.closest('[data-next="toMyJobs"]')) {
-      if (typeof show === 'function') show('screenMyJobs');
+      if (typeof show === 'function') show('myJobs');
       loadMyJobs();
     }
   });
@@ -461,8 +500,10 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   }
 
-  // Load my jobs when screen opens
-  document.addEventListener('lomo:screen', function(e) {
-    if (e.detail && e.detail.screen === 'screenMyJobs') loadMyJobs();
+  // Load screens when they become active
+  window.addEventListener('lomo:screen-change', function(e) {
+    if (!e.detail) return;
+    if (e.detail.current === 'myJobs') loadMyJobs();
+    if (e.detail.current === 'recruiterPublic') loadRecruiterProfileJobs();
   });
 });

@@ -1140,6 +1140,8 @@ function getPasswordPolicyError(password) {
           return;
         }
 
+        if(route === 'toMyJobs'){ show('myJobs'); if(typeof loadMyJobs === 'function') loadMyJobs(); return; }
+        if(route === 'toPostJob'){ if(typeof openJobForm === 'function') openJobForm(null); return; }
         if(route === 'toCandidateFeed')    { showEmployeeDashboard(); return; }
         if(route === 'toEmployerSearch')   { showEmployerDashboard(); return; }
         if(route === 'toEmployerDashboard'){ showEmployerDashboard(); return; }
@@ -1184,6 +1186,7 @@ function getPasswordPolicyError(password) {
           return;
         }
         if(where === 'toPrevFromDone'){ show(state.prevFromDone || 'landing'); return; }
+        if(where === 'toMyJobs'){ show('myJobs'); if(typeof loadMyJobs === 'function') loadMyJobs(); return; }
         if(where === 'toRecruiterPublic'){ renderRecruiterPublic(); show('recruiterPublic'); return; }
         if(where === 'toEmployeePublic'){ renderEmployeePublic(); show('employeePublic'); return; }
         if(where === 'toEmployerDashboard'){ showEmployerDashboard(); return; }

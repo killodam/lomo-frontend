@@ -24,6 +24,8 @@ const screens = {
   employerSearch: document.getElementById('screenEmployerSearch'),
   chat: document.getElementById('screenChat'),
   publicProfile: document.getElementById('screenPublicProfile'),
+  myJobs: document.getElementById('screenMyJobs'),
+  postJob: document.getElementById('screenPostJob'),
   // Info screens (burger menu)
   how: document.getElementById('screenHow'),
   security: document.getElementById('screenSecurity'),
