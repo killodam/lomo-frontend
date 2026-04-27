@@ -376,7 +376,7 @@ function hydrateEmployerForm() {
   setAvatar('mpEAvatarImg', p.avatarDataUrl);
   setText('mpEAvatarHint', p.avatarDataUrl ? 'Логотип выбран' : 'Логотип не выбран');
   setStatusTag('companyDocStatusE', p.proofs?.companyDoc?.status || 'не загружено');
-  setText('companyDocHintE', p.proofs?.companyDoc?.fileName ? ('Прикреплено: ' + p.proofs.companyDoc.fileName) : 'Файл не выбран');
+  setText('companyDocHintE', proofHintText(p.proofs?.companyDoc));
 
   // Corp email verification status
   const corpVerifyRow = document.getElementById('corpVerifyRow');
@@ -423,15 +423,15 @@ function hydrateEmployeeForm() {
   setAvatar('mpCAvatarImg', p.avatarDataUrl);
   setText('mpCAvatarHint', p.avatarDataUrl ? 'Фото выбрано' : 'Фото не выбрано');
   setStatusTag('cvStatusC', p.proofs?.cv?.status || 'не загружено');
-  setText('cvHintC', p.proofs?.cv?.fileName ? ('Прикреплено: ' + p.proofs.cv.fileName) : 'Файл не выбран');
+  setText('cvHintC', proofHintText(p.proofs?.cv));
   setStatusTag('eduStatusC', p.proofs?.education?.status || 'не загружено');
-  setText('eduHintC', p.proofs?.education?.fileName ? ('Прикреплено: ' + p.proofs.education.fileName) : 'Файл не выбран');
+  setText('eduHintC', proofHintText(p.proofs?.education));
   setStatusTag('workStatusC', p.proofs?.work?.status || 'не загружено');
-  setText('workHintC', p.proofs?.work?.fileName ? ('Прикреплено: ' + p.proofs.work.fileName) : 'Файл не выбран');
+  setText('workHintC', proofHintText(p.proofs?.work));
   setStatusTag('courseStatusC', p.proofs?.courses?.status || 'не загружено');
-  setText('courseHintC', p.proofs?.courses?.fileName ? ('Прикреплено: ' + p.proofs.courses.fileName) : 'Файл не выбран');
+  setText('courseHintC', proofHintText(p.proofs?.courses));
   setStatusTag('passStatusC', p.proofs?.passport?.status || 'не загружено');
-  setText('passHintC', p.proofs?.passport?.fileName ? ('Прикреплено: ' + p.proofs.passport.fileName) : 'Файл не выбран');
+  setText('passHintC', proofHintText(p.proofs?.passport));
   const has = p.portfolio && p.portfolio.length;
   setText('portHintC', has ? ('Прикреплено: ' + p.portfolio.length + ' файл(ов)') : 'Файлы не выбраны');
   setStatusTag('portStatusC', has ? 'на рассмотрении' : 'не загружено');
@@ -460,6 +460,11 @@ function setStatusTag(id, status) {
   else if (safeStatus.includes('рассмотр') || safeStatus.includes('провер')) el.classList.add('warn');
   else if (safeStatus.includes('отклон')) el.classList.add('bad');
   else el.classList.add('ghost');
+}
+
+function proofHintText(proof) {
+  if (!proof || !proof.fileName || proof.status === 'отклонено') return 'Файл не выбран';
+  return 'Прикреплено: ' + proof.fileName;
 }
 
 function isNativeCapacitorRuntime() {
@@ -748,9 +753,8 @@ function wireProofs() {
     bindNativeInputPicker(inp, inp._lomoHandleFiles);
 
     const proof = state[binding.role].proofs[binding.key];
-    const curName = proof && proof.fileName;
     const hintEl = document.getElementById(binding.hint);
-    if (hintEl) hintEl.textContent = curName ? ('Прикреплено: ' + curName) : 'Файл не выбран';
+    if (hintEl) hintEl.textContent = proofHintText(proof);
     if (proof) setStatusTag(binding.status, proof.status);
   });
 }

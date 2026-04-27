@@ -232,8 +232,9 @@
       if(!el) return;
       el.innerHTML = '<div class="pubProfileFilesState">Загрузка...</div>';
       apiFetch('/admin/users/'+userId+'/files').then(function(files){
-        if(!files||!files.length){ el.innerHTML='<div class="pubProfileFilesState empty">Файлов нет</div>'; return; }
-        el.innerHTML = files.map(function(f){
+        var active = (files||[]).filter(function(f){ return f.status !== 'rejected'; });
+        if(!active.length){ el.innerHTML='<div class="pubProfileFilesState empty">Файлов нет</div>'; return; }
+        el.innerHTML = active.map(function(f){
           return '<div class="pubProfileFileRow">'
             + '<span class="pubProfileFileName">'+escHtml(f.file_name||'файл')+'</span>'
             + '<button type="button" class="miniLink" data-open-doc="'+escHtml(f.id)+'" data-file-name="'+escHtml(f.file_name||'файл')+'">Открыть</button>'
