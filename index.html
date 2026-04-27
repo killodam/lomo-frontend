@@ -490,6 +490,7 @@
     <div class="profileHeaderInner">
       <button type="button" class="logoMarkBtn" data-next="toEmployerSearch"><span class="logoMark">LOMO</span></button>
       <div class="profileHeaderActions">
+        <button type="button" class="feedNavBtn" data-next="toMyJobs">💼 Вакансии</button>
         <button type="button" class="feedNavBtn" data-next="toChatHub">Чаты</button>
         <button type="button" class="feedNavBtn accent" data-next="toEmployerProfile">Редактировать</button>
       </div>
@@ -642,17 +643,40 @@
     <div id="tabEDocs" class="profileTabPane" hidden>
       <div class="profileEditSection">
         <div class="profileSectionHead">Верификация компании</div>
+        <div id="companyVerifyBanner" class="companyVerifyBanner hidden"></div>
+        <div class="formCol">
+          <div class="sqInput">
+            <input id="companyINN" type="text" placeholder="ИНН (10 или 12 цифр)" maxlength="12" inputmode="numeric" autocomplete="off">
+          </div>
+          <div class="innHint" id="innValidHint"></div>
+          <div class="sqInput"><input id="companyOGRN" type="text" placeholder="ОГРН (13 цифр)" maxlength="13" inputmode="numeric" autocomplete="off"></div>
+          <div class="sqInput"><input id="companyLegalName" type="text" placeholder="Полное юридическое наименование" autocomplete="off"></div>
+          <div class="sqInput"><input id="companyLegalAddress" type="text" placeholder="Юридический адрес" autocomplete="off"></div>
+          <label class="checkboxRow">
+            <input type="checkbox" id="actualSameAsLegal"> Фактический адрес совпадает с юридическим
+          </label>
+          <div id="actualAddressWrap" class="sqInput">
+            <input id="companyActualAddress" type="text" placeholder="Фактический адрес" autocomplete="off">
+          </div>
+          <div class="sqInput"><input id="companyCEOName" type="text" placeholder="ФИО генерального директора" autocomplete="off"></div>
+        </div>
+        <div class="profileSectionHead" style="margin-top:16px">Документы</div>
         <div class="verifyGrid verifyGridSingleColumn">
           <div class="miniCard">
-            <div class="miniTop">
-              <div class="miniLabel">Документы компании / ИНН</div>
-              <span class="statusTag" id="companyDocStatusE">не загружено</span>
-              <button type="button" class="miniLink" data-del="employer:companyDoc">Удалить</button>
-            </div>
-            <div class="dropZone" id="dropZoneCompanyDocE">Нажмите или перетащите файл</div>
-            <input class="fileInput" id="fileCompanyDocE" type="file" accept=".pdf,.doc,.docx,image/*"/>
-            <div class="miniHint" id="companyDocHintE">Файл не выбран</div>
+            <div class="miniLabel">Скан паспорта / доверенности руководителя</div>
+            <div class="dropZone" id="dropZoneCEODoc">Нажмите или перетащите файл (PDF, JPG, PNG)</div>
+            <input class="fileInput" id="fileCEODoc" type="file" accept=".pdf,.jpg,.jpeg,.png"/>
+            <div class="miniHint" id="ceoDocHint">Файл не выбран</div>
           </div>
+          <div class="miniCard">
+            <div class="miniLabel">Выписка из ЕГРЮЛ</div>
+            <div class="dropZone" id="dropZoneRegDoc">Нажмите или перетащите файл (PDF)</div>
+            <input class="fileInput" id="fileRegDoc" type="file" accept=".pdf"/>
+            <div class="miniHint" id="regDocHint">Файл не выбран</div>
+          </div>
+        </div>
+        <div style="margin-top:16px">
+          <button type="button" class="accentBtn pillCTA" id="btnSaveCompanyDocs">Отправить на проверку</button>
         </div>
       </div>
       <div class="profileEditSection">
@@ -1007,10 +1031,42 @@
 
     <!-- Vacancies tab -->
     <div id="feedTabVacancies" class="hidden">
-      <div class="vacComingSoon">
-        <div class="vacComingSoonIco">💼</div>
-        <div class="vacComingSoonTitle">Вакансии — скоро</div>
-        <div class="vacComingSoonSub">Работодатели смогут публиковать вакансии напрямую. Следите за обновлениями.</div>
+      <div class="feedSearchHero">
+        <div class="feedSearchHeroInner">
+          <h1 class="feedTitle">Вакансии</h1>
+          <p class="feedSub">Верифицированные компании · реальные возможности</p>
+          <div class="jobFeedFilters" id="jobFeedFilters">
+            <select id="jobFilterDirection" class="feedFilterSelect">
+              <option value="">Все направления</option>
+              <optgroup label="IT">
+                <option>Frontend</option><option>Backend</option><option>Fullstack</option>
+                <option>DevOps</option><option>Data</option><option>Mobile</option>
+                <option>QA</option><option>Product</option><option>Design</option>
+              </optgroup>
+              <optgroup label="Финансы">
+                <option>Бухгалтерия</option><option>Аудит</option><option>Финансовый анализ</option>
+                <option>Банкинг</option><option>Инвестиции</option><option>Fintech</option>
+              </optgroup>
+            </select>
+            <select id="jobFilterFormat" class="feedFilterSelect">
+              <option value="">Любой формат</option>
+              <option>Удалённо</option><option>Офис</option><option>Гибрид</option>
+            </select>
+            <select id="jobFilterExperience" class="feedFilterSelect">
+              <option value="">Любой опыт</option>
+              <option>Опыт не нужен</option><option>От 1 года</option><option>От 2 лет</option>
+              <option>От 3 лет</option><option>От 5 лет</option>
+            </select>
+            <select id="jobFilterGrade" class="feedFilterSelect">
+              <option value="">Любой грейд</option>
+              <option>Junior</option><option>Middle</option><option>Senior</option><option>Lead</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="feedContent">
+        <div id="jobFeedList" class="feedListWrap jobFeedListWrap"></div>
+        <div id="jobFeedPager" class="pager"></div>
       </div>
     </div>
 
@@ -1231,14 +1287,29 @@
         <div id="adminCandidatePager" class="pager"></div>
       </div>
 
-      <!-- TAB: Employers feed -->
+      <!-- TAB: Employers / Companies -->
       <div id="adminTabPanelEmployers" class="hidden">
-        <div class="adminSectionHead">
-          <div class="adminSectionTitle">Все работодатели</div>
-          <input id="adminEmpSearch" type="text" placeholder="Поиск..." class="sqInput adminSearchInput">
+        <div class="adminSectionHead adminSectionHeadWrap">
+          <div class="adminSectionHeading">
+            <div class="adminSectionTitle">Компании <span id="adminCompaniesPendingBadge" class="pendingBadge hidden"></span></div>
+          </div>
         </div>
-        <div id="adminEmployerList"><div class="adminListLoading">Загрузка...</div></div>
-        <div id="adminEmployerPager" class="pager"></div>
+        <div class="adminRoleFilterRow">
+          <button class="adminRoleChip active" data-company-filter="" type="button">Все</button>
+          <button class="adminRoleChip" data-company-filter="pending" type="button">⏳ На проверке</button>
+          <button class="adminRoleChip" data-company-filter="verified" type="button">✓ Верифицированы</button>
+          <button class="adminRoleChip" data-company-filter="rejected" type="button">✗ Отклонены</button>
+          <button class="adminRoleChip" data-company-filter="unverified" type="button">Не проверены</button>
+        </div>
+        <div id="adminCompaniesList"><div class="adminListLoading">Загрузка...</div></div>
+      </div>
+
+      <!-- Modal: Company review -->
+      <div id="adminCompanyModal" class="modalOverlay hidden">
+        <div class="adminCompanyModalInner">
+          <button type="button" class="modalCloseBtn" id="adminCompanyModalClose">×</button>
+          <div id="adminCompanyModalBody"></div>
+        </div>
       </div>
 
       <!-- TAB: All users -->
@@ -1256,6 +1327,97 @@
         <div id="adminUsersPager" class="pager"></div>
       </div>
 
+    </div>
+  </div>
+</section>
+
+<!-- SCREEN: My Jobs -->
+<section id="screenMyJobs" class="screen" aria-label="Мои вакансии">
+  <header class="profileHeader">
+    <div class="profileHeaderInner">
+      <button type="button" class="backBtnInline" data-back="toRecruiterPublic">← Назад</button>
+      <span class="profileHeaderTitle">Мои вакансии (<span id="myJobsCount">0</span>)</span>
+      <button type="button" class="accentBtn pillCTA" id="btnNewJob">+ Новая вакансия</button>
+    </div>
+  </header>
+  <div class="profileEditBody">
+    <div id="myJobsList" class="myJobsList"></div>
+  </div>
+</section>
+
+<!-- SCREEN: Post Job -->
+<section id="screenPostJob" class="screen" aria-label="Создать вакансию">
+  <header class="profileHeader">
+    <div class="profileHeaderInner">
+      <button type="button" class="backBtnInline" data-back="toMyJobs" id="jobBtnCancel">← Мои вакансии</button>
+      <span class="profileHeaderTitle" id="jobFormTitle">Новая вакансия</span>
+    </div>
+  </header>
+  <div class="profileEditBody">
+    <div class="profileEditSection">
+      <div class="profileSectionHead">Позиция</div>
+      <div class="formCol">
+        <div class="sqInput"><input id="jobInputTitle" type="text" placeholder="Название вакансии (Frontend Engineer, Data Analyst...)" maxlength="100" autocomplete="off"></div>
+        <div class="sqInput">
+          <select id="jobSelectDirection" class="sqSelect">
+            <option value="">— Направление (обязательно) —</option>
+            <optgroup label="IT">
+              <option>Frontend</option><option>Backend</option><option>Fullstack</option>
+              <option>DevOps</option><option>Data</option><option>Mobile</option>
+              <option>QA</option><option>Product</option><option>Design</option>
+            </optgroup>
+            <optgroup label="Финансы">
+              <option>Бухгалтерия</option><option>Аудит</option><option>Финансовый анализ</option>
+              <option>Банкинг</option><option>Инвестиции</option><option>Fintech</option>
+            </optgroup>
+          </select>
+        </div>
+        <div class="sqInput">
+          <select id="jobSelectGrade" class="sqSelect">
+            <option value="">— Грейд (необязательно) —</option>
+            <option>Junior</option><option>Middle</option><option>Senior</option><option>Lead</option>
+          </select>
+        </div>
+      </div>
+    </div>
+    <div class="profileEditSection">
+      <div class="profileSectionHead">Условия</div>
+      <div class="formCol">
+        <div class="sqInput">
+          <select id="jobSelectExperience" class="sqSelect">
+            <option value="">— Требуемый опыт (обязательно) —</option>
+            <option>Опыт не нужен</option><option>От 1 года</option><option>От 2 лет</option>
+            <option>От 3 лет</option><option>От 5 лет</option>
+          </select>
+        </div>
+        <div class="sqInput">
+          <select id="jobSelectFormat" class="sqSelect">
+            <option value="">— Формат работы (обязательно) —</option>
+            <option>Удалённо</option><option>Офис</option><option>Гибрид</option>
+          </select>
+        </div>
+        <div class="sqInput"><input id="jobInputCity" type="text" placeholder="Город (необязательно)" autocomplete="off"></div>
+        <div class="jobSalaryRow">
+          <div class="sqInput salaryInput"><input id="jobInputSalaryFrom" type="number" placeholder="Зарплата от" min="0" max="9999999"></div>
+          <span class="jobSalaryDash">—</span>
+          <div class="sqInput salaryInput"><input id="jobInputSalaryTo" type="number" placeholder="до (₽/мес)" min="0" max="9999999"></div>
+        </div>
+      </div>
+    </div>
+    <div class="profileEditSection">
+      <div class="profileSectionHead">Навыки</div>
+      <div class="sqInput"><input id="jobSkillInput" type="text" placeholder="Введите навык и нажмите Enter (Python, React, SQL...)" autocomplete="off"></div>
+      <div id="jobSkillTagsWrap" class="skillTagsWrap"></div>
+    </div>
+    <div class="profileEditSection">
+      <div class="profileSectionHead">Описание</div>
+      <div class="sqInput"><textarea id="jobInputDescription" placeholder="Задачи, требования, условия — чем подробнее, тем лучше" rows="5" style="resize:vertical"></textarea></div>
+    </div>
+    <div class="profileEditSection">
+      <div class="jobFormActions">
+        <button type="button" class="accentBtn pillCTA" id="jobBtnPublish">Опубликовать</button>
+        <button type="button" class="sqBtn ghostBtn" id="jobBtnDraft">Сохранить черновик</button>
+      </div>
     </div>
   </div>
 </section>
@@ -1966,6 +2128,8 @@
 <script src="./scripts/info-screens.js"></script>
 <script src="./scripts/ai-matching.js"></script>
 <script src="./scripts/feed-extra.js"></script>
+<script src="./scripts/jobs.js"></script>
+<script src="./scripts/company-docs.js"></script>
 
 
 </body>

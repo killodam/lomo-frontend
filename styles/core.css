@@ -955,3 +955,99 @@
   color: #6b7280;
   line-height: 1.4;
 }
+
+/* ── Jobs: feed cards ────────────────────────────────────────────────────────── */
+.jobFeedFilters { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+.feedFilterSelect { background:#fff; border:1px solid #e5e7eb; border-radius:20px; padding:6px 14px; font-size:13px; color:#374151; cursor:pointer; }
+.feedFilterSelect:focus { outline:none; border-color:#14b8a6; }
+
+.jobFeedListWrap { display:grid; grid-template-columns:repeat(auto-fill,minmax(300px,1fr)); gap:16px; padding:16px; }
+
+.jobCard { background:#fff; border-radius:16px; box-shadow:0 1px 4px rgba(0,0,0,.07); padding:18px; display:flex; flex-direction:column; gap:12px; transition:box-shadow .2s; }
+.jobCard:hover { box-shadow:0 4px 16px rgba(0,0,0,.12); }
+.jobCardHead { display:flex; flex-direction:column; gap:6px; }
+.jobCardCompanyRow { display:flex; align-items:center; gap:10px; }
+.jobCardAvatarWrap { flex-shrink:0; }
+.jobCardLogo { width:36px; height:36px; border-radius:50%; object-fit:cover; }
+.jobCardLogoFallback { width:36px; height:36px; border-radius:50%; background:#0d9488; color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; }
+.jobCardCompanyInfo { display:flex; flex-direction:column; gap:2px; }
+.jobCardCompany { font-size:13px; font-weight:600; color:#374151; }
+.jobVerifiedBadge { font-size:11px; color:#059669; background:#d1fae5; padding:1px 8px; border-radius:10px; display:inline-block; }
+.jobCardTitle { font-size:16px; font-weight:700; color:#111827; line-height:1.3; }
+.jobCardMeta { display:flex; flex-wrap:wrap; gap:6px; }
+.jobMetaPill { font-size:12px; background:#f3f4f6; color:#374151; border-radius:12px; padding:3px 10px; }
+.jobMetaPill.salary { background:#ecfdf5; color:#065f46; font-weight:600; }
+.jobMetaPill.dir { background:#eff6ff; color:#1d4ed8; }
+.jobCardSkills { display:flex; flex-wrap:wrap; gap:5px; }
+.skillPill { font-size:12px; background:#f0fdf4; color:#166534; border-radius:10px; padding:2px 8px; }
+.jobCardFooter { margin-top:auto; }
+.jobApplyBtn { width:100%; }
+
+/* ── Jobs: My Jobs list ──────────────────────────────────────────────────────── */
+.myJobsList { padding:16px; display:flex; flex-direction:column; gap:10px; }
+.myJobRow { background:#fff; border-radius:14px; padding:14px 16px; display:flex; align-items:center; gap:12px; box-shadow:0 1px 3px rgba(0,0,0,.07); }
+.myJobInfo { flex:1; min-width:0; }
+.myJobTitle { font-size:15px; font-weight:600; color:#111827; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.myJobMeta { font-size:12px; color:#6b7280; margin-top:3px; display:flex; flex-wrap:wrap; gap:4px; align-items:center; }
+.myJobActions { display:flex; gap:8px; flex-shrink:0; }
+.miniLink.ok  { color:#059669; }
+.miniLink.warn { color:#d97706; }
+.miniLink.bad  { color:#dc2626; }
+
+/* ── Jobs: Create form ───────────────────────────────────────────────────────── */
+.sqSelect { width:100%; background:#f5f5f5; border:none; border-radius:12px; padding:13px 14px; font-size:15px; color:#222; appearance:none; cursor:pointer; }
+.sqSelect:focus { outline:2px solid #14b8a6; }
+.jobSalaryRow { display:flex; align-items:center; gap:8px; }
+.salaryInput { flex:1; margin:0 !important; }
+.jobSalaryDash { color:#9ca3af; font-size:14px; flex-shrink:0; }
+.skillTagsWrap { display:flex; flex-wrap:wrap; gap:6px; margin-top:8px; min-height:32px; }
+.skillTag { display:inline-flex; align-items:center; gap:4px; background:#e0f2fe; color:#0369a1; border-radius:12px; padding:4px 10px; font-size:13px; }
+.skillTagDel { background:none; border:none; cursor:pointer; color:#0369a1; font-size:14px; line-height:1; padding:0; }
+.jobFormActions { display:flex; gap:12px; padding-bottom:32px; }
+
+/* ── Company verification ────────────────────────────────────────────────────── */
+.companyVerifyBanner { border-radius:12px; padding:12px 16px; margin-bottom:16px; font-size:14px; font-weight:500; }
+.companyVerifyBanner.pending { background:#fef3c7; color:#92400e; }
+.companyVerifyBanner.ok      { background:#d1fae5; color:#065f46; }
+.companyVerifyBanner.bad     { background:#fee2e2; color:#991b1b; }
+.innHint { font-size:12px; margin-top:4px; padding-left:4px; }
+.innHint.ok  { color:#059669; }
+.innHint.bad { color:#dc2626; }
+.checkboxRow { display:flex; align-items:center; gap:8px; font-size:14px; color:#374151; cursor:pointer; padding:4px 0; }
+.inputError { outline:2px solid #ef4444 !important; }
+.inputOk    { outline:2px solid #10b981 !important; }
+
+/* ── Admin: Companies panel ──────────────────────────────────────────────────── */
+.pendingBadge { background:#ef4444; color:#fff; border-radius:10px; padding:1px 7px; font-size:11px; font-weight:700; margin-left:6px; }
+.adminCompanyRow { display:flex; align-items:center; gap:12px; padding:12px 16px; background:#fff; border-radius:12px; margin-bottom:8px; box-shadow:0 1px 3px rgba(0,0,0,.06); }
+.adminCompanyLogoWrap { flex-shrink:0; }
+.adminCompanyLogo { width:36px; height:36px; border-radius:50%; object-fit:cover; }
+.adminCompanyLogoFb { width:36px; height:36px; border-radius:50%; background:#0d9488; color:#fff; display:flex; align-items:center; justify-content:center; font-size:15px; font-weight:700; }
+.adminCompanyInfo { flex:1; min-width:0; }
+.adminCompanyName { font-size:14px; font-weight:600; color:#111827; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.adminCompanyMeta { font-size:12px; color:#6b7280; margin-top:2px; }
+.adminCompanyActions { display:flex; gap:8px; flex-shrink:0; }
+
+/* ── Admin: Company modal ────────────────────────────────────────────────────── */
+.modalOverlay { position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:1000; display:flex; align-items:center; justify-content:center; padding:16px; }
+.adminCompanyModalInner { background:#fff; border-radius:20px; width:100%; max-width:780px; max-height:90vh; overflow-y:auto; padding:24px; position:relative; }
+.modalCloseBtn { position:absolute; top:16px; right:16px; background:none; border:none; font-size:22px; cursor:pointer; color:#6b7280; }
+.adminCompanyModalCols { display:grid; grid-template-columns:1fr 1fr; gap:24px; }
+.adminCompanyModalCol {}
+.adminCompanyModalHead { font-size:13px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.05em; margin-bottom:12px; }
+.adminModalRow { display:flex; flex-direction:column; gap:2px; margin-bottom:10px; }
+.adminModalLabel { font-size:11px; color:#9ca3af; text-transform:uppercase; letter-spacing:.04em; }
+.adminModalVal { font-size:14px; color:#111827; }
+.adminDocRow { display:flex; justify-content:space-between; align-items:center; padding:10px 12px; background:#f9fafb; border-radius:10px; margin-bottom:8px; font-size:14px; }
+.adminDocRow.emptyDoc { color:#9ca3af; }
+.adminCompanyModalActions { margin-top:20px; border-top:1px solid #f0f0f0; padding-top:16px; display:flex; flex-direction:column; gap:12px; }
+.adminRejectForm { display:flex; gap:8px; }
+.adminRejectForm textarea { flex:1; }
+.accentBtn.ok  { background:#059669; }
+.accentBtn.bad { background:#dc2626; }
+
+@media (max-width:600px) {
+  .adminCompanyModalCols { grid-template-columns:1fr; }
+  .jobFeedListWrap { grid-template-columns:1fr; }
+  .jobFormActions { flex-direction:column; }
+}
