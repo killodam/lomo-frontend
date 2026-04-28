@@ -34,10 +34,7 @@ var companyDocsState = {
 };
 
 function loadCompanyDocs() {
-  var base = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
-  fetch(base + '/company/docs', {
-    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('lomo_token') || '') }
-  })
+  apiFetch('/company/docs')
     .then(function(r) { return r.ok ? r.json() : null; })
     .then(function(data) {
       if (!data) return;
@@ -103,16 +100,11 @@ function renderCompanyVerifyStatus(status, rejectReason) {
 function uploadCompanyDocFile(inputEl, urlKey, nameKey, hintId, cb) {
   var file = inputEl.files && inputEl.files[0];
   if (!file) return;
-  var base = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
   var fd = new FormData();
   fd.append('file', file);
   setCompanyDocHint(hintId, 'Загрузка...');
 
-  fetch(base + '/upload', {
-    method: 'POST',
-    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('lomo_token') || '') },
-    body: fd,
-  })
+  apiFetch('/upload', { method: 'POST', body: fd })
     .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
     .then(function(d) {
       companyDocsState[urlKey]  = d.fileUrl;
@@ -158,16 +150,11 @@ function saveCompanyDocs() {
   // Remove undefined keys
   Object.keys(payload).forEach(function(k) { if (payload[k] === undefined) delete payload[k]; });
 
-  var base = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
-  fetch(base + '/company/docs', {
-    method: 'POST',
-    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('lomo_token') || ''), 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  })
+  apiFetch('/company/docs', { method: 'POST', body: JSON.stringify(payload) })
     .then(function(r) { return r.json(); })
     .then(function(d) {
       if (d.ok) {
-        showCompanyDocsToast('Документы отправлены на проверку', 'ok');
+        showCompanyDocsToast('Документы отправлены на проверку', 'success');
         loadCompanyDocs();
       } else {
         showCompanyDocsToast(d.error || 'Ошибка', 'error');
@@ -232,12 +219,9 @@ function loadAdminCompanies() {
   if (!list) return;
   list.innerHTML = '<div class="adminListLoading">Загрузка...</div>';
 
-  var base = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
   var params = adminCompaniesState.filterStatus ? '?status=' + adminCompaniesState.filterStatus : '';
 
-  fetch(base + '/company/admin/companies' + params, {
-    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('lomo_token') || '') }
-  })
+  apiFetch('/company/admin/companies' + params)
     .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
     .then(function(data) {
       adminCompaniesState.items = data.items || [];
@@ -293,10 +277,7 @@ function escAdm(s) {
 }
 
 function openAdminCompanyReview(companyId) {
-  var base = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
-  fetch(base + '/company/admin/companies/' + companyId + '/docs', {
-    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('lomo_token') || '') }
-  })
+  apiFetch('/company/admin/companies/' + companyId + '/docs')
     .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
     .then(function(data) {
       renderAdminCompanyModal(data);
@@ -389,11 +370,7 @@ function initAdminCompaniesPanel() {
 }
 
 function adminVerifyCompany(companyId) {
-  var base = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
-  fetch(base + '/company/admin/companies/' + companyId + '/verify', {
-    method: 'POST',
-    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('lomo_token') || ''), 'Content-Type': 'application/json' },
-  })
+  apiFetch('/company/admin/companies/' + companyId + '/verify', { method: 'POST' })
     .then(function(r) { return r.json(); })
     .then(function(d) {
       if (d.ok) {
@@ -407,10 +384,8 @@ function adminVerifyCompany(companyId) {
 function adminRejectCompany(companyId) {
   var reason = (document.getElementById('adminCompanyRejectReason') || {}).value || '';
   if (!reason.trim()) { alert('Укажите причину'); return; }
-  var base = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
-  fetch(base + '/company/admin/companies/' + companyId + '/reject', {
+  apiFetch('/company/admin/companies/' + companyId + '/reject', {
     method: 'POST',
-    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('lomo_token') || ''), 'Content-Type': 'application/json' },
     body: JSON.stringify({ reason: reason }),
   })
     .then(function(r) { return r.json(); })

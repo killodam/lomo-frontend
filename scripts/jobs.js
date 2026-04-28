@@ -57,10 +57,7 @@ function loadJobsFeed(page) {
   if (f.experience) params.set('experience', f.experience);
   if (f.grade)      params.set('grade', f.grade);
 
-  var base = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
-  fetch(base + '/jobs?' + params.toString(), {
-    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('lomo_token') || '') }
-  })
+  apiFetch('/jobs?' + params.toString())
     .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
     .then(function(data) {
       renderJobFeed(data, list, pager);
@@ -151,14 +148,9 @@ function handleJobApply(jobId, companyStatus) {
     showToast('Компания ещё не прошла верификацию — отклики временно недоступны', 'info');
     return;
   }
-  var base = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
-  var token = localStorage.getItem('lomo_token') || '';
-  if (!token) { showToast('Войдите, чтобы откликнуться', 'info'); return; }
+  if (!state.userId) { showToast('Войдите, чтобы откликнуться', 'info'); return; }
 
-  fetch(base + '/jobs/' + jobId + '/apply', {
-    method: 'POST',
-    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-  })
+  apiFetch('/jobs/' + jobId + '/apply', { method: 'POST' })
     .then(function(r) { return r.json(); })
     .then(function(d) {
       if (d.ok) showToast('Отклик отправлен!', 'success');
@@ -174,10 +166,7 @@ function loadMyJobs() {
   if (!list) return;
   list.innerHTML = '<div class="feedLoading">Загрузка...</div>';
 
-  var base = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
-  fetch(base + '/jobs/my', {
-    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('lomo_token') || '') }
-  })
+  apiFetch('/jobs/my')
     .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
     .then(function(jobs) {
       jobsState.myJobs = jobs;
@@ -243,10 +232,8 @@ function handleMyJobActions(e) {
 }
 
 function changeJobStatus(jobId, status) {
-  var base = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
-  fetch(base + '/jobs/' + jobId + '/status', {
+  apiFetch('/jobs/' + jobId + '/status', {
     method: 'PATCH',
-    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('lomo_token') || ''), 'Content-Type': 'application/json' },
     body: JSON.stringify({ status: status }),
   })
     .then(function(r) { return r.json(); })
@@ -258,11 +245,7 @@ function changeJobStatus(jobId, status) {
 }
 
 function deleteJob(jobId) {
-  var base = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
-  fetch(base + '/jobs/' + jobId, {
-    method: 'DELETE',
-    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('lomo_token') || '') },
-  })
+  apiFetch('/jobs/' + jobId, { method: 'DELETE' })
     .then(function(r) { return r.json(); })
     .then(function(d) {
       if (d.ok) { showToast('Вакансия удалена', 'success'); loadMyJobs(); }
@@ -385,17 +368,11 @@ function submitJobForm(statusVal) {
   var errors = validateJobForm(data);
   if (errors.length) { showToast(errors[0], 'error'); return; }
 
-  var base   = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
-  var token  = localStorage.getItem('lomo_token') || '';
   var isEdit = !!jobsState.editingJobId;
-  var url    = isEdit ? base + '/jobs/' + jobsState.editingJobId : base + '/jobs';
+  var path   = isEdit ? '/jobs/' + jobsState.editingJobId : '/jobs';
   var method = isEdit ? 'PUT' : 'POST';
 
-  fetch(url, {
-    method: method,
-    headers: { 'Authorization': 'Bearer ' + token, 'Content-Type': 'application/json' },
-    body: JSON.stringify(data),
-  })
+  apiFetch(path, { method: method, body: JSON.stringify(data) })
     .then(function(r) { return r.json(); })
     .then(function(d) {
       if (d.id) {
@@ -416,10 +393,7 @@ function loadRecruiterProfileJobs() {
   if (!list) return;
   list.innerHTML = '<div class="feedLoading">Загрузка...</div>';
 
-  var base = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
-  fetch(base + '/jobs/my', {
-    headers: { 'Authorization': 'Bearer ' + (localStorage.getItem('lomo_token') || '') }
-  })
+  apiFetch('/jobs/my')
     .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
     .then(function(jobs) {
       var active = (jobs || []).filter(function(j) { return j.status === 'active'; });
