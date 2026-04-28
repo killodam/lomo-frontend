@@ -148,12 +148,12 @@ function initJobFeedFilters() {
 
 function handleJobApply(jobId, companyStatus) {
   if (companyStatus !== 'verified') {
-    showToast('Компания ещё не прошла верификацию — отклики временно недоступны', 'warn');
+    showToast('Компания ещё не прошла верификацию — отклики временно недоступны', 'info');
     return;
   }
   var base = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
   var token = localStorage.getItem('lomo_token') || '';
-  if (!token) { showToast('Войдите, чтобы откликнуться', 'warn'); return; }
+  if (!token) { showToast('Войдите, чтобы откликнуться', 'info'); return; }
 
   fetch(base + '/jobs/' + jobId + '/apply', {
     method: 'POST',
@@ -161,7 +161,7 @@ function handleJobApply(jobId, companyStatus) {
   })
     .then(function(r) { return r.json(); })
     .then(function(d) {
-      if (d.ok) showToast('Отклик отправлен!', 'ok');
+      if (d.ok) showToast('Отклик отправлен!', 'success');
       else showToast(d.error || 'Ошибка', 'error');
     })
     .catch(function() { showToast('Ошибка сети', 'error'); });
@@ -251,7 +251,7 @@ function changeJobStatus(jobId, status) {
   })
     .then(function(r) { return r.json(); })
     .then(function(d) {
-      if (d.id) { showToast('Статус обновлён', 'ok'); loadMyJobs(); }
+      if (d.id) { showToast('Статус обновлён', 'success'); loadMyJobs(); }
       else showToast(d.error || 'Ошибка', 'error');
     })
     .catch(function() { showToast('Ошибка сети', 'error'); });
@@ -265,7 +265,7 @@ function deleteJob(jobId) {
   })
     .then(function(r) { return r.json(); })
     .then(function(d) {
-      if (d.ok) { showToast('Вакансия удалена', 'ok'); loadMyJobs(); }
+      if (d.ok) { showToast('Вакансия удалена', 'success'); loadMyJobs(); }
       else showToast(d.error || 'Ошибка', 'error');
     })
     .catch(function() { showToast('Ошибка сети', 'error'); });
@@ -399,7 +399,7 @@ function submitJobForm(statusVal) {
     .then(function(r) { return r.json(); })
     .then(function(d) {
       if (d.id) {
-        showToast(statusVal === 'active' ? 'Вакансия опубликована!' : 'Черновик сохранён', 'ok');
+        showToast(statusVal === 'active' ? 'Вакансия опубликована!' : 'Черновик сохранён', 'success');
         if (typeof show === 'function') show('myJobs');
         loadMyJobs();
       } else {
@@ -446,21 +446,6 @@ function loadRecruiterProfileJobs() {
       var section = document.getElementById('rpJobsSection');
       if (section) section.classList.add('hidden');
     });
-}
-
-// ── Toast helper (fallback if not defined globally) ───────────────────────────
-
-function showToast(msg, type) {
-  if (typeof window.showToast === 'function' && window.showToast !== showToast) {
-    window.showToast(msg, type);
-    return;
-  }
-  var t = document.createElement('div');
-  t.className = 'toastMsg ' + (type || '');
-  t.textContent = msg;
-  document.body.appendChild(t);
-  setTimeout(function() { t.classList.add('visible'); }, 10);
-  setTimeout(function() { t.classList.remove('visible'); setTimeout(function() { t.remove(); }, 300); }, 3000);
 }
 
 // ── Init ─────────────────────────────────────────────────────────────────────
