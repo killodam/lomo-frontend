@@ -58,7 +58,6 @@ function loadJobsFeed(page) {
   if (f.grade)      params.set('grade', f.grade);
 
   apiFetch('/jobs?' + params.toString())
-    .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
     .then(function(data) {
       renderJobFeed(data, list, pager);
     })
@@ -151,7 +150,6 @@ function handleJobApply(jobId, companyStatus) {
   if (!state.userId) { showToast('Войдите, чтобы откликнуться', 'info'); return; }
 
   apiFetch('/jobs/' + jobId + '/apply', { method: 'POST' })
-    .then(function(r) { return r.json(); })
     .then(function(d) {
       if (d.ok) showToast('Отклик отправлен!', 'success');
       else showToast(d.error || 'Ошибка', 'error');
@@ -167,7 +165,6 @@ function loadMyJobs() {
   list.innerHTML = '<div class="feedLoading">Загрузка...</div>';
 
   apiFetch('/jobs/my')
-    .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
     .then(function(jobs) {
       jobsState.myJobs = jobs;
       renderMyJobs(jobs, list);
@@ -236,7 +233,6 @@ function changeJobStatus(jobId, status) {
     method: 'PATCH',
     body: JSON.stringify({ status: status }),
   })
-    .then(function(r) { return r.json(); })
     .then(function(d) {
       if (d.id) { showToast('Статус обновлён', 'success'); loadMyJobs(); }
       else showToast(d.error || 'Ошибка', 'error');
@@ -246,7 +242,6 @@ function changeJobStatus(jobId, status) {
 
 function deleteJob(jobId) {
   apiFetch('/jobs/' + jobId, { method: 'DELETE' })
-    .then(function(r) { return r.json(); })
     .then(function(d) {
       if (d.ok) { showToast('Вакансия удалена', 'success'); loadMyJobs(); }
       else showToast(d.error || 'Ошибка', 'error');
@@ -373,7 +368,6 @@ function submitJobForm(statusVal) {
   var method = isEdit ? 'PUT' : 'POST';
 
   apiFetch(path, { method: method, body: JSON.stringify(data) })
-    .then(function(r) { return r.json(); })
     .then(function(d) {
       if (d.id) {
         showToast(statusVal === 'active' ? 'Вакансия опубликована!' : 'Черновик сохранён', 'success');
@@ -394,7 +388,6 @@ function loadRecruiterProfileJobs() {
   list.innerHTML = '<div class="feedLoading">Загрузка...</div>';
 
   apiFetch('/jobs/my')
-    .then(function(r) { return r.ok ? r.json() : Promise.reject(r.status); })
     .then(function(jobs) {
       var active = (jobs || []).filter(function(j) { return j.status === 'active'; });
       var section = document.getElementById('rpJobsSection');

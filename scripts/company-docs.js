@@ -35,7 +35,6 @@ var companyDocsState = {
 
 function loadCompanyDocs() {
   apiFetch('/company/docs')
-    .then(function(r) { return r.ok ? r.json() : null; })
     .then(function(data) {
       if (!data) return;
       companyDocsState.verifyStatus = data.company_verify_status || 'unverified';
@@ -105,7 +104,6 @@ function uploadCompanyDocFile(inputEl, urlKey, nameKey, hintId, cb) {
   setCompanyDocHint(hintId, 'Загрузка...');
 
   apiFetch('/upload', { method: 'POST', body: fd })
-    .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
     .then(function(d) {
       companyDocsState[urlKey]  = d.fileUrl;
       companyDocsState[nameKey] = d.fileName;
@@ -151,7 +149,6 @@ function saveCompanyDocs() {
   Object.keys(payload).forEach(function(k) { if (payload[k] === undefined) delete payload[k]; });
 
   apiFetch('/company/docs', { method: 'POST', body: JSON.stringify(payload) })
-    .then(function(r) { return r.json(); })
     .then(function(d) {
       if (d.ok) {
         showCompanyDocsToast('Документы отправлены на проверку', 'success');
@@ -222,7 +219,6 @@ function loadAdminCompanies() {
   var params = adminCompaniesState.filterStatus ? '?status=' + adminCompaniesState.filterStatus : '';
 
   apiFetch('/company/admin/companies' + params)
-    .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
     .then(function(data) {
       adminCompaniesState.items = data.items || [];
       renderAdminCompanies(data.items || []);
@@ -278,7 +274,6 @@ function escAdm(s) {
 
 function openAdminCompanyReview(companyId) {
   apiFetch('/company/admin/companies/' + companyId + '/docs')
-    .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
     .then(function(data) {
       renderAdminCompanyModal(data);
     })
@@ -371,7 +366,6 @@ function initAdminCompaniesPanel() {
 
 function adminVerifyCompany(companyId) {
   apiFetch('/company/admin/companies/' + companyId + '/verify', { method: 'POST' })
-    .then(function(r) { return r.json(); })
     .then(function(d) {
       if (d.ok) {
         document.getElementById('adminCompanyModal').classList.add('hidden');
@@ -388,7 +382,6 @@ function adminRejectCompany(companyId) {
     method: 'POST',
     body: JSON.stringify({ reason: reason }),
   })
-    .then(function(r) { return r.json(); })
     .then(function(d) {
       if (d.ok) {
         document.getElementById('adminCompanyModal').classList.add('hidden');

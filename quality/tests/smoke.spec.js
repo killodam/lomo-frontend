@@ -351,6 +351,80 @@ test('candidate feed role chips request server-side role filter', async ({ page 
   await expect(page.locator('#candidateFeedList')).toContainText('Анна Петрова');
 });
 
+test('candidate vacancies tab loads jobs through apiFetch', async ({ page }) => {
+  let jobsRequested = false;
+
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'cand-1', email: 'candidate@example.com', login: 'candidate', role: 'candidate' },
+          profile: { full_name: 'Иван Кандидат', location: 'Москва', edu_place: 'МГУ', vacancies: 'Product Designer' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([], 1, 15, 0)),
+      });
+    }
+
+    if (url.pathname.endsWith('/jobs')) {
+      jobsRequested = true;
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          items: [{
+            id: 'job-1',
+            title: 'Frontend Engineer',
+            company: 'LOMO HR',
+            company_verify_status: 'verified',
+            direction: 'Frontend',
+            format: 'Удалённо',
+            experience: 'От 2 лет',
+            grade: 'Middle',
+            city: 'Москва',
+            salary_from: 180000,
+            salary_to: 240000,
+            skills: ['React', 'CSS'],
+          }],
+          page: 1,
+          pageSize: 12,
+          total: 1,
+          totalPages: 1,
+        }),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.fill('#loginEmail', 'candidate@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await page.click('[data-main-tab="vacancies"]');
+
+  await expect.poll(() => jobsRequested).toBe(true);
+  await expect(page.locator('#jobFeedList')).toContainText('Frontend Engineer');
+  await expect(page.locator('#jobFeedList')).toContainText('LOMO HR');
+});
+
 test('forgot password flow reaches success screen after reset', async ({ page }) => {
   await page.route('**/api/**', async (route) => {
     const request = route.request();
@@ -1003,6 +1077,91 @@ test('employer favorites filter keeps bookmarked candidates and searches locally
 
   await page.fill('#empSearchName', 'Маркетинг');
   await expect(page.locator('#employerCandidateList')).toContainText('По этому запросу в избранном никого нет');
+});
+
+test('employer can open my jobs and publish a new vacancy', async ({ page }) => {
+  let createdJob = null;
+
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'emp-1', email: 'hr@example.com', login: 'hr', role: 'employer' },
+          profile: { full_name: 'Анна HR', company: 'LOMO HR', industry: 'HR Tech', public_id: 'LOMO-EMP0001' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/candidates')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([], 1, 15, 0)),
+      });
+    }
+
+    if (url.pathname.endsWith('/jobs/my')) {
+      const jobs = createdJob
+        ? [Object.assign({ applications_count: 0, status: 'active' }, createdJob)]
+        : [{ id: 'job-existing', title: 'Data Analyst', direction: 'Data', experience: 'От 2 лет', salary_from: 160000, salary_to: 220000, format: 'Гибрид', grade: 'Middle', skills: [], status: 'active', applications_count: 2 }];
+
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(jobs),
+      });
+    }
+
+    if (url.pathname.endsWith('/jobs') && request.method() === 'POST') {
+      createdJob = Object.assign({ id: 'job-new', applications_count: 0 }, JSON.parse(request.postData() || '{}'));
+      return route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify(createdJob),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.fill('#loginEmail', 'hr@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await expect(page.locator('#screenEmployerSearch')).toHaveClass(/active/);
+  await page.click('#searchCompanyProfileBtn');
+  await expect(page.locator('#screenRecruiterPublic')).toHaveClass(/active/);
+
+  await page.click('#screenRecruiterPublic [data-next="toMyJobs"]');
+  await expect(page.locator('#myJobsList')).toContainText('Data Analyst');
+
+  await page.click('#btnNewJob');
+  await expect(page.locator('#screenPostJob')).toHaveClass(/active/);
+  await page.fill('#jobInputTitle', 'React Engineer');
+  await page.selectOption('#jobSelectDirection', 'Frontend');
+  await page.selectOption('#jobSelectExperience', 'От 2 лет');
+  await page.selectOption('#jobSelectFormat', 'Удалённо');
+  await page.selectOption('#jobSelectGrade', 'Middle');
+  await page.fill('#jobInputSalaryFrom', '180000');
+  await page.fill('#jobInputSalaryTo', '240000');
+  await page.fill('#jobSkillInput', 'React');
+  await page.press('#jobSkillInput', 'Enter');
+  await page.click('#jobBtnPublish');
+
+  await expect.poll(() => createdJob && createdJob.title).toBe('React Engineer');
+  await expect(page.locator('#screenMyJobs')).toHaveClass(/active/);
+  await expect(page.locator('#myJobsList')).toContainText('React Engineer');
 });
 
 test('user can send connection request from public profile', async ({ page }) => {
@@ -2013,4 +2172,80 @@ test('candidate verification banner opens document edit tab', async ({ page }) =
   await expect(page.locator('#screenMyEmployeeProfile')).toHaveClass(/active/);
   await expect(page.locator('#screenMyEmployeeProfile .profileTab[data-tab="tabCDocs"]')).toHaveClass(/active/);
   await expect(page.locator('#tabCDocs')).toBeVisible();
+});
+
+test('employer company verification form saves through apiFetch', async ({ page }) => {
+  let savedPayload = null;
+
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'emp-1', email: 'hr@example.com', login: 'hr', role: 'employer' },
+          profile: { full_name: 'Анна HR', company: 'LOMO HR', industry: 'HR Tech', public_id: 'LOMO-EMP0001' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/candidates')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([], 1, 15, 0)),
+      });
+    }
+
+    if (url.pathname.endsWith('/company/docs') && request.method() === 'GET') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(savedPayload
+          ? { company_verify_status: 'pending', inn: savedPayload.inn, ogrn: savedPayload.ogrn, legal_name: savedPayload.legal_name, legal_address: savedPayload.legal_address, actual_address: savedPayload.actual_address, ceo_name: savedPayload.ceo_name, documents: {} }
+          : { company_verify_status: 'unverified', documents: {} }),
+      });
+    }
+
+    if (url.pathname.endsWith('/company/docs') && request.method() === 'POST') {
+      savedPayload = JSON.parse(request.postData() || '{}');
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true }),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.fill('#loginEmail', 'hr@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await expect(page.locator('#screenEmployerSearch')).toHaveClass(/active/);
+  await page.click('#searchCompanyProfileBtn');
+  await expect(page.locator('#screenRecruiterPublic')).toHaveClass(/active/);
+  await page.click('#screenRecruiterPublic [data-next="toEmployerProfile"]');
+  await page.click('#screenMyEmployerProfile .profileTab[data-tab="tabEDocs"]');
+
+  await page.fill('#companyINN', '7707083893');
+  await page.fill('#companyOGRN', '1027700132195');
+  await page.fill('#companyLegalName', 'ООО ЛОМО');
+  await page.fill('#companyLegalAddress', 'Москва, Тестовая 1');
+  await page.check('#actualSameAsLegal');
+  await page.fill('#companyCEOName', 'Иван Иванов');
+  await page.click('#btnSaveCompanyDocs');
+
+  await expect.poll(() => savedPayload && savedPayload.inn).toBe('7707083893');
+  await expect(page.locator('#companyVerifyBanner')).toContainText('Документы на проверке');
 });
