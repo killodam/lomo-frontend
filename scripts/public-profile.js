@@ -137,6 +137,8 @@
         if (u.active_projects) {
           employerSections += '<div class="pubProfileSection"><div class="pubProfileSTitle">Активные проекты</div><div class="pubProfileText">'+escHtml(u.active_projects.replace(/;/g,', '))+'</div></div>';
         }
+        // Jobs placeholder — populated after render
+        employerSections += '<div id="pubEmployerJobsSection" class="pubProfileSection" style="display:none"><div class="pubProfileSTitle">Открытые вакансии</div><div id="pubEmployerJobsList"></div></div>';
       }
 
       // ── VERIFICATION CHIPS ────────────────────────────────────────────
@@ -220,11 +222,43 @@
       show('publicProfile');
       if (canConnect) loadPublicConnectionPanel(u.id);
       if (canEmployerRequest) loadEmployerAccessPanel(u.id);
+      if (isEmployer) loadPublicEmployerJobs(u.id);
     }
 
     function closeUserProfile(){
       if (typeof resetPageSeo === 'function') resetPageSeo();
       closePublicProfile();
+    }
+
+    function loadPublicEmployerJobs(userId) {
+      var section = document.getElementById('pubEmployerJobsSection');
+      var list    = document.getElementById('pubEmployerJobsList');
+      if (!section || !list) return;
+
+      apiFetch('/jobs?company_id=' + encodeURIComponent(userId) + '&pageSize=10')
+        .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
+        .then(function(data) {
+          var items = (data.items || []);
+          if (!items.length) return;
+          section.style.display = '';
+          list.innerHTML = items.map(function(j) {
+            var sal = '';
+            if (j.salary_from && j.salary_to) sal = Number(j.salary_from).toLocaleString('ru') + ' — ' + Number(j.salary_to).toLocaleString('ru') + ' ₽';
+            else if (j.salary_from) sal = 'от ' + Number(j.salary_from).toLocaleString('ru') + ' ₽';
+            else if (j.salary_to)  sal = 'до ' + Number(j.salary_to).toLocaleString('ru') + ' ₽';
+            return '<div class="pubJobItem">'
+              + '<div class="pubJobTitle">' + escHtml(j.title) + '</div>'
+              + '<div class="pubJobMeta">'
+                + escHtml(j.direction)
+                + ' · ' + escHtml(j.format)
+                + (j.grade ? ' · ' + escHtml(j.grade) : '')
+                + (sal ? ' · ' + sal : '')
+                + (j.city ? ' · 📍 ' + escHtml(j.city) : '')
+              + '</div>'
+            + '</div>';
+          }).join('');
+        })
+        .catch(function() {});
     }
 
     function loadUserFiles(userId){
