@@ -236,7 +236,6 @@
       if (!section || !list) return;
 
       apiFetch('/jobs?company_id=' + encodeURIComponent(userId) + '&pageSize=10')
-        .then(function(r) { return r.ok ? r.json() : Promise.reject(); })
         .then(function(data) {
           var items = (data.items || []);
           if (!items.length) return;
