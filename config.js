@@ -1,6 +1,8 @@
 (function initLomoConfig() {
-  var defaultApiBase = '/api';
-  var defaultChatWsBase = window.location.origin;
+  var host = window.location.hostname || '';
+  var isLocal = host === 'localhost' || host === '127.0.0.1';
+  var defaultApiBase = isLocal ? 'http://localhost:3000/api' : '/api';
+  var defaultChatWsBase = isLocal ? 'http://localhost:3000' : window.location.origin;
 
   window.LOMO_CONFIG = Object.assign(
     {
