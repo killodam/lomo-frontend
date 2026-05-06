@@ -19,8 +19,33 @@
       openUserProfile(u);
     }
 
+    function _getActiveScreenKey() {
+      if (typeof activeScreenKey === 'string' && activeScreenKey && screens[activeScreenKey]) {
+        return activeScreenKey;
+      }
+      var keys = Object.keys(screens);
+      for (var i = 0; i < keys.length; i += 1) {
+        var key = keys[i];
+        if (screens[key] && screens[key].classList.contains('active')) return key;
+      }
+      return '';
+    }
+
+    function _rememberProfileFromScreen(nextKey) {
+      var sourceKey = nextKey || _getActiveScreenKey();
+      if (!sourceKey || sourceKey === 'publicProfile' || !screens[sourceKey]) return;
+      _profileFromScreen = sourceKey;
+    }
+
+    function _getProfileReturnScreen() {
+      if (_profileFromScreen && _profileFromScreen !== 'publicProfile' && screens[_profileFromScreen]) {
+        return _profileFromScreen;
+      }
+      return 'landing';
+    }
+
     function closePublicProfile(){
-      show(_profileFromScreen);
+      show(_getProfileReturnScreen());
     }
 
     function _parseSkills(raw) {
@@ -39,9 +64,8 @@
     var GRADE_LABELS = { intern:'Стажёр', junior:'Junior', middle:'Middle', senior:'Senior', lead:'Lead' };
     var FORMAT_LABELS = { remote:'Удалённо', office:'Офис', hybrid:'Гибрид' };
 
-    function openUserProfile(u){
-      var activeKey = Object.keys(screens).find(function(k){ return screens[k] && screens[k].classList.contains('active'); });
-      if(activeKey) _profileFromScreen = activeKey;
+    function openUserProfile(u, fromScreenKey){
+      _rememberProfileFromScreen(fromScreenKey);
       _activePublicProfileUserId = u.id || '';
 
       var isEmployer = u.role === 'employer';
@@ -277,14 +301,14 @@
     }
 
 function openPublicProfileByPublicId(publicId) {
+  var fromScreenKey = _getActiveScreenKey();
   apiGetPublicProfile(publicId).then(function(profile){
     if (!profile) throw new Error('Not found');
     var u = Object.assign({}, profile, { id: profile.id || publicId, role: profile.role || 'candidate' });
     _userCache[String(u.id)] = u;
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    openUserProfile(u);
+    openUserProfile(u, fromScreenKey);
   }).catch(function(){
     showToast('Профиль не найден', 'error');
-    show('landing');
+    show(_getProfileReturnScreen());
   });
 }
