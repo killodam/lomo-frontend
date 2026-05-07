@@ -460,3 +460,510 @@
     .pubJobItem:last-child{ border-bottom:none; }
     .pubJobTitle{ font-size:14px; font-weight:600; color:#111827; margin-bottom:3px; }
     .pubJobMeta{ font-size:12px; color:#6b7280; }
+
+/* ════════════════════════════════════════════════════════
+   PREMIUM AUTH SCREENS
+   ════════════════════════════════════════════════════════ */
+.authBrandMark {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .20em;
+  text-transform: uppercase;
+  color: #2a7a8a;
+  margin-bottom: -6px;
+}
+.authBrandLogo {
+  font-size: 14px;
+  color: #2a7a8a;
+  display: inline-block;
+  animation: authLogoSpin 8s linear infinite;
+}
+@keyframes authLogoSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.authBrandTitle {
+  font-size: 26px;
+  font-weight: 800;
+  letter-spacing: -.03em;
+  color: rgba(0,0,0,.88);
+  text-align: center;
+  margin-bottom: -4px;
+}
+#screenLoginForm .centerBlock { gap: 12px; }
+#screenLoginForm .wrap { padding-top: 60px; justify-content: flex-start; }
+
+/* ════════════════════════════════════════════════════════
+   PREMIUM CHAT ENHANCEMENTS (light mode)
+   ════════════════════════════════════════════════════════ */
+
+/* Accent stripe at bottom of header */
+.chatHeader::after {
+  content: '';
+  display: block;
+  height: 2px;
+  background: linear-gradient(90deg, transparent 0%, rgba(38,110,120,.18) 30%, rgba(56,178,172,.35) 50%, rgba(38,110,120,.18) 70%, transparent 100%);
+}
+/* Bubble glow */
+.chatBubble.mine {
+  box-shadow: 0 2px 12px rgba(38,110,120,.28);
+}
+/* Sidebar search */
+.chatSearchWrap {
+  padding: 10px 10px 6px;
+  border-bottom: 1px solid rgba(0,0,0,.04);
+}
+.chatSearchInput {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 8px 14px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(0,0,0,.08);
+  background: rgba(0,0,0,.03);
+  font: inherit;
+  font-size: 13px;
+  color: #0e0f0f;
+  outline: none;
+  transition: border .15s, background .15s;
+}
+.chatSearchInput:focus {
+  border-color: rgba(38,110,120,.30);
+  background: rgba(38,110,120,.04);
+}
+
+/* ════════════════════════════════════════════════════════
+   DRAWER THEME TOGGLE
+   ════════════════════════════════════════════════════════ */
+.drawerThemeBtn {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(0,0,0,.09);
+  background: rgba(0,0,0,.03);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(0,0,0,.78);
+  transition: background .18s, border-color .18s, color .18s;
+  margin-bottom: 12px;
+  text-align: left;
+}
+.drawerThemeBtn:hover {
+  background: rgba(38,110,120,.07);
+  border-color: rgba(38,110,120,.20);
+  color: #1a5c68;
+}
+.drawerThemeIcon { font-size: 17px; line-height: 1; flex-shrink: 0; }
+.drawerThemeLabel { flex: 1; }
+.drawerThemeTrack {
+  width: 36px;
+  height: 20px;
+  border-radius: 999px;
+  background: rgba(0,0,0,.14);
+  position: relative;
+  flex-shrink: 0;
+  transition: background .22s cubic-bezier(.4,0,.2,1);
+}
+.drawerThemeKnob {
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgba(0,0,0,.22);
+  transition: transform .22s cubic-bezier(.4,0,.2,1);
+}
+
+/* ════════════════════════════════════════════════════════
+   DARK THEME — CSS VARIABLES
+   ════════════════════════════════════════════════════════ */
+:root[data-theme="dark"] {
+  --bg: #0d1117;
+  --label: rgba(225,229,235,.90);
+  --placeholder: rgba(225,229,235,.38);
+  --sqFill: rgba(255,255,255,.07);
+  --sqBorder: rgba(255,255,255,.11);
+  --sqHoverFill: rgba(255,255,255,.10);
+  --sqHoverBorder: rgba(255,255,255,.17);
+  --backFill: rgba(255,255,255,.06);
+  --backBorder: rgba(255,255,255,.13);
+  --accentFill: rgba(56,178,172,.16);
+  --accentBorder: rgba(56,178,172,.30);
+  --accentText: #4ecdc4;
+  --accentHoverFill: rgba(56,178,172,.22);
+  --accentHoverBorder: rgba(56,178,172,.45);
+}
+
+/* Body background */
+[data-theme="dark"] body {
+  background:
+    radial-gradient(900px 600px at 15% 0%, rgba(38,130,145,.07), transparent 55%),
+    radial-gradient(700px 500px at 85% 10%, rgba(38,110,125,.05), transparent 50%),
+    #0d1117;
+}
+body { transition: background .22s ease; }
+
+/* ── Drawer dark ── */
+[data-theme="dark"] .drawerOverlay { background: rgba(0,0,0,.65); }
+[data-theme="dark"] .drawer {
+  background: rgba(18,26,29,.97);
+  border-right-color: rgba(255,255,255,.08);
+}
+[data-theme="dark"] .drawerHead { border-bottom-color: rgba(255,255,255,.07); }
+[data-theme="dark"] .drawerBrand { color: rgba(225,229,235,.88); }
+[data-theme="dark"] .drawerClose {
+  border-color: rgba(255,255,255,.10);
+  background: rgba(255,255,255,.05);
+  color: rgba(225,229,235,.60);
+}
+[data-theme="dark"] .drawerClose:hover { background: rgba(255,255,255,.09); }
+[data-theme="dark"] .drawerItem {
+  border-color: rgba(255,255,255,.08) !important;
+  background: rgba(255,255,255,.04) !important;
+  color: rgba(225,229,235,.75) !important;
+}
+[data-theme="dark"] .drawerItem:hover {
+  background: rgba(56,178,172,.10) !important;
+  color: #4ecdc4 !important;
+  box-shadow: none !important;
+}
+[data-theme="dark"] .drawerFoot { border-top-color: rgba(255,255,255,.07); }
+[data-theme="dark"] .drawerHint { color: rgba(225,229,235,.30); }
+[data-theme="dark"] .drawerThemeBtn {
+  border-color: rgba(255,255,255,.10);
+  background: rgba(255,255,255,.05);
+  color: rgba(225,229,235,.80);
+}
+[data-theme="dark"] .drawerThemeBtn:hover {
+  background: rgba(56,178,172,.10);
+  border-color: rgba(56,178,172,.25);
+  color: #4ecdc4;
+}
+[data-theme="dark"] .drawerThemeTrack { background: #26707a; }
+[data-theme="dark"] .drawerThemeKnob { transform: translateX(16px); }
+
+/* ── General inputs / buttons dark ── */
+[data-theme="dark"] .sqInput {
+  background: var(--sqFill);
+  border-color: var(--sqBorder);
+}
+[data-theme="dark"] .sqInput input,
+[data-theme="dark"] .sqInput textarea { color: var(--label); }
+[data-theme="dark"] .sqInput input::placeholder,
+[data-theme="dark"] .sqInput textarea::placeholder { color: var(--placeholder); }
+[data-theme="dark"] .sqInput:focus-within {
+  background: rgba(56,178,172,.07) !important;
+  border-color: rgba(56,178,172,.38) !important;
+}
+[data-theme="dark"] .sqText { color: rgba(225,229,235,.90) !important; }
+[data-theme="dark"] .sqSubtext { color: #4ecdc4 !important; opacity:1 !important; }
+[data-theme="dark"] .backBtn,
+[data-theme="dark"] .backBtnInline {
+  border-color: rgba(255,255,255,.15) !important;
+  background: rgba(255,255,255,.06) !important;
+  color: rgba(225,229,235,.75) !important;
+}
+[data-theme="dark"] .backBtn:hover,
+[data-theme="dark"] .backBtnInline:hover {
+  border-color: rgba(56,178,172,.35) !important;
+  color: #4ecdc4 !important;
+  background: rgba(56,178,172,.08) !important;
+}
+
+/* ── Auth screens dark ── */
+[data-theme="dark"] .authBrandMark { color: #4ecdc4; }
+[data-theme="dark"] .authBrandLogo { color: #4ecdc4; }
+[data-theme="dark"] .authBrandTitle { color: rgba(225,229,235,.92); }
+[data-theme="dark"] .regFormTitle { color: rgba(225,229,235,.92); }
+[data-theme="dark"] .authFlowTitle { color: rgba(225,229,235,.92); }
+[data-theme="dark"] .authFlowSub { color: rgba(225,229,235,.52); }
+[data-theme="dark"] #screenLoginForm .sqInput,
+[data-theme="dark"] #screenRoleReg .sqInput,
+[data-theme="dark"] #screenRegForm .sqInput {
+  background: rgba(255,255,255,.06) !important;
+  border-color: rgba(255,255,255,.11) !important;
+  box-shadow: none !important;
+}
+[data-theme="dark"] #screenLoginForm .sqInput input,
+[data-theme="dark"] #screenRoleReg .sqInput input,
+[data-theme="dark"] #screenRegForm .sqInput input { color: rgba(225,229,235,.90) !important; }
+[data-theme="dark"] #screenLoginForm .sqInput input::placeholder,
+[data-theme="dark"] #screenRoleReg .sqInput input::placeholder,
+[data-theme="dark"] #screenRegForm .sqInput input::placeholder { color: rgba(225,229,235,.35) !important; }
+[data-theme="dark"] #screenLoginForm .sqInput:focus-within,
+[data-theme="dark"] #screenRoleReg .sqInput:focus-within,
+[data-theme="dark"] #screenRegForm .sqInput:focus-within {
+  background: rgba(56,178,172,.08) !important;
+  border-color: rgba(56,178,172,.40) !important;
+  box-shadow: 0 0 0 3px rgba(56,178,172,.08) !important;
+}
+[data-theme="dark"] #screenLoginForm .accentBtn,
+[data-theme="dark"] #screenRoleReg .accentBtn,
+[data-theme="dark"] #screenRegForm .accentBtn {
+  background: #26707a; border-color: #26707a;
+}
+[data-theme="dark"] #screenLoginForm .accentBtn:hover,
+[data-theme="dark"] #screenRoleReg .accentBtn:hover,
+[data-theme="dark"] #screenRegForm .accentBtn:hover {
+  background: #1f5c68; border-color: #1f5c68;
+}
+[data-theme="dark"] #screenLoginForm .backBtn,
+[data-theme="dark"] #screenRoleReg .backBtn,
+[data-theme="dark"] #screenRegForm .backBtn {
+  color: rgba(225,229,235,.70) !important;
+  border-color: rgba(255,255,255,.14) !important;
+  background: transparent !important;
+}
+[data-theme="dark"] #screenRoleReg .sqBtn {
+  background: rgba(255,255,255,.05) !important;
+  border-color: rgba(255,255,255,.10) !important;
+  color: rgba(225,229,235,.85) !important;
+}
+[data-theme="dark"] #screenRoleReg .sqBtn:hover {
+  border-color: rgba(56,178,172,.30) !important;
+  background: rgba(56,178,172,.08) !important;
+}
+[data-theme="dark"] #screenRoleReg .sqBtn.selected {
+  border-color: rgba(56,178,172,.36) !important;
+  background: rgba(56,178,172,.13) !important;
+}
+[data-theme="dark"] .consentBox {
+  background: rgba(255,255,255,.04);
+  border-color: rgba(255,255,255,.10);
+}
+[data-theme="dark"] .consentTitle { color: rgba(78,205,196,.70); }
+[data-theme="dark"] .consentText { color: rgba(225,229,235,.60); }
+[data-theme="dark"] .consentLinks { color: #4ecdc4; }
+[data-theme="dark"] .regStep {
+  border-color: rgba(255,255,255,.18);
+  color: rgba(225,229,235,.45);
+}
+[data-theme="dark"] .regLine { background: rgba(255,255,255,.12); }
+[data-theme="dark"] .fieldError { color: #f87171; }
+[data-theme="dark"] .passwordToggle { color: rgba(225,229,235,.45); }
+[data-theme="dark"] .strengthBar { background: rgba(255,255,255,.10); }
+[data-theme="dark"] .linkBtn { color: rgba(225,229,235,.50) !important; }
+
+/* ── Top bar / feed header dark ── */
+[data-theme="dark"] .topBar {
+  background: rgba(13,17,23,.97) !important;
+  border-bottom-color: rgba(255,255,255,.07) !important;
+}
+[data-theme="dark"] .feedHeaderWord { color: rgba(225,229,235,.90) !important; }
+[data-theme="dark"] .feedHeaderBurger span { background: rgba(225,229,235,.80) !important; }
+[data-theme="dark"] .ldBurger span { background: rgba(225,229,235,.80) !important; }
+
+/* ── Feed cards dark ── */
+[data-theme="dark"] .feedCard {
+  background: #141c1e;
+  border-color: rgba(255,255,255,.07);
+}
+[data-theme="dark"] .feedCard:hover {
+  border-color: rgba(56,178,172,.25);
+  box-shadow: 0 2px 12px rgba(0,0,0,.40);
+}
+[data-theme="dark"] .feedName { color: rgba(225,229,235,.92) !important; }
+[data-theme="dark"] .feedSub { color: rgba(225,229,235,.50) !important; }
+[data-theme="dark"] .feedTag { background: rgba(255,255,255,.06); border-color: rgba(255,255,255,.09); color: rgba(225,229,235,.60); }
+[data-theme="dark"] .feedTag.teal { background: rgba(56,178,172,.12); border-color: rgba(56,178,172,.22); color: #4ecdc4; }
+[data-theme="dark"] .feedTag.ok,.feedTag.verified { background: rgba(34,197,94,.10); border-color: rgba(34,197,94,.18); color: #4ade80; }
+[data-theme="dark"] .feedTag.warn,.feedTag.pending { background: rgba(245,158,11,.10); border-color: rgba(245,158,11,.18); color: #fbbf24; }
+[data-theme="dark"] .feedEmpty { color: rgba(225,229,235,.35); }
+
+/* ── Social cards dark ── */
+[data-theme="dark"] .socialCard {
+  background: #141c1e;
+  border-color: rgba(255,255,255,.07);
+  box-shadow: none;
+}
+[data-theme="dark"] .socialCard:hover {
+  border-color: rgba(56,178,172,.25);
+  box-shadow: 0 4px 18px rgba(0,0,0,.40);
+}
+[data-theme="dark"] .scName { color: rgba(225,229,235,.92); }
+[data-theme="dark"] .scSub { color: rgba(225,229,235,.50); }
+[data-theme="dark"] .scAbout { color: rgba(225,229,235,.62); }
+[data-theme="dark"] .scBody { border-top-color: rgba(255,255,255,.06); }
+[data-theme="dark"] .scJobLine { color: #4ecdc4; }
+
+/* ── Public profile dark ── */
+[data-theme="dark"] .pubProfileCard { background: #141c1e; }
+[data-theme="dark"] .pubProfileName { color: rgba(225,229,235,.95); }
+[data-theme="dark"] .pubProfileSubtitle { color: rgba(225,229,235,.58); }
+[data-theme="dark"] .pubProfileSection { border-top-color: rgba(255,255,255,.07); }
+[data-theme="dark"] .pubProfileSTitle { color: rgba(225,229,235,.40); }
+[data-theme="dark"] .pubProfileText { color: rgba(225,229,235,.72); }
+[data-theme="dark"] .pubProfileTextAccent { color: #4ecdc4; }
+[data-theme="dark"] .pubMetaPill {
+  background: rgba(255,255,255,.05);
+  border-color: rgba(255,255,255,.08);
+  color: rgba(225,229,235,.65);
+}
+[data-theme="dark"] .pubSkillChip {
+  background: rgba(56,178,172,.12);
+  border-color: rgba(56,178,172,.22);
+  color: #4ecdc4;
+}
+[data-theme="dark"] .pubProfileEmptyHint { color: rgba(225,229,235,.35); }
+[data-theme="dark"] .pubJobItem { border-bottom-color: rgba(255,255,255,.07); }
+[data-theme="dark"] .pubJobTitle { color: rgba(225,229,235,.88); }
+[data-theme="dark"] .pubJobMeta { color: rgba(225,229,235,.50); }
+[data-theme="dark"] .pubCvBtn {
+  border-color: rgba(56,178,172,.35);
+  color: #4ecdc4;
+  background: rgba(56,178,172,.08);
+}
+[data-theme="dark"] .pubVerChip {
+  background: rgba(34,197,94,.10);
+  color: #4ade80;
+  border-color: rgba(34,197,94,.20);
+}
+[data-theme="dark"] .pubVerChip.pending {
+  background: rgba(245,158,11,.10);
+  color: #fbbf24;
+  border-color: rgba(245,158,11,.20);
+}
+
+/* ── Chat screen dark ── */
+[data-theme="dark"] #screenChat { background: #0d1117; }
+[data-theme="dark"] .chatHeader {
+  background: rgba(13,17,23,.97);
+  border-bottom-color: rgba(255,255,255,.07);
+}
+[data-theme="dark"] .chatHeader::after {
+  background: linear-gradient(90deg, transparent 0%, rgba(56,178,172,.12) 30%, rgba(78,205,196,.25) 50%, rgba(56,178,172,.12) 70%, transparent 100%);
+}
+[data-theme="dark"] .chatHeaderWord { color: rgba(225,229,235,.90); }
+[data-theme="dark"] .chatHeaderBack { color: rgba(225,229,235,.50); }
+[data-theme="dark"] .chatHeaderBack:hover { background: rgba(56,178,172,.10); color: #4ecdc4; }
+[data-theme="dark"] .chatAutoBadge {
+  background: rgba(56,178,172,.12);
+  border-color: rgba(56,178,172,.20);
+  color: #4ecdc4;
+}
+[data-theme="dark"] .chatSidebar,
+[data-theme="dark"] .chatThread {
+  background: #141c1e;
+  border-color: rgba(255,255,255,.07);
+}
+[data-theme="dark"] .chatSidebarTitle { color: rgba(225,229,235,.90); }
+[data-theme="dark"] .chatSidebarMeta { color: rgba(225,229,235,.38); }
+[data-theme="dark"] .chatSidebarHead,
+[data-theme="dark"] .chatConnectionInbox { border-bottom-color: rgba(255,255,255,.06); }
+[data-theme="dark"] .chatSearchWrap { border-bottom-color: rgba(255,255,255,.05); }
+[data-theme="dark"] .chatSearchInput {
+  background: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.09);
+  color: rgba(225,229,235,.88);
+}
+[data-theme="dark"] .chatSearchInput::placeholder { color: rgba(225,229,235,.35); }
+[data-theme="dark"] .chatSearchInput:focus {
+  border-color: rgba(56,178,172,.35);
+  background: rgba(56,178,172,.07);
+}
+[data-theme="dark"] .chatConversationItem:hover { background: rgba(255,255,255,.05); }
+[data-theme="dark"] .chatConversationItem.active { background: rgba(38,110,120,.14); }
+[data-theme="dark"] .chatConversationName { color: rgba(225,229,235,.90); }
+[data-theme="dark"] .chatConversationPreview { color: rgba(225,229,235,.48); }
+[data-theme="dark"] .chatConversationTime { color: rgba(225,229,235,.32); }
+[data-theme="dark"] .chatConversationMeta { color: rgba(225,229,235,.38); }
+[data-theme="dark"] .chatConversationEmpty { color: rgba(225,229,235,.32); }
+[data-theme="dark"] .chatThreadHead { border-bottom-color: rgba(255,255,255,.06); }
+[data-theme="dark"] .chatThreadTitle { color: rgba(225,229,235,.90); }
+[data-theme="dark"] .chatThreadMeta { color: rgba(225,229,235,.38); }
+[data-theme="dark"] .chatThreadBack { color: rgba(225,229,235,.48); }
+[data-theme="dark"] .chatThreadBack:hover { background: rgba(255,255,255,.07); color: rgba(225,229,235,.88); }
+[data-theme="dark"] .chatEmptyIco { opacity: .28; }
+[data-theme="dark"] .chatEmptyTitle { color: rgba(225,229,235,.52); }
+[data-theme="dark"] .chatEmptyText { color: rgba(225,229,235,.36); }
+[data-theme="dark"] .chatBubble { background: #1e2c30; }
+[data-theme="dark"] .chatBubbleText { color: rgba(225,229,235,.88); }
+[data-theme="dark"] .chatBubble.mine { background: #1a4f57; box-shadow: 0 2px 12px rgba(0,0,0,.35); }
+[data-theme="dark"] .chatBubble.mine .chatBubbleText { color: #ddf4f7; }
+[data-theme="dark"] .chatBubbleMeta { color: rgba(225,229,235,.28); }
+[data-theme="dark"] .chatBubble.mine .chatBubbleMeta { color: rgba(221,244,247,.40); }
+[data-theme="dark"] .chatComposer {
+  background: #141c1e;
+  border-top-color: rgba(255,255,255,.06);
+}
+[data-theme="dark"] .chatComposerInput {
+  background: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.09);
+  color: rgba(225,229,235,.88);
+}
+[data-theme="dark"] .chatComposerInput::placeholder { color: rgba(225,229,235,.38); }
+[data-theme="dark"] .chatComposerInput:focus {
+  border-color: rgba(56,178,172,.38);
+  box-shadow: 0 0 0 3px rgba(56,178,172,.08);
+  background: rgba(255,255,255,.07);
+}
+[data-theme="dark"] .chatComposerMeta { color: rgba(225,229,235,.32); }
+[data-theme="dark"] .chatSendBtn { box-shadow: 0 2px 8px rgba(0,0,0,.35); }
+[data-theme="dark"] .chatSendBtn:disabled { background: rgba(255,255,255,.12); }
+[data-theme="dark"] .chatRefreshIconBtn { color: rgba(225,229,235,.28); }
+[data-theme="dark"] .chatRefreshIconBtn:hover { color: #4ecdc4; background: rgba(56,178,172,.10); }
+[data-theme="dark"] .chatConnectionCard {
+  background: #1a2528;
+  border-color: rgba(255,255,255,.07);
+}
+[data-theme="dark"] .chatConnectionCard.incoming {
+  background: rgba(38,110,120,.10);
+  border-color: rgba(56,178,172,.15);
+}
+[data-theme="dark"] .chatConnectionName { color: rgba(225,229,235,.90); }
+[data-theme="dark"] .chatConnectionMeta { color: rgba(225,229,235,.50); }
+[data-theme="dark"] .chatConnectionBtn {
+  background: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.10);
+  color: rgba(225,229,235,.75);
+}
+[data-theme="dark"] .chatConnectionBtn.primary { background: #26707a; border-color: #26707a; color: #fff; }
+[data-theme="dark"] .chatConnectionBtn.danger { color: #f87171; }
+[data-theme="dark"] .chatInboxTitle { color: rgba(225,229,235,.42); }
+[data-theme="dark"] .chatInboxCount { background: rgba(56,178,172,.15); color: #4ecdc4; }
+[data-theme="dark"] .chatNewMessagesBtn {
+  background: rgba(13,17,23,.97);
+  border-color: rgba(56,178,172,.25);
+  color: #4ecdc4;
+  box-shadow: 0 4px 14px rgba(0,0,0,.30);
+}
+[data-theme="dark"] .chatProfileBtn {
+  border-color: rgba(56,178,172,.28);
+  color: #4ecdc4;
+}
+[data-theme="dark"] .chatProfileBtn:hover { background: rgba(56,178,172,.10); }
+[data-theme="dark"] .chatMessageList::-webkit-scrollbar-thumb { background: rgba(255,255,255,.09); }
+[data-theme="dark"] .chatConversationList::-webkit-scrollbar-thumb { background: rgba(255,255,255,.09); }
+
+/* ── Modal dark ── */
+[data-theme="dark"] .modalOverlay { background: rgba(0,0,0,.65); }
+[data-theme="dark"] .modalCard {
+  background: #141c1e;
+  border-color: rgba(255,255,255,.09);
+  box-shadow: 0 24px 64px rgba(0,0,0,.55);
+}
+[data-theme="dark"] .modalTitle { color: rgba(225,229,235,.95); }
+[data-theme="dark"] .modalParagraph { color: rgba(225,229,235,.68); }
+[data-theme="dark"] .modalList li { color: rgba(225,229,235,.65); }
+[data-theme="dark"] .modalClose {
+  border-color: rgba(255,255,255,.10);
+  background: rgba(255,255,255,.05);
+  color: rgba(225,229,235,.60);
+}
+
+/* ── Toast dark ── */
+[data-theme="dark"] #toast {
+  background: #1e2c30;
+  box-shadow: 0 8px 32px rgba(0,0,0,.50);
+}
+[data-theme="dark"] #toast.success { background: #1a3a30; border-color: rgba(34,197,94,.25); }
+[data-theme="dark"] #toast.error   { background: #2a1a1a; border-color: rgba(239,68,68,.25); }
+[data-theme="dark"] #toast.info    { background: #1a2a3a; border-color: rgba(59,130,246,.25); }
