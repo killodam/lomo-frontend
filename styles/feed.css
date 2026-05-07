@@ -632,6 +632,7 @@
 
 /* ── Responsive ── */
 @media (max-width: 640px) {
+  .feedHeader { padding-top: env(safe-area-inset-top, 0px); }
   .feedHeaderInner { padding: 0 14px; height: 52px; }
   .feedHeaderWord { display: none; }
   .feedHeaderNav { gap: 4px; }

@@ -12,6 +12,7 @@
       }
       
       body {
+        background: #fff;
         overflow-x: hidden;
         min-height: 100dvh;
       }
@@ -81,7 +82,15 @@
       #screenVerifyCode .wrap,
       #screenResetPassword .wrap,
       #screenRegForm .wrap {
-        padding-top: calc(74px + env(safe-area-inset-top, 0px));
+        padding-top: calc(92px + env(safe-area-inset-top, 0px));
+      }
+
+      .screenTopBarInset {
+        padding-top: env(safe-area-inset-top, 0px);
+      }
+
+      .stickyTop {
+        top: 0 !important;
       }
 
       #screenRoleReg .centerBlock,
