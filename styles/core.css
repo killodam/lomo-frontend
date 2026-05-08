@@ -603,15 +603,22 @@
     #screenRegForm .wrap{
       gap: 14px;
       padding-bottom: 0;
-      padding-top: 64px;
+      padding-top: 20px;
       justify-content: flex-start;
+      background: #fff;
     }
     #screenRegForm .centerBlock{
       gap: 14px;
     }
     #screenRegForm .footerArea{
+      padding: 4px 0 40px;
+    }
+
+    /* Back button: in-flow (not absolute) so it stays visible when form scrolls */
+    #screenRegForm .backBtn {
       position: static;
-      padding: 8px 0 40px;
+      align-self: flex-start;
+      margin-left: 16px;
     }
 
     #screenLoginForm .backBtn,

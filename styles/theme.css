@@ -679,6 +679,7 @@ body { transition: background .22s ease; }
 }
 
 /* ── Auth screens dark ── */
+[data-theme="dark"] #screenRegForm .wrap { background: #0d1117; }
 [data-theme="dark"] .authBrandMark { color: #4ecdc4; }
 [data-theme="dark"] .authBrandLogo { color: #4ecdc4; }
 [data-theme="dark"] .authBrandTitle { color: rgba(225,229,235,.92); }
