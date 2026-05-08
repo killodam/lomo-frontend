@@ -614,11 +614,14 @@
       padding: 4px 0 40px;
     }
 
-    /* Back button: in-flow (not absolute) so it stays visible when form scrolls */
+    /* Back button: sticky so it stays visible even when the long form is scrolled */
     #screenRegForm .backBtn {
-      position: static;
+      position: sticky;
+      top: 16px;
       align-self: flex-start;
       margin-left: 16px;
+      left: auto;
+      z-index: 10;
     }
 
     #screenLoginForm .backBtn,
