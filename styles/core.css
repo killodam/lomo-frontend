@@ -611,7 +611,8 @@
       gap: 14px;
     }
     #screenRegForm .footerArea{
-      padding: 4px 0 40px;
+      position: static;
+      padding: 8px 0 40px;
     }
 
     /* Back button: sticky so it stays visible even when the long form is scrolled */
