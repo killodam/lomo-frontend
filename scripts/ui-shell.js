@@ -10,8 +10,7 @@
   }
   var saved = '';
   try { saved = localStorage.getItem(THEME_KEY) || ''; } catch (e) {}
-  var preferDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
-  applyTheme(saved || (preferDark ? 'dark' : 'light'));
+  applyTheme(saved || 'light');
 
   document.addEventListener('DOMContentLoaded', function () {
     var btn = document.getElementById('themeToggleBtn');
