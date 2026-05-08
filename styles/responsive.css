@@ -296,9 +296,10 @@
       }
 
       .backBtn {
+        position: fixed;
         left: 16px;
         top: calc(14px + env(safe-area-inset-top, 0px));
-        z-index: 6;
+        z-index: 120;
       }
 
       .topBar {
