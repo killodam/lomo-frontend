@@ -22,14 +22,14 @@
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" href="./icons/app-icon.svg" type="image/svg+xml"/>
 <link rel="apple-touch-icon" href="./icons/icon-192.png"/>
-<link rel="stylesheet" href="./styles/core.css?v=3"/>
-<link rel="stylesheet" href="./styles/profile.css?v=3"/>
-<link rel="stylesheet" href="./styles/theme.css?v=3"/>
-<link rel="stylesheet" href="./styles/responsive.css?v=3"/>
-<link rel="stylesheet" href="./styles/chat.css?v=3"/>
-<link rel="stylesheet" href="./styles/landing.css?v=3"/>
-<link rel="stylesheet" href="./styles/feed.css?v=3"/>
-<link rel="stylesheet" href="./styles/info-screens.css?v=3"/>
+<link rel="stylesheet" href="./styles/core.css?v=5"/>
+<link rel="stylesheet" href="./styles/profile.css?v=5"/>
+<link rel="stylesheet" href="./styles/theme.css?v=5"/>
+<link rel="stylesheet" href="./styles/responsive.css?v=5"/>
+<link rel="stylesheet" href="./styles/chat.css?v=5"/>
+<link rel="stylesheet" href="./styles/landing.css?v=5"/>
+<link rel="stylesheet" href="./styles/feed.css?v=5"/>
+<link rel="stylesheet" href="./styles/info-screens.css?v=5"/>
 </head>
 <body>
 <div class="stage">
@@ -331,8 +331,8 @@
 
 <!-- 4A) REGISTRATION FORM -->
 <section aria-label="Registration form" class="screen" id="screenRegForm">
-<div class="wrap">
 <button aria-label="Back" class="backBtn" data-back="toRoleReg">← Назад</button>
+<div class="wrap">
 <div class="centerBlock">
 <div class="regProgress" id="regProgressForm">
   <span class="regStep done">1</span>
@@ -384,9 +384,7 @@
   <div class="consentError" id="consentError" aria-live="polite">Пожалуйста, подтвердите все согласия</div>
 </div>
 
-<div class="footerArea">
-<button class="accentBtn nextBtn" id="btnRegNext" data-next="fromRegForm" disabled>далее</button>
-</div>
+<button class="accentBtn nextBtn" id="btnRegNext" data-next="fromRegForm" disabled style="margin: 8px 0 40px;">далее</button>
 </div>
 </section>
 

@@ -603,25 +603,18 @@
     #screenRegForm .wrap{
       gap: 14px;
       padding-bottom: 0;
-      padding-top: 20px;
+      padding-top: 64px;
       justify-content: flex-start;
       background: #fff;
+      overflow-y: visible;
     }
     #screenRegForm .centerBlock{
       gap: 14px;
     }
-    #screenRegForm .footerArea{
-      position: static;
-      padding: 8px 0 40px;
-    }
-
-    /* Back button: sticky so it stays visible even when the long form is scrolled */
-    #screenRegForm .backBtn {
-      position: sticky;
-      top: 16px;
-      align-self: flex-start;
-      margin-left: 16px;
-      left: auto;
+    #screenRegForm > .backBtn {
+      position: absolute;
+      top: 20px;
+      left: 20px;
       z-index: 10;
     }
 
