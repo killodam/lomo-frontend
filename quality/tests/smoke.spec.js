@@ -1847,14 +1847,20 @@ test('registration form keeps back button and step 2 progress visible', async ({
   const backBox = await page.locator('#screenRegForm > .backBtn').boundingBox();
   const progressBox = await page.locator('#regProgressForm').boundingBox();
   const activeStepBox = await page.locator('#regProgressForm .regStep.active').boundingBox();
+  const titleBox = await page.locator('#screenRegForm .regFormTitle').boundingBox();
+  const nextBox = await page.locator('#btnRegNext').boundingBox();
 
   expect(backBox).not.toBeNull();
   expect(progressBox).not.toBeNull();
   expect(activeStepBox).not.toBeNull();
+  expect(titleBox).not.toBeNull();
+  expect(nextBox).not.toBeNull();
   expect(backBox.y).toBeGreaterThanOrEqual(24);
   expect(progressBox.y).toBeGreaterThanOrEqual(36);
   expect(activeStepBox.y).toBeGreaterThanOrEqual(36);
   expect(progressBox.x).toBeGreaterThan(backBox.x + backBox.width + 80);
+  expect(titleBox.y).toBeGreaterThan(progressBox.y + progressBox.height + 24);
+  expect(nextBox.width).toBeLessThan(140);
 });
 
 test('mobile candidate feed avoids horizontal overflow after login', async ({ page }) => {

@@ -319,10 +319,15 @@
       #screenRegForm .wrap > .regProgress {
         position: fixed;
         top: calc(28px + env(safe-area-inset-top, 0px));
-        left: auto;
-        right: 18px;
-        transform: none;
+        left: 50%;
+        right: auto;
+        transform: translateX(-50%);
         z-index: 130;
+        gap: 5px;
+      }
+
+      #screenRegForm .wrap > .regProgress .regLine {
+        min-width: 15px;
       }
 
       .topBar {
