@@ -603,7 +603,7 @@
     #screenRegForm .wrap{
       gap: 14px;
       padding-bottom: 0;
-      padding-top: 72px;
+      padding-top: 0;
       justify-content: flex-start;
       align-items: center;
       background: #fff;
@@ -623,21 +623,23 @@
       z-index: 10;
     }
 
-    /* Progress indicator pinned at top-center, always visible even when form scrolls */
-    #screenRegForm > .regProgress {
-      position: absolute;
-      top: 24px;
-      left: 50%;
-      transform: translateX(-50%);
-      margin-bottom: 0;
+    /* Progress indicator: sticky inside wrap so it stays visible on scroll */
+    #screenRegForm .wrap > .regProgress {
+      position: sticky;
+      top: 0;
       z-index: 5;
-      width: auto;
+      background: #fff;
+      padding: 14px 0 10px;
+      margin-bottom: 0;
+      width: 100%;
+      justify-content: center;
     }
 
-    /* Role selection: top-align content so there's no huge empty space above */
+    /* Role selection: vertically centered, just enough top padding for the back button */
     #screenRoleReg .wrap {
-      justify-content: flex-start;
-      padding-top: 100px;
+      justify-content: center;
+      padding-top: 60px;
+      padding-bottom: 60px;
     }
 
     #screenLoginForm .backBtn,
