@@ -1837,6 +1837,7 @@ test('registration form keeps back button and step 2 progress visible', async ({
 
   await page.goto('/');
   await page.click('#landingRegBtn2');
+  const roleBackBox = await page.locator('#screenRoleReg .backBtn').boundingBox();
   await page.click('#roleChoices [data-value="EMPLOYEE"]');
   await page.click('#btnRoleNext');
 
@@ -1860,6 +1861,9 @@ test('registration form keeps back button and step 2 progress visible', async ({
   expect(activeStepBox.y).toBeGreaterThanOrEqual(36);
   expect(progressBox.x).toBeGreaterThan(backBox.x + backBox.width + 80);
   expect(titleBox.y).toBeGreaterThan(progressBox.y + progressBox.height + 24);
+  expect(roleBackBox).not.toBeNull();
+  expect(Math.abs(backBox.width - roleBackBox.width)).toBeLessThan(1);
+  expect(Math.abs(backBox.height - roleBackBox.height)).toBeLessThan(1);
   expect(nextBox.width).toBeLessThan(140);
 });
 
