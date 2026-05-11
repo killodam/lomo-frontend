@@ -955,9 +955,8 @@ function getPasswordPolicyError(password) {
           (async () => {
             try {
               const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-              const loginRe = /^[a-z0-9._-]{3,32}$/i;
-              if (!emailRe.test(loginEmail) && !loginRe.test(loginEmail)) {
-                showToast('Введите корректный email или логин');
+              if (!emailRe.test(loginEmail)) {
+                showToast('Введите корректный email');
                 if(loginBtn) loginBtn.disabled = false;
                 return;
               }

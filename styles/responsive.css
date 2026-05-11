@@ -85,6 +85,10 @@
         padding-top: calc(92px + env(safe-area-inset-top, 0px));
       }
 
+      #screenRegForm .wrap {
+        padding-top: calc(118px + env(safe-area-inset-top, 0px));
+      }
+
       .screenTopBarInset {
         padding-top: env(safe-area-inset-top, 0px);
       }
@@ -300,6 +304,25 @@
         left: 16px;
         top: calc(14px + env(safe-area-inset-top, 0px));
         z-index: 120;
+      }
+
+      #screenRegForm > .backBtn {
+        position: fixed;
+        left: 18px;
+        top: calc(18px + env(safe-area-inset-top, 0px));
+        min-height: 48px;
+        padding: 0 18px;
+        font-size: 16px;
+        z-index: 140;
+      }
+
+      #screenRegForm .wrap > .regProgress {
+        position: fixed;
+        top: calc(28px + env(safe-area-inset-top, 0px));
+        left: auto;
+        right: 18px;
+        transform: none;
+        z-index: 130;
       }
 
       .topBar {

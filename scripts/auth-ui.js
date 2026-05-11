@@ -146,4 +146,4 @@ function wireEmailValidation(inputId, wrapId, errorId, options = {}) {
 }
 
 wireEmailValidation('regEmail', 'sqInputRegEmail', 'regEmailError');
-wireEmailValidation('loginEmail', 'sqInputLoginEmail', 'loginEmailError', { allowLogin: true });
+wireEmailValidation('loginEmail', 'sqInputLoginEmail', 'loginEmailError');

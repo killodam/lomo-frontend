@@ -1832,6 +1832,31 @@ test('mobile registration role step stays readable and actionable', async ({ pag
   expect(nextBox.y + nextBox.height).toBeLessThan(844);
 });
 
+test('registration form keeps back button and step 2 progress visible', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+
+  await page.goto('/');
+  await page.click('#landingRegBtn2');
+  await page.click('#roleChoices [data-value="EMPLOYEE"]');
+  await page.click('#btnRoleNext');
+
+  await expect(page.locator('#screenRegForm')).toHaveClass(/active/);
+  await expect(page.locator('#screenRegForm > .backBtn')).toBeVisible();
+  await expect(page.locator('#regProgressForm .regStep.active')).toHaveText('2');
+
+  const backBox = await page.locator('#screenRegForm > .backBtn').boundingBox();
+  const progressBox = await page.locator('#regProgressForm').boundingBox();
+  const activeStepBox = await page.locator('#regProgressForm .regStep.active').boundingBox();
+
+  expect(backBox).not.toBeNull();
+  expect(progressBox).not.toBeNull();
+  expect(activeStepBox).not.toBeNull();
+  expect(backBox.y).toBeGreaterThanOrEqual(24);
+  expect(progressBox.y).toBeGreaterThanOrEqual(36);
+  expect(activeStepBox.y).toBeGreaterThanOrEqual(36);
+  expect(progressBox.x).toBeGreaterThan(backBox.x + backBox.width + 80);
+});
+
 test('mobile candidate feed avoids horizontal overflow after login', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
 
@@ -2070,52 +2095,6 @@ test('existing account can log in by email without validation error', async ({ p
   await page.fill('#loginPassword', 'secret123');
   await page.click('[data-next="fromLoginForm"]');
   await expect(page.locator('#screenCandidateFeed')).toHaveClass(/active/);
-});
-
-test('existing account can log in by username identifier', async ({ page }) => {
-  let loginIdentifier = '';
-
-  await page.route('**/api/**', async (route) => {
-    const request = route.request();
-    const url = new URL(request.url());
-
-    if (url.pathname.endsWith('/auth/login')) {
-      const body = JSON.parse(request.postData() || '{}');
-      loginIdentifier = body.email || '';
-      return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          user: { id: 'cand-existing', email: 'existing@example.com', login: 'existing.user', role: 'candidate' },
-          profile: { full_name: 'Существующий Пользователь', location: 'Москва', edu_place: 'ВШЭ', vacancies: 'Analyst' },
-          achievements: [],
-        }),
-      });
-    }
-
-    if (url.pathname.endsWith('/profile/feed')) {
-      return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify(paginated([], 1, 12, 0)),
-      });
-    }
-
-    return route.fulfill({
-      status: 200,
-      contentType: 'application/json',
-      body: JSON.stringify([]),
-    });
-  });
-
-  await openLogin(page);
-  await page.fill('#loginEmail', 'existing.user');
-  await page.locator('#loginPassword').focus();
-  await expect(page.locator('#loginEmailError')).toHaveClass(/hidden/);
-  await page.fill('#loginPassword', 'secret123');
-  await page.click('[data-next="fromLoginForm"]');
-  await expect(page.locator('#screenCandidateFeed')).toHaveClass(/active/);
-  await expect.poll(() => loginIdentifier).toBe('existing.user');
 });
 
 test('browser back does not return authenticated user to landing', async ({ page }) => {
