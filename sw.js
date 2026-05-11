@@ -1,4 +1,4 @@
-const STATIC_CACHE = 'lomo-static-v7';
+const STATIC_CACHE = 'lomo-static-v8';
 const OFFLINE_URL = '/offline.html';
 const PRECACHE_URLS = [
   '/',

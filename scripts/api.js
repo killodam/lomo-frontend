@@ -78,6 +78,17 @@ function publicProfileUrlForId(publicId) {
   return base + '?profile=' + encodeURIComponent(publicId || '');
 }
 
+function replaceHistoryForSeo(url, screenKey) {
+  var current = {};
+  var existing = window.history && history.state && typeof history.state === 'object' ? history.state : {};
+  Object.keys(existing).forEach(function (name) {
+    current[name] = existing[name];
+  });
+  current.lomo = true;
+  current.lomoScreen = screenKey || current.lomoScreen || (typeof activeScreenKey === 'string' ? activeScreenKey : '');
+  history.replaceState(current, document.title, url);
+}
+
 function updatePageSeoForProfile(user) {
   if (!user) return;
   var isEmployer = user.role === 'employer';
@@ -101,9 +112,14 @@ function updatePageSeoForProfile(user) {
   set('twitterDesc',   'content', desc);
   set('canonicalLink', 'href',    url);
 
-  // Update browser URL (no page reload, helps crawler see unique URLs)
-  if (user.public_id && history.replaceState) {
-    history.replaceState(null, title, url);
+  // Keep public-profile URLs indexable without overwriting the previous in-app
+  // screen entry. Internal profile opens still use the SPA history stack.
+  if (
+    user.public_id &&
+    history.replaceState &&
+    (typeof activeScreenKey !== 'string' || !activeScreenKey || activeScreenKey === 'publicProfile')
+  ) {
+    replaceHistoryForSeo(url, 'publicProfile');
   }
 }
 
@@ -118,7 +134,9 @@ function resetPageSeo() {
   set('twitterTitle',  'content', title);
   set('twitterDesc',   'content', desc);
   set('canonicalLink', 'href',    location.origin + location.pathname);
-  if (history.replaceState) history.replaceState(null, title, location.origin + location.pathname);
+  if (history.replaceState && location.search.indexOf('profile=') !== -1) {
+    replaceHistoryForSeo(location.origin + location.pathname, typeof activeScreenKey === 'string' ? activeScreenKey : '');
+  }
 }
 
 function buildQuery(params = {}) {

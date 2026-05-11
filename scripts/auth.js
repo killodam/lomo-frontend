@@ -955,8 +955,9 @@ function getPasswordPolicyError(password) {
           (async () => {
             try {
               const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-              if (!emailRe.test(loginEmail)) {
-                showToast('Введите корректный email');
+              const loginRe = /^[a-z0-9._-]{3,32}$/i;
+              if (!emailRe.test(loginEmail) && !loginRe.test(loginEmail)) {
+                showToast('Введите корректный email или логин');
                 if(loginBtn) loginBtn.disabled = false;
                 return;
               }
@@ -965,9 +966,9 @@ function getPasswordPolicyError(password) {
               saveToStorage();
               pruneStaleLocalStorage(user.id);
               registerPushAfterAuth({ prompt: true });
-              if(user.role === 'employer'){ showEmployerDashboard(); }
-              else if(user.role === 'admin'){ show('adminQueue'); }
-              else { showEmployeeDashboard(); }
+              if(user.role === 'employer'){ showEmployerDashboard({ replaceHistory: true }); }
+              else if(user.role === 'admin'){ show('adminQueue', { replaceHistory: true }); }
+              else { showEmployeeDashboard({ replaceHistory: true }); }
             } catch(err) {
               showToast('Ошибка входа: ' + err.message);
               if(loginBtn) loginBtn.disabled = false;

@@ -36,6 +36,7 @@ const screens = {
   faq: document.getElementById('screenFaq'),
 };
 var activeScreenKey = '';
+var _screenHistoryApplying = false;
 
 var _RESTORABLE_SCREENS = ['candidateFeed','employerSearch','adminQueue','myEmployeeProfile','myEmployerProfile','chat','recruiterPublic','employeePublic'];
 
@@ -50,6 +51,62 @@ function getLastScreen() {
 
 function clearLastScreen() {
   try { sessionStorage.removeItem('lomo_screen'); } catch(e) {}
+}
+
+function getScreenHistoryState(key) {
+  var current = {};
+  var existing = window.history && history.state && typeof history.state === 'object' ? history.state : {};
+  Object.keys(existing).forEach(function (name) {
+    current[name] = existing[name];
+  });
+  current.lomo = true;
+  current.lomoScreen = key;
+  return current;
+}
+
+function writeScreenHistory(key, options) {
+  var opts = options || {};
+  var currentState;
+  if (_screenHistoryApplying || !window.history || !history.pushState || !history.replaceState) return;
+  if (!screens[key]) return;
+
+  currentState = history.state && typeof history.state === 'object' ? history.state : {};
+  if (opts.replaceHistory || opts.initialHistory || !currentState.lomoScreen) {
+    history.replaceState(getScreenHistoryState(key), document.title, location.href);
+    return;
+  }
+
+  if (currentState.lomoScreen === key) {
+    history.replaceState(getScreenHistoryState(key), document.title, location.href);
+    return;
+  }
+
+  history.pushState(getScreenHistoryState(key), document.title, location.href);
+}
+
+function getAuthenticatedHistoryScreen(key) {
+  var authScreens = ['landing','loginForm','roleReg','regForm','forgot','resetPassword'];
+  if (typeof state === 'undefined' || !state.userId || authScreens.indexOf(key) === -1) return key;
+  if (state.roleReg === 'ADMIN') return 'adminQueue';
+  if (state.roleReg === 'EMPLOYER') return 'employerSearch';
+  return 'candidateFeed';
+}
+
+function restoreScreenFromHistory(event) {
+  var state = event && event.state && typeof event.state === 'object' ? event.state : {};
+  var key = getAuthenticatedHistoryScreen(state.lomoScreen || '');
+  if (!key || !screens[key]) return;
+
+  _screenHistoryApplying = true;
+  try {
+    show(key);
+  } finally {
+    _screenHistoryApplying = false;
+  }
+}
+
+if (window.history && history.pushState) {
+  window.addEventListener('popstate', restoreScreenFromHistory);
 }
 
 function emitScreenChange(nextKey, previousKey) {
@@ -93,20 +150,31 @@ function setScreenActiveState(screen, isActive) {
 function showEntryScreen(options) {
   var opts = options || {};
   if (opts.clearAuth !== false && typeof clearAuthInputs === 'function') clearAuthInputs();
-  show('landing');
+  clearLastScreen();
+  show('landing', { replaceHistory: true });
 }
 
-function show(key) {
+function show(key, options) {
   var targetKey = key;
   var previousKey = activeScreenKey;
+  var historyOptions = options || {};
+  if (!screens[targetKey]) return;
+
+  if (targetKey === activeScreenKey) {
+    writeScreenHistory(targetKey, historyOptions);
+    if (typeof closeDrawer === 'function') closeDrawer();
+    if (typeof closeModal === 'function') closeModal();
+    return;
+  }
+
   Object.entries(screens).forEach(function (entry) {
     var screenKey = entry[0];
     var screen = entry[1];
     setScreenActiveState(screen, screenKey === targetKey);
   });
-  if (!screens[targetKey]) return;
   activeScreenKey = targetKey;
   saveLastScreen(targetKey);
+  writeScreenHistory(targetKey, Object.assign({}, historyOptions, { initialHistory: !previousKey }));
   try { screens[targetKey].scrollTop = 0; } catch (error) {}
   if (typeof closeDrawer === 'function') closeDrawer();
   if (typeof closeModal === 'function') closeModal();

@@ -2072,6 +2072,95 @@ test('existing account can log in by email without validation error', async ({ p
   await expect(page.locator('#screenCandidateFeed')).toHaveClass(/active/);
 });
 
+test('existing account can log in by username identifier', async ({ page }) => {
+  let loginIdentifier = '';
+
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      const body = JSON.parse(request.postData() || '{}');
+      loginIdentifier = body.email || '';
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'cand-existing', email: 'existing@example.com', login: 'existing.user', role: 'candidate' },
+          profile: { full_name: 'Существующий Пользователь', location: 'Москва', edu_place: 'ВШЭ', vacancies: 'Analyst' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([], 1, 12, 0)),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.fill('#loginEmail', 'existing.user');
+  await page.locator('#loginPassword').focus();
+  await expect(page.locator('#loginEmailError')).toHaveClass(/hidden/);
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+  await expect(page.locator('#screenCandidateFeed')).toHaveClass(/active/);
+  await expect.poll(() => loginIdentifier).toBe('existing.user');
+});
+
+test('browser back does not return authenticated user to landing', async ({ page }) => {
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'cand-existing', email: 'existing@example.com', login: 'existing.user', role: 'candidate' },
+          profile: { full_name: 'Существующий Пользователь', location: 'Москва', edu_place: 'ВШЭ', vacancies: 'Analyst' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([], 1, 12, 0)),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.fill('#loginEmail', 'existing@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+  await expect(page.locator('#screenCandidateFeed')).toHaveClass(/active/);
+
+  await page.goBack();
+  await expect(page.locator('#screenCandidateFeed')).toHaveClass(/active/);
+  await expect(page.locator('#screenLanding')).not.toHaveClass(/active/);
+});
+
 test('candidate feed header profile button opens public profile screen', async ({ page }) => {
   await page.route('**/api/**', async (route) => {
     const request = route.request();
@@ -2198,6 +2287,15 @@ test('public profile back button returns user to previous screen after public-id
 
   await expect(page.locator('#screenPublicProfile')).toHaveClass(/active/);
   await expect(page.locator('#pubProfileContent')).toContainText('Алина HR');
+
+  await page.goBack();
+  await expect(page.locator('#screenCandidateFeed')).toHaveClass(/active/);
+  await expect(page.locator('#screenLanding')).not.toHaveClass(/active/);
+
+  await page.evaluate(() => {
+    window.openPublicProfileByPublicId('LOMO-EMP00044');
+  });
+  await expect(page.locator('#screenPublicProfile')).toHaveClass(/active/);
 
   await page.click('#pubProfileBackBtn');
   await expect(page.locator('#screenCandidateFeed')).toHaveClass(/active/);

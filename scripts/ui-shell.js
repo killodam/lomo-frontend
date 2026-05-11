@@ -294,12 +294,12 @@ function bindStaticUiActions() {
 
 }
 
-function showEmployerDashboard() {
-  show('employerSearch');
+function showEmployerDashboard(options) {
+  show('employerSearch', options || {});
 }
 
-function showEmployeeDashboard() {
-  show('candidateFeed');
+function showEmployeeDashboard(options) {
+  show('candidateFeed', options || {});
 }
 
 initHashRouting();
