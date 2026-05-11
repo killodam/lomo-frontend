@@ -603,7 +603,7 @@
     #screenRegForm .wrap{
       gap: 14px;
       padding-bottom: 0;
-      padding-top: 68px;
+      padding-top: 0;
       justify-content: flex-start;
       align-items: center;
       background: #fff;
@@ -616,25 +616,32 @@
     #screenRegForm .centerBlock{
       gap: 14px;
     }
-    #screenRegForm > .backBtn {
-      position: absolute;
-      top: 20px;
-      left: 20px;
-      z-index: 10;
-    }
-
-    /* Progress indicator: sticky, sits just below the back button, stays visible on scroll */
-    #screenRegForm .wrap > .regProgress {
+    /* Reg form sticky header bar — holds back btn + progress together */
+    .regFormBar {
       position: sticky;
-      top: 68px;
-      z-index: 5;
-      background: #fff;
-      padding: 10px 0 8px;
-      margin-bottom: 4px;
-      width: var(--inW, 430px);
+      top: 0;
+      z-index: 10;
+      background: var(--bg, #fff);
+      width: 100%;
+      display: flex;
+      align-items: center;
+      padding: 20px 24px 14px;
+      box-sizing: border-box;
+    }
+    .regFormBar .backBtn {
+      position: static;
+      top: auto;
+      left: auto;
+      flex-shrink: 0;
+    }
+    .regFormBar .regProgress {
+      position: static;
+      flex: 1;
+      justify-content: center;
+      margin-bottom: 0;
     }
 
-    /* Role selection: vertically centered, just enough top padding for the back button */
+    /* Role selection: vertically centered */
     #screenRoleReg .wrap {
       justify-content: center;
       padding-top: 60px;
