@@ -80,15 +80,9 @@
       #screenLoginForm .wrap,
       #screenForgot .wrap,
       #screenVerifyCode .wrap,
-      #screenResetPassword .wrap {
-        padding-top: calc(92px + env(safe-area-inset-top, 0px));
-      }
-      /* reg form uses .regFormBar for the top area — no padding-top needed */
+      #screenResetPassword .wrap,
       #screenRegForm .wrap {
-        padding-top: env(safe-area-inset-top, 0px);
-      }
-      #screenRegForm .regFormBar {
-        padding-top: calc(16px + env(safe-area-inset-top, 0px));
+        padding-top: calc(92px + env(safe-area-inset-top, 0px));
       }
 
       .screenTopBarInset {

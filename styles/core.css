@@ -601,13 +601,16 @@
     }
 
     #screenRegForm .wrap{
-      gap: 14px;
+      gap: 16px;
+      padding-top: 76px;
       padding-bottom: 0;
-      padding-top: 0;
       justify-content: flex-start;
       align-items: center;
       background: #fff;
       overflow-y: visible;
+    }
+    #screenRegForm .wrap > .regProgress {
+      margin-bottom: 4px;
     }
     #screenRegForm .wrap > .nextBtn {
       align-self: center;
@@ -616,31 +619,6 @@
     #screenRegForm .centerBlock{
       gap: 14px;
     }
-    /* Reg form sticky header bar — holds back btn + progress together */
-    .regFormBar {
-      position: sticky;
-      top: 0;
-      z-index: 10;
-      background: var(--bg, #fff);
-      width: 100%;
-      display: flex;
-      align-items: center;
-      padding: 20px 24px 14px;
-      box-sizing: border-box;
-    }
-    .regFormBar .backBtn {
-      position: static;
-      top: auto;
-      left: auto;
-      flex-shrink: 0;
-    }
-    .regFormBar .regProgress {
-      position: static;
-      flex: 1;
-      justify-content: center;
-      margin-bottom: 0;
-    }
-
     /* Role selection: vertically centered */
     #screenRoleReg .wrap {
       justify-content: center;
