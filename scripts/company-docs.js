@@ -262,7 +262,10 @@ function saveCompanyDocs() {
 
 function showCompanyDocsToast(msg, type) {
   if (typeof window.showToast === 'function') { window.showToast(msg, type); return; }
-  alert(msg);
+  var toast = document.getElementById('toast');
+  if (!toast) return;
+  toast.textContent = msg;
+  toast.className = 'toast show ' + (type || 'info');
 }
 
 function updateCompanyType(type) {
@@ -478,7 +481,7 @@ function openAdminCompanyReview(companyId) {
     .then(function(data) {
       renderAdminCompanyModal(data);
     })
-    .catch(function() { alert('Ошибка загрузки данных компании'); });
+    .catch(function() { showCompanyDocsToast('Ошибка загрузки данных компании', 'error'); });
 }
 
 function buildAdminCompanyWarnings(data) {
@@ -623,14 +626,15 @@ function adminVerifyCompany(companyId) {
       if (d.ok) {
         document.getElementById('adminCompanyModal').classList.add('hidden');
         loadAdminCompanies();
-      } else { alert(d.error || 'Ошибка'); }
+        showCompanyDocsToast('Компания верифицирована', 'success');
+      } else { showCompanyDocsToast(d.error || 'Ошибка', 'error'); }
     })
-    .catch(function() { alert('Ошибка сети'); });
+    .catch(function() { showCompanyDocsToast('Ошибка сети', 'error'); });
 }
 
 function adminRejectCompany(companyId) {
   var reason = (document.getElementById('adminCompanyRejectReason') || {}).value || '';
-  if (!reason.trim()) { alert('Укажите причину'); return; }
+  if (!reason.trim()) { showCompanyDocsToast('Укажите причину', 'info'); return; }
   apiFetch('/company/admin/companies/' + companyId + '/reject', {
     method: 'POST',
     body: JSON.stringify({ reason: reason }),
@@ -639,9 +643,10 @@ function adminRejectCompany(companyId) {
       if (d.ok) {
         document.getElementById('adminCompanyModal').classList.add('hidden');
         loadAdminCompanies();
-      } else { alert(d.error || 'Ошибка'); }
+        showCompanyDocsToast('Компания отклонена', 'success');
+      } else { showCompanyDocsToast(d.error || 'Ошибка', 'error'); }
     })
-    .catch(function() { alert('Ошибка сети'); });
+    .catch(function() { showCompanyDocsToast('Ошибка сети', 'error'); });
 }
 
 // ── Init ──────────────────────────────────────────────────────────────────────
