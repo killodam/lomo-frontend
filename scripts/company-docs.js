@@ -303,7 +303,8 @@ function updateCompanyReadyChecklist() {
 
   el.innerHTML = items.map(function(item) {
     return '<div class="checklistItem ' + (item.ok ? 'ok' : 'miss') + '">'
-      + (item.ok ? '✓' : '○') + ' ' + escAdm(item.label)
+      + '<span class="ciIcon">' + (item.ok ? '✓' : '○') + '</span>'
+      + '<span class="ciLabel">' + escAdm(item.label) + '</span>'
       + '</div>';
   }).join('');
 }
