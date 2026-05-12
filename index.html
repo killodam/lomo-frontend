@@ -22,14 +22,14 @@
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" href="./icons/app-icon.svg" type="image/svg+xml"/>
 <link rel="apple-touch-icon" href="./icons/icon-192.png"/>
-<link rel="stylesheet" href="./styles/core.css?v=14"/>
-<link rel="stylesheet" href="./styles/profile.css?v=14"/>
-<link rel="stylesheet" href="./styles/theme.css?v=14"/>
-<link rel="stylesheet" href="./styles/responsive.css?v=14"/>
-<link rel="stylesheet" href="./styles/chat.css?v=14"/>
-<link rel="stylesheet" href="./styles/landing.css?v=14"/>
-<link rel="stylesheet" href="./styles/feed.css?v=14"/>
-<link rel="stylesheet" href="./styles/info-screens.css?v=14"/>
+<link rel="stylesheet" href="./styles/core.css?v=15"/>
+<link rel="stylesheet" href="./styles/profile.css?v=15"/>
+<link rel="stylesheet" href="./styles/theme.css?v=15"/>
+<link rel="stylesheet" href="./styles/responsive.css?v=15"/>
+<link rel="stylesheet" href="./styles/chat.css?v=15"/>
+<link rel="stylesheet" href="./styles/landing.css?v=15"/>
+<link rel="stylesheet" href="./styles/feed.css?v=15"/>
+<link rel="stylesheet" href="./styles/info-screens.css?v=15"/>
 </head>
 <body>
 <div class="stage">
@@ -647,12 +647,20 @@
       <div class="profileEditSection">
         <div class="profileSectionHead">Верификация компании</div>
         <div id="companyVerifyBanner" class="companyVerifyBanner hidden"></div>
+        <div class="companyVerifyHelp">
+          <div>
+            <div class="companyVerifyHelpTitle">Что нужно для проверки</div>
+            <div class="companyVerifyHelpText">Юрлицо: ИНН, ОГРН, КПП, юридическое название и адрес. ИП: ИНН и ОГРНИП. Добавьте официальный контакт и документ, подтверждающий полномочия представителя.</div>
+          </div>
+        </div>
         <div class="formCol">
           <div class="sqInput">
             <input id="companyINN" type="text" placeholder="ИНН (10 или 12 цифр)" maxlength="12" inputmode="numeric" autocomplete="off">
           </div>
           <div class="innHint" id="innValidHint"></div>
           <div class="sqInput"><input id="companyOGRN" type="text" placeholder="ОГРН (13 цифр)" maxlength="13" inputmode="numeric" autocomplete="off"></div>
+          <div class="sqInput"><input id="companyOGRNIP" type="text" placeholder="ОГРНИП (15 цифр, если ИП)" maxlength="15" inputmode="numeric" autocomplete="off"></div>
+          <div class="sqInput"><input id="companyKPP" type="text" placeholder="КПП (9 цифр, для юрлиц)" maxlength="9" inputmode="numeric" autocomplete="off"></div>
           <div class="sqInput"><input id="companyLegalName" type="text" placeholder="Полное юридическое наименование" autocomplete="off"></div>
           <div class="sqInput"><input id="companyLegalAddress" type="text" placeholder="Юридический адрес" autocomplete="off"></div>
           <label class="checkboxRow">
@@ -662,11 +670,15 @@
             <input id="companyActualAddress" type="text" placeholder="Фактический адрес" autocomplete="off">
           </div>
           <div class="sqInput"><input id="companyCEOName" type="text" placeholder="ФИО генерального директора" autocomplete="off"></div>
+          <div class="sqInput"><input id="companyRepresentativeName" type="text" placeholder="ФИО представителя (если подаёт не руководитель)" autocomplete="off"></div>
+          <div class="sqInput"><input id="companyOfficialEmail" type="email" placeholder="Официальный email компании" autocomplete="off"></div>
+          <div class="sqInput"><input id="companyOfficialDomain" type="text" placeholder="Официальный домен (company.ru)" autocomplete="off"></div>
+          <div class="sqInput"><input id="companyOfficialWebsite" type="text" placeholder="Официальный сайт (https://company.ru)" autocomplete="off"></div>
         </div>
         <div class="profileSectionHead" style="margin-top:16px">Документы</div>
-        <div class="verifyGrid verifyGridSingleColumn">
+        <div class="verifyGrid">
           <div class="miniCard">
-            <div class="miniLabel">Скан паспорта / доверенности руководителя</div>
+            <div class="miniLabel">Документ руководителя</div>
             <div class="dropZone" id="dropZoneCEODoc">Нажмите или перетащите файл (PDF, JPG, PNG)</div>
             <input class="fileInput" id="fileCEODoc" type="file" accept=".pdf,.jpg,.jpeg,.png"/>
             <div class="miniHint" id="ceoDocHint">Файл не выбран</div>
@@ -677,8 +689,14 @@
             <input class="fileInput" id="fileRegDoc" type="file" accept=".pdf"/>
             <div class="miniHint" id="regDocHint">Файл не выбран</div>
           </div>
+          <div class="miniCard">
+            <div class="miniLabel">Полномочия представителя</div>
+            <div class="dropZone" id="dropZoneAuthorityDoc">Нажмите или перетащите файл (PDF, JPG, PNG)</div>
+            <input class="fileInput" id="fileAuthorityDoc" type="file" accept=".pdf,.jpg,.jpeg,.png"/>
+            <div class="miniHint" id="authorityDocHint">Файл не выбран</div>
+          </div>
         </div>
-        <div style="margin-top:16px">
+        <div class="companyVerifyAction">
           <button type="button" class="accentBtn pillCTA" id="btnSaveCompanyDocs">Отправить на проверку</button>
         </div>
       </div>
@@ -2113,27 +2131,27 @@
 
 <script src="./config.js"></script>
 <script src="./capacitor.js"></script>
-<script src="./scripts/runtime.js?v=14"></script>
-<script src="./scripts/api.js?v=14"></script>
-<script src="./scripts/state.js?v=14"></script>
-<script src="./scripts/social-card.js?v=14"></script>
-<script src="./scripts/screens.js?v=14"></script>
-<script src="./scripts/push-notifications.js?v=14"></script>
-<script src="./scripts/auth.js?v=14"></script>
-<script src="./scripts/bookmarks-store.js?v=14"></script>
-<script src="./scripts/admin.js?v=14"></script>
-<script src="./scripts/feed-refresh.js?v=14"></script>
-<script src="./scripts/public-profile.js?v=14"></script>
-<script src="./scripts/chat.js?v=14"></script>
-<script src="./scripts/auth-ui.js?v=14"></script>
-<script src="./scripts/profile-runtime.js?v=14"></script>
-<script src="./scripts/ui-shell.js?v=14"></script>
-<script src="./scripts/admin-ui-bindings.js?v=14"></script>
-<script src="./scripts/info-screens.js?v=14"></script>
-<script src="./scripts/ai-matching.js?v=14"></script>
-<script src="./scripts/feed-extra.js?v=14"></script>
-<script src="./scripts/jobs.js?v=14"></script>
-<script src="./scripts/company-docs.js?v=14"></script>
+<script src="./scripts/runtime.js?v=15"></script>
+<script src="./scripts/api.js?v=15"></script>
+<script src="./scripts/state.js?v=15"></script>
+<script src="./scripts/social-card.js?v=15"></script>
+<script src="./scripts/screens.js?v=15"></script>
+<script src="./scripts/push-notifications.js?v=15"></script>
+<script src="./scripts/auth.js?v=15"></script>
+<script src="./scripts/bookmarks-store.js?v=15"></script>
+<script src="./scripts/admin.js?v=15"></script>
+<script src="./scripts/feed-refresh.js?v=15"></script>
+<script src="./scripts/public-profile.js?v=15"></script>
+<script src="./scripts/chat.js?v=15"></script>
+<script src="./scripts/auth-ui.js?v=15"></script>
+<script src="./scripts/profile-runtime.js?v=15"></script>
+<script src="./scripts/ui-shell.js?v=15"></script>
+<script src="./scripts/admin-ui-bindings.js?v=15"></script>
+<script src="./scripts/info-screens.js?v=15"></script>
+<script src="./scripts/ai-matching.js?v=15"></script>
+<script src="./scripts/feed-extra.js?v=15"></script>
+<script src="./scripts/jobs.js?v=15"></script>
+<script src="./scripts/company-docs.js?v=15"></script>
 
 
 </body>

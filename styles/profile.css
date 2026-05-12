@@ -904,6 +904,12 @@
       z-index: 50;
     }
     .modalOverlay.open{ opacity:1; pointer-events:auto; }
+    #adminCompanyModal.modalOverlay:not(.hidden){
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 1200;
+      background: rgba(0,0,0,.5);
+    }
     .modalCard{
       width: min(760px, 94vw);
       max-height: min(82vh, 760px);

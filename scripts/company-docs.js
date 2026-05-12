@@ -30,6 +30,8 @@ var companyDocsState = {
   ceoDocName: '',
   regDocUrl: '',
   regDocName: '',
+  authorityDocUrl: '',
+  authorityDocName: '',
   verifyStatus: 'unverified',
 };
 
@@ -42,10 +44,16 @@ function loadCompanyDocs() {
       var fields = {
         companyINN:           data.inn,
         companyOGRN:          data.ogrn,
+        companyOGRNIP:        data.ogrnip,
+        companyKPP:           data.kpp,
         companyLegalName:     data.legal_name,
         companyLegalAddress:  data.legal_address,
         companyActualAddress: data.actual_address,
         companyCEOName:       data.ceo_name,
+        companyRepresentativeName: data.representative_name,
+        companyOfficialEmail: data.official_email,
+        companyOfficialDomain: data.official_domain,
+        companyOfficialWebsite: data.official_website,
       };
       Object.keys(fields).forEach(function(id) {
         var el = document.getElementById(id);
@@ -67,6 +75,11 @@ function loadCompanyDocs() {
         companyDocsState.regDocUrl  = docs.registration_doc.file_url;
         companyDocsState.regDocName = docs.registration_doc.file_name;
         setCompanyDocHint('regDocHint', docs.registration_doc.file_name);
+      }
+      if (docs.authority_doc) {
+        companyDocsState.authorityDocUrl  = docs.authority_doc.file_url;
+        companyDocsState.authorityDocName = docs.authority_doc.file_name;
+        setCompanyDocHint('authorityDocHint', docs.authority_doc.file_name);
       }
 
       renderCompanyVerifyStatus(data.company_verify_status, data.company_reject_reason);
@@ -115,34 +128,114 @@ function uploadCompanyDocFile(inputEl, urlKey, nameKey, hintId, cb) {
     });
 }
 
+function companyDocsValue(id) {
+  return (document.getElementById(id) || {}).value || '';
+}
+
+function normalizeCompanyDigits(id, length) {
+  var el = document.getElementById(id);
+  var value = String(companyDocsValue(id)).replace(/\D/g, '');
+  if (length) value = value.slice(0, length);
+  if (el) el.value = value;
+  if (!value) return '';
+  return value;
+}
+
+function clearCompanyDocsErrors() {
+  [
+    'companyINN',
+    'companyOGRN',
+    'companyOGRNIP',
+    'companyKPP',
+    'companyLegalName',
+    'companyLegalAddress',
+    'companyCEOName',
+    'companyOfficialEmail',
+    'companyOfficialDomain',
+    'companyOfficialWebsite',
+  ].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.classList.remove('inputError');
+  });
+}
+
+function failCompanyDocsField(id, msg) {
+  var el = document.getElementById(id);
+  if (el) {
+    el.classList.add('inputError');
+    if (typeof el.focus === 'function') el.focus();
+  }
+  showCompanyDocsToast(msg, 'error');
+  return false;
+}
+
+function isValidCompanyEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || '').trim());
+}
+
+function normalizeCompanyDomain(value) {
+  var normalized = String(value || '').trim().toLowerCase()
+    .replace(/^https?:\/\//, '')
+    .replace(/^www\./, '')
+    .split('/')[0];
+  return normalized;
+}
+
+function isValidCompanyDomain(value) {
+  return /^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$/i.test(value);
+}
+
 function saveCompanyDocs() {
-  var inn       = (document.getElementById('companyINN') || {}).value || '';
-  var ogrn      = (document.getElementById('companyOGRN') || {}).value || '';
+  clearCompanyDocsErrors();
+  var inn       = normalizeCompanyDigits('companyINN');
+  var ogrn      = normalizeCompanyDigits('companyOGRN', 13);
+  var ogrnip    = normalizeCompanyDigits('companyOGRNIP', 15);
+  var kpp       = normalizeCompanyDigits('companyKPP', 9);
   var cbSame    = document.getElementById('actualSameAsLegal');
-  var legalAddr = (document.getElementById('companyLegalAddress') || {}).value || '';
+  var legalName = companyDocsValue('companyLegalName').trim();
+  var legalAddr = companyDocsValue('companyLegalAddress').trim();
   var actualAddr = cbSame && cbSame.checked
     ? legalAddr
-    : ((document.getElementById('companyActualAddress') || {}).value || '');
+    : companyDocsValue('companyActualAddress').trim();
+  var ceoName = companyDocsValue('companyCEOName').trim();
+  var representativeName = companyDocsValue('companyRepresentativeName').trim();
+  var officialEmail = companyDocsValue('companyOfficialEmail').trim();
+  var officialDomain = normalizeCompanyDomain(companyDocsValue('companyOfficialDomain'));
+  var officialWebsite = companyDocsValue('companyOfficialWebsite').trim();
 
-  // Validate INN if provided
-  if (inn && !validateINN(inn)) {
-    showCompanyDocsToast('Неверная контрольная сумма ИНН', 'error');
-    document.getElementById('companyINN').classList.add('inputError');
-    return;
-  }
+  if (!inn) return failCompanyDocsField('companyINN', 'Укажите ИНН компании');
+  if (!validateINN(inn)) return failCompanyDocsField('companyINN', 'Неверная контрольная сумма ИНН');
+  if (!ogrn && !ogrnip) return failCompanyDocsField('companyOGRN', 'Укажите ОГРН для юрлица или ОГРНИП для ИП');
+  if (ogrn && ogrn.length !== 13) return failCompanyDocsField('companyOGRN', 'ОГРН должен содержать 13 цифр');
+  if (ogrnip && ogrnip.length !== 15) return failCompanyDocsField('companyOGRNIP', 'ОГРНИП должен содержать 15 цифр');
+  if (ogrn && (!kpp || kpp.length !== 9)) return failCompanyDocsField('companyKPP', 'Для юрлица укажите КПП из 9 цифр');
+  if (!legalName) return failCompanyDocsField('companyLegalName', 'Укажите полное юридическое название');
+  if (!legalAddr) return failCompanyDocsField('companyLegalAddress', 'Укажите юридический адрес');
+  if (!ceoName) return failCompanyDocsField('companyCEOName', 'Укажите ФИО руководителя');
+  if (officialEmail && !isValidCompanyEmail(officialEmail)) return failCompanyDocsField('companyOfficialEmail', 'Укажите корректный официальный email');
+  if (officialDomain && !isValidCompanyDomain(officialDomain)) return failCompanyDocsField('companyOfficialDomain', 'Домен должен быть вида company.ru');
+  if (!officialEmail && !officialDomain && !officialWebsite) return failCompanyDocsField('companyOfficialEmail', 'Укажите официальный email, домен или сайт');
   if (document.getElementById('companyINN')) document.getElementById('companyINN').classList.remove('inputError');
 
   var payload = {
     inn:              inn || undefined,
     ogrn:             ogrn || undefined,
-    legal_name:       (document.getElementById('companyLegalName') || {}).value || undefined,
+    ogrnip:           ogrnip || undefined,
+    kpp:              kpp || undefined,
+    legal_name:       legalName || undefined,
     legal_address:    legalAddr || undefined,
     actual_address:   actualAddr || undefined,
-    ceo_name:         (document.getElementById('companyCEOName') || {}).value || undefined,
+    ceo_name:         ceoName || undefined,
+    representative_name: representativeName || undefined,
+    official_email:   officialEmail || undefined,
+    official_domain:  officialDomain || undefined,
+    official_website: officialWebsite || undefined,
     ceo_doc:          companyDocsState.ceoDocUrl || undefined,
     ceo_doc_name:     companyDocsState.ceoDocName || undefined,
     registration_doc: companyDocsState.regDocUrl || undefined,
     registration_doc_name: companyDocsState.regDocName || undefined,
+    authority_doc:    companyDocsState.authorityDocUrl || undefined,
+    authority_doc_name: companyDocsState.authorityDocName || undefined,
   };
 
   // Remove undefined keys
@@ -168,6 +261,7 @@ function showCompanyDocsToast(msg, type) {
 function initCompanyDocsForm() {
   var ceoInput = document.getElementById('fileCEODoc');
   var regInput = document.getElementById('fileRegDoc');
+  var authorityInput = document.getElementById('fileAuthorityDoc');
   var saveBtn  = document.getElementById('btnSaveCompanyDocs');
   var cbSame   = document.getElementById('actualSameAsLegal');
 
@@ -177,6 +271,12 @@ function initCompanyDocsForm() {
   if (regInput) regInput.addEventListener('change', function() {
     uploadCompanyDocFile(regInput, 'regDocUrl', 'regDocName', 'regDocHint');
   });
+  if (authorityInput) authorityInput.addEventListener('change', function() {
+    uploadCompanyDocFile(authorityInput, 'authorityDocUrl', 'authorityDocName', 'authorityDocHint');
+  });
+  bindCompanyDocDropZone('dropZoneCEODoc', ceoInput);
+  bindCompanyDocDropZone('dropZoneRegDoc', regInput);
+  bindCompanyDocDropZone('dropZoneAuthorityDoc', authorityInput);
   if (saveBtn) saveBtn.addEventListener('click', saveCompanyDocs);
 
   if (cbSame) {
@@ -205,6 +305,39 @@ function initCompanyDocsForm() {
       }
     });
   }
+  bindCompanyDigitsOnly('companyOGRN', 13);
+  bindCompanyDigitsOnly('companyOGRNIP', 15);
+  bindCompanyDigitsOnly('companyKPP', 9);
+}
+
+function bindCompanyDigitsOnly(id, maxLen) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.addEventListener('input', function() {
+    el.value = String(el.value || '').replace(/\D/g, '').slice(0, maxLen);
+    el.classList.remove('inputError');
+  });
+}
+
+function bindCompanyDocDropZone(zoneId, inputEl) {
+  var zone = document.getElementById(zoneId);
+  if (!zone || !inputEl) return;
+  zone.addEventListener('click', function() { inputEl.click(); });
+  zone.addEventListener('dragover', function(event) {
+    event.preventDefault();
+    zone.classList.add('dropZone--over');
+  });
+  zone.addEventListener('dragleave', function() {
+    zone.classList.remove('dropZone--over');
+  });
+  zone.addEventListener('drop', function(event) {
+    event.preventDefault();
+    zone.classList.remove('dropZone--over');
+    if (event.dataTransfer.files && event.dataTransfer.files.length) {
+      inputEl.files = event.dataTransfer.files;
+      inputEl.dispatchEvent(new Event('change'));
+    }
+  });
 }
 
 // ── Admin: companies panel ────────────────────────────────────────────────────
@@ -288,6 +421,7 @@ function renderAdminCompanyModal(data) {
   var docs = data.documents || {};
   var ceoDoc = docs.ceo_doc;
   var regDoc = docs.registration_doc;
+  var authorityDoc = docs.authority_doc;
 
   body.innerHTML = ''
     + '<div class="adminCompanyModalCols">'
@@ -301,10 +435,17 @@ function renderAdminCompanyModal(data) {
               : '—',
             true)
         + adminModalRow('ОГРН', data.ogrn || '—')
+        + adminModalRow('ОГРНИП', data.ogrnip || '—')
+        + adminModalRow('КПП', data.kpp || '—')
         + adminModalRow('Юр. наименование', data.legal_name || '—')
         + adminModalRow('Юр. адрес', data.legal_address || '—')
         + adminModalRow('Факт. адрес', data.actual_address || '—')
         + adminModalRow('ФИО директора', data.ceo_name || '—')
+        + adminModalRow('ФИО представителя', data.representative_name || '—')
+        + adminModalRow('Офиц. email', data.official_email || data.corp_email || data.email || '—')
+        + adminModalRow('Корп. почта подтверждена', data.corp_email_verified ? 'да' : 'нет')
+        + adminModalRow('Офиц. домен', data.official_domain || '—')
+        + adminModalRow('Офиц. сайт', data.official_website || data.website || '—')
         + adminModalRow('Регистрация', data.created_at ? new Date(data.created_at).toLocaleDateString('ru') : '—')
       + '</div>'
       + '<div class="adminCompanyModalCol">'
@@ -317,6 +458,10 @@ function renderAdminCompanyModal(data) {
             ? '<div class="adminDocRow"><span>Выписка из ЕГРЮЛ</span>'
               + '<button class="miniLink" data-open-doc="' + escAdm(regDoc.id) + '" data-file-name="' + escAdm(regDoc.file_name) + '">Открыть</button></div>'
             : '<div class="adminDocRow emptyDoc">Выписка не загружена</div>')
+        + (authorityDoc
+            ? '<div class="adminDocRow"><span>Полномочия представителя</span>'
+              + '<button class="miniLink" data-open-doc="' + escAdm(authorityDoc.id) + '" data-file-name="' + escAdm(authorityDoc.file_name) + '">Открыть</button></div>'
+            : '<div class="adminDocRow emptyDoc">Документ полномочий не загружен</div>')
       + '</div>'
     + '</div>'
     + '<div class="adminCompanyModalActions">'
@@ -339,7 +484,9 @@ function initAdminCompaniesPanel() {
   if (!panel) return;
 
   // Status filter chips
-  panel.addEventListener('click', function(e) {
+  document.addEventListener('click', function(e) {
+    if (!e.target.closest('#adminTabPanelEmployers') && !e.target.closest('#adminCompanyModal')) return;
+
     var chip = e.target.closest('[data-company-filter]');
     if (chip) {
       panel.querySelectorAll('[data-company-filter]').forEach(function(c) { c.classList.remove('active'); });

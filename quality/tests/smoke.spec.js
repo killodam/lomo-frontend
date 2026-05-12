@@ -1738,6 +1738,119 @@ test('admin dashboard loads queue and users with server-side search', async ({ p
   await expect.poll(() => userSearch).toBe('founder');
 });
 
+test('admin can review company verification legal details', async ({ page }) => {
+  let verifyCalled = false;
+
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'admin-1', email: 'admin@example.com', login: 'admin', role: 'admin' },
+          profile: null,
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/admin/queue')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([], 1, 20, 0)),
+      });
+    }
+
+    if (url.pathname.endsWith('/company/admin/companies')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          pendingCount: 1,
+          items: [{
+            id: 'company-1',
+            email: 'hr@lomo.website',
+            company: 'LOMO',
+            inn: '7707083893',
+            kpp: '770701001',
+            company_verify_status: 'pending',
+            active_jobs: 2,
+          }],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/company/admin/companies/company-1/docs')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'company-1',
+          email: 'hr@lomo.website',
+          company: 'LOMO',
+          inn: '7707083893',
+          ogrn: '1027700132195',
+          ogrnip: '',
+          kpp: '770701001',
+          legal_name: 'ООО ЛОМО',
+          legal_address: 'Москва, Тестовая 1',
+          actual_address: 'Москва, Тестовая 1',
+          ceo_name: 'Иван Иванов',
+          representative_name: 'Анна HR',
+          official_email: 'verify@lomo.website',
+          official_domain: 'lomo.website',
+          official_website: 'https://lomo.website/',
+          corp_email_verified: true,
+          company_verify_status: 'pending',
+          documents: {
+            ceo_doc: { id: 'doc-ceo', file_name: 'ceo.pdf' },
+            registration_doc: { id: 'doc-reg', file_name: 'egrul.pdf' },
+            authority_doc: { id: 'doc-auth', file_name: 'authority.pdf' },
+          },
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/company/admin/companies/company-1/verify') && request.method() === 'POST') {
+      verifyCalled = true;
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ ok: true }),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.evaluate(() => { document.cookie = 'lomo_csrf=test-suite; path=/'; });
+  await page.fill('#loginEmail', 'admin@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await expect(page.locator('#screenAdminQueue')).toHaveClass(/active/);
+  await page.click('#adminTabEmployers');
+  await expect(page.locator('#adminCompaniesList')).toContainText('LOMO');
+  await page.click('[data-admin-company-review="company-1"]');
+
+  await expect(page.locator('#adminCompanyModalBody')).toContainText('КПП');
+  await expect(page.locator('#adminCompanyModalBody')).toContainText('770701001');
+  await expect(page.locator('#adminCompanyModalBody')).toContainText('verify@lomo.website');
+  await expect(page.locator('#adminCompanyModalBody')).toContainText('Полномочия представителя');
+
+  await page.click('#adminBtnVerifyCompany');
+  await expect.poll(() => verifyCalled).toBe(true);
+});
+
 test('admin logout returns to landing', async ({ page }) => {
   let logoutCalled = false;
 
@@ -2377,7 +2490,22 @@ test('employer company verification form saves through apiFetch', async ({ page 
         status: 200,
         contentType: 'application/json',
         body: JSON.stringify(savedPayload
-          ? { company_verify_status: 'pending', inn: savedPayload.inn, ogrn: savedPayload.ogrn, legal_name: savedPayload.legal_name, legal_address: savedPayload.legal_address, actual_address: savedPayload.actual_address, ceo_name: savedPayload.ceo_name, documents: {} }
+          ? {
+              company_verify_status: 'pending',
+              inn: savedPayload.inn,
+              ogrn: savedPayload.ogrn,
+              ogrnip: savedPayload.ogrnip,
+              kpp: savedPayload.kpp,
+              legal_name: savedPayload.legal_name,
+              legal_address: savedPayload.legal_address,
+              actual_address: savedPayload.actual_address,
+              ceo_name: savedPayload.ceo_name,
+              representative_name: savedPayload.representative_name,
+              official_email: savedPayload.official_email,
+              official_domain: savedPayload.official_domain,
+              official_website: savedPayload.official_website,
+              documents: {},
+            }
           : { company_verify_status: 'unverified', documents: {} }),
       });
     }
@@ -2411,12 +2539,20 @@ test('employer company verification form saves through apiFetch', async ({ page 
 
   await page.fill('#companyINN', '7707083893');
   await page.fill('#companyOGRN', '1027700132195');
+  await page.fill('#companyKPP', '770701001');
   await page.fill('#companyLegalName', 'ООО ЛОМО');
   await page.fill('#companyLegalAddress', 'Москва, Тестовая 1');
   await page.check('#actualSameAsLegal');
   await page.fill('#companyCEOName', 'Иван Иванов');
+  await page.fill('#companyRepresentativeName', 'Анна HR');
+  await page.fill('#companyOfficialEmail', 'verify@lomo.website');
+  await page.fill('#companyOfficialDomain', 'https://www.lomo.website/about');
+  await page.fill('#companyOfficialWebsite', 'lomo.website');
   await page.click('#btnSaveCompanyDocs');
 
   await expect.poll(() => savedPayload && savedPayload.inn).toBe('7707083893');
+  expect(savedPayload.kpp).toBe('770701001');
+  expect(savedPayload.official_domain).toBe('lomo.website');
+  expect(savedPayload.official_website).toBe('lomo.website');
   await expect(page.locator('#companyVerifyBanner')).toContainText('Документы на проверке');
 });

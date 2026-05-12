@@ -1077,6 +1077,10 @@
 .companyVerifyBanner.pending { background:#fef3c7; color:#92400e; }
 .companyVerifyBanner.ok      { background:#d1fae5; color:#065f46; }
 .companyVerifyBanner.bad     { background:#fee2e2; color:#991b1b; }
+.companyVerifyHelp { border:1px solid rgba(38,110,120,.16); background:rgba(235,248,250,.55); border-radius:18px; padding:14px 16px; margin-bottom:16px; }
+.companyVerifyHelpTitle { font-size:12px; font-weight:800; letter-spacing:.08em; text-transform:uppercase; color:#1a5c68; margin-bottom:6px; }
+.companyVerifyHelpText { font-size:13px; line-height:1.5; color:#4b5563; }
+.companyVerifyAction { margin-top:16px; display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
 .innHint { font-size:12px; margin-top:4px; padding-left:4px; }
 .innHint.ok  { color:#059669; }
 .innHint.bad { color:#dc2626; }
