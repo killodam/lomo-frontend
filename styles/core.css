@@ -1088,6 +1088,94 @@
 .inputError { outline:2px solid #ef4444 !important; }
 .inputOk    { outline:2px solid #10b981 !important; }
 
+/* ── Company verification: new UI components ─────────────────────────────────── */
+.companyTypeSwitch { display:flex; align-items:center; gap:12px; margin-bottom:16px; flex-wrap:wrap; }
+.companyTypeSwitchLabel { font-size:13px; font-weight:600; color:#374151; }
+.companyTypeSwitchBtns { display:flex; gap:6px; }
+.companyTypeBtn {
+  padding:7px 16px;
+  border-radius:999px;
+  border:1.5px solid rgba(38,110,120,.22);
+  background:#fff;
+  color:#374151;
+  font-size:13px;
+  font-weight:600;
+  cursor:pointer;
+  transition:all .15s ease;
+}
+.companyTypeBtn:hover { border-color:rgba(38,110,120,.4); background:#f0fdfa; }
+.companyTypeBtn.active { background:#0e7490; color:#fff; border-color:#0e7490; }
+
+.companyFormBlock {
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:16px;
+  padding:18px 18px 14px;
+  margin-bottom:16px;
+  background:#fff;
+}
+.companyFormBlockHead {
+  font-size:14px;
+  font-weight:700;
+  color:#111827;
+  margin-bottom:14px;
+}
+.companyFormBlockSub { font-size:13px; font-weight:400; color:#9ca3af; }
+
+.verifyGrid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:12px; }
+.miniCard {
+  border:1px solid rgba(0,0,0,.08);
+  border-radius:12px;
+  padding:14px;
+  background:#f9fafb;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+}
+.miniLabel { font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.04em; }
+.miniValue { font-size:14px; color:#111827; word-break:break-word; }
+.miniOptional { font-size:11px; font-weight:400; color:#9ca3af; text-transform:none; letter-spacing:0; }
+.docHelpText { font-size:12px; color:#6b7280; line-height:1.45; }
+
+.companyReadyChecklist { display:flex; flex-direction:column; gap:6px; margin-bottom:14px; }
+.checklistItem {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-size:13px;
+  padding:6px 10px;
+  border-radius:8px;
+}
+.checklistItem.ok   { color:#065f46; background:#d1fae5; }
+.checklistItem.miss { color:#991b1b; background:#fee2e2; }
+.checklistItem::before { font-size:14px; flex-shrink:0; }
+.checklistItem.ok::before   { content:'✓'; }
+.checklistItem.miss::before { content:'✗'; }
+
+/* ── Admin: Company warnings ─────────────────────────────────────────────────── */
+.adminCompanyWarnings {
+  border:1.5px solid #f59e0b;
+  background:#fffbeb;
+  border-radius:12px;
+  padding:12px 14px;
+  margin-bottom:16px;
+}
+.adminCompanyWarningsHead {
+  font-size:12px;
+  font-weight:800;
+  text-transform:uppercase;
+  letter-spacing:.06em;
+  color:#92400e;
+  margin-bottom:8px;
+}
+.adminCompanyWarning {
+  font-size:13px;
+  color:#78350f;
+  line-height:1.4;
+  padding:4px 0;
+  border-top:1px solid rgba(245,158,11,.2);
+}
+.adminCompanyWarning:first-of-type { border-top:none; }
+
 /* ── Admin: Companies panel ──────────────────────────────────────────────────── */
 .pendingBadge { background:#ef4444; color:#fff; border-radius:10px; padding:1px 7px; font-size:11px; font-weight:700; margin-left:6px; }
 .adminCompanyRow { display:flex; align-items:center; gap:12px; padding:12px 16px; background:#fff; border-radius:12px; margin-bottom:8px; box-shadow:0 1px 3px rgba(0,0,0,.06); }

@@ -33,6 +33,7 @@ var companyDocsState = {
   authorityDocUrl: '',
   authorityDocName: '',
   verifyStatus: 'unverified',
+  companyType: 'legal',
 };
 
 function loadCompanyDocs() {
@@ -83,6 +84,11 @@ function loadCompanyDocs() {
       }
 
       renderCompanyVerifyStatus(data.company_verify_status, data.company_reject_reason);
+
+      // Detect company type: OGRNIP present (and no OGRN) → ИП
+      var detectedType = (data.ogrnip && !data.ogrn) ? 'ip' : 'legal';
+      updateCompanyType(detectedType);
+      updateCompanyReadyChecklist();
     })
     .catch(function() {});
 }
@@ -187,10 +193,11 @@ function isValidCompanyDomain(value) {
 
 function saveCompanyDocs() {
   clearCompanyDocsErrors();
-  var inn       = normalizeCompanyDigits('companyINN');
-  var ogrn      = normalizeCompanyDigits('companyOGRN', 13);
-  var ogrnip    = normalizeCompanyDigits('companyOGRNIP', 15);
-  var kpp       = normalizeCompanyDigits('companyKPP', 9);
+  var isIP   = companyDocsState.companyType === 'ip';
+  var inn    = normalizeCompanyDigits('companyINN');
+  var ogrn   = isIP ? '' : normalizeCompanyDigits('companyOGRN', 13);
+  var ogrnip = isIP ? normalizeCompanyDigits('companyOGRNIP', 15) : '';
+  var kpp    = isIP ? '' : normalizeCompanyDigits('companyKPP', 9);
   var cbSame    = document.getElementById('actualSameAsLegal');
   var legalName = companyDocsValue('companyLegalName').trim();
   var legalAddr = companyDocsValue('companyLegalAddress').trim();
@@ -258,6 +265,49 @@ function showCompanyDocsToast(msg, type) {
   alert(msg);
 }
 
+function updateCompanyType(type) {
+  companyDocsState.companyType = type || 'legal';
+  document.querySelectorAll('[data-company-type]').forEach(function(btn) {
+    btn.classList.toggle('active', btn.getAttribute('data-company-type') === companyDocsState.companyType);
+  });
+  var ogrnRow   = document.getElementById('companyOgrnRow');
+  var ogrnipRow = document.getElementById('companyOgrnipRow');
+  if (ogrnRow)   ogrnRow.classList.toggle('hidden', companyDocsState.companyType === 'ip');
+  if (ogrnipRow) ogrnipRow.classList.toggle('hidden', companyDocsState.companyType === 'legal');
+  updateCompanyReadyChecklist();
+}
+
+function updateCompanyReadyChecklist() {
+  var el = document.getElementById('companyReadyChecklist');
+  if (!el) return;
+  var type = companyDocsState.companyType || 'legal';
+
+  function fval(id) { return ((document.getElementById(id) || {}).value || '').trim(); }
+
+  var innOk = validateINN(fval('companyINN').replace(/\D/g, ''));
+  var items = [
+    { ok: innOk, label: 'ИНН заполнен и корректен' },
+    type === 'legal'
+      ? { ok: fval('companyOGRN').replace(/\D/g,'').length === 13, label: 'ОГРН (13 цифр)' }
+      : { ok: fval('companyOGRNIP').replace(/\D/g,'').length === 15, label: 'ОГРНИП (15 цифр)' },
+  ];
+  if (type === 'legal') items.push({ ok: fval('companyKPP').replace(/\D/g,'').length === 9, label: 'КПП (9 цифр)' });
+  items.push(
+    { ok: !!fval('companyLegalName'), label: 'Юридическое наименование' },
+    { ok: !!fval('companyLegalAddress'), label: 'Юридический адрес' },
+    { ok: !!fval('companyCEOName'), label: 'ФИО руководителя' },
+    { ok: !!(fval('companyOfficialEmail') || fval('companyOfficialDomain') || fval('companyOfficialWebsite')), label: 'Официальный контакт (email, домен или сайт)' },
+    { ok: !!companyDocsState.ceoDocUrl, label: 'Документ руководителя загружен' },
+    { ok: !!companyDocsState.regDocUrl, label: 'Выписка из ЕГРЮЛ / ЕГРИП загружена' }
+  );
+
+  el.innerHTML = items.map(function(item) {
+    return '<div class="checklistItem ' + (item.ok ? 'ok' : 'miss') + '">'
+      + (item.ok ? '✓' : '○') + ' ' + escAdm(item.label)
+      + '</div>';
+  }).join('');
+}
+
 function initCompanyDocsForm() {
   var ceoInput = document.getElementById('fileCEODoc');
   var regInput = document.getElementById('fileRegDoc');
@@ -308,6 +358,23 @@ function initCompanyDocsForm() {
   bindCompanyDigitsOnly('companyOGRN', 13);
   bindCompanyDigitsOnly('companyOGRNIP', 15);
   bindCompanyDigitsOnly('companyKPP', 9);
+
+  // Company type toggle
+  document.querySelectorAll('[data-company-type]').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      updateCompanyType(btn.getAttribute('data-company-type'));
+    });
+  });
+
+  // Live checklist updates on field input
+  ['companyINN','companyOGRN','companyOGRNIP','companyKPP','companyLegalName',
+   'companyLegalAddress','companyCEOName','companyOfficialEmail',
+   'companyOfficialDomain','companyOfficialWebsite'].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.addEventListener('input', updateCompanyReadyChecklist);
+  });
+
+  updateCompanyType('legal');
 }
 
 function bindCompanyDigitsOnly(id, maxLen) {
@@ -413,6 +480,23 @@ function openAdminCompanyReview(companyId) {
     .catch(function() { alert('Ошибка загрузки данных компании'); });
 }
 
+function buildAdminCompanyWarnings(data) {
+  var warnings = [];
+  var docs = data.documents || {};
+  if (data.ogrn && !data.kpp) {
+    warnings.push('Нет КПП при наличии ОГРН — ожидается для юрлица');
+  }
+  var officialEmail = data.official_email || data.corp_email || '';
+  var emailDomain = officialEmail.includes('@') ? officialEmail.split('@')[1] : '';
+  if (emailDomain && data.official_domain && emailDomain !== data.official_domain) {
+    warnings.push('Домен email (' + escAdm(emailDomain) + ') не совпадает с официальным доменом (' + escAdm(data.official_domain) + ')');
+  }
+  if (data.representative_name && !docs.authority_doc) {
+    warnings.push('Указан представитель, но документ полномочий не загружен');
+  }
+  return warnings;
+}
+
 function renderAdminCompanyModal(data) {
   var modal = document.getElementById('adminCompanyModal');
   var body  = document.getElementById('adminCompanyModalBody');
@@ -422,42 +506,63 @@ function renderAdminCompanyModal(data) {
   var ceoDoc = docs.ceo_doc;
   var regDoc = docs.registration_doc;
   var authorityDoc = docs.authority_doc;
+  var warnings = buildAdminCompanyWarnings(data);
+
+  var officialEmailVal = data.official_email || data.corp_email || data.email || '';
+  var officialEmailHtml = officialEmailVal
+    ? '<a href="mailto:' + escAdm(officialEmailVal) + '" class="miniLink">' + escAdm(officialEmailVal) + '</a>'
+    : '—';
+  var domainVal = data.official_domain || '';
+  var domainHtml = domainVal
+    ? '<a href="https://' + escAdm(domainVal) + '" target="_blank" rel="noopener noreferrer" class="miniLink">' + escAdm(domainVal) + '</a>'
+    : '—';
+  var websiteVal = data.official_website || data.website || '';
+  var websiteHtml = websiteVal
+    ? '<a href="' + escAdm(websiteVal) + '" target="_blank" rel="noopener noreferrer" class="miniLink">' + escAdm(websiteVal) + '</a>'
+    : '—';
 
   body.innerHTML = ''
+    + (warnings.length
+        ? '<div class="adminCompanyWarnings">'
+          + '<div class="adminCompanyWarningsHead">⚠ Потенциальные проблемы</div>'
+          + warnings.map(function(w) { return '<div class="adminCompanyWarning">' + w + '</div>'; }).join('')
+          + '</div>'
+        : '')
     + '<div class="adminCompanyModalCols">'
       + '<div class="adminCompanyModalCol">'
-        + '<div class="adminCompanyModalHead">Данные компании</div>'
+        + '<div class="adminCompanyModalHead">Реквизиты</div>'
         + adminModalRow('Компания', data.company || '—')
-        + adminModalRow('Email', data.email)
         + adminModalRow('ИНН',
             data.inn
               ? data.inn + ' <a href="https://egrul.nalog.ru/?query=' + escAdm(data.inn) + '" target="_blank" rel="noopener noreferrer" class="miniLink">→ ЕГРЮЛ</a>'
               : '—',
             true)
-        + adminModalRow('ОГРН', data.ogrn || '—')
-        + adminModalRow('ОГРНИП', data.ogrnip || '—')
-        + adminModalRow('КПП', data.kpp || '—')
+        + (data.ogrn ? adminModalRow('ОГРН', data.ogrn) : '')
+        + (data.ogrnip ? adminModalRow('ОГРНИП', data.ogrnip) : '')
+        + (data.kpp ? adminModalRow('КПП', data.kpp) : '')
         + adminModalRow('Юр. наименование', data.legal_name || '—')
         + adminModalRow('Юр. адрес', data.legal_address || '—')
-        + adminModalRow('Факт. адрес', data.actual_address || '—')
+        + (data.actual_address && data.actual_address !== data.legal_address
+            ? adminModalRow('Факт. адрес', data.actual_address)
+            : '')
         + adminModalRow('ФИО директора', data.ceo_name || '—')
-        + adminModalRow('ФИО представителя', data.representative_name || '—')
-        + adminModalRow('Офиц. email', data.official_email || data.corp_email || data.email || '—')
-        + adminModalRow('Корп. почта подтверждена', data.corp_email_verified ? 'да' : 'нет')
-        + adminModalRow('Офиц. домен', data.official_domain || '—')
-        + adminModalRow('Офиц. сайт', data.official_website || data.website || '—')
-        + adminModalRow('Регистрация', data.created_at ? new Date(data.created_at).toLocaleDateString('ru') : '—')
+        + (data.representative_name ? adminModalRow('ФИО представителя', data.representative_name) : '')
+        + adminModalRow('Email', officialEmailHtml, true)
+        + (data.corp_email_verified ? adminModalRow('Корп. почта', 'подтверждена ✓') : '')
+        + (domainVal ? adminModalRow('Домен', domainHtml, true) : '')
+        + (websiteVal ? adminModalRow('Сайт', websiteHtml, true) : '')
+        + adminModalRow('Зарегистрирован', data.created_at ? new Date(data.created_at).toLocaleDateString('ru') : '—')
       + '</div>'
       + '<div class="adminCompanyModalCol">'
         + '<div class="adminCompanyModalHead">Документы</div>'
         + (ceoDoc
-            ? '<div class="adminDocRow"><span>Скан паспорта / доверенности</span>'
+            ? '<div class="adminDocRow"><span>Документ директора</span>'
               + '<button class="miniLink" data-open-doc="' + escAdm(ceoDoc.id) + '" data-file-name="' + escAdm(ceoDoc.file_name) + '">Открыть</button></div>'
-            : '<div class="adminDocRow emptyDoc">Паспорт директора не загружен</div>')
+            : '<div class="adminDocRow emptyDoc">⚠ Документ директора не загружен</div>')
         + (regDoc
-            ? '<div class="adminDocRow"><span>Выписка из ЕГРЮЛ</span>'
+            ? '<div class="adminDocRow"><span>Выписка ЕГРЮЛ / ЕГРИП</span>'
               + '<button class="miniLink" data-open-doc="' + escAdm(regDoc.id) + '" data-file-name="' + escAdm(regDoc.file_name) + '">Открыть</button></div>'
-            : '<div class="adminDocRow emptyDoc">Выписка не загружена</div>')
+            : '<div class="adminDocRow emptyDoc">⚠ Выписка не загружена</div>')
         + (authorityDoc
             ? '<div class="adminDocRow"><span>Полномочия представителя</span>'
               + '<button class="miniLink" data-open-doc="' + escAdm(authorityDoc.id) + '" data-file-name="' + escAdm(authorityDoc.file_name) + '">Открыть</button></div>'
