@@ -521,8 +521,9 @@
     var skills = Array.isArray(c.skills) ? c.skills
       : (typeof c.skills === 'string' ? c.skills.split(/[,;]+/).map(function (s) { return s.trim(); }) : []);
     var uid = esc(c.user_id || c.id || '');
-    var avatar = c.avatar_url
-      ? '<img class="aiResultAvatar" src="' + esc(c.avatar_url) + '" alt="" loading="lazy">'
+    var avatarSrc = typeof safeImageUrl === 'function' ? safeImageUrl(c.avatar_url) : (c.avatar_url || '');
+    var avatar = avatarSrc
+      ? '<img class="aiResultAvatar" src="' + esc(avatarSrc) + '" alt="" loading="lazy">'
       : '<div class="aiResultAvatarFallback">' + esc((c.full_name || 'U').charAt(0).toUpperCase()) + '</div>';
     var verified = c.is_verified ? '<span class="aiResultVerifiedBadge">✓</span>' : '';
     var tags = [
@@ -538,6 +539,12 @@
           return '<span class="aiResultOverlapTag">' + esc(displayToken(t)) + '</span>';
         }).join('') + '</div>'
       : '';
+    var reasons = Array.isArray(r.reasons) ? r.reasons : [];
+    var reasonsHtml = reasons.length
+      ? '<div class="aiResultReasons">' + reasons.slice(0, 3).map(function (reason) {
+          return '<span class="aiResultReason">' + esc(reason) + '</span>';
+        }).join('') + '</div>'
+      : '';
     var salaryHtml = c.salary_expectations
       ? '<div class="aiResultSalary">от ' + Number(c.salary_expectations).toLocaleString('ru-RU') + ' ₽</div>'
       : '';
@@ -551,6 +558,7 @@
         (tags ? '<div class="aiResultTags">' + tags + '</div>' : '') +
         (skillTags ? '<div class="aiResultSkills">' + skillTags + '</div>' : '') +
         overlapHtml +
+        reasonsHtml +
       '</div>' +
     '</div>';
   }
@@ -586,6 +594,37 @@
       });
   }
 
+  function fetchServerMatches(text, opts) {
+    if (typeof apiFetch !== 'function') return Promise.reject(new Error('apiFetch unavailable'));
+    return apiFetch('/profile/candidates/match', {
+      method: 'POST',
+      body: JSON.stringify({
+        jobText: text,
+        grade: opts.grade || '',
+        format: opts.format || '',
+        verifiedOnly: opts.verifiedOnly,
+        activeOnly: opts.activeOnly,
+        maxResults: opts.maxResults || 20,
+      }),
+    }).then(function (data) {
+      var results = Array.isArray(data && data.results) ? data.results : [];
+      return results.map(function (result) {
+        result.candidate = normalizeCandidate(result.candidate || {});
+        result.overlap = Array.isArray(result.overlap) ? result.overlap : [];
+        result.reasons = Array.isArray(result.reasons) ? result.reasons : [];
+        return result;
+      });
+    });
+  }
+
+  function fetchMatches(text, opts) {
+    return fetchServerMatches(text, opts).catch(function () {
+      return fetchCandidates().then(function (candidates) {
+        return match(text, opts, candidates);
+      });
+    });
+  }
+
   // ── RUN ──────────────────────────────────────────────────────────────────
 
   function runMatch() {
@@ -616,10 +655,11 @@
     var t1 = setTimeout(function () { setStep(2, 'Извлечение ключевых навыков...'); }, 400);
     var t2 = setTimeout(function () { setStep(3, 'Ранжирование кандидатов...'); }, 800);
 
-    fetchCandidates().then(function (candidates) {
+    var matchOptions = { grade: grade, format: format, verifiedOnly: verifiedOnly, activeOnly: activeOnly, maxResults: 20 };
+
+    fetchMatches(text, matchOptions).then(function (results) {
       setTimeout(function () {
         clearTimeout(t1); clearTimeout(t2);
-        var results = match(text, { grade: grade, format: format, verifiedOnly: verifiedOnly, activeOnly: activeOnly }, candidates);
 
         if (loadState)    loadState.classList.add('hidden');
         if (resultsState) resultsState.classList.remove('hidden');

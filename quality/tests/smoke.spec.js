@@ -1080,6 +1080,85 @@ test('employer favorites filter keeps bookmarked candidates and searches locally
   await expect(page.locator('#employerCandidateList')).toContainText('По этому запросу в избранном никого нет');
 });
 
+test('AI matching uses backend-ranked candidates before local fallback', async ({ page }) => {
+  let matchPayload = null;
+
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'emp-ai', email: 'hr@example.com', login: 'hr', role: 'employer' },
+          profile: { full_name: 'Анна HR', company: 'LOMO HR', public_id: 'LOMO-EMP0001' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/candidates/match')) {
+      matchPayload = JSON.parse(request.postData() || '{}');
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          engineVersion: 'backend-deterministic-v1',
+          criteria: { grade: 'middle', format: 'remote' },
+          results: [{
+            score: 94,
+            overlap: ['react', 'typescript'],
+            reasons: ['Совпали навыки: React, TypeScript', 'Активно ищет работу'],
+            candidate: {
+              id: 'cand-react',
+              user_id: 'cand-react',
+              full_name: 'Анна React',
+              avatar_url: '',
+              job_title: 'Frontend developer',
+              skills: ['React', 'TypeScript'],
+              grade: 'middle',
+              work_format: 'remote',
+              looking_for_work: true,
+              is_verified: true,
+              verification_level: 2,
+            },
+          }],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/candidates')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(paginated([], 1, 12, 0)),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.fill('#loginEmail', 'hr@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await expect(page.locator('#screenEmployerSearch')).toHaveClass(/active/);
+  await page.click('#btnOpenAiMatch');
+  await page.fill('#aiMatchTextarea', 'Ищем middle frontend React TypeScript удалённо');
+  await page.click('#btnRunAiMatch');
+
+  await expect(page.locator('#aiMatchResults')).toContainText('Анна React');
+  await expect(page.locator('#aiMatchResults')).toContainText('Совпали навыки');
+  await expect.poll(() => matchPayload && matchPayload.jobText).toContain('React TypeScript');
+});
+
 test('employer can open my jobs and publish a new vacancy', async ({ page }) => {
   let createdJob = null;
 
