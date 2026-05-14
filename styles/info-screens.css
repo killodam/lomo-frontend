@@ -571,3 +571,151 @@
   font-family: inherit;
 }
 .infoLink:hover { color: #1d5f6e; }
+
+/* ════════════════════════════════════════════════════════
+   DARK THEME — INFO SCREENS
+   ════════════════════════════════════════════════════════ */
+[data-theme="dark"] #screenFaq.screen,
+[data-theme="dark"] #screenAbout.screen,
+[data-theme="dark"] #screenContacts.screen,
+[data-theme="dark"] #screenHow.screen,
+[data-theme="dark"] #screenSecurity.screen,
+[data-theme="dark"] #screenTerms.screen,
+[data-theme="dark"] #screenPrivacy.screen {
+  background: #0d1117;
+}
+
+[data-theme="dark"] .infoScreenHeader {
+  background: rgba(13,17,23,.97);
+  border-bottom-color: rgba(255,255,255,.07);
+}
+[data-theme="dark"] .infoScreenHeaderTitle { color: rgba(225,229,235,.88); }
+[data-theme="dark"] .infoBackBtn { color: #4ecdc4; }
+[data-theme="dark"] .infoBackBtn:hover { color: #38b2ac; }
+
+[data-theme="dark"] .infoHeroTitle { color: #4ecdc4; }
+[data-theme="dark"] .infoHeroSub { color: rgba(225,229,235,.55); }
+
+[data-theme="dark"] .infoSectionTitle { color: rgba(225,229,235,.90); }
+
+[data-theme="dark"] .infoCard {
+  background: #141c1e;
+  box-shadow: 0 2px 14px rgba(0,0,0,.35);
+}
+[data-theme="dark"] .infoCardTitle { color: rgba(225,229,235,.90); }
+[data-theme="dark"] .infoCardText { color: rgba(225,229,235,.52); }
+
+[data-theme="dark"] .infoStep {
+  background: #141c1e;
+  box-shadow: 0 2px 14px rgba(0,0,0,.35);
+}
+[data-theme="dark"] .infoStepTitle { color: rgba(225,229,235,.90); }
+[data-theme="dark"] .infoStepText { color: rgba(225,229,235,.52); }
+
+[data-theme="dark"] .infoHighlight {
+  background: rgba(38,112,122,.12);
+  border-color: rgba(56,178,172,.30);
+}
+[data-theme="dark"] .infoHighlightText { color: rgba(225,229,235,.90); }
+[data-theme="dark"] .infoHighlightSub { color: rgba(225,229,235,.52); }
+
+[data-theme="dark"] .infoCheckList li {
+  color: rgba(225,229,235,.68);
+  border-bottom-color: rgba(255,255,255,.06);
+}
+[data-theme="dark"] .infoCheckList li::before { color: #4ecdc4; }
+
+[data-theme="dark"] .infoPathCard.light {
+  background: #141c1e;
+  box-shadow: 0 2px 14px rgba(0,0,0,.35);
+}
+[data-theme="dark"] .infoPathCard.light .infoPathTag { color: #4ecdc4; }
+[data-theme="dark"] .infoPathCard.light .infoPathTitle { color: rgba(225,229,235,.90); }
+[data-theme="dark"] .infoPathCard.light .infoPathList li { color: rgba(225,229,235,.52); }
+[data-theme="dark"] .infoPathCard.light .infoPathList li::before { color: #4ecdc4; }
+
+[data-theme="dark"] .accordionItem {
+  background: #141c1e;
+  box-shadow: none;
+}
+[data-theme="dark"] .accordionHead {
+  color: rgba(225,229,235,.88);
+}
+[data-theme="dark"] .accordionHead:hover { background: rgba(255,255,255,.04); }
+[data-theme="dark"] .accordionArrow { color: #4ecdc4; }
+[data-theme="dark"] .accordionBodyInner { color: rgba(225,229,235,.58); }
+
+[data-theme="dark"] .faqChip {
+  background: rgba(255,255,255,.07);
+  color: rgba(225,229,235,.60);
+}
+[data-theme="dark"] .faqChip.active,
+[data-theme="dark"] .faqChip:hover { background: #26707a; color: #fff; }
+
+[data-theme="dark"] .faqSearch {
+  background: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.10);
+  color: rgba(225,229,235,.88);
+}
+[data-theme="dark"] .faqSearch::placeholder { color: rgba(225,229,235,.28); }
+[data-theme="dark"] .faqSearch:focus { border-color: rgba(56,178,172,.38); }
+[data-theme="dark"] .faqEmpty { color: rgba(225,229,235,.32); }
+
+[data-theme="dark"] .contactCard {
+  background: #141c1e;
+  box-shadow: none;
+  border: 1px solid rgba(255,255,255,.07);
+  color: rgba(225,229,235,.88);
+}
+[data-theme="dark"] .contactCard:hover {
+  box-shadow: 0 6px 22px rgba(0,0,0,.40);
+  border-color: rgba(56,178,172,.22);
+}
+[data-theme="dark"] .contactCardTitle { color: rgba(225,229,235,.90); }
+[data-theme="dark"] .contactCardValue { color: #4ecdc4; }
+
+[data-theme="dark"] .contactForm {
+  background: #141c1e;
+  box-shadow: none;
+}
+[data-theme="dark"] .contactFormTitle { color: rgba(225,229,235,.90); }
+[data-theme="dark"] .contactFormInput {
+  background: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.10);
+  color: rgba(225,229,235,.88);
+}
+[data-theme="dark"] .contactFormInput::placeholder { color: rgba(225,229,235,.28); }
+[data-theme="dark"] .contactFormInput:focus { border-color: rgba(56,178,172,.38); background: rgba(255,255,255,.07); }
+
+[data-theme="dark"] .infoWorkHours {
+  background: rgba(38,112,122,.10);
+  color: rgba(225,229,235,.65);
+}
+
+[data-theme="dark"] .aboutHeroLogo { color: #4ecdc4; }
+[data-theme="dark"] .aboutHeroTagline { color: rgba(225,229,235,.52); }
+
+[data-theme="dark"] .aboutCounter {
+  background: #141c1e;
+  box-shadow: none;
+}
+[data-theme="dark"] .aboutCounterNum { color: #4ecdc4; }
+[data-theme="dark"] .aboutCounterLabel { color: rgba(225,229,235,.40); }
+
+[data-theme="dark"] .aboutTimeline::before { background: rgba(56,178,172,.20); }
+[data-theme="dark"] .aboutTimelineItem::before { background: #4ecdc4; }
+[data-theme="dark"] .aboutTimelineYear { color: #4ecdc4; }
+[data-theme="dark"] .aboutTimelineText { color: rgba(225,229,235,.62); }
+
+[data-theme="dark"] .aboutTeamCard {
+  background: #141c1e;
+  box-shadow: none;
+}
+[data-theme="dark"] .aboutTeamName { color: rgba(225,229,235,.90); }
+[data-theme="dark"] .aboutTeamRole { color: rgba(225,229,235,.42); }
+
+[data-theme="dark"] .legalDate { color: rgba(225,229,235,.32); }
+[data-theme="dark"] .infoAcceptBtn { background: #26707a; }
+[data-theme="dark"] .infoAcceptBtn:hover { background: #1f5c68; }
+[data-theme="dark"] .infoLink { color: #4ecdc4; }
+[data-theme="dark"] .infoLink:hover { color: #38b2ac; }

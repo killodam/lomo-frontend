@@ -1892,3 +1892,63 @@
   line-height: 1.55;
   max-width: 300px;
 }
+
+/* ════════════════════════════════════════════════════════
+   DARK THEME — FEED.CSS OVERRIDES
+   feed.css loads after theme.css, so .feedListWrap .socialCard
+   specificity (0,1,1) wins over [data-theme="dark"] .socialCard (0,1,1).
+   Bump specificity here to (0,2,1) to fix white cards in dark mode.
+   ════════════════════════════════════════════════════════ */
+[data-theme="dark"] .feedListWrap .socialCard {
+  background: #141c1e;
+  border-color: rgba(255,255,255,.07);
+  box-shadow: none;
+}
+[data-theme="dark"] .feedListWrap .socialCard:hover {
+  background: #1a2528;
+  border-color: rgba(56,178,172,.22);
+  box-shadow: 0 4px 18px rgba(0,0,0,.45);
+}
+[data-theme="dark"] .feedListWrap .socialCard::before {
+  background: linear-gradient(180deg, #4ecdc4 0%, #26707a 100%);
+}
+[data-theme="dark"] .feedListWrap .scName { color: rgba(225,229,235,.92); }
+[data-theme="dark"] .feedListWrap .scVerBadge {
+  background: rgba(34,197,94,.10);
+  color: #4ade80;
+  border-color: rgba(34,197,94,.20);
+}
+[data-theme="dark"] .feedListWrap .scVerBadge.pending {
+  background: rgba(245,158,11,.10);
+  color: #fbbf24;
+  border-color: rgba(245,158,11,.22);
+}
+[data-theme="dark"] .feedListWrap .scBookmarkBtn { color: rgba(225,229,235,.28); }
+[data-theme="dark"] .feedListWrap .scBookmarkBtn.active { color: #fbbf24; }
+[data-theme="dark"] .feedListWrap .scBookmarkBtn:hover { color: rgba(225,229,235,.60); }
+
+/* jobFeedListWrap dark (vacancies feed) */
+[data-theme="dark"] .jobFeedListWrap .feedCard {
+  background: #141c1e;
+  border-color: rgba(255,255,255,.07);
+  box-shadow: none;
+}
+[data-theme="dark"] .jobFeedListWrap .feedCard:hover {
+  background: #1a2528;
+  border-color: rgba(56,178,172,.22);
+  box-shadow: 0 4px 18px rgba(0,0,0,.40);
+}
+[data-theme="dark"] .jobFeedName { color: rgba(225,229,235,.90); }
+[data-theme="dark"] .jobFeedCompany { color: rgba(225,229,235,.55); }
+[data-theme="dark"] .jobFeedChip {
+  background: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.09);
+  color: rgba(225,229,235,.60);
+}
+[data-theme="dark"] .jobFeedChip.teal {
+  background: rgba(56,178,172,.12);
+  border-color: rgba(56,178,172,.22);
+  color: #4ecdc4;
+}
+[data-theme="dark"] .vacComingSoonTitle { color: rgba(225,229,235,.60); }
+[data-theme="dark"] .vacComingSoonSub { color: rgba(225,229,235,.35); }

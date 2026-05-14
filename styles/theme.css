@@ -1378,3 +1378,89 @@ body { transition: background .22s ease; }
   border-color: rgba(255,255,255,.07) !important;
   background: rgba(255,255,255,.04) !important;
 }
+[data-theme="dark"] .miniLabel { color: rgba(225,229,235,.40) !important; }
+[data-theme="dark"] .miniValue { color: rgba(225,229,235,.85) !important; }
+[data-theme="dark"] .miniOptional { color: rgba(225,229,235,.32) !important; }
+[data-theme="dark"] .docHelpText { color: rgba(225,229,235,.42) !important; }
+
+/* Network rows (connections panel) */
+[data-theme="dark"] .networkRow {
+  background: #1a2528;
+  border-color: rgba(255,255,255,.07);
+}
+[data-theme="dark"] .networkGroupTitle { color: rgba(225,229,235,.35); }
+[data-theme="dark"] .networkName { color: rgba(225,229,235,.90); }
+[data-theme="dark"] .networkMeta { color: rgba(225,229,235,.45); }
+[data-theme="dark"] .networkHint { color: rgba(225,229,235,.42); }
+
+/* Company verification form blocks */
+[data-theme="dark"] .companyFormBlock {
+  background: #141c1e;
+  border-color: rgba(255,255,255,.07);
+}
+[data-theme="dark"] .companyFormBlockHead { color: rgba(225,229,235,.90); }
+[data-theme="dark"] .companyFormBlockSub { color: rgba(225,229,235,.38); }
+[data-theme="dark"] .companyTypeSwitchLabel { color: rgba(225,229,235,.65); }
+[data-theme="dark"] .companyTypeBtn {
+  background: rgba(255,255,255,.06);
+  border-color: rgba(255,255,255,.12);
+  color: rgba(225,229,235,.72);
+}
+[data-theme="dark"] .companyTypeBtn:hover {
+  background: rgba(56,178,172,.09);
+  border-color: rgba(56,178,172,.28);
+  color: #4ecdc4;
+}
+[data-theme="dark"] .companyTypeBtn.active {
+  background: #26707a;
+  border-color: #26707a;
+  color: #fff;
+}
+
+/* Checklist items */
+[data-theme="dark"] .checklistItem.ok {
+  background: rgba(34,197,94,.10);
+  color: #4ade80;
+}
+[data-theme="dark"] .checklistItem.miss {
+  background: rgba(255,255,255,.05);
+  color: rgba(225,229,235,.52);
+}
+[data-theme="dark"] .checklistItem.ok .ciIcon {
+  background: rgba(34,197,94,.18);
+  color: #4ade80;
+}
+[data-theme="dark"] .checklistItem.miss .ciIcon {
+  background: rgba(255,255,255,.09);
+  color: rgba(225,229,235,.38);
+}
+[data-theme="dark"] .companyVerifyAction .accentBtn {
+  background: #26707a;
+  border-color: #26707a;
+  color: #fff;
+}
+[data-theme="dark"] .companyVerifyAction .accentBtn:hover {
+  background: #1f5c68;
+  border-color: #1f5c68;
+}
+
+/* Admin company warnings */
+[data-theme="dark"] .adminCompanyWarnings {
+  background: rgba(245,158,11,.08);
+  border-color: rgba(245,158,11,.28);
+}
+[data-theme="dark"] .adminCompanyWarningsHead { color: #fbbf24; }
+[data-theme="dark"] .adminCompanyWarning { color: rgba(251,191,36,.80); border-top-color: rgba(245,158,11,.15); }
+
+/* Danger zone dark */
+[data-theme="dark"] .dangerZoneCard {
+  background: rgba(30,10,10,.85);
+  border-color: rgba(220,38,38,.22);
+}
+[data-theme="dark"] .dangerZoneText { color: rgba(252,165,165,.75); }
+[data-theme="dark"] .dangerPill {
+  color: #f87171;
+  border-color: rgba(220,38,38,.28);
+  background: rgba(255,255,255,.05);
+}
+[data-theme="dark"] .dangerPill:hover { background: rgba(239,68,68,.10); border-color: rgba(220,38,38,.38); }
