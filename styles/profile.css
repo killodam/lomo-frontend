@@ -589,6 +589,134 @@
       border-color: rgba(38,112,122,.55);
     }
 
+    #screenMyEmployeeProfile .candidateVerifyIntro {
+      padding: 16px 18px;
+      margin-bottom: 18px;
+      border: 1px solid rgba(38,112,122,.16);
+      border-radius: 20px;
+      background:
+        linear-gradient(135deg, rgba(38,112,122,.11), rgba(255,255,255,.58)),
+        rgba(235,248,250,.50);
+    }
+    #screenMyEmployeeProfile .candidateVerifyIntroTitle {
+      color: #134e5a;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: .01em;
+    }
+    #screenMyEmployeeProfile .candidateVerifyIntroText {
+      max-width: 860px;
+      margin-top: 6px;
+      color: #50606a;
+      font-size: 13px;
+      line-height: 1.55;
+    }
+    #screenMyEmployeeProfile .candidateVerifyLevelRow {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 12px;
+    }
+    #screenMyEmployeeProfile .verifyLevelPill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 26px;
+      padding: 0 11px;
+      border-radius: 999px;
+      border: 1px solid transparent;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .04em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+    #screenMyEmployeeProfile .verifyLevelPill.l1 {
+      color: #8a5800;
+      background: rgba(245,158,11,.12);
+      border-color: rgba(245,158,11,.24);
+    }
+    #screenMyEmployeeProfile .verifyLevelPill.l2 {
+      color: #1a5c68;
+      background: rgba(38,112,122,.12);
+      border-color: rgba(38,112,122,.22);
+    }
+    #screenMyEmployeeProfile .verifyLevelPill.l3 {
+      color: #166534;
+      background: rgba(34,197,94,.12);
+      border-color: rgba(34,197,94,.22);
+    }
+    #screenMyEmployeeProfile .candidateVerifyGroup + .candidateVerifyGroup {
+      margin-top: 18px;
+    }
+    #screenMyEmployeeProfile .candidateVerifyGroupHead {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 14px;
+      margin-bottom: 12px;
+    }
+    #screenMyEmployeeProfile .candidateVerifyGroupTitle {
+      color: #111827;
+      font-size: 15px;
+      font-weight: 800;
+    }
+    #screenMyEmployeeProfile .candidateVerifyGroupSub {
+      max-width: 760px;
+      margin-top: 4px;
+      color: #667085;
+      font-size: 12px;
+      line-height: 1.5;
+    }
+    #screenMyEmployeeProfile .candidateVerifyGrid {
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+    #screenMyEmployeeProfile .candidateVerifyGrid.compactGrid {
+      grid-template-columns: minmax(250px, .8fr) minmax(320px, 1.2fr);
+    }
+    #screenMyEmployeeProfile .candidateVerifyGrid .miniCard {
+      min-height: 168px;
+    }
+    #screenMyEmployeeProfile .candidateVerifyGrid .miniCard.primary {
+      border-color: rgba(38,112,122,.22);
+      box-shadow: inset 0 0 0 1px rgba(38,112,122,.06);
+    }
+    #screenMyEmployeeProfile .candidateVerifyGrid .miniCard.sensitive {
+      border-color: rgba(34,197,94,.18);
+    }
+    #screenMyEmployeeProfile .candidateSignalCard {
+      min-height: 168px;
+      padding: 16px;
+      border: 1px solid rgba(38,112,122,.14);
+      border-radius: 16px;
+      background: rgba(255,255,255,.52);
+      box-sizing: border-box;
+    }
+    #screenMyEmployeeProfile .candidateSignalTitle {
+      margin-bottom: 12px;
+      color: #134e5a;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+    }
+    #screenMyEmployeeProfile .candidateSignalCard .sqInput {
+      min-height: 52px;
+      margin-bottom: 8px;
+    }
+    #screenMyEmployeeProfile .candidateSignalCard .sqInput:last-child {
+      margin-bottom: 0;
+    }
+
+    @media (max-width: 760px) {
+      #screenMyEmployeeProfile .candidateVerifyGrid.compactGrid {
+        grid-template-columns: 1fr;
+      }
+      #screenMyEmployeeProfile .candidateVerifyGroupHead {
+        flex-direction: column;
+      }
+    }
+
     /* CONSENT */
     .consentBox{
       width: min(520px, 92vw);

@@ -1743,6 +1743,7 @@ test('chat hub opens on conversation list without auto-selecting a thread', asyn
 
 test('admin dashboard loads queue and users with server-side search', async ({ page }) => {
   let userSearch = '';
+  let queueSort = '';
 
   await page.route('**/api/**', async (route) => {
     const request = route.request();
@@ -1761,6 +1762,7 @@ test('admin dashboard loads queue and users with server-side search', async ({ p
     }
 
     if (url.pathname.endsWith('/admin/queue')) {
+      queueSort = url.searchParams.get('sort') || '';
       return route.fulfill({
         status: 200,
         contentType: 'application/json',
@@ -1809,6 +1811,8 @@ test('admin dashboard loads queue and users with server-side search', async ({ p
 
   await expect(page.locator('#screenAdminQueue')).toHaveClass(/active/);
   await expect(page.locator('#adminQueueList')).toContainText('Кирилл Архипов');
+  await expect.poll(() => queueSort).toBe('review_priority_desc');
+  await expect(page.locator('#adminQueueSort')).toHaveValue('review_priority_desc');
 
   await page.click('#adminTabUsers');
   await expect(page.locator('#adminUsersList')).toContainText('founder@lomo.website');
@@ -2535,6 +2539,10 @@ test('candidate verification banner opens document edit tab', async ({ page }) =
   await expect(page.locator('#screenMyEmployeeProfile')).toHaveClass(/active/);
   await expect(page.locator('#screenMyEmployeeProfile .profileTab[data-tab="tabCDocs"]')).toHaveClass(/active/);
   await expect(page.locator('#tabCDocs')).toBeVisible();
+  await expect(page.locator('#tabCDocs')).toContainText('Скан диплома');
+  await expect(page.locator('#tabCDocs')).toContainText('Выписка из СФР / ЭТК');
+  await expect(page.locator('#filePassSelfieC')).toHaveCount(1);
+  await expect(page.locator('#mpCLinkedinUrl')).toHaveCount(1);
 });
 
 test('employer company verification form saves through apiFetch', async ({ page }) => {

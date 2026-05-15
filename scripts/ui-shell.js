@@ -228,6 +228,7 @@ function bindStaticUiActions() {
   });
   bindUiAction('verifyLevelInfoBtn', 'click', function () { openVerifyLevelModal(); });
   bindUiAction('refreshAdminQueueBtn', 'click', function () { loadAdminQueue(); });
+  bindUiAction('adminQueueSort', 'change', function () { updateAdminQueueSort(); });
   bindUiAction('adminPreviewCandidateBtn', 'click', function () {
     show('employerSearch');
     var btn = document.getElementById('empAdminBackBtn');

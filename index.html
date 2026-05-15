@@ -22,14 +22,14 @@
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" href="./icons/app-icon.svg" type="image/svg+xml"/>
 <link rel="apple-touch-icon" href="./icons/icon-192.png"/>
-<link rel="stylesheet" href="./styles/core.css?v=18"/>
-<link rel="stylesheet" href="./styles/profile.css?v=18"/>
-<link rel="stylesheet" href="./styles/theme.css?v=18"/>
-<link rel="stylesheet" href="./styles/responsive.css?v=18"/>
-<link rel="stylesheet" href="./styles/chat.css?v=18"/>
-<link rel="stylesheet" href="./styles/landing.css?v=18"/>
-<link rel="stylesheet" href="./styles/feed.css?v=18"/>
-<link rel="stylesheet" href="./styles/info-screens.css?v=18"/>
+<link rel="stylesheet" href="./styles/core.css?v=19"/>
+<link rel="stylesheet" href="./styles/profile.css?v=19"/>
+<link rel="stylesheet" href="./styles/theme.css?v=19"/>
+<link rel="stylesheet" href="./styles/responsive.css?v=19"/>
+<link rel="stylesheet" href="./styles/chat.css?v=19"/>
+<link rel="stylesheet" href="./styles/landing.css?v=19"/>
+<link rel="stylesheet" href="./styles/feed.css?v=19"/>
+<link rel="stylesheet" href="./styles/info-screens.css?v=19"/>
 </head>
 <body>
 <div class="stage">
@@ -829,6 +829,7 @@
             <span class="statusTag" id="corpEmailVerifiedStatusC">не подтверждена</span>
             <button type="button" class="pillBtn soft" id="btnSendCorpVerifyC">Подтвердить место работы</button>
           </div>
+          <div class="verifyTooltip">Для L2 после email-кода приложите в разделе «Документы» приказ о приёме или первую страницу трудового договора.</div>
         </div>
       </div>
       <div class="profileEditSection">
@@ -853,36 +854,152 @@
     <div id="tabCDocs" class="profileTabPane" hidden>
       <div class="profileEditSection">
         <div class="profileSectionHead">Подтверждения</div>
-        <div class="verifyGrid">
-          <div class="miniCard">
-            <div class="miniTop"><div class="miniLabel">Образование</div><span class="statusTag" id="eduStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:education">Удалить</button></div>
-            <div class="dropZone" id="dropZoneEduC">Нажмите или перетащите файл</div>
-            <input class="fileInput" id="fileEduC" type="file" accept=".pdf,.doc,.docx,image/*"/>
-            <div class="miniHint" id="eduHintC">Файл не выбран</div>
+        <div class="candidateVerifyIntro">
+          <div class="candidateVerifyIntroTitle">Что именно проверяет LOMO</div>
+          <div class="candidateVerifyIntroText">L1 подтверждает базовые факты, L2 добавляет опыт и текущее место работы, L3 усиливает антифрод. Чувствительные документы остаются защищёнными: публично виден только CV, если вы сами это разрешите.</div>
+          <div class="candidateVerifyLevelRow">
+            <span class="verifyLevelPill l1">L1 · база</span>
+            <span class="verifyLevelPill l2">L2 · опыт</span>
+            <span class="verifyLevelPill l3">L3 · строгая проверка</span>
           </div>
-          <div class="miniCard">
-            <div class="miniTop"><div class="miniLabel">Опыт работы</div><span class="statusTag" id="workStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:work">Удалить</button></div>
-            <div class="dropZone" id="dropZoneWorkC">Нажмите или перетащите файл</div>
-            <input class="fileInput" id="fileWorkC" type="file" accept=".pdf,.doc,.docx,image/*"/>
-            <div class="miniHint" id="workHintC">Файл не выбран</div>
+        </div>
+
+        <div class="candidateVerifyGroup">
+          <div class="candidateVerifyGroupHead">
+            <div>
+              <div class="candidateVerifyGroupTitle">Образование</div>
+              <div class="candidateVerifyGroupSub">Диплом обязателен для базовой проверки; справка нужна только если обучение ещё продолжается.</div>
+            </div>
+            <span class="verifyLevelPill l1">L1</span>
           </div>
-          <div class="miniCard">
-            <div class="miniTop"><div class="miniLabel">Курсы / сертификаты</div><span class="statusTag" id="courseStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:courses">Удалить</button></div>
-            <div class="dropZone" id="dropZoneCourseC">Нажмите или перетащите файл</div>
-            <input class="fileInput" id="fileCourseC" type="file" accept=".pdf,.doc,.docx,image/*"/>
-            <div class="miniHint" id="courseHintC">Файл не выбран</div>
+          <div class="verifyGrid candidateVerifyGrid">
+            <div class="miniCard primary">
+              <div class="miniTop"><div class="miniLabel">Скан диплома <span class="miniOptional">лицевая + оборот</span></div><span class="statusTag" id="eduStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:education">Удалить</button></div>
+              <div class="dropZone" id="dropZoneEduC">Нажмите или перетащите файл</div>
+              <input class="fileInput" id="fileEduC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+              <div class="miniHint" id="eduHintC">Файл не выбран</div>
+            </div>
+            <div class="miniCard">
+              <div class="miniTop"><div class="miniLabel">Приложение к диплому <span class="miniOptional">предметы и оценки</span></div><span class="statusTag" id="eduSupplementStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:educationSupplement">Удалить</button></div>
+              <div class="dropZone" id="dropZoneEduSupplementC">Нажмите или перетащите файл</div>
+              <input class="fileInput" id="fileEduSupplementC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+              <div class="miniHint" id="eduSupplementHintC">Файл не выбран</div>
+            </div>
+            <div class="miniCard">
+              <div class="miniTop"><div class="miniLabel">Академическая справка <span class="miniOptional">если ещё учитесь</span></div><span class="statusTag" id="eduTranscriptStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:educationTranscript">Удалить</button></div>
+              <div class="dropZone" id="dropZoneEduTranscriptC">Нажмите или перетащите файл</div>
+              <input class="fileInput" id="fileEduTranscriptC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+              <div class="miniHint" id="eduTranscriptHintC">Файл не выбран</div>
+            </div>
           </div>
-          <div class="miniCard">
-            <div class="miniTop"><div class="miniLabel">Паспорт (разворот)</div><span class="statusTag" id="passStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:passport">Удалить</button></div>
-            <div class="dropZone" id="dropZonePassC">Нажмите или перетащите файл</div>
-            <input class="fileInput" id="filePassC" type="file" accept=".pdf,.doc,.docx,image/*"/>
-            <div class="miniHint" id="passHintC">Файл не выбран</div>
+        </div>
+
+        <div class="candidateVerifyGroup">
+          <div class="candidateVerifyGroupHead">
+            <div>
+              <div class="candidateVerifyGroupTitle">Опыт и текущее место работы</div>
+              <div class="candidateVerifyGroupSub">Для L2 лучше приложить официальный источник стажа и отдельно подтвердить текущую компанию.</div>
+            </div>
+            <span class="verifyLevelPill l2">L2</span>
           </div>
-          <div class="miniCard">
-            <div class="miniTop"><div class="miniLabel">Резюме / CV (публично)</div><span class="statusTag" id="cvStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:cv">Удалить</button></div>
-            <div class="dropZone" id="dropZoneCVC">Нажмите или перетащите файл</div>
-            <input class="fileInput" id="fileCVC" type="file" accept=".pdf,.doc,.docx,image/*"/>
-            <div class="miniHint" id="cvHintC">Файл не выбран</div>
+          <div class="verifyGrid candidateVerifyGrid">
+            <div class="miniCard primary">
+              <div class="miniTop"><div class="miniLabel">Трудовая книжка <span class="miniOptional">все заполненные развороты</span></div><span class="statusTag" id="workStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:work">Удалить</button></div>
+              <div class="dropZone" id="dropZoneWorkC">Нажмите или перетащите файл</div>
+              <input class="fileInput" id="fileWorkC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+              <div class="miniHint" id="workHintC">Файл не выбран</div>
+            </div>
+            <div class="miniCard">
+              <div class="miniTop"><div class="miniLabel">Выписка из СФР / ЭТК <span class="miniOptional">альтернатива трудовой</span></div><span class="statusTag" id="workSfrStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:workSfr">Удалить</button></div>
+              <div class="dropZone" id="dropZoneWorkSfrC">Нажмите или перетащите файл</div>
+              <input class="fileInput" id="fileWorkSfrC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+              <div class="miniHint" id="workSfrHintC">Файл не выбран</div>
+            </div>
+            <div class="miniCard">
+              <div class="miniTop"><div class="miniLabel">Справка / рекомендация <span class="miniOptional">необязательно</span></div><span class="statusTag" id="workReferenceStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:workReference">Удалить</button></div>
+              <div class="dropZone" id="dropZoneWorkReferenceC">Нажмите или перетащите файл</div>
+              <input class="fileInput" id="fileWorkReferenceC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+              <div class="miniHint" id="workReferenceHintC">Файл не выбран</div>
+            </div>
+            <div class="miniCard">
+              <div class="miniTop"><div class="miniLabel">Приказ / трудовой договор <span class="miniOptional">1-я страница</span></div><span class="statusTag" id="currentWorkStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:currentWork">Удалить</button></div>
+              <div class="dropZone" id="dropZoneCurrentWorkC">Нажмите или перетащите файл</div>
+              <input class="fileInput" id="fileCurrentWorkC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+              <div class="miniHint" id="currentWorkHintC">Файл не выбран</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="candidateVerifyGroup">
+          <div class="candidateVerifyGroupHead">
+            <div>
+              <div class="candidateVerifyGroupTitle">Курсы и внешние сигналы</div>
+              <div class="candidateVerifyGroupSub">Полезное дополнение, но не важнее диплома, опыта и паспорта.</div>
+            </div>
+            <span class="verifyLevelPill l1">L1</span>
+          </div>
+          <div class="verifyGrid candidateVerifyGrid compactGrid">
+            <div class="miniCard">
+              <div class="miniTop"><div class="miniLabel">Курсы / сертификаты</div><span class="statusTag" id="courseStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:courses">Удалить</button></div>
+              <div class="dropZone" id="dropZoneCourseC">Нажмите или перетащите файл</div>
+              <input class="fileInput" id="fileCourseC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+              <div class="miniHint" id="courseHintC">Файл не выбран</div>
+            </div>
+            <div class="candidateSignalCard">
+              <div class="candidateSignalTitle">Ссылки для проверки</div>
+              <div class="formCol">
+                <div class="sqInput"><input id="mpCCourseVerificationUrl" type="url" placeholder="Ссылка на сертификат (Coursera, Stepik и т.д.)" autocomplete="url"></div>
+                <div class="sqInput"><input id="mpCLinkedinUrl" type="url" placeholder="LinkedIn — дополнительный сигнал" autocomplete="url"></div>
+                <div class="sqInput"><input id="mpCHhUrl" type="url" placeholder="HH.ru — дополнительный сигнал" autocomplete="url"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="candidateVerifyGroup sensitive">
+          <div class="candidateVerifyGroupHead">
+            <div>
+              <div class="candidateVerifyGroupTitle">Паспорт и антифрод</div>
+              <div class="candidateVerifyGroupSub">Чувствительные файлы нужны для L3 и проверяются особенно строго.</div>
+            </div>
+            <span class="verifyLevelPill l3">L3</span>
+          </div>
+          <div class="verifyGrid candidateVerifyGrid">
+            <div class="miniCard primary sensitive">
+              <div class="miniTop"><div class="miniLabel">Паспорт, разворот 2–3</div><span class="statusTag" id="passStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:passport">Удалить</button></div>
+              <div class="dropZone" id="dropZonePassC">Нажмите или перетащите файл</div>
+              <input class="fileInput" id="filePassC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+              <div class="miniHint" id="passHintC">Файл не выбран</div>
+            </div>
+            <div class="miniCard sensitive">
+              <div class="miniTop"><div class="miniLabel">Разворот с пропиской <span class="miniOptional">необязательно</span></div><span class="statusTag" id="passRegistrationStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:passportRegistration">Удалить</button></div>
+              <div class="dropZone" id="dropZonePassRegistrationC">Нажмите или перетащите файл</div>
+              <input class="fileInput" id="filePassRegistrationC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+              <div class="miniHint" id="passRegistrationHintC">Файл не выбран</div>
+            </div>
+            <div class="miniCard sensitive">
+              <div class="miniTop"><div class="miniLabel">Селфи с паспортом <span class="miniOptional">антифрод</span></div><span class="statusTag" id="passSelfieStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:passportSelfie">Удалить</button></div>
+              <div class="dropZone" id="dropZonePassSelfieC">Нажмите или перетащите файл</div>
+              <input class="fileInput" id="filePassSelfieC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+              <div class="miniHint" id="passSelfieHintC">Файл не выбран</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="candidateVerifyGroup cvGroup">
+          <div class="candidateVerifyGroupHead">
+            <div>
+              <div class="candidateVerifyGroupTitle">Резюме / CV</div>
+              <div class="candidateVerifyGroupSub">Хранится как файл профиля. Не участвует в строгой верификации и становится публичным только по вашему выбору.</div>
+            </div>
+          </div>
+          <div class="verifyGrid candidateVerifyGrid compactGrid">
+            <div class="miniCard">
+              <div class="miniTop"><div class="miniLabel">Резюме / CV</div><span class="statusTag" id="cvStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:cv">Удалить</button></div>
+              <div class="dropZone" id="dropZoneCVC">Нажмите или перетащите файл</div>
+              <input class="fileInput" id="fileCVC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+              <div class="miniHint" id="cvHintC">Файл не выбран</div>
+            </div>
           </div>
         </div>
       </div>
@@ -1324,7 +1441,16 @@
             <div class="adminSectionTitle">Очередь проверок</div>
             <div class="adminSectionSub">Документы, ожидающие верификации</div>
           </div>
-          <button class="pillBtn" id="refreshAdminQueueBtn">↻ Обновить</button>
+          <div class="adminQueueControls">
+            <label class="adminQueueSortLabel" for="adminQueueSort">Сортировка</label>
+            <select id="adminQueueSort" class="adminQueueSort">
+              <option value="review_priority_desc">Сначала важные</option>
+              <option value="created_desc">Сначала новые</option>
+              <option value="created_asc">Сначала старые</option>
+              <option value="name_asc">По имени</option>
+            </select>
+            <button class="pillBtn" id="refreshAdminQueueBtn">↻ Обновить</button>
+          </div>
         </div>
         <div id="adminQueueList"><div class="adminListLoading">Загрузка...</div></div>
         <div id="adminQueuePager" class="pager"></div>
@@ -2163,27 +2289,27 @@
 
 <script src="./config.js"></script>
 <script src="./capacitor.js"></script>
-<script src="./scripts/runtime.js?v=18"></script>
-<script src="./scripts/api.js?v=18"></script>
-<script src="./scripts/state.js?v=18"></script>
-<script src="./scripts/social-card.js?v=18"></script>
-<script src="./scripts/screens.js?v=18"></script>
-<script src="./scripts/push-notifications.js?v=18"></script>
-<script src="./scripts/auth.js?v=18"></script>
-<script src="./scripts/bookmarks-store.js?v=18"></script>
-<script src="./scripts/admin.js?v=18"></script>
-<script src="./scripts/feed-refresh.js?v=18"></script>
-<script src="./scripts/public-profile.js?v=18"></script>
-<script src="./scripts/chat.js?v=18"></script>
-<script src="./scripts/auth-ui.js?v=18"></script>
-<script src="./scripts/profile-runtime.js?v=18"></script>
-<script src="./scripts/ui-shell.js?v=18"></script>
-<script src="./scripts/admin-ui-bindings.js?v=18"></script>
-<script src="./scripts/info-screens.js?v=18"></script>
-<script src="./scripts/ai-matching.js?v=18"></script>
-<script src="./scripts/feed-extra.js?v=18"></script>
-<script src="./scripts/jobs.js?v=18"></script>
-<script src="./scripts/company-docs.js?v=18"></script>
+<script src="./scripts/runtime.js?v=19"></script>
+<script src="./scripts/api.js?v=19"></script>
+<script src="./scripts/state.js?v=19"></script>
+<script src="./scripts/social-card.js?v=19"></script>
+<script src="./scripts/screens.js?v=19"></script>
+<script src="./scripts/push-notifications.js?v=19"></script>
+<script src="./scripts/auth.js?v=19"></script>
+<script src="./scripts/bookmarks-store.js?v=19"></script>
+<script src="./scripts/admin.js?v=19"></script>
+<script src="./scripts/feed-refresh.js?v=19"></script>
+<script src="./scripts/public-profile.js?v=19"></script>
+<script src="./scripts/chat.js?v=19"></script>
+<script src="./scripts/auth-ui.js?v=19"></script>
+<script src="./scripts/profile-runtime.js?v=19"></script>
+<script src="./scripts/ui-shell.js?v=19"></script>
+<script src="./scripts/admin-ui-bindings.js?v=19"></script>
+<script src="./scripts/info-screens.js?v=19"></script>
+<script src="./scripts/ai-matching.js?v=19"></script>
+<script src="./scripts/feed-extra.js?v=19"></script>
+<script src="./scripts/jobs.js?v=19"></script>
+<script src="./scripts/company-docs.js?v=19"></script>
 
 
 </body>

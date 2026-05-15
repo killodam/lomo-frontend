@@ -6,7 +6,7 @@ var employerSearchState = { page: 1, pageSize: 15, total: 0, totalPages: 0, sear
 var _feedScrollObserver = null;
 var _employerScrollObserver = null;
 var employerFilterUiState = { signature: '' };
-var adminQueueState = { page: 1, pageSize: 20, total: 0, totalPages: 0 };
+var adminQueueState = { page: 1, pageSize: 20, total: 0, totalPages: 0, sort: 'review_priority_desc' };
 var adminCandidateState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '' };
 var adminEmployerState = { page: 1, pageSize: 12, total: 0, totalPages: 0, search: '' };
 var adminUsersState = { page: 1, pageSize: 20, total: 0, totalPages: 0, search: '', roleFilter: '' };
@@ -30,6 +30,11 @@ function recoverAuthFlowOnProtectedError(err, options) {
   showToast('Сессия завершилась. Войдите снова.', 'error');
   showEntryScreen();
   return true;
+}
+
+function safeAdminExternalUrl(value) {
+  var url = String(value || '').trim();
+  return /^https:\/\//i.test(url) ? url : '';
 }
 
 function normalizePaginatedResponse(result) {
@@ -474,6 +479,7 @@ function loadAdminQueue(page) {
   apiAdminQueue({
     page: adminQueueState.page,
     pageSize: adminQueueState.pageSize,
+    sort: adminQueueState.sort,
   }).then(function (result) {
     var data = normalizePaginatedResponse(result);
     syncPagerState(adminQueueState, data);
@@ -499,6 +505,20 @@ function loadAdminQueue(page) {
       var card = document.createElement('div');
       card.className = 'adminCard';
       card.id = 'acard_' + item.id;
+      var reviewLevel = Number(item.review_level || 0);
+      var reviewLevelHtml = reviewLevel
+        ? '<span class="reviewLevelBadge l' + reviewLevel + '">L' + reviewLevel + '</span>'
+        : '';
+      var signalLinks = [
+        safeAdminExternalUrl(item.linkedin_url) ? { label: 'LinkedIn', url: safeAdminExternalUrl(item.linkedin_url) } : null,
+        safeAdminExternalUrl(item.hh_url) ? { label: 'HH.ru', url: safeAdminExternalUrl(item.hh_url) } : null,
+        safeAdminExternalUrl(item.course_verification_url) ? { label: 'Сертификат', url: safeAdminExternalUrl(item.course_verification_url) } : null,
+      ].filter(Boolean);
+      var signalLinksHtml = signalLinks.length
+        ? '<div class="adminSignalLinks">' + signalLinks.map(function (link) {
+            return '<a href="' + escapeHtml(link.url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(link.label) + '</a>';
+          }).join('') + '</div>'
+        : '';
       card.innerHTML =
         '<div class="adminCardHead">' +
           '<div class="adminAvatar">' + escapeHtml(initials || '?') + '</div>' +
@@ -510,7 +530,9 @@ function loadAdminQueue(page) {
               escapeHtml(item.ach_title || item.org || '') +
               (item.file_name ? ' · ' + escapeHtml(item.file_name) : '') +
             '</div>' +
+            signalLinksHtml +
           '</div>' +
+          reviewLevelHtml +
           '<span class="statusBadge warn">На рассмотрении</span>' +
         '</div>' +
         '<div class="adminActions">' +
@@ -573,6 +595,13 @@ function loadAdminQueue(page) {
     if (listEl) listEl.innerHTML = queueEmptyState('Не удалось загрузить очередь');
     renderPager('adminQueuePager', { total: 0 }, function () {}, { label: 'документов' });
   });
+}
+
+function updateAdminQueueSort() {
+  var select = document.getElementById('adminQueueSort');
+  adminQueueState.sort = select && select.value ? select.value : 'review_priority_desc';
+  adminQueueState.page = 1;
+  loadAdminQueue(1);
 }
 
 function bindAdminRoleChips() {
@@ -776,20 +805,21 @@ function renderEmployerAccessPanel(candidateId, requests, files) {
   });
 
   var buttons = ['education', 'work', 'courses', 'passport', 'cv'].map(function (type) {
+    var requestLabel = REQUEST_DOC_TYPE_LABELS[type] || DOC_TYPE_LABELS[type] || type;
     var file = fileMap[type];
     if (file) {
-      return '<button type="button" class="pillBtn" data-open-doc="' + escapeHtml(file.id) + '" data-file-name="' + escapeHtml(file.file_name || DOC_TYPE_LABELS[type]) + '">Открыть: ' + escapeHtml(DOC_TYPE_LABELS[type]) + '</button>';
+      return '<button type="button" class="pillBtn" data-open-doc="' + escapeHtml(file.id) + '" data-file-name="' + escapeHtml(file.file_name || requestLabel) + '">Открыть: ' + escapeHtml(requestLabel) + '</button>';
     }
 
     var req = requestMap[type];
     if (req && req.status === 'pending') {
-      return '<button type="button" class="pillBtn" disabled>Запрос отправлен: ' + escapeHtml(DOC_TYPE_LABELS[type]) + '</button>';
+      return '<button type="button" class="pillBtn" disabled>Запрос отправлен: ' + escapeHtml(requestLabel) + '</button>';
     }
     if (req && req.status === 'approved') {
-      return '<button type="button" class="pillBtn" disabled>Доступ одобрен: ' + escapeHtml(DOC_TYPE_LABELS[type]) + '</button>';
+      return '<button type="button" class="pillBtn" disabled>Доступ одобрен: ' + escapeHtml(requestLabel) + '</button>';
     }
 
-    return '<button type="button" class="pillBtn" data-request-doc="' + escapeHtml(type) + '" data-candidate-id="' + escapeHtml(candidateId) + '">Запросить: ' + escapeHtml(DOC_TYPE_LABELS[type]) + '</button>';
+    return '<button type="button" class="pillBtn" data-request-doc="' + escapeHtml(type) + '" data-candidate-id="' + escapeHtml(candidateId) + '">Запросить: ' + escapeHtml(requestLabel) + '</button>';
   }).join('');
 
   var filesHtml = (files && files.length)

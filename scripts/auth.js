@@ -651,15 +651,54 @@ function getPasswordPolicyError(password) {
 
           const inputMap = {
             employer: { companyDoc:'fileCompanyDocE' },
-            employee: { education:'fileEduC', work:'fileWorkC', courses:'fileCourseC', passport:'filePassC', cv:'fileCVC' }
+            employee: {
+              education:'fileEduC',
+              educationSupplement:'fileEduSupplementC',
+              educationTranscript:'fileEduTranscriptC',
+              work:'fileWorkC',
+              workSfr:'fileWorkSfrC',
+              workReference:'fileWorkReferenceC',
+              currentWork:'fileCurrentWorkC',
+              courses:'fileCourseC',
+              passport:'filePassC',
+              passportRegistration:'filePassRegistrationC',
+              passportSelfie:'filePassSelfieC',
+              cv:'fileCVC'
+            }
           };
           const hintMap = {
             employer: { companyDoc:'companyDocHintE' },
-            employee: { education:'eduHintC', work:'workHintC', courses:'courseHintC', passport:'passHintC', cv:'cvHintC' }
+            employee: {
+              education:'eduHintC',
+              educationSupplement:'eduSupplementHintC',
+              educationTranscript:'eduTranscriptHintC',
+              work:'workHintC',
+              workSfr:'workSfrHintC',
+              workReference:'workReferenceHintC',
+              currentWork:'currentWorkHintC',
+              courses:'courseHintC',
+              passport:'passHintC',
+              passportRegistration:'passRegistrationHintC',
+              passportSelfie:'passSelfieHintC',
+              cv:'cvHintC'
+            }
           };
           const statusMap = {
             employer: { companyDoc:'companyDocStatusE' },
-            employee: { education:'eduStatusC', work:'workStatusC', courses:'courseStatusC', passport:'passStatusC', cv:'cvStatusC' }
+            employee: {
+              education:'eduStatusC',
+              educationSupplement:'eduSupplementStatusC',
+              educationTranscript:'eduTranscriptStatusC',
+              work:'workStatusC',
+              workSfr:'workSfrStatusC',
+              workReference:'workReferenceStatusC',
+              currentWork:'currentWorkStatusC',
+              courses:'courseStatusC',
+              passport:'passStatusC',
+              passportRegistration:'passRegistrationStatusC',
+              passportSelfie:'passSelfieStatusC',
+              cv:'cvStatusC'
+            }
           };
 
           const inputId = inputMap[role]?.[key];
@@ -1065,6 +1104,9 @@ function getPasswordPolicyError(password) {
           p.eduPlace  = (document.getElementById('mpCEduPlace')?.value  || '').trim();
           p.eduYear   = (document.getElementById('mpCEduYear')?.value   || '').trim();
           p.vacancies = (document.getElementById('mpCVacancies')?.value || '').trim();
+          p.courseVerificationUrl = (document.getElementById('mpCCourseVerificationUrl')?.value || '').trim();
+          p.linkedinUrl = (document.getElementById('mpCLinkedinUrl')?.value || '').trim();
+          p.hhUrl = (document.getElementById('mpCHhUrl')?.value || '').trim();
           p.salaryExpectations = (document.getElementById('mpCSalary')?.value || '').trim();
           p.lookingForWork = !!(document.getElementById('mpCLookingForWork')?.checked);
           p.telegram  = (document.getElementById('mpCTelegram')?.value  || '').trim();
@@ -1085,6 +1127,9 @@ function getPasswordPolicyError(password) {
             full_name: p.fullName, location: p.city, phone: p.phone,
             about: p.about, edu_place: p.eduPlace, edu_year: p.eduYear,
             vacancies: p.vacancies, salary_expectations: p.salaryExpectations,
+            course_verification_url: p.courseVerificationUrl,
+            linkedin_url: p.linkedinUrl,
+            hh_url: p.hhUrl,
             looking_for_work: p.lookingForWork,
             telegram: p.telegram, email: p.email,
             corp_email: p.corpEmail, current_job: p.current_job, job_title: p.job_title, work_exp: p.work_exp,

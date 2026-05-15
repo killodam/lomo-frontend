@@ -400,6 +400,9 @@ function hydrateEmployeeForm() {
   setVal('mpCEduPlace', p.eduPlace);
   setVal('mpCEduYear', p.eduYear);
   setVal('mpCVacancies', p.vacancies);
+  setVal('mpCCourseVerificationUrl', p.courseVerificationUrl);
+  setVal('mpCLinkedinUrl', p.linkedinUrl);
+  setVal('mpCHhUrl', p.hhUrl);
   setVal('mpCSalary', p.salaryExpectations);
   var lookingCb = document.getElementById('mpCLookingForWork');
   if (lookingCb) lookingCb.checked = !!p.lookingForWork;
@@ -426,12 +429,26 @@ function hydrateEmployeeForm() {
   setText('cvHintC', proofHintText(p.proofs?.cv));
   setStatusTag('eduStatusC', p.proofs?.education?.status || 'не загружено');
   setText('eduHintC', proofHintText(p.proofs?.education));
+  setStatusTag('eduSupplementStatusC', p.proofs?.educationSupplement?.status || 'не загружено');
+  setText('eduSupplementHintC', proofHintText(p.proofs?.educationSupplement));
+  setStatusTag('eduTranscriptStatusC', p.proofs?.educationTranscript?.status || 'не загружено');
+  setText('eduTranscriptHintC', proofHintText(p.proofs?.educationTranscript));
   setStatusTag('workStatusC', p.proofs?.work?.status || 'не загружено');
   setText('workHintC', proofHintText(p.proofs?.work));
+  setStatusTag('workSfrStatusC', p.proofs?.workSfr?.status || 'не загружено');
+  setText('workSfrHintC', proofHintText(p.proofs?.workSfr));
+  setStatusTag('workReferenceStatusC', p.proofs?.workReference?.status || 'не загружено');
+  setText('workReferenceHintC', proofHintText(p.proofs?.workReference));
+  setStatusTag('currentWorkStatusC', p.proofs?.currentWork?.status || 'не загружено');
+  setText('currentWorkHintC', proofHintText(p.proofs?.currentWork));
   setStatusTag('courseStatusC', p.proofs?.courses?.status || 'не загружено');
   setText('courseHintC', proofHintText(p.proofs?.courses));
   setStatusTag('passStatusC', p.proofs?.passport?.status || 'не загружено');
   setText('passHintC', proofHintText(p.proofs?.passport));
+  setStatusTag('passRegistrationStatusC', p.proofs?.passportRegistration?.status || 'не загружено');
+  setText('passRegistrationHintC', proofHintText(p.proofs?.passportRegistration));
+  setStatusTag('passSelfieStatusC', p.proofs?.passportSelfie?.status || 'не загружено');
+  setText('passSelfieHintC', proofHintText(p.proofs?.passportSelfie));
   const has = p.portfolio && p.portfolio.length;
   setText('portHintC', has ? ('Прикреплено: ' + p.portfolio.length + ' файл(ов)') : 'Файлы не выбраны');
   setStatusTag('portStatusC', has ? 'на рассмотрении' : 'не загружено');
@@ -730,9 +747,16 @@ function wireProofs() {
   const bindings = [
     { role: 'employer', key: 'companyDoc', input: 'fileCompanyDocE', hint: 'companyDocHintE', status: 'companyDocStatusE' },
     { role: 'employee', key: 'education', input: 'fileEduC', hint: 'eduHintC', status: 'eduStatusC' },
+    { role: 'employee', key: 'educationSupplement', input: 'fileEduSupplementC', hint: 'eduSupplementHintC', status: 'eduSupplementStatusC' },
+    { role: 'employee', key: 'educationTranscript', input: 'fileEduTranscriptC', hint: 'eduTranscriptHintC', status: 'eduTranscriptStatusC' },
     { role: 'employee', key: 'work', input: 'fileWorkC', hint: 'workHintC', status: 'workStatusC' },
+    { role: 'employee', key: 'workSfr', input: 'fileWorkSfrC', hint: 'workSfrHintC', status: 'workSfrStatusC' },
+    { role: 'employee', key: 'workReference', input: 'fileWorkReferenceC', hint: 'workReferenceHintC', status: 'workReferenceStatusC' },
+    { role: 'employee', key: 'currentWork', input: 'fileCurrentWorkC', hint: 'currentWorkHintC', status: 'currentWorkStatusC' },
     { role: 'employee', key: 'courses', input: 'fileCourseC', hint: 'courseHintC', status: 'courseStatusC' },
     { role: 'employee', key: 'passport', input: 'filePassC', hint: 'passHintC', status: 'passStatusC' },
+    { role: 'employee', key: 'passportRegistration', input: 'filePassRegistrationC', hint: 'passRegistrationHintC', status: 'passRegistrationStatusC' },
+    { role: 'employee', key: 'passportSelfie', input: 'filePassSelfieC', hint: 'passSelfieHintC', status: 'passSelfieStatusC' },
     { role: 'employee', key: 'cv', input: 'fileCVC', hint: 'cvHintC', status: 'cvStatusC' },
   ];
 
@@ -763,9 +787,16 @@ function wireDropZones() {
   const zones = [
     { zoneId: 'dropZoneCompanyDocE', inputId: 'fileCompanyDocE' },
     { zoneId: 'dropZoneEduC', inputId: 'fileEduC' },
+    { zoneId: 'dropZoneEduSupplementC', inputId: 'fileEduSupplementC' },
+    { zoneId: 'dropZoneEduTranscriptC', inputId: 'fileEduTranscriptC' },
     { zoneId: 'dropZoneWorkC', inputId: 'fileWorkC' },
+    { zoneId: 'dropZoneWorkSfrC', inputId: 'fileWorkSfrC' },
+    { zoneId: 'dropZoneWorkReferenceC', inputId: 'fileWorkReferenceC' },
+    { zoneId: 'dropZoneCurrentWorkC', inputId: 'fileCurrentWorkC' },
     { zoneId: 'dropZoneCourseC', inputId: 'fileCourseC' },
     { zoneId: 'dropZonePassC', inputId: 'filePassC' },
+    { zoneId: 'dropZonePassRegistrationC', inputId: 'filePassRegistrationC' },
+    { zoneId: 'dropZonePassSelfieC', inputId: 'filePassSelfieC' },
     { zoneId: 'dropZoneCVC', inputId: 'fileCVC' },
     { zoneId: 'dropZonePortfolio', inputId: 'filePortfolioC' },
   ];

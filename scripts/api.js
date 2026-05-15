@@ -15,29 +15,58 @@ const CHAT_WS_BASE = (window.LOMO_CONFIG?.CHAT_WS_BASE || BACKEND_BASE).replace(
 const CSRF_COOKIE_NAME = window.LOMO_CONFIG?.CSRF_COOKIE_NAME || 'lomo_csrf';
 
 const DOC_TYPE_LABELS = {
-  education: 'Образование',
-  work: 'Опыт работы',
+  education: 'Скан диплома',
+  education_supplement: 'Приложение к диплому',
+  education_transcript: 'Академическая справка',
+  work: 'Трудовая книжка',
+  work_sfr: 'Выписка из СФР / ЭТК',
+  work_reference: 'Справка / рекомендация',
+  current_work: 'Приказ / трудовой договор',
   courses: 'Курсы / сертификаты',
-  passport: 'Паспорт',
+  passport: 'Паспорт, разворот 2–3',
+  passport_registration: 'Паспорт, прописка',
+  passport_selfie: 'Селфи с паспортом',
   cv: 'CV',
   company_doc: 'Документы компании',
+};
+
+const REQUEST_DOC_TYPE_LABELS = {
+  education: 'Образование',
+  work: 'Опыт работы',
+  courses: 'Курсы',
+  passport: 'Паспорт',
+  cv: 'CV',
 };
 
 const PROOF_KEY_TO_TYPE = {
   companyDoc: 'company_doc',
   education: 'education',
+  educationSupplement: 'education_supplement',
+  educationTranscript: 'education_transcript',
   work: 'work',
+  workSfr: 'work_sfr',
+  workReference: 'work_reference',
+  currentWork: 'current_work',
   courses: 'courses',
   passport: 'passport',
+  passportRegistration: 'passport_registration',
+  passportSelfie: 'passport_selfie',
   cv: 'cv',
 };
 
 const TYPE_TO_PROOF_KEY = {
   company_doc: 'companyDoc',
   education: 'education',
+  education_supplement: 'educationSupplement',
+  education_transcript: 'educationTranscript',
   work: 'work',
+  work_sfr: 'workSfr',
+  work_reference: 'workReference',
+  current_work: 'currentWork',
   courses: 'courses',
   passport: 'passport',
+  passport_registration: 'passportRegistration',
+  passport_selfie: 'passportSelfie',
   cv: 'cv',
 };
 
@@ -449,6 +478,9 @@ function applyProfileToState(user, profile, achievements) {
       eduPlace: profile.edu_place || '',
       eduYear: profile.edu_year || '',
       vacancies: profile.vacancies || '',
+      courseVerificationUrl: profile.course_verification_url || '',
+      linkedinUrl: profile.linkedin_url || '',
+      hhUrl: profile.hh_url || '',
       salaryExpectations: profile.salary_expectations || '',
       lookingForWork: !!profile.looking_for_work,
       current_job: profile.current_job || '',
@@ -468,9 +500,16 @@ function applyProfileToState(user, profile, achievements) {
   } else {
     state.employee.proofs = {
       education: emptyProof(),
+      educationSupplement: emptyProof(),
+      educationTranscript: emptyProof(),
       work: emptyProof(),
+      workSfr: emptyProof(),
+      workReference: emptyProof(),
+      currentWork: emptyProof(),
       courses: emptyProof(),
       passport: emptyProof(),
+      passportRegistration: emptyProof(),
+      passportSelfie: emptyProof(),
       cv: emptyProof(),
     };
   }

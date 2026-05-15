@@ -345,6 +345,30 @@
     .adminCardInfo{ flex:1; min-width:0; }
     .adminCardName{ font-size:13px; font-weight:700; color:#1a1a1a; }
     .adminCardDoc{ font-size:12px; color:#666; margin-top:2px; }
+    .adminSignalLinks{ display:flex;gap:6px;flex-wrap:wrap;margin-top:6px; }
+    .adminSignalLinks a{
+      border:1px solid rgba(38,110,120,.18);
+      border-radius:999px;
+      padding:3px 8px;
+      color:#1a5c68;
+      background:rgba(38,110,120,.07);
+      font-size:11px;
+      font-weight:700;
+      text-decoration:none;
+    }
+    .reviewLevelBadge{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      min-width:28px;
+      height:28px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:800;
+    }
+    .reviewLevelBadge.l1{ color:#8a5800;background:rgba(245,158,11,.12); }
+    .reviewLevelBadge.l2{ color:#1a5c68;background:rgba(38,112,122,.12); }
+    .reviewLevelBadge.l3{ color:#166534;background:rgba(34,197,94,.12); }
     .adminActions{ display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-top:8px; }
     .adminBtn{ padding:8px 16px; border-radius:999px; font-size:12px; font-weight:700; cursor:pointer; border:1px solid rgba(38,110,120,.28); background:rgba(38,110,120,.10); color:#1a5c68; transition:all .15s; }
     .adminBtn:hover{ background:rgba(38,110,120,.18); }
@@ -364,6 +388,19 @@
     .adminSectionSub{ font-size:13px;color:#666;margin-top:2px; }
     .adminSearchInput{ width:220px; }
     .adminSearchInput.wide{ width:260px; }
+    .adminQueueControls{ display:flex;align-items:center;gap:8px;flex-wrap:wrap; }
+    .adminQueueSortLabel{ font-size:12px;color:#667085;font-weight:700; }
+    .adminQueueSort{
+      min-height:38px;
+      padding:0 12px;
+      border:1px solid rgba(38,110,120,.18);
+      border-radius:999px;
+      background:rgba(255,255,255,.88);
+      color:#1a5c68;
+      font-size:12px;
+      font-weight:700;
+      outline:none;
+    }
     .adminUsersTable{ width:100%; border-collapse:collapse; font-size:13px; }
     .adminUsersHeadRow{ border-bottom:1px solid rgba(38,110,120,.15); }
     .adminUsersHeadCell{ text-align:left; padding:6px 8px; color:#666; }
@@ -586,18 +623,18 @@
    DARK THEME — CSS VARIABLES
    ════════════════════════════════════════════════════════ */
 :root[data-theme="dark"] {
-  --bg: #0d1117;
-  --label: rgba(225,229,235,.90);
-  --placeholder: rgba(225,229,235,.38);
-  --sqFill: rgba(255,255,255,.07);
-  --sqBorder: rgba(255,255,255,.11);
-  --sqHoverFill: rgba(255,255,255,.10);
-  --sqHoverBorder: rgba(255,255,255,.17);
-  --backFill: rgba(255,255,255,.06);
-  --backBorder: rgba(255,255,255,.13);
+  --bg: #0b1115;
+  --label: rgba(239,246,248,.94);
+  --placeholder: rgba(207,222,228,.56);
+  --sqFill: rgba(255,255,255,.075);
+  --sqBorder: rgba(190,224,229,.16);
+  --sqHoverFill: rgba(255,255,255,.11);
+  --sqHoverBorder: rgba(190,224,229,.24);
+  --backFill: rgba(255,255,255,.07);
+  --backBorder: rgba(190,224,229,.18);
   --accentFill: rgba(56,178,172,.16);
-  --accentBorder: rgba(56,178,172,.30);
-  --accentText: #4ecdc4;
+  --accentBorder: rgba(78,205,196,.34);
+  --accentText: #66ddd4;
   --accentHoverFill: rgba(56,178,172,.22);
   --accentHoverBorder: rgba(56,178,172,.45);
 }
@@ -605,9 +642,10 @@
 /* Body background */
 [data-theme="dark"] body {
   background:
-    radial-gradient(900px 600px at 15% 0%, rgba(38,130,145,.07), transparent 55%),
-    radial-gradient(700px 500px at 85% 10%, rgba(38,110,125,.05), transparent 50%),
-    #0d1117;
+    radial-gradient(900px 600px at 15% 0%, rgba(41,144,159,.16), transparent 55%),
+    radial-gradient(760px 520px at 85% 8%, rgba(38,110,125,.12), transparent 52%),
+    radial-gradient(700px 500px at 50% 100%, rgba(22,78,90,.10), transparent 58%),
+    #0b1115;
 }
 body { transition: background .22s ease; }
 
@@ -1208,18 +1246,18 @@ body { transition: background .22s ease; }
 [data-theme="dark"] #screenRecruiterPublic,
 [data-theme="dark"] #screenEmployeePublic,
 [data-theme="dark"] #screenMyEmployerProfile,
-[data-theme="dark"] #screenMyEmployeeProfile { background: #0d1117; }
+[data-theme="dark"] #screenMyEmployeeProfile { background: #0b1115; }
 
 /* Sticky profile header */
 [data-theme="dark"] .profileHeader {
-  background: rgba(13,17,23,.97) !important;
+  background: rgba(11,17,21,.94) !important;
   border-bottom-color: rgba(255,255,255,.07) !important;
 }
 [data-theme="dark"] .profileHeaderTitle { color: rgba(225,229,235,.45); }
 
 /* Profile edit sticky bar */
 [data-theme="dark"] .profileEditStickyBar {
-  background: rgba(13,17,23,.97);
+  background: rgba(11,17,21,.94);
   border-bottom-color: rgba(255,255,255,.07);
 }
 [data-theme="dark"] .profileTab {
@@ -1235,23 +1273,23 @@ body { transition: background .22s ease; }
 
 /* Section cards */
 [data-theme="dark"] .profileSection {
-  background: #141c1e;
-  border-color: rgba(255,255,255,.07);
-  box-shadow: none;
+  background: linear-gradient(180deg, rgba(24,35,39,.96), rgba(18,28,32,.98));
+  border-color: rgba(190,224,229,.11);
+  box-shadow: 0 18px 45px rgba(0,0,0,.16);
 }
 [data-theme="dark"] .profileEditSection {
-  background: #141c1e;
-  border-color: rgba(255,255,255,.07);
-  box-shadow: none;
+  background: linear-gradient(180deg, rgba(24,35,39,.96), rgba(18,28,32,.98));
+  border-color: rgba(190,224,229,.11);
+  box-shadow: 0 18px 45px rgba(0,0,0,.16);
 }
 [data-theme="dark"] .profileEditAvatar { border-bottom-color: rgba(255,255,255,.07); }
 
 /* Profile typography */
 [data-theme="dark"] .profileName { color: rgba(225,229,235,.95); }
 [data-theme="dark"] .profileMeta { color: rgba(225,229,235,.50); }
-[data-theme="dark"] .profileSub { color: rgba(225,229,235,.48); }
-[data-theme="dark"] .profileAbout { color: rgba(225,229,235,.68); }
-[data-theme="dark"] .profileSectionHead { color: #4ecdc4; }
+[data-theme="dark"] .profileSub { color: rgba(225,235,239,.68); }
+[data-theme="dark"] .profileAbout { color: rgba(225,235,239,.78); }
+[data-theme="dark"] .profileSectionHead { color: #66ddd4; }
 
 /* Badges */
 [data-theme="dark"] .badge { background: rgba(225,229,235,.90); color: #0d1117; }
@@ -1311,8 +1349,9 @@ body { transition: background .22s ease; }
 
 /* Dropzone */
 [data-theme="dark"] .dropZone {
-  border-color: rgba(255,255,255,.12) !important;
-  color: rgba(225,229,235,.45) !important;
+  border-color: rgba(190,224,229,.22) !important;
+  color: rgba(225,235,239,.72) !important;
+  background: rgba(255,255,255,.025);
 }
 [data-theme="dark"] .dropZone:hover { background: rgba(255,255,255,.04) !important; }
 
@@ -1375,13 +1414,50 @@ body { transition: background .22s ease; }
 
 /* Mini card (profile small stats) */
 [data-theme="dark"] .miniCard {
-  border-color: rgba(255,255,255,.07) !important;
-  background: rgba(255,255,255,.04) !important;
+  border-color: rgba(190,224,229,.13) !important;
+  background: rgba(255,255,255,.055) !important;
 }
-[data-theme="dark"] .miniLabel { color: rgba(225,229,235,.40) !important; }
+[data-theme="dark"] .miniLabel { color: rgba(225,235,239,.72) !important; }
 [data-theme="dark"] .miniValue { color: rgba(225,229,235,.85) !important; }
-[data-theme="dark"] .miniOptional { color: rgba(225,229,235,.32) !important; }
-[data-theme="dark"] .docHelpText { color: rgba(225,229,235,.42) !important; }
+[data-theme="dark"] .miniOptional { color: rgba(225,235,239,.50) !important; }
+[data-theme="dark"] .docHelpText { color: rgba(225,235,239,.60) !important; }
+
+[data-theme="dark"] #screenMyEmployeeProfile .candidateVerifyIntro {
+  background:
+    linear-gradient(135deg, rgba(56,178,172,.15), rgba(255,255,255,.035)),
+    rgba(255,255,255,.035);
+  border-color: rgba(78,205,196,.18);
+}
+[data-theme="dark"] #screenMyEmployeeProfile .candidateVerifyIntroTitle,
+[data-theme="dark"] #screenMyEmployeeProfile .candidateSignalTitle {
+  color: #8be8df;
+}
+[data-theme="dark"] #screenMyEmployeeProfile .candidateVerifyIntroText,
+[data-theme="dark"] #screenMyEmployeeProfile .candidateVerifyGroupSub {
+  color: rgba(225,235,239,.70);
+}
+[data-theme="dark"] #screenMyEmployeeProfile .candidateVerifyGroupTitle {
+  color: rgba(239,246,248,.95);
+}
+[data-theme="dark"] #screenMyEmployeeProfile .verifyLevelPill.l1 {
+  color: #fbbf24;
+  background: rgba(245,158,11,.14);
+  border-color: rgba(245,158,11,.24);
+}
+[data-theme="dark"] #screenMyEmployeeProfile .verifyLevelPill.l2 {
+  color: #66ddd4;
+  background: rgba(56,178,172,.14);
+  border-color: rgba(78,205,196,.24);
+}
+[data-theme="dark"] #screenMyEmployeeProfile .verifyLevelPill.l3 {
+  color: #6ee7b7;
+  background: rgba(34,197,94,.14);
+  border-color: rgba(34,197,94,.24);
+}
+[data-theme="dark"] #screenMyEmployeeProfile .candidateSignalCard {
+  background: rgba(255,255,255,.045);
+  border-color: rgba(190,224,229,.14);
+}
 
 /* Network rows (connections panel) */
 [data-theme="dark"] .networkRow {
@@ -1395,8 +1471,8 @@ body { transition: background .22s ease; }
 
 /* Company verification form blocks */
 [data-theme="dark"] .companyFormBlock {
-  background: #141c1e;
-  border-color: rgba(255,255,255,.07);
+  background: linear-gradient(180deg, rgba(24,35,39,.96), rgba(18,28,32,.98));
+  border-color: rgba(190,224,229,.11);
 }
 [data-theme="dark"] .companyFormBlockHead { color: rgba(225,229,235,.90); }
 [data-theme="dark"] .companyFormBlockSub { color: rgba(225,229,235,.38); }
@@ -1451,6 +1527,21 @@ body { transition: background .22s ease; }
 }
 [data-theme="dark"] .adminCompanyWarningsHead { color: #fbbf24; }
 [data-theme="dark"] .adminCompanyWarning { color: rgba(251,191,36,.80); border-top-color: rgba(245,158,11,.15); }
+
+[data-theme="dark"] .adminQueueSortLabel { color: rgba(225,235,239,.66); }
+[data-theme="dark"] .adminQueueSort {
+  background: rgba(255,255,255,.06);
+  border-color: rgba(190,224,229,.16);
+  color: rgba(239,246,248,.90);
+}
+[data-theme="dark"] .adminSignalLinks a {
+  color: #66ddd4;
+  background: rgba(56,178,172,.10);
+  border-color: rgba(78,205,196,.18);
+}
+[data-theme="dark"] .reviewLevelBadge.l1 { color:#fbbf24;background:rgba(245,158,11,.14); }
+[data-theme="dark"] .reviewLevelBadge.l2 { color:#66ddd4;background:rgba(56,178,172,.14); }
+[data-theme="dark"] .reviewLevelBadge.l3 { color:#6ee7b7;background:rgba(34,197,94,.14); }
 
 /* Danger zone dark */
 [data-theme="dark"] .dangerZoneCard {

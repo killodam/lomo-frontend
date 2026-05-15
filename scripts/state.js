@@ -55,6 +55,9 @@ const state = {
     eduPlace: '',
     eduYear: '',
     vacancies: '',
+    courseVerificationUrl: '',
+    linkedinUrl: '',
+    hhUrl: '',
     current_job: '',
     job_title: '',
     work_exp: [],
@@ -63,9 +66,16 @@ const state = {
     avatarDataUrl: '',
     proofs: {
       education: emptyProof(),
+      educationSupplement: emptyProof(),
+      educationTranscript: emptyProof(),
       work: emptyProof(),
+      workSfr: emptyProof(),
+      workReference: emptyProof(),
+      currentWork: emptyProof(),
       courses: emptyProof(),
       passport: emptyProof(),
+      passportRegistration: emptyProof(),
+      passportSelfie: emptyProof(),
       cv: emptyProof(),
     },
   },
@@ -123,6 +133,9 @@ function saveToStorage() {
       eduPlace: state.employee.eduPlace,
       eduYear: state.employee.eduYear,
       vacancies: state.employee.vacancies,
+      courseVerificationUrl: state.employee.courseVerificationUrl,
+      linkedinUrl: state.employee.linkedinUrl,
+      hhUrl: state.employee.hhUrl,
       current_job: state.employee.current_job,
       job_title: state.employee.job_title,
       work_exp: state.employee.work_exp,
@@ -136,12 +149,47 @@ function saveToStorage() {
           achievementId: state.employee.proofs.education.achievementId || '',
           rejectReason: state.employee.proofs.education.rejectReason || '',
         },
+        educationSupplement: {
+          fileName: state.employee.proofs.educationSupplement.fileName,
+          status: state.employee.proofs.educationSupplement.status,
+          docId: state.employee.proofs.educationSupplement.docId || '',
+          achievementId: state.employee.proofs.educationSupplement.achievementId || '',
+          rejectReason: state.employee.proofs.educationSupplement.rejectReason || '',
+        },
+        educationTranscript: {
+          fileName: state.employee.proofs.educationTranscript.fileName,
+          status: state.employee.proofs.educationTranscript.status,
+          docId: state.employee.proofs.educationTranscript.docId || '',
+          achievementId: state.employee.proofs.educationTranscript.achievementId || '',
+          rejectReason: state.employee.proofs.educationTranscript.rejectReason || '',
+        },
         work: {
           fileName: state.employee.proofs.work.fileName,
           status: state.employee.proofs.work.status,
           docId: state.employee.proofs.work.docId || '',
           achievementId: state.employee.proofs.work.achievementId || '',
           rejectReason: state.employee.proofs.work.rejectReason || '',
+        },
+        workSfr: {
+          fileName: state.employee.proofs.workSfr.fileName,
+          status: state.employee.proofs.workSfr.status,
+          docId: state.employee.proofs.workSfr.docId || '',
+          achievementId: state.employee.proofs.workSfr.achievementId || '',
+          rejectReason: state.employee.proofs.workSfr.rejectReason || '',
+        },
+        workReference: {
+          fileName: state.employee.proofs.workReference.fileName,
+          status: state.employee.proofs.workReference.status,
+          docId: state.employee.proofs.workReference.docId || '',
+          achievementId: state.employee.proofs.workReference.achievementId || '',
+          rejectReason: state.employee.proofs.workReference.rejectReason || '',
+        },
+        currentWork: {
+          fileName: state.employee.proofs.currentWork.fileName,
+          status: state.employee.proofs.currentWork.status,
+          docId: state.employee.proofs.currentWork.docId || '',
+          achievementId: state.employee.proofs.currentWork.achievementId || '',
+          rejectReason: state.employee.proofs.currentWork.rejectReason || '',
         },
         courses: {
           fileName: state.employee.proofs.courses.fileName,
@@ -156,6 +204,20 @@ function saveToStorage() {
           docId: state.employee.proofs.passport.docId || '',
           achievementId: state.employee.proofs.passport.achievementId || '',
           rejectReason: state.employee.proofs.passport.rejectReason || '',
+        },
+        passportRegistration: {
+          fileName: state.employee.proofs.passportRegistration.fileName,
+          status: state.employee.proofs.passportRegistration.status,
+          docId: state.employee.proofs.passportRegistration.docId || '',
+          achievementId: state.employee.proofs.passportRegistration.achievementId || '',
+          rejectReason: state.employee.proofs.passportRegistration.rejectReason || '',
+        },
+        passportSelfie: {
+          fileName: state.employee.proofs.passportSelfie.fileName,
+          status: state.employee.proofs.passportSelfie.status,
+          docId: state.employee.proofs.passportSelfie.docId || '',
+          achievementId: state.employee.proofs.passportSelfie.achievementId || '',
+          rejectReason: state.employee.proofs.passportSelfie.rejectReason || '',
         },
         cv: {
           fileName: state.employee.proofs.cv.fileName,
@@ -198,7 +260,7 @@ function clearUserStorage(userId) {
 function mergeLocalState(userId) {
   const saved = loadUserStorage(userId);
   const employerFields = ['fullName', 'title', 'company', 'foundedYear', 'location', 'industry', 'products', 'activeProjects', 'neededSpecialists', 'about', 'email', 'corpEmail', 'phone', 'website', 'telegram', 'avatarDataUrl'];
-  const employeeFields = ['fullName', 'city', 'phone', 'about', 'email', 'telegram', 'corpEmail', 'eduPlace', 'eduYear', 'vacancies', 'current_job', 'job_title', 'avatarDataUrl'];
+  const employeeFields = ['fullName', 'city', 'phone', 'about', 'email', 'telegram', 'corpEmail', 'eduPlace', 'eduYear', 'vacancies', 'courseVerificationUrl', 'linkedinUrl', 'hhUrl', 'current_job', 'job_title', 'avatarDataUrl'];
 
   if (saved.employer) {
     employerFields.forEach(function (key) {
@@ -230,7 +292,7 @@ function mergeLocalState(userId) {
   if (saved.login && !state.login) state.login = saved.login;
   if (saved.publicId && !state.publicId) state.publicId = saved.publicId;
 
-  ['education', 'work', 'courses', 'passport', 'cv'].forEach(function (key) {
+  ['education', 'educationSupplement', 'educationTranscript', 'work', 'workSfr', 'workReference', 'currentWork', 'courses', 'passport', 'passportRegistration', 'passportSelfie', 'cv'].forEach(function (key) {
     const proof = saved.employee?.proofs?.[key];
     if (!proof) return;
     if (!state.employee.proofs[key].fileName && proof.fileName) state.employee.proofs[key].fileName = proof.fileName;
@@ -300,6 +362,9 @@ function resetState() {
     eduPlace: '',
     eduYear: '',
     vacancies: '',
+    courseVerificationUrl: '',
+    linkedinUrl: '',
+    hhUrl: '',
     current_job: '',
     job_title: '',
     work_exp: [],
@@ -308,9 +373,16 @@ function resetState() {
     avatarDataUrl: '',
     proofs: {
       education: emptyProof(),
+      educationSupplement: emptyProof(),
+      educationTranscript: emptyProof(),
       work: emptyProof(),
+      workSfr: emptyProof(),
+      workReference: emptyProof(),
+      currentWork: emptyProof(),
       courses: emptyProof(),
       passport: emptyProof(),
+      passportRegistration: emptyProof(),
+      passportSelfie: emptyProof(),
       cv: emptyProof(),
     },
   };
@@ -323,9 +395,16 @@ function resetDisplay() {
   const hints = {
     companyDocHintE: 'Файл не выбран',
     eduHintC: 'Файл не выбран',
+    eduSupplementHintC: 'Файл не выбран',
+    eduTranscriptHintC: 'Файл не выбран',
     workHintC: 'Файл не выбран',
+    workSfrHintC: 'Файл не выбран',
+    workReferenceHintC: 'Файл не выбран',
+    currentWorkHintC: 'Файл не выбран',
     courseHintC: 'Файл не выбран',
     passHintC: 'Файл не выбран',
+    passRegistrationHintC: 'Файл не выбран',
+    passSelfieHintC: 'Файл не выбран',
     cvHintC: 'Файл не выбран',
     portHintC: 'Файлы не выбраны',
   };
@@ -333,7 +412,7 @@ function resetDisplay() {
     const element = document.getElementById(id);
     if (element) element.textContent = hints[id];
   });
-  ['companyDocStatusE', 'eduStatusC', 'workStatusC', 'courseStatusC', 'passStatusC', 'cvStatusC'].forEach(function (id) {
+  ['companyDocStatusE', 'eduStatusC', 'eduSupplementStatusC', 'eduTranscriptStatusC', 'workStatusC', 'workSfrStatusC', 'workReferenceStatusC', 'currentWorkStatusC', 'courseStatusC', 'passStatusC', 'passRegistrationStatusC', 'passSelfieStatusC', 'cvStatusC'].forEach(function (id) {
     const element = document.getElementById(id);
     if (element) {
       element.textContent = 'не загружено';
