@@ -483,6 +483,8 @@ function loadAdminQueue(page) {
   }).then(function (result) {
     var data = normalizePaginatedResponse(result);
     syncPagerState(adminQueueState, data);
+    var totalEl = document.getElementById('adminQueueTotalCount');
+    if (totalEl) totalEl.textContent = String(data.total || 0);
 
     var listEl = document.getElementById('adminQueueList');
     if (!listEl) return;
@@ -542,9 +544,8 @@ function loadAdminQueue(page) {
       var actions = card.querySelector('.adminActions');
       if (item.id) {
         var btnView = document.createElement('button');
-        btnView.className = 'adminBtn';
+        btnView.className = 'adminBtn view';
         btnView.textContent = 'Просмотреть';
-        btnView.style.cssText = 'background:#e0f2fe;color:#0369a1;border:1px solid #bae6fd;';
         btnView.addEventListener('click', function () {
           openSecureDocument(item.id, item.file_name).catch(function (err) {
             showToast(safeErrorText(err), 'error');
@@ -591,8 +592,10 @@ function loadAdminQueue(page) {
     renderPager('adminQueuePager', adminQueueState, loadAdminQueue, { label: 'документов' });
   }).catch(function (err) {
     var listEl = document.getElementById('adminQueueList');
+    var totalEl = document.getElementById('adminQueueTotalCount');
     showToast(safeErrorText(err), 'error');
     if (listEl) listEl.innerHTML = queueEmptyState('Не удалось загрузить очередь');
+    if (totalEl) totalEl.textContent = '0';
     renderPager('adminQueuePager', { total: 0 }, function () {}, { label: 'документов' });
   });
 }

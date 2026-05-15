@@ -475,7 +475,7 @@ function setStatusTag(id, status) {
   const safeStatus = (status || '').toLowerCase();
   if (safeStatus.includes('подтверж')) el.classList.add('ok');
   else if (safeStatus.includes('рассмотр') || safeStatus.includes('провер')) el.classList.add('warn');
-  else if (safeStatus.includes('отклон')) el.classList.add('bad');
+  else if (safeStatus.includes('отклон') || safeStatus.includes('ошиб')) el.classList.add('bad');
   else el.classList.add('ghost');
 }
 
@@ -681,8 +681,14 @@ function handleProofSelection(binding, file) {
         showToast('Файл загружен ✓ — на рассмотрении');
         saveToStorage();
       } catch (error) {
-        if (hintEl) hintEl.textContent = 'Прикреплено: ' + name + ' (локально)';
-        showToast('Файл загружен локально');
+        proof.status = 'ошибка загрузки';
+        proof.docId = '';
+        setStatusTag(binding.status, proof.status);
+        if (hintEl) hintEl.textContent = 'Не удалось загрузить: ' + name;
+        if (binding.role === 'employer') renderRecruiterPublic();
+        if (binding.role === 'employee') renderEmployeePublic();
+        showToast(safeErrorText(error), 'error');
+        saveToStorage();
       }
     })();
   } else {

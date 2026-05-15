@@ -1813,6 +1813,8 @@ test('admin dashboard loads queue and users with server-side search', async ({ p
   await expect(page.locator('#adminQueueList')).toContainText('Кирилл Архипов');
   await expect.poll(() => queueSort).toBe('review_priority_desc');
   await expect(page.locator('#adminQueueSort')).toHaveValue('review_priority_desc');
+  await expect(page.locator('#adminThemeToggleBtn')).toBeVisible();
+  await expect(page.locator('#adminQueueTotalCount')).toHaveText('1');
 
   await page.click('#adminTabUsers');
   await expect(page.locator('#adminUsersList')).toContainText('founder@lomo.website');
@@ -2540,9 +2542,32 @@ test('candidate verification banner opens document edit tab', async ({ page }) =
   await expect(page.locator('#screenMyEmployeeProfile .profileTab[data-tab="tabCDocs"]')).toHaveClass(/active/);
   await expect(page.locator('#tabCDocs')).toBeVisible();
   await expect(page.locator('#tabCDocs')).toContainText('Скан диплома');
-  await expect(page.locator('#tabCDocs')).toContainText('Выписка из СФР / ЭТК');
   await expect(page.locator('#filePassSelfieC')).toHaveCount(1);
   await expect(page.locator('#mpCLinkedinUrl')).toHaveCount(1);
+
+  await page.click('#screenMyEmployeeProfile .profileTab[data-tab="tabCExp"]');
+  await expect(page.locator('#tabCExp')).toContainText('Подтверждение опыта');
+  await expect(page.locator('#tabCExp')).toContainText('Выписка из СФР / ЭТК');
+});
+
+test('dark theme keeps feed tabs and candidate verification readable', async ({ page }) => {
+  await page.goto('/');
+  await page.evaluate(function () {
+    document.documentElement.setAttribute('data-theme', 'dark');
+    document.cookie = 'lomo_csrf=test-suite; path=/';
+    show('candidateFeed');
+    show('employeePublic');
+  });
+
+  var feedTabsBg = await page.locator('.feedMainTabs').evaluate(function (el) {
+    return getComputedStyle(el).backgroundColor;
+  });
+  var achTitleColor = await page.locator('#screenEmployeePublic .achTitle').first().evaluate(function (el) {
+    return getComputedStyle(el).color;
+  });
+
+  expect(feedTabsBg).not.toBe('rgb(255, 255, 255)');
+  expect(achTitleColor).not.toBe('rgb(0, 0, 0)');
 });
 
 test('employer company verification form saves through apiFetch', async ({ page }) => {

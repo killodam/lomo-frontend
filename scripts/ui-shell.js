@@ -3,23 +3,25 @@
   var THEME_KEY = 'lomo_theme';
   function applyTheme(t) {
     document.documentElement.setAttribute('data-theme', t);
-    var icon  = document.getElementById('themeIcon');
-    var label = document.getElementById('themeLabel');
-    if (icon)  icon.textContent  = t === 'dark' ? '☀️' : '🌙';
-    if (label) label.textContent = t === 'dark' ? 'Светлая тема' : 'Тёмная тема';
+    document.querySelectorAll('[data-theme-icon]').forEach(function (icon) {
+      icon.textContent = t === 'dark' ? '☀️' : '🌙';
+    });
+    document.querySelectorAll('[data-theme-label]').forEach(function (label) {
+      label.textContent = t === 'dark' ? 'Светлая тема' : 'Тёмная тема';
+    });
   }
   var saved = '';
   try { saved = localStorage.getItem(THEME_KEY) || ''; } catch (e) {}
   applyTheme(saved || 'light');
 
   document.addEventListener('DOMContentLoaded', function () {
-    var btn = document.getElementById('themeToggleBtn');
-    if (!btn) return;
-    btn.addEventListener('click', function () {
-      var current = document.documentElement.getAttribute('data-theme');
-      var next = current === 'dark' ? 'light' : 'dark';
-      try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
-      applyTheme(next);
+    document.querySelectorAll('[data-theme-toggle]').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        var current = document.documentElement.getAttribute('data-theme');
+        var next = current === 'dark' ? 'light' : 'dark';
+        try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+        applyTheme(next);
+      });
     });
   });
 })();

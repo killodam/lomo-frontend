@@ -22,14 +22,14 @@
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" href="./icons/app-icon.svg" type="image/svg+xml"/>
 <link rel="apple-touch-icon" href="./icons/icon-192.png"/>
-<link rel="stylesheet" href="./styles/core.css?v=19"/>
-<link rel="stylesheet" href="./styles/profile.css?v=19"/>
-<link rel="stylesheet" href="./styles/theme.css?v=19"/>
-<link rel="stylesheet" href="./styles/responsive.css?v=19"/>
-<link rel="stylesheet" href="./styles/chat.css?v=19"/>
-<link rel="stylesheet" href="./styles/landing.css?v=19"/>
-<link rel="stylesheet" href="./styles/feed.css?v=19"/>
-<link rel="stylesheet" href="./styles/info-screens.css?v=19"/>
+<link rel="stylesheet" href="./styles/core.css?v=20"/>
+<link rel="stylesheet" href="./styles/profile.css?v=20"/>
+<link rel="stylesheet" href="./styles/theme.css?v=20"/>
+<link rel="stylesheet" href="./styles/responsive.css?v=20"/>
+<link rel="stylesheet" href="./styles/chat.css?v=20"/>
+<link rel="stylesheet" href="./styles/landing.css?v=20"/>
+<link rel="stylesheet" href="./styles/feed.css?v=20"/>
+<link rel="stylesheet" href="./styles/info-screens.css?v=20"/>
 </head>
 <body>
 <div class="stage">
@@ -51,9 +51,9 @@
 <button type="button" class="drawerItem" data-drawer-open="faq">FAQ</button>
   </nav>
   <div class="drawerFoot">
-    <button type="button" class="drawerThemeBtn" id="themeToggleBtn" aria-label="Переключить тему">
-      <span class="drawerThemeIcon" id="themeIcon">🌙</span>
-      <span class="drawerThemeLabel" id="themeLabel">Тёмная тема</span>
+    <button type="button" class="drawerThemeBtn" id="themeToggleBtn" data-theme-toggle aria-label="Переключить тему">
+      <span class="drawerThemeIcon" id="themeIcon" data-theme-icon>🌙</span>
+      <span class="drawerThemeLabel" id="themeLabel" data-theme-label>Тёмная тема</span>
       <span class="drawerThemeTrack" aria-hidden="true"><span class="drawerThemeKnob"></span></span>
     </button>
     <div class="drawerHint">Нажмите ESC или кликните вне панели, чтобы закрыть.</div>
@@ -829,13 +829,51 @@
             <span class="statusTag" id="corpEmailVerifiedStatusC">не подтверждена</span>
             <button type="button" class="pillBtn soft" id="btnSendCorpVerifyC">Подтвердить место работы</button>
           </div>
-          <div class="verifyTooltip">Для L2 после email-кода приложите в разделе «Документы» приказ о приёме или первую страницу трудового договора.</div>
+          <div class="verifyTooltip">Для L2 после email-кода приложите ниже приказ о приёме или первую страницу трудового договора.</div>
         </div>
       </div>
       <div class="profileEditSection">
         <div class="profileSectionHead">Опыт работы</div>
         <div class="formCol" id="workExpList"></div>
         <button type="button" class="addExpBtn" id="addWorkExpBtn">+ Добавить место работы</button>
+      </div>
+      <div class="profileEditSection candidateExpProofSection">
+        <div class="profileSectionHead">Подтверждение опыта</div>
+        <div class="candidateVerifyGroup">
+          <div class="candidateVerifyGroupHead">
+            <div>
+              <div class="candidateVerifyGroupTitle">Опыт и текущее место работы</div>
+              <div class="candidateVerifyGroupSub">Для L2 приложите официальный источник стажа и отдельно подтвердите текущую компанию.</div>
+            </div>
+            <span class="verifyLevelPill l2">L2</span>
+          </div>
+          <div class="verifyGrid candidateVerifyGrid">
+            <div class="miniCard primary">
+              <div class="miniTop"><div class="miniLabel">Трудовая книжка <span class="miniOptional">все заполненные развороты</span></div><span class="statusTag" id="workStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:work">Удалить</button></div>
+              <div class="dropZone" id="dropZoneWorkC">Нажмите или перетащите файл</div>
+              <input class="fileInput" id="fileWorkC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+              <div class="miniHint" id="workHintC">Файл не выбран</div>
+            </div>
+            <div class="miniCard">
+              <div class="miniTop"><div class="miniLabel">Выписка из СФР / ЭТК <span class="miniOptional">альтернатива трудовой</span></div><span class="statusTag" id="workSfrStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:workSfr">Удалить</button></div>
+              <div class="dropZone" id="dropZoneWorkSfrC">Нажмите или перетащите файл</div>
+              <input class="fileInput" id="fileWorkSfrC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+              <div class="miniHint" id="workSfrHintC">Файл не выбран</div>
+            </div>
+            <div class="miniCard">
+              <div class="miniTop"><div class="miniLabel">Справка / рекомендация <span class="miniOptional">необязательно</span></div><span class="statusTag" id="workReferenceStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:workReference">Удалить</button></div>
+              <div class="dropZone" id="dropZoneWorkReferenceC">Нажмите или перетащите файл</div>
+              <input class="fileInput" id="fileWorkReferenceC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+              <div class="miniHint" id="workReferenceHintC">Файл не выбран</div>
+            </div>
+            <div class="miniCard">
+              <div class="miniTop"><div class="miniLabel">Приказ / трудовой договор <span class="miniOptional">1-я страница</span></div><span class="statusTag" id="currentWorkStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:currentWork">Удалить</button></div>
+              <div class="dropZone" id="dropZoneCurrentWorkC">Нажмите или перетащите файл</div>
+              <input class="fileInput" id="fileCurrentWorkC" type="file" accept=".pdf,.doc,.docx,image/*"/>
+              <div class="miniHint" id="currentWorkHintC">Файл не выбран</div>
+            </div>
+          </div>
+        </div>
       </div>
       <div class="profileEditSection">
         <div class="profileSectionHead">Портфолио (файлы / фото)</div>
@@ -856,7 +894,7 @@
         <div class="profileSectionHead">Подтверждения</div>
         <div class="candidateVerifyIntro">
           <div class="candidateVerifyIntroTitle">Что именно проверяет LOMO</div>
-          <div class="candidateVerifyIntroText">L1 подтверждает базовые факты, L2 добавляет опыт и текущее место работы, L3 усиливает антифрод. Чувствительные документы остаются защищёнными: публично виден только CV, если вы сами это разрешите.</div>
+          <div class="candidateVerifyIntroText">L1 подтверждает базовые факты, L3 усиливает антифрод. Документы опыта и текущего места работы теперь лежат во вкладке «Опыт», рядом с самими данными. Чувствительные файлы остаются защищёнными: публично виден только CV, если вы сами это разрешите.</div>
           <div class="candidateVerifyLevelRow">
             <span class="verifyLevelPill l1">L1 · база</span>
             <span class="verifyLevelPill l2">L2 · опыт</span>
@@ -890,42 +928,6 @@
               <div class="dropZone" id="dropZoneEduTranscriptC">Нажмите или перетащите файл</div>
               <input class="fileInput" id="fileEduTranscriptC" type="file" accept=".pdf,.doc,.docx,image/*"/>
               <div class="miniHint" id="eduTranscriptHintC">Файл не выбран</div>
-            </div>
-          </div>
-        </div>
-
-        <div class="candidateVerifyGroup">
-          <div class="candidateVerifyGroupHead">
-            <div>
-              <div class="candidateVerifyGroupTitle">Опыт и текущее место работы</div>
-              <div class="candidateVerifyGroupSub">Для L2 лучше приложить официальный источник стажа и отдельно подтвердить текущую компанию.</div>
-            </div>
-            <span class="verifyLevelPill l2">L2</span>
-          </div>
-          <div class="verifyGrid candidateVerifyGrid">
-            <div class="miniCard primary">
-              <div class="miniTop"><div class="miniLabel">Трудовая книжка <span class="miniOptional">все заполненные развороты</span></div><span class="statusTag" id="workStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:work">Удалить</button></div>
-              <div class="dropZone" id="dropZoneWorkC">Нажмите или перетащите файл</div>
-              <input class="fileInput" id="fileWorkC" type="file" accept=".pdf,.doc,.docx,image/*"/>
-              <div class="miniHint" id="workHintC">Файл не выбран</div>
-            </div>
-            <div class="miniCard">
-              <div class="miniTop"><div class="miniLabel">Выписка из СФР / ЭТК <span class="miniOptional">альтернатива трудовой</span></div><span class="statusTag" id="workSfrStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:workSfr">Удалить</button></div>
-              <div class="dropZone" id="dropZoneWorkSfrC">Нажмите или перетащите файл</div>
-              <input class="fileInput" id="fileWorkSfrC" type="file" accept=".pdf,.doc,.docx,image/*"/>
-              <div class="miniHint" id="workSfrHintC">Файл не выбран</div>
-            </div>
-            <div class="miniCard">
-              <div class="miniTop"><div class="miniLabel">Справка / рекомендация <span class="miniOptional">необязательно</span></div><span class="statusTag" id="workReferenceStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:workReference">Удалить</button></div>
-              <div class="dropZone" id="dropZoneWorkReferenceC">Нажмите или перетащите файл</div>
-              <input class="fileInput" id="fileWorkReferenceC" type="file" accept=".pdf,.doc,.docx,image/*"/>
-              <div class="miniHint" id="workReferenceHintC">Файл не выбран</div>
-            </div>
-            <div class="miniCard">
-              <div class="miniTop"><div class="miniLabel">Приказ / трудовой договор <span class="miniOptional">1-я страница</span></div><span class="statusTag" id="currentWorkStatusC">не загружено</span><button type="button" class="miniLink" data-del="employee:currentWork">Удалить</button></div>
-              <div class="dropZone" id="dropZoneCurrentWorkC">Нажмите или перетащите файл</div>
-              <input class="fileInput" id="fileCurrentWorkC" type="file" accept=".pdf,.doc,.docx,image/*"/>
-              <div class="miniHint" id="currentWorkHintC">Файл не выбран</div>
             </div>
           </div>
         </div>
@@ -1405,17 +1407,29 @@
 <!-- IMPROVED ADMIN PANEL -->
 <section id="screenAdminQueue" class="screen" aria-label="Панель администратора">
   <div class="wrap profileWrap">
-    <div class="topBar stickyTop screenTopBarInset">
-      <div class="topLeft screenTopBarCluster">
+    <header class="adminHero screenTopBarInset">
+      <div class="adminHeroCopy">
         <span class="adminBadge">ADMIN</span>
+        <div>
+          <div class="adminHeroTitle">Панель проверки</div>
+          <div class="adminHeroSub">Документы, компании и пользователи в одном спокойном рабочем месте.</div>
+        </div>
       </div>
-      <div class="topRight screenTopBarActions">
+      <div class="adminHeroActions">
+        <button type="button" class="adminThemeToggleBtn" id="adminThemeToggleBtn" data-theme-toggle aria-label="Переключить тему">
+          <span data-theme-icon>🌙</span>
+          <span data-theme-label>Тёмная тема</span>
+        </button>
+        <button type="button" class="sqBtn sm ghostBtn adminLogoutBtn" id="adminLogoutBtn">Выйти</button>
+      </div>
+    </header>
+    <div class="adminTabRail">
+      <nav class="adminTabNav" aria-label="Разделы админки">
         <button class="adminTabBtn active" id="adminTabDocs" data-admin-tab="docs">📋 Документы</button>
         <button class="adminTabBtn" id="adminTabCandidates" data-admin-tab="candidates">👥 Кандидаты</button>
         <button class="adminTabBtn" id="adminTabEmployers" data-admin-tab="employers">🏢 Компании</button>
         <button class="adminTabBtn" id="adminTabUsers" data-admin-tab="users">⚙️ Юзеры</button>
-        <button type="button" class="sqBtn sm ghostBtn adminLogoutBtn" id="adminLogoutBtn">Выйти</button>
-      </div>
+      </nav>
     </div>
     <div class="centerBlock">
 
@@ -1436,6 +1450,17 @@
 
       <!-- TAB: Documents queue -->
       <div id="adminTabPanelDocs">
+        <div class="adminReviewSummary">
+          <div class="adminReviewMetric">
+            <span class="adminReviewMetricValue" id="adminQueueTotalCount">0</span>
+            <span class="adminReviewMetricLabel">в очереди</span>
+          </div>
+          <div class="adminReviewLegend">
+            <span class="reviewLevelBadge l3">L3</span><span>паспорт и антифрод</span>
+            <span class="reviewLevelBadge l2">L2</span><span>опыт и текущее место</span>
+            <span class="reviewLevelBadge l1">L1</span><span>база и сертификаты</span>
+          </div>
+        </div>
         <div class="adminSectionHead">
           <div class="adminSectionHeading">
             <div class="adminSectionTitle">Очередь проверок</div>
@@ -2289,27 +2314,27 @@
 
 <script src="./config.js"></script>
 <script src="./capacitor.js"></script>
-<script src="./scripts/runtime.js?v=19"></script>
-<script src="./scripts/api.js?v=19"></script>
-<script src="./scripts/state.js?v=19"></script>
-<script src="./scripts/social-card.js?v=19"></script>
-<script src="./scripts/screens.js?v=19"></script>
-<script src="./scripts/push-notifications.js?v=19"></script>
-<script src="./scripts/auth.js?v=19"></script>
-<script src="./scripts/bookmarks-store.js?v=19"></script>
-<script src="./scripts/admin.js?v=19"></script>
-<script src="./scripts/feed-refresh.js?v=19"></script>
-<script src="./scripts/public-profile.js?v=19"></script>
-<script src="./scripts/chat.js?v=19"></script>
-<script src="./scripts/auth-ui.js?v=19"></script>
-<script src="./scripts/profile-runtime.js?v=19"></script>
-<script src="./scripts/ui-shell.js?v=19"></script>
-<script src="./scripts/admin-ui-bindings.js?v=19"></script>
-<script src="./scripts/info-screens.js?v=19"></script>
-<script src="./scripts/ai-matching.js?v=19"></script>
-<script src="./scripts/feed-extra.js?v=19"></script>
-<script src="./scripts/jobs.js?v=19"></script>
-<script src="./scripts/company-docs.js?v=19"></script>
+<script src="./scripts/runtime.js?v=20"></script>
+<script src="./scripts/api.js?v=20"></script>
+<script src="./scripts/state.js?v=20"></script>
+<script src="./scripts/social-card.js?v=20"></script>
+<script src="./scripts/screens.js?v=20"></script>
+<script src="./scripts/push-notifications.js?v=20"></script>
+<script src="./scripts/auth.js?v=20"></script>
+<script src="./scripts/bookmarks-store.js?v=20"></script>
+<script src="./scripts/admin.js?v=20"></script>
+<script src="./scripts/feed-refresh.js?v=20"></script>
+<script src="./scripts/public-profile.js?v=20"></script>
+<script src="./scripts/chat.js?v=20"></script>
+<script src="./scripts/auth-ui.js?v=20"></script>
+<script src="./scripts/profile-runtime.js?v=20"></script>
+<script src="./scripts/ui-shell.js?v=20"></script>
+<script src="./scripts/admin-ui-bindings.js?v=20"></script>
+<script src="./scripts/info-screens.js?v=20"></script>
+<script src="./scripts/ai-matching.js?v=20"></script>
+<script src="./scripts/feed-extra.js?v=20"></script>
+<script src="./scripts/jobs.js?v=20"></script>
+<script src="./scripts/company-docs.js?v=20"></script>
 
 
 </body>

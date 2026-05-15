@@ -407,6 +407,153 @@
     .adminUsersRow{ border-bottom:1px solid rgba(0,0,0,.05); }
     .adminUsersCell{ padding:8px; }
     .adminUsersRoleTag{ display:inline-flex; align-items:center; padding:2px 8px; border-radius:6px; font-size:11px; font-weight:700; background:rgba(38,110,120,.10); color:#1a5c68; }
+    #screenAdminQueue{
+      background:
+        radial-gradient(900px 420px at 10% 0%, rgba(38,130,145,.12), transparent 52%),
+        #f5f8fa;
+    }
+    #screenAdminQueue .centerBlock{
+      max-width:1040px;
+      padding:24px 24px 72px;
+    }
+    .adminHero{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+      width:100%;
+      padding:18px max(24px, calc((100vw - 1040px) / 2));
+      border-bottom:1px solid rgba(38,110,120,.10);
+      background:rgba(255,255,255,.82);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+      box-sizing:border-box;
+    }
+    .adminHeroCopy{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      min-width:0;
+    }
+    .adminHeroTitle{
+      font-size:22px;
+      font-weight:800;
+      letter-spacing:-.03em;
+      color:#0e0f0f;
+    }
+    .adminHeroSub{
+      margin-top:2px;
+      font-size:13px;
+      color:#667085;
+    }
+    .adminHeroActions{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+    .adminThemeToggleBtn{
+      min-height:42px;
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      border:1px solid rgba(38,110,120,.18);
+      border-radius:999px;
+      background:rgba(255,255,255,.92);
+      color:#1a5c68;
+      font-weight:700;
+      font-size:13px;
+      padding:0 14px;
+      cursor:pointer;
+      transition:background .18s,border-color .18s,transform .18s;
+    }
+    .adminThemeToggleBtn:hover{
+      background:rgba(235,248,250,.96);
+      border-color:rgba(38,110,120,.30);
+      transform:translateY(-1px);
+    }
+    .adminTabRail{
+      position:sticky;
+      top:0;
+      z-index:48;
+      padding:12px max(24px, calc((100vw - 1040px) / 2));
+      border-bottom:1px solid rgba(38,110,120,.10);
+      background:rgba(245,248,250,.88);
+      backdrop-filter:blur(16px);
+      -webkit-backdrop-filter:blur(16px);
+    }
+    .adminTabRail .adminTabNav{
+      margin-bottom:0;
+      gap:10px;
+    }
+    .adminTabRail .adminTabBtn{
+      min-height:42px;
+      padding:0 16px;
+      border-color:rgba(38,110,120,.14);
+      background:rgba(255,255,255,.82);
+      font-weight:700;
+      color:#52606d;
+    }
+    .adminTabRail .adminTabBtn.active{
+      color:#fff;
+      background:#26707a;
+      border-color:#26707a;
+      box-shadow:0 10px 22px rgba(38,112,122,.18);
+    }
+    .adminPreviewBar{
+      padding:18px;
+      border-radius:20px;
+      margin-bottom:18px;
+    }
+    .adminReviewSummary{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:16px;
+      padding:16px 18px;
+      margin-bottom:16px;
+      border:1px solid rgba(38,110,120,.12);
+      border-radius:20px;
+      background:rgba(255,255,255,.78);
+    }
+    .adminReviewMetric{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      min-width:90px;
+    }
+    .adminReviewMetricValue{
+      font-size:28px;
+      line-height:1;
+      font-weight:800;
+      color:#1a5c68;
+    }
+    .adminReviewMetricLabel{
+      font-size:12px;
+      color:#667085;
+    }
+    .adminReviewLegend{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      flex-wrap:wrap;
+      color:#667085;
+      font-size:12px;
+    }
+    .adminCard{
+      padding:16px 18px;
+      border-radius:20px;
+      background:rgba(255,255,255,.84);
+    }
+    .adminBtn.view{
+      background:#e0f2fe;
+      color:#0369a1;
+      border-color:#bae6fd;
+    }
+    .adminBtn.view:hover{
+      background:#cfeefd;
+    }
 
     .dangerZoneCard{
       margin-top:18px;
@@ -440,6 +587,21 @@
     }
 
     @media (max-width: 720px){
+      .adminHero{
+        align-items:flex-start;
+        flex-direction:column;
+        padding-inline:16px;
+      }
+      .adminTabRail{
+        padding-inline:16px;
+      }
+      #screenAdminQueue .centerBlock{
+        padding:18px 16px 72px;
+      }
+      .adminReviewSummary{
+        align-items:flex-start;
+        flex-direction:column;
+      }
       .dangerZoneRow{
         flex-direction:column;
         align-items:stretch;
@@ -646,6 +808,7 @@
     radial-gradient(760px 520px at 85% 8%, rgba(38,110,125,.12), transparent 52%),
     radial-gradient(700px 500px at 50% 100%, rgba(22,78,90,.10), transparent 58%),
     #0b1115;
+  color: rgba(225,235,239,.86);
 }
 body { transition: background .22s ease; }
 
@@ -1238,6 +1401,17 @@ body { transition: background .22s ease; }
   color: #4ecdc4;
 }
 [data-theme="dark"] .feedPullRefresh.ready { background: #26707a; border-color: #26707a; color: #fff; }
+[data-theme="dark"] .feedScreen { background: #0d1117; }
+[data-theme="dark"] .feedMainTabs {
+  background: #10181c;
+  border-bottom-color: rgba(255,255,255,.08);
+}
+[data-theme="dark"] .feedMainTab { color: rgba(225,235,239,.58); }
+[data-theme="dark"] .feedMainTab.active {
+  color: #66ddd4;
+  border-bottom-color: #66ddd4;
+}
+[data-theme="dark"] .feedMainTab:hover:not(.active) { color: rgba(239,246,248,.90); }
 
 /* ════════════════════════════════════════════════════════
    DARK THEME — PROFILE SCREENS
@@ -1290,6 +1464,31 @@ body { transition: background .22s ease; }
 [data-theme="dark"] .profileSub { color: rgba(225,235,239,.68); }
 [data-theme="dark"] .profileAbout { color: rgba(225,235,239,.78); }
 [data-theme="dark"] .profileSectionHead { color: #66ddd4; }
+[data-theme="dark"] .achTitle,
+[data-theme="dark"] .jobTitle { color: rgba(239,246,248,.94); }
+[data-theme="dark"] .achMeta,
+[data-theme="dark"] .jobMeta,
+[data-theme="dark"] .miniHint { color: rgba(225,235,239,.62); }
+[data-theme="dark"] .chip.ghost,
+[data-theme="dark"] .statusTag,
+[data-theme="dark"] .statusTag.ghost {
+  background: rgba(255,255,255,.06);
+  border-color: rgba(190,224,229,.14);
+  color: rgba(225,235,239,.74);
+}
+[data-theme="dark"] .ghostBtn {
+  background: rgba(255,255,255,.055) !important;
+  border-color: rgba(190,224,229,.14) !important;
+  color: rgba(239,246,248,.82) !important;
+}
+[data-theme="dark"] .verifyLevelInfoBtn { color: #66ddd4; }
+[data-theme="dark"] .verifyLevelInfoBtn:hover { color: #8be8df; }
+[data-theme="dark"] .onboardingBanner {
+  background: rgba(56,178,172,.08);
+  border-color: rgba(78,205,196,.16);
+}
+[data-theme="dark"] .onboardingText { color: rgba(239,246,248,.88); }
+[data-theme="dark"] .onboardingDismiss { color: #66ddd4; }
 
 /* Badges */
 [data-theme="dark"] .badge { background: rgba(225,229,235,.90); color: #0d1117; }
@@ -1542,6 +1741,134 @@ body { transition: background .22s ease; }
 [data-theme="dark"] .reviewLevelBadge.l1 { color:#fbbf24;background:rgba(245,158,11,.14); }
 [data-theme="dark"] .reviewLevelBadge.l2 { color:#66ddd4;background:rgba(56,178,172,.14); }
 [data-theme="dark"] .reviewLevelBadge.l3 { color:#6ee7b7;background:rgba(34,197,94,.14); }
+[data-theme="dark"] #screenAdminQueue{
+  background:
+    radial-gradient(900px 420px at 10% 0%, rgba(56,178,172,.12), transparent 52%),
+    #0b1115;
+}
+[data-theme="dark"] .adminHero{
+  background: rgba(11,17,21,.92);
+  border-bottom-color: rgba(255,255,255,.07);
+}
+[data-theme="dark"] .adminHeroTitle { color: rgba(239,246,248,.96); }
+[data-theme="dark"] .adminHeroSub { color: rgba(225,235,239,.58); }
+[data-theme="dark"] .adminThemeToggleBtn{
+  background: rgba(255,255,255,.055);
+  border-color: rgba(190,224,229,.16);
+  color: #66ddd4;
+}
+[data-theme="dark"] .adminThemeToggleBtn:hover{
+  background: rgba(56,178,172,.12);
+  border-color: rgba(78,205,196,.26);
+}
+[data-theme="dark"] .adminTabRail{
+  background: rgba(11,17,21,.88);
+  border-bottom-color: rgba(255,255,255,.07);
+}
+[data-theme="dark"] .adminTabRail .adminTabBtn{
+  background: rgba(255,255,255,.05);
+  border-color: rgba(190,224,229,.12);
+  color: rgba(225,235,239,.72);
+}
+[data-theme="dark"] .adminTabRail .adminTabBtn.active{
+  background: #26707a;
+  border-color: #26707a;
+  color: #fff;
+}
+[data-theme="dark"] .adminPreviewBar,
+[data-theme="dark"] .adminReviewSummary{
+  background: linear-gradient(135deg, rgba(56,178,172,.10), rgba(255,255,255,.03));
+  border-color: rgba(190,224,229,.12);
+}
+[data-theme="dark"] .adminPreviewLabel,
+[data-theme="dark"] .adminReviewMetricLabel,
+[data-theme="dark"] .adminReviewLegend,
+[data-theme="dark"] .adminSectionSub,
+[data-theme="dark"] .adminCardDoc,
+[data-theme="dark"] .adminEmptyState,
+[data-theme="dark"] .adminListLoading,
+[data-theme="dark"] .adminUsersHeadCell,
+[data-theme="dark"] .adminUserName,
+[data-theme="dark"] .adminActivityText{
+  color: rgba(225,235,239,.58);
+}
+[data-theme="dark"] .adminReviewMetricValue,
+[data-theme="dark"] .adminSectionTitle,
+[data-theme="dark"] .adminCardName,
+[data-theme="dark"] .adminUserEmail,
+[data-theme="dark"] .adminUsersCell{
+  color: rgba(239,246,248,.94);
+}
+[data-theme="dark"] .adminPreviewBtn{
+  background: rgba(255,255,255,.055);
+  border-color: rgba(190,224,229,.12);
+  box-shadow: none;
+}
+[data-theme="dark"] .adminPreviewBtn:hover{
+  background: rgba(56,178,172,.10);
+  border-color: rgba(78,205,196,.24);
+}
+[data-theme="dark"] .adminPreviewBtnTitle{ color: rgba(239,246,248,.94); }
+[data-theme="dark"] .adminPreviewBtnSub{ color: rgba(225,235,239,.58); }
+[data-theme="dark"] .adminCard{
+  background: linear-gradient(180deg, rgba(24,35,39,.96), rgba(18,28,32,.98));
+  border-color: rgba(190,224,229,.11);
+}
+[data-theme="dark"] .adminAvatar{
+  background: linear-gradient(135deg, rgba(56,178,172,.22), rgba(38,112,122,.35));
+  color: #8be8df;
+}
+[data-theme="dark"] .adminBtn.view{
+  background: rgba(56,178,172,.11);
+  border-color: rgba(78,205,196,.22);
+  color: #66ddd4;
+}
+[data-theme="dark"] .adminBtn.view:hover{
+  background: rgba(56,178,172,.18);
+}
+[data-theme="dark"] .statusBadge.ghost{
+  background: rgba(255,255,255,.06);
+  color: rgba(225,235,239,.72);
+}
+[data-theme="dark"] .statusBadge.warn{
+  background: rgba(245,158,11,.12);
+  color: #fbbf24;
+}
+[data-theme="dark"] .statusBadge.ok{
+  background: rgba(34,197,94,.12);
+  color: #4ade80;
+}
+[data-theme="dark"] .statusBadge.bad{
+  background: rgba(239,68,68,.12);
+  color: #f87171;
+}
+[data-theme="dark"] .adminRoleChip{
+  background: rgba(255,255,255,.05);
+  border-color: rgba(190,224,229,.12);
+  color: rgba(225,235,239,.72);
+}
+[data-theme="dark"] .adminRoleChip:hover{
+  background: rgba(56,178,172,.08);
+  border-color: rgba(78,205,196,.22);
+  color: #66ddd4;
+}
+[data-theme="dark"] .adminRoleChip.active{
+  background: #26707a;
+  border-color: #26707a;
+  color: #fff;
+}
+[data-theme="dark"] .adminSearchInput{
+  background: rgba(255,255,255,.055);
+  border-color: rgba(190,224,229,.14);
+  color: rgba(239,246,248,.92);
+}
+[data-theme="dark"] .adminSearchInput::placeholder{
+  color: rgba(225,235,239,.34);
+}
+[data-theme="dark"] .adminUsersHeadRow,
+[data-theme="dark"] .adminUsersRow{
+  border-bottom-color: rgba(255,255,255,.07);
+}
 
 /* Danger zone dark */
 [data-theme="dark"] .dangerZoneCard {
