@@ -34,6 +34,7 @@ const screens = {
   contacts: document.getElementById('screenContacts'),
   about: document.getElementById('screenAbout'),
   faq: document.getElementById('screenFaq'),
+  subscriptions: document.getElementById('screenSubscriptions'),
 };
 var activeScreenKey = '';
 var _screenHistoryApplying = false;

@@ -31,10 +31,10 @@ test('landing no longer renders legacy auth or logo screens', async ({ page }) =
   await expect(page.locator('#ldNavLogoImg')).toHaveAttribute('src', './icons/app-icon.svg');
 });
 
-test('service worker precaches landing and feed styles', async ({ page }) => {
+test('service worker precaches landing, feed and subscription assets', async ({ page }) => {
   await page.goto('/');
   await expect.poll(async () => page.evaluate(async () => {
-    if (!('caches' in window)) return { hasLanding: false, hasFeed: false };
+    if (!('caches' in window)) return { hasLanding: false, hasFeed: false, hasSubscriptions: false };
 
     var keys = await caches.keys();
     var paths = [];
@@ -50,8 +50,9 @@ test('service worker precaches landing and feed styles', async ({ page }) => {
     return {
       hasLanding: paths.includes('/styles/landing.css'),
       hasFeed: paths.includes('/styles/feed.css'),
+      hasSubscriptions: paths.includes('/scripts/subscriptions.js'),
     };
-  })).toEqual({ hasLanding: true, hasFeed: true });
+  })).toEqual({ hasLanding: true, hasFeed: true, hasSubscriptions: true });
 });
 
 test('manifest exposes png install icons for Android shells', async ({ page }) => {
@@ -73,6 +74,44 @@ test('manifest exposes png install icons for Android shells', async ({ page }) =
     { src: '/icons/icon-maskable-192.png', type: 'image/png', purpose: 'maskable' },
     { src: '/icons/icon-maskable-512.png', type: 'image/png', purpose: 'maskable' },
   ]);
+});
+
+test('subscriptions screen opens from drawer and loads public plans', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.route('**/api/**', async (route) => {
+    const url = new URL(route.request().url());
+
+    if (url.pathname.endsWith('/subscriptions/plans')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          candidate: [{
+            key: 'verification_fast_24h',
+            name: 'Быстрая верификация 24ч',
+            price: 490,
+            interval: 'one_time',
+            description: 'Проверка за сутки',
+            features: ['Приоритетная обработка'],
+          }],
+          employer: [],
+        }),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await page.goto('/');
+  await page.click('.ldBurger');
+  await page.click('#drawerSubscriptionsBtn');
+
+  await expect(page.locator('#screenSubscriptions')).toHaveClass(/active/);
+  await expect(page.locator('#subscriptionsContent')).toContainText('Быстрая верификация 24ч');
 });
 
 test('valid stored session bypasses landing and opens candidate feed', async ({ page }) => {

@@ -22,14 +22,15 @@
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" href="./icons/app-icon.svg" type="image/svg+xml"/>
 <link rel="apple-touch-icon" href="./icons/icon-192.png"/>
-<link rel="stylesheet" href="./styles/core.css?v=20"/>
-<link rel="stylesheet" href="./styles/profile.css?v=20"/>
-<link rel="stylesheet" href="./styles/theme.css?v=20"/>
-<link rel="stylesheet" href="./styles/responsive.css?v=20"/>
-<link rel="stylesheet" href="./styles/chat.css?v=20"/>
-<link rel="stylesheet" href="./styles/landing.css?v=20"/>
-<link rel="stylesheet" href="./styles/feed.css?v=20"/>
-<link rel="stylesheet" href="./styles/info-screens.css?v=20"/>
+<link rel="stylesheet" href="./styles/core.css?v=21"/>
+<link rel="stylesheet" href="./styles/profile.css?v=21"/>
+<link rel="stylesheet" href="./styles/theme.css?v=21"/>
+<link rel="stylesheet" href="./styles/responsive.css?v=21"/>
+<link rel="stylesheet" href="./styles/chat.css?v=21"/>
+<link rel="stylesheet" href="./styles/landing.css?v=21"/>
+<link rel="stylesheet" href="./styles/feed.css?v=21"/>
+<link rel="stylesheet" href="./styles/info-screens.css?v=21"/>
+<link rel="stylesheet" href="./styles/main.css?v=21"/>
 </head>
 <body>
 <div class="stage">
@@ -49,6 +50,7 @@
     <button type="button" class="drawerItem" data-drawer-open="contacts">Контакты</button>
     <button type="button" class="drawerItem" data-drawer-open="about">О проекте</button>
 <button type="button" class="drawerItem" data-drawer-open="faq">FAQ</button>
+<button type="button" class="drawerItem" id="drawerSubscriptionsBtn" data-drawer-open="subscriptions">💳 Подписки и тарифы</button>
   </nav>
   <div class="drawerFoot">
     <button type="button" class="drawerThemeBtn" id="themeToggleBtn" data-theme-toggle aria-label="Переключить тему">
@@ -2312,29 +2314,45 @@
   </div>
 </section>
 
+<!-- SCREEN: SUBSCRIPTIONS -->
+<section id="screenSubscriptions" class="screen" aria-label="Подписки и тарифы">
+  <div class="infoScreenHeader">
+    <button type="button" class="infoBackBtn" data-info-back>← Назад</button>
+    <span class="infoScreenHeaderTitle">Подписки и тарифы</span>
+  </div>
+  <div class="infoScreenBody">
+    <div class="pageContent">
+      <div id="subscriptionsContent">
+        <div class="subLoading">Загрузка тарифов…</div>
+      </div>
+    </div>
+  </div>
+</section>
+
 <script src="./config.js"></script>
 <script src="./capacitor.js"></script>
-<script src="./scripts/runtime.js?v=20"></script>
-<script src="./scripts/api.js?v=20"></script>
-<script src="./scripts/state.js?v=20"></script>
-<script src="./scripts/social-card.js?v=20"></script>
-<script src="./scripts/screens.js?v=20"></script>
-<script src="./scripts/push-notifications.js?v=20"></script>
-<script src="./scripts/auth.js?v=20"></script>
-<script src="./scripts/bookmarks-store.js?v=20"></script>
-<script src="./scripts/admin.js?v=20"></script>
-<script src="./scripts/feed-refresh.js?v=20"></script>
-<script src="./scripts/public-profile.js?v=20"></script>
-<script src="./scripts/chat.js?v=20"></script>
-<script src="./scripts/auth-ui.js?v=20"></script>
-<script src="./scripts/profile-runtime.js?v=20"></script>
-<script src="./scripts/ui-shell.js?v=20"></script>
-<script src="./scripts/admin-ui-bindings.js?v=20"></script>
-<script src="./scripts/info-screens.js?v=20"></script>
-<script src="./scripts/ai-matching.js?v=20"></script>
-<script src="./scripts/feed-extra.js?v=20"></script>
-<script src="./scripts/jobs.js?v=20"></script>
-<script src="./scripts/company-docs.js?v=20"></script>
+<script src="./scripts/runtime.js?v=21"></script>
+<script src="./scripts/api.js?v=21"></script>
+<script src="./scripts/state.js?v=21"></script>
+<script src="./scripts/social-card.js?v=21"></script>
+<script src="./scripts/screens.js?v=21"></script>
+<script src="./scripts/push-notifications.js?v=21"></script>
+<script src="./scripts/auth.js?v=21"></script>
+<script src="./scripts/bookmarks-store.js?v=21"></script>
+<script src="./scripts/admin.js?v=21"></script>
+<script src="./scripts/feed-refresh.js?v=21"></script>
+<script src="./scripts/public-profile.js?v=21"></script>
+<script src="./scripts/chat.js?v=21"></script>
+<script src="./scripts/auth-ui.js?v=21"></script>
+<script src="./scripts/profile-runtime.js?v=21"></script>
+<script src="./scripts/ui-shell.js?v=21"></script>
+<script src="./scripts/admin-ui-bindings.js?v=21"></script>
+<script src="./scripts/info-screens.js?v=21"></script>
+<script src="./scripts/ai-matching.js?v=21"></script>
+<script src="./scripts/feed-extra.js?v=21"></script>
+<script src="./scripts/jobs.js?v=21"></script>
+<script src="./scripts/company-docs.js?v=21"></script>
+<script src="./scripts/subscriptions.js?v=21"></script>
 
 
 </body>

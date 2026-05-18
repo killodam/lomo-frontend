@@ -1,4 +1,4 @@
-const STATIC_CACHE = 'lomo-static-v15';
+const STATIC_CACHE = 'lomo-static-v16';
 const OFFLINE_URL = '/offline.html';
 const PRECACHE_URLS = [
   '/',
@@ -25,6 +25,7 @@ const PRECACHE_URLS = [
   '/scripts/auth-ui.js',
   '/scripts/profile-runtime.js',
   '/scripts/ui-shell.js',
+  '/scripts/subscriptions.js',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
   '/icons/icon-maskable-192.png',
