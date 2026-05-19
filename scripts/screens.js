@@ -142,6 +142,7 @@ function clearScreenInputs(key) {
 
 function setScreenActiveState(screen, isActive) {
   if (!screen) return;
+  screen.style.display = isActive ? '' : 'none';
   screen.classList.toggle('active', isActive);
   screen.setAttribute('aria-hidden', isActive ? 'false' : 'true');
   if (isActive) screen.removeAttribute('inert');
@@ -184,7 +185,13 @@ function show(key, options) {
     updateConsentRoleText();
     resetConsents();
   }
-  if (targetKey === 'loginForm') clearScreenInputs('loginForm');
+  if (targetKey === 'loginForm') {
+    clearScreenInputs('loginForm');
+    var loginPasswordError = document.getElementById('loginPasswordError');
+    var loginPasswordInputWrap = document.getElementById('sqInputLoginPassword');
+    if (loginPasswordError) loginPasswordError.classList.add('hidden');
+    if (loginPasswordInputWrap) loginPasswordInputWrap.classList.remove('inputError');
+  }
   if (targetKey === 'employeePublic') { updateProfileProgress(); loadIncomingRequests(); loadOwnConnections(); }
   if (targetKey === 'recruiterPublic') loadOwnConnections();
   if (targetKey === 'adminQueue') { loadAdminQueue(); loadAdminUsers(); switchAdminTab('docs'); }

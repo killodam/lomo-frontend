@@ -24,6 +24,10 @@
     {
       "source": "/api/:path*",
       "destination": "https://lomo-backend-hergg.amvera.io/api/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }

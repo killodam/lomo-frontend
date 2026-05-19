@@ -1,4 +1,5 @@
 const { test, expect } = require('@playwright/test');
+const path = require('path');
 
 function paginated(items, page, pageSize, total) {
   return {
@@ -74,6 +75,155 @@ test('manifest exposes png install icons for Android shells', async ({ page }) =
     { src: '/icons/icon-maskable-192.png', type: 'image/png', purpose: 'maskable' },
     { src: '/icons/icon-maskable-512.png', type: 'image/png', purpose: 'maskable' },
   ]);
+});
+
+test('screen transitions fully hide inactive screens', async ({ page }) => {
+  await page.goto('/');
+  await page.click('#landingLoginBtn');
+
+  await expect(page.locator('#screenLoginForm')).toHaveClass(/active/);
+  await expect(page.locator('#screenLanding')).toHaveCSS('display', 'none');
+
+  await page.click('#screenLoginForm [data-back="toLanding"]');
+  await expect(page.locator('#screenLanding')).toHaveClass(/active/);
+  await expect(page.locator('#screenLoginForm')).toHaveCSS('display', 'none');
+});
+
+test('wrong login credentials show inline password error', async ({ page }) => {
+  await page.route('**/api/**', async (route) => {
+    var url = new URL(route.request().url());
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 401,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'Invalid credentials' }),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await openLogin(page);
+  await page.fill('#loginEmail', 'candidate@example.com');
+  await page.fill('#loginPassword', 'wrong-password');
+  await page.click('#screenLoginForm .accentBtn.nextBtn');
+
+  await expect(page.locator('#loginPasswordError')).toBeVisible();
+  await expect(page.locator('#loginPasswordError')).toHaveText('Неверная почта или пароль');
+  await expect(page.locator('#sqInputLoginPassword')).toHaveClass(/inputError/);
+  await expect(page.locator('#screenLoginForm .accentBtn.nextBtn')).toBeEnabled();
+});
+
+test('landing stats retry once after cold API response', async ({ page }) => {
+  var statsCalls = 0;
+
+  await page.route('**/api/**', async (route) => {
+    var url = new URL(route.request().url());
+
+    if (url.pathname.endsWith('/public/stats')) {
+      statsCalls += 1;
+      if (statsCalls === 1) {
+        return route.fulfill({
+          status: 503,
+          contentType: 'application/json',
+          body: JSON.stringify({ error: 'booting' }),
+        });
+      }
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ totalUsers: 12, verifiedProfiles: 7, companies: 3, activeJobs: 2 }),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await page.goto('/');
+  await expect(page.locator('.ldCounters')).toHaveClass(/is-loading/);
+  await expect.poll(async () => page.locator('#ldCountUsers').textContent(), { timeout: 7000 }).toBe('12');
+  expect(statsCalls).toBe(2);
+});
+
+test('landing stats hide when retry still returns all zeros', async ({ page }) => {
+  await page.route('**/api/**', async (route) => {
+    var url = new URL(route.request().url());
+
+    if (url.pathname.endsWith('/public/stats')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ totalUsers: 0, verifiedProfiles: 0, companies: 0, activeJobs: 0 }),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await page.goto('/');
+  await expect(page.locator('.ldCounters')).toHaveClass(/is-loading/);
+  await expect(page.locator('.ldCounters')).toHaveClass(/is-hidden/, { timeout: 7000 });
+});
+
+test('public profile path opens SPA profile screen', async ({ page }) => {
+  await page.route('**/p/LOMO-PATH0001', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'text/html',
+      path: path.resolve(__dirname, '../../index.html'),
+    });
+  });
+
+  await page.route('**/api/**', async (route) => {
+    var url = new URL(route.request().url());
+
+    if (url.pathname.endsWith('/auth/me')) {
+      return route.fulfill({
+        status: 401,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'Authentication required' }),
+      });
+    }
+
+    if (url.pathname.endsWith('/public/profile/LOMO-PATH0001')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'public-user-1',
+          public_id: 'LOMO-PATH0001',
+          role: 'candidate',
+          full_name: 'Публичный Профиль',
+          location: 'Москва',
+          edu_status: 'verified',
+        }),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await page.goto('/p/LOMO-PATH0001');
+
+  await expect(page.locator('#screenPublicProfile')).toHaveClass(/active/);
+  await expect(page.locator('#pubProfileContent')).toContainText('Публичный Профиль');
 });
 
 test('subscriptions screen opens from drawer and loads public plans', async ({ page }) => {

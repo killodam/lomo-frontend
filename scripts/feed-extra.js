@@ -92,30 +92,84 @@ function initLandingCounter() {
   var profilesEl = document.getElementById('ldCountProfiles');
   var companiesEl = document.getElementById('ldCountCompanies');
   var vacanciesEl = document.getElementById('ldCountVacancies');
+  var countersEl = usersEl ? usersEl.closest('.ldCounters') : null;
   if (!profilesEl && !companiesEl) return;
 
   var triggered = false;
+  var completed = false;
+
+  function normalizeStats(data) {
+    data = data || {};
+    return {
+      total: Number(data.totalUsers || 0),
+      verified: Number(data.verifiedProfiles || 0),
+      companies: Number(data.companies || 0),
+      activeJobs: Number(data.activeJobs || 0)
+    };
+  }
+
+  function isZeroStats(stats) {
+    return !stats.total && !stats.verified && !stats.companies && !stats.activeJobs;
+  }
+
+  function setCountersLoading() {
+    if (countersEl) {
+      countersEl.classList.remove('is-hidden');
+      countersEl.classList.add('is-loading');
+    }
+    if (usersEl) usersEl.textContent = '';
+    if (profilesEl) profilesEl.textContent = '';
+    if (companiesEl) companiesEl.textContent = '';
+    if (vacanciesEl) vacanciesEl.textContent = '';
+  }
+
+  function hideCounters() {
+    completed = true;
+    if (countersEl) {
+      countersEl.classList.remove('is-loading');
+      countersEl.classList.add('is-hidden');
+    }
+  }
+
+  function requestStats() {
+    var base = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
+    return fetch(base + '/public/stats')
+      .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); });
+  }
+
   function runCounters(total, verified, companies, activeJobs) {
     if (triggered) return;
     triggered = true;
+    completed = true;
+    if (countersEl) countersEl.classList.remove('is-loading', 'is-hidden');
     if (usersEl) animateCounter(usersEl, total, 800);
     if (profilesEl) animateCounter(profilesEl, verified, 900);
     if (companiesEl) animateCounter(companiesEl, companies, 600);
     if (vacanciesEl) animateCounter(vacanciesEl, activeJobs, 700);
   }
 
-  function fetchAndRun() {
-    var base = (typeof API_BASE !== 'undefined') ? API_BASE : '/api';
-    fetch(base + '/public/stats')
-      .then(function (r) { return r.ok ? r.json() : Promise.reject(r.status); })
+  function fetchAndRun(attempt) {
+    if (completed) return;
+    if (!attempt) setCountersLoading();
+    requestStats()
       .then(function (data) {
-        runCounters(data.totalUsers || 0, data.verifiedProfiles || 0, data.companies || 0, data.activeJobs || 0);
+        var stats = normalizeStats(data);
+        if (isZeroStats(stats)) {
+          if (!attempt) {
+            setTimeout(function () { fetchAndRun(1); }, 3000);
+            return;
+          }
+          hideCounters();
+          return;
+        }
+        runCounters(stats.total, stats.verified, stats.companies, stats.activeJobs);
       })
       .catch(function () {
-        if (usersEl) usersEl.textContent = '—';
-        if (profilesEl) profilesEl.textContent = '—';
-        if (companiesEl) companiesEl.textContent = '—';
-        if (vacanciesEl) vacanciesEl.textContent = '—';
+        if (!attempt) {
+          setTimeout(function () { fetchAndRun(1); }, 3000);
+          return;
+        }
+        hideCounters();
       });
   }
 

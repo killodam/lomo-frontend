@@ -97,9 +97,33 @@ function getPasswordPolicyError(password) {
   return '';
 }
 
+function clearLoginError() {
+  var err = document.getElementById('loginPasswordError');
+  var passwordWrap = document.getElementById('sqInputLoginPassword');
+  if (err) err.classList.add('hidden');
+  if (passwordWrap) passwordWrap.classList.remove('inputError');
+}
+
+function showLoginError(message) {
+  var err = document.getElementById('loginPasswordError');
+  var passwordWrap = document.getElementById('sqInputLoginPassword');
+  if (err) {
+    err.textContent = message || 'Неверная почта или пароль';
+    err.classList.remove('hidden');
+  }
+  if (passwordWrap) passwordWrap.classList.add('inputError');
+}
+
+document.addEventListener('input', function (e) {
+  var target = e.target;
+  if (!target) return;
+  if (target.id === 'loginEmail' || target.id === 'loginPassword') clearLoginError();
+});
+
     function clearAuthInputs(){
       ['regFirstName','regLastName','regEmail','regPassword','regPasswordConfirm','loginEmail','loginPassword','forgotEmail','newPassword','confirmPassword']
         .forEach(id => { const el = document.getElementById(id); if(el) el.value=''; });
+      clearLoginError();
       // clear code cells
       for(let i=0;i<6;i++){ const cc=document.getElementById('cc'+i); if(cc) cc.value=''; }
       document.querySelectorAll('.codeCell').forEach(c=>c.classList.remove('filled','active','error'));
@@ -990,6 +1014,7 @@ function getPasswordPolicyError(password) {
           const loginEmail = (document.getElementById('loginEmail')?.value    || '').trim().toLowerCase();
           const loginPwd   = (document.getElementById('loginPassword')?.value || '').trim();
           const loginBtn   = document.querySelector('#screenLoginForm .accentBtn.nextBtn');
+          clearLoginError();
           if(loginBtn) loginBtn.disabled = true;
           (async () => {
             try {
@@ -1008,7 +1033,7 @@ function getPasswordPolicyError(password) {
               else if(user.role === 'admin'){ show('adminQueue', { replaceHistory: true }); }
               else { showEmployeeDashboard({ replaceHistory: true }); }
             } catch(err) {
-              showToast('Ошибка входа: ' + err.message);
+              showLoginError('Неверная почта или пароль');
               if(loginBtn) loginBtn.disabled = false;
             }
           })();
@@ -1359,9 +1384,11 @@ function getPasswordPolicyError(password) {
       // Also support ?profile=<id> (query string) for backward compat.
       var _hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
       var _queryParams = new URLSearchParams(window.location.search);
-      var publicProfileId = _hashParams.get('profile') || _queryParams.get('profile');
+      var _pathProfileMatch = window.location.pathname.match(/^\/p\/(LOMO-[A-Z0-9]{8})\/?$/i);
+      var publicProfileId = _hashParams.get('profile') || _queryParams.get('profile') || (_pathProfileMatch ? _pathProfileMatch[1].toUpperCase() : '');
 
       if (publicProfileId && typeof window.openPublicProfileByPublicId === 'function') {
+        window.LOMO_PUBLIC_PROFILE_ROUTE_OPENED = true;
         window.openPublicProfileByPublicId(publicProfileId);
         return;
       }

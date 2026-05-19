@@ -271,3 +271,59 @@
 [data-theme="dark"] .subError {
   color: #f87171;
 }
+
+/* Critical transition and auth fixes */
+html,
+body,
+.stage {
+  border: 0 !important;
+  outline: 0 !important;
+}
+
+.screen:not(.active),
+.screen[inert] {
+  display: none !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  z-index: 0 !important;
+}
+
+.screen.active {
+  display: flex !important;
+  z-index: 1;
+}
+
+.loginPasswordError {
+  color: #dc2626;
+  font-size: 13px;
+  margin-top: 6px;
+  width: var(--inW);
+  padding-left: 18px;
+  line-height: 1.35;
+}
+
+.ldCounters.is-hidden {
+  display: none;
+}
+
+.ldCounters.is-loading .ldCounterNum {
+  display: inline-block;
+  width: 72px;
+  height: 36px;
+  border-radius: 12px;
+  color: transparent;
+  background: linear-gradient(90deg, #edf2f4 0%, #dfe9ec 45%, #edf2f4 90%);
+  background-size: 220% 100%;
+  animation: lomoStatsSkeleton 1.1s ease-in-out infinite;
+}
+
+[data-theme="dark"] .ldCounters.is-loading .ldCounterNum {
+  background: linear-gradient(90deg, rgba(255,255,255,.08) 0%, rgba(255,255,255,.14) 45%, rgba(255,255,255,.08) 90%);
+  background-size: 220% 100%;
+}
+
+@keyframes lomoStatsSkeleton {
+  0% { background-position: 100% 0; }
+  100% { background-position: -100% 0; }
+}

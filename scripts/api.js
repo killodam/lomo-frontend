@@ -101,10 +101,7 @@ function apiTypeToProofKey(type) {
 }
 
 function publicProfileUrlForId(publicId) {
-  // Use query string (?profile=) instead of hash (#profile=) so Google
-  // can index public profile pages. Auth.js reads both formats.
-  var base = location.origin + location.pathname;
-  return base + '?profile=' + encodeURIComponent(publicId || '');
+  return location.origin + '/p/' + encodeURIComponent(publicId || '');
 }
 
 function replaceHistoryForSeo(url, screenKey) {
@@ -155,16 +152,18 @@ function updatePageSeoForProfile(user) {
 function resetPageSeo() {
   var title = 'LOMO — Верификация документов для HR';
   var desc  = 'LOMO — платформа верификации карьерных данных. Работодатели находят кандидатов с подтверждёнными документами.';
+  var isProfileUrl = location.search.indexOf('profile=') !== -1 || /^\/p\/LOMO-[A-Z0-9]{8}\/?$/i.test(location.pathname);
+  var canonicalUrl = isProfileUrl ? (location.origin + '/') : (location.origin + location.pathname);
   document.title = title;
   var set = function(id, attr, val) { var el = document.getElementById(id); if (el) el.setAttribute(attr, val); };
   set('ogTitle',       'content', title);
   set('ogDescription', 'content', desc);
-  set('ogUrl',         'content', location.origin + location.pathname);
+  set('ogUrl',         'content', canonicalUrl);
   set('twitterTitle',  'content', title);
   set('twitterDesc',   'content', desc);
-  set('canonicalLink', 'href',    location.origin + location.pathname);
-  if (history.replaceState && location.search.indexOf('profile=') !== -1) {
-    replaceHistoryForSeo(location.origin + location.pathname, typeof activeScreenKey === 'string' ? activeScreenKey : '');
+  set('canonicalLink', 'href',    canonicalUrl);
+  if (history.replaceState && isProfileUrl) {
+    replaceHistoryForSeo(canonicalUrl, typeof activeScreenKey === 'string' ? activeScreenKey : '');
   }
 }
 

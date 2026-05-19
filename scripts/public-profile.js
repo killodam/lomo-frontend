@@ -312,3 +312,31 @@ function openPublicProfileByPublicId(publicId) {
     show(_getProfileReturnScreen());
   });
 }
+
+function getPublicProfileIdFromLocation() {
+  var hashParams;
+  var queryParams;
+  var pathMatch;
+  try {
+    hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ''));
+    queryParams = new URLSearchParams(window.location.search);
+    pathMatch = window.location.pathname.match(/^\/p\/(LOMO-[A-Z0-9]{8})\/?$/i);
+    return hashParams.get('profile') || queryParams.get('profile') || (pathMatch ? pathMatch[1].toUpperCase() : '');
+  } catch (error) {
+    pathMatch = window.location.pathname.match(/^\/p\/(LOMO-[A-Z0-9]{8})\/?$/i);
+    return pathMatch ? pathMatch[1].toUpperCase() : '';
+  }
+}
+
+function initPublicProfileLocationRoute() {
+  var publicProfileId = getPublicProfileIdFromLocation();
+  if (!publicProfileId || window.LOMO_PUBLIC_PROFILE_ROUTE_OPENED) return;
+  window.LOMO_PUBLIC_PROFILE_ROUTE_OPENED = true;
+  openPublicProfileByPublicId(publicProfileId);
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initPublicProfileLocationRoute);
+} else {
+  initPublicProfileLocationRoute();
+}
