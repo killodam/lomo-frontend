@@ -689,11 +689,16 @@ function handleProofSelection(binding, file) {
         if (binding.role === 'employee') renderEmployeePublic();
         showToast(safeErrorText(error), 'error');
         saveToStorage();
+      } finally {
+        const inputEl = document.getElementById(binding.input);
+        if (inputEl) inputEl.value = '';
       }
     })();
   } else {
     if (hintEl && name) hintEl.textContent = 'Прикреплено: ' + name;
     if (name) showToast('Файл загружен ✓');
+    const inputEl = document.getElementById(binding.input);
+    if (inputEl) inputEl.value = '';
   }
 }
 

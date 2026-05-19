@@ -227,6 +227,200 @@ function queueEmptyState(text) {
   return '<div class="adminEmptyState">' + escapeHtml(text) + '</div>';
 }
 
+function normalizeAdminQueueDocuments(item) {
+  if (!item) return [];
+  if (Array.isArray(item.documents)) return item.documents;
+  if (typeof item.documents === 'string') {
+    try {
+      var parsed = JSON.parse(item.documents);
+      if (Array.isArray(parsed)) return parsed;
+    } catch (error) {}
+  }
+  return [item];
+}
+
+function normalizeAdminQueueUsers(items) {
+  var source = Array.isArray(items) ? items : [];
+  var groups = [];
+  var groupByUser = {};
+
+  source.forEach(function (item) {
+    var docs = normalizeAdminQueueDocuments(item);
+    var userKey = String(item.user_id || item.user_email || item.id || '');
+    var group = groupByUser[userKey];
+
+    if (!group) {
+      group = {
+        user_id: item.user_id || userKey,
+        user_email: item.user_email || '',
+        full_name: item.full_name || '',
+        linkedin_url: item.linkedin_url || '',
+        hh_url: item.hh_url || '',
+        course_verification_url: item.course_verification_url || '',
+        review_level: Number(item.review_level || 0),
+        documents_count: Number(item.documents_count || docs.length || 0),
+        documents: [],
+      };
+      groupByUser[userKey] = group;
+      groups.push(group);
+    }
+
+    docs.forEach(function (doc) {
+      var normalized = Object.assign({}, item, doc);
+      normalized.user_id = normalized.user_id || group.user_id;
+      normalized.user_email = normalized.user_email || group.user_email;
+      normalized.full_name = normalized.full_name || group.full_name;
+      group.documents.push(normalized);
+      group.review_level = Math.max(group.review_level || 0, Number(normalized.review_level || 0));
+    });
+
+    group.documents_count = Math.max(Number(group.documents_count || 0), group.documents.length);
+  });
+
+  return groups;
+}
+
+function adminQueueInitials(name, email) {
+  var raw = String(name || email || '?').trim();
+  return raw
+    .split(/\s+/)
+    .map(function (segment) { return segment[0] || ''; })
+    .join('')
+    .slice(0, 2)
+    .toUpperCase() || '?';
+}
+
+function adminQueueDocLabel(doc) {
+  return escapeHtml(DOC_TYPE_LABELS[doc.ach_type] || doc.ach_type || 'Документ') +
+    (doc.ach_title || doc.org ? ' · ' + escapeHtml(doc.ach_title || doc.org || '') : '') +
+    (doc.file_name ? ' · ' + escapeHtml(doc.file_name) : '');
+}
+
+function adminQueueSignalLinksHtml(item) {
+  var signalLinks = [
+    safeAdminExternalUrl(item.linkedin_url) ? { label: 'LinkedIn', url: safeAdminExternalUrl(item.linkedin_url) } : null,
+    safeAdminExternalUrl(item.hh_url) ? { label: 'HH.ru', url: safeAdminExternalUrl(item.hh_url) } : null,
+    safeAdminExternalUrl(item.course_verification_url) ? { label: 'Сертификат', url: safeAdminExternalUrl(item.course_verification_url) } : null,
+  ].filter(Boolean);
+
+  if (!signalLinks.length) return '';
+  return '<div class="adminSignalLinks">' + signalLinks.map(function (link) {
+    return '<a href="' + escapeHtml(link.url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(link.label) + '</a>';
+  }).join('') + '</div>';
+}
+
+function appendAdminQueueDocument(parent, doc) {
+  var docCard = document.createElement('div');
+  docCard.className = 'adminQueueDocReview';
+  docCard.id = 'acard_' + doc.id;
+  var reviewLevel = Number(doc.review_level || 0);
+  var reviewLevelHtml = reviewLevel
+    ? '<span class="reviewLevelBadge l' + reviewLevel + '">L' + reviewLevel + '</span>'
+    : '';
+
+  docCard.innerHTML =
+    '<div class="adminQueueDocReviewTop">' +
+      '<div class="adminQueueDocReviewInfo">' +
+        '<div class="adminQueueDocReviewTitle">' + adminQueueDocLabel(doc) + '</div>' +
+        adminQueueSignalLinksHtml(doc) +
+      '</div>' +
+      reviewLevelHtml +
+      '<span class="statusBadge warn">На рассмотрении</span>' +
+    '</div>' +
+    '<div class="adminActions">' +
+      '<input class="rejectInput" id="rInput_' + escapeHtml(doc.id) + '" placeholder="Причина отказа"/>' +
+    '</div>';
+
+  var actions = docCard.querySelector('.adminActions');
+  if (doc.id) {
+    var btnView = document.createElement('button');
+    btnView.className = 'adminBtn view';
+    btnView.textContent = 'Просмотреть';
+    btnView.addEventListener('click', function () {
+      openSecureDocument(doc.id, doc.file_name).catch(function (err) {
+        showToast(safeErrorText(err), 'error');
+      });
+    });
+    actions.appendChild(btnView);
+  }
+
+  var btnApprove = document.createElement('button');
+  btnApprove.className = 'adminBtn ok';
+  btnApprove.textContent = 'Подтвердить';
+  btnApprove.addEventListener('click', function () {
+    apiAdminApprove(doc.id).then(function () {
+      showToast('Документ подтверждён', 'success');
+      loadAdminQueue(adminQueueState.page);
+    }).catch(function (err) {
+      showToast(safeErrorText(err), 'error');
+    });
+  });
+
+  var btnReject = document.createElement('button');
+  btnReject.className = 'adminBtn danger';
+  btnReject.textContent = 'Отклонить';
+  btnReject.addEventListener('click', function () {
+    var reason = document.getElementById('rInput_' + doc.id);
+    var value = reason ? reason.value.trim() : '';
+    if (!value) {
+      showToast('Укажите причину отказа', 'info');
+      return;
+    }
+    apiAdminReject(doc.id, value).then(function () {
+      showToast('Документ отклонён', 'success');
+      loadAdminQueue(adminQueueState.page);
+    }).catch(function (err) {
+      showToast(safeErrorText(err), 'error');
+    });
+  });
+
+  actions.insertBefore(btnApprove, actions.firstChild);
+  actions.appendChild(btnReject);
+  parent.appendChild(docCard);
+}
+
+function appendAdminQueueUserCard(listEl, group) {
+  var card = document.createElement('div');
+  card.className = 'adminUserQueueCard';
+  var displayName = group.full_name || group.user_email || 'Пользователь LOMO';
+  var reviewLevel = Number(group.review_level || 0);
+  var reviewLevelHtml = reviewLevel
+    ? '<span class="reviewLevelBadge l' + reviewLevel + '">L' + reviewLevel + '</span>'
+    : '';
+  var docs = Array.isArray(group.documents) ? group.documents : [];
+  var docsCount = Number(group.documents_count || docs.length || 0);
+
+  card.innerHTML =
+    '<button type="button" class="adminUserQueueHead" aria-expanded="false">' +
+      '<span class="adminAvatar">' + escapeHtml(adminQueueInitials(displayName, group.user_email)) + '</span>' +
+      '<span class="adminUserQueueInfo">' +
+        '<span class="adminUserQueueName">' + escapeHtml(displayName) + '</span>' +
+        '<span class="adminUserQueueMeta">' +
+          escapeHtml(group.user_email || 'email не указан') +
+          ' · ' + docsCount + ' документ(ов) на проверку' +
+        '</span>' +
+      '</span>' +
+      reviewLevelHtml +
+      '<span class="adminUserQueueOpen">Открыть</span>' +
+    '</button>' +
+    '<div class="adminUserQueueDocs hidden"></div>';
+
+  var header = card.querySelector('.adminUserQueueHead');
+  var docsEl = card.querySelector('.adminUserQueueDocs');
+  header.addEventListener('click', function () {
+    var expanded = header.getAttribute('aria-expanded') === 'true';
+    header.setAttribute('aria-expanded', expanded ? 'false' : 'true');
+    header.querySelector('.adminUserQueueOpen').textContent = expanded ? 'Открыть' : 'Скрыть';
+    docsEl.classList.toggle('hidden', expanded);
+  });
+
+  docs.forEach(function (doc) {
+    appendAdminQueueDocument(docsEl, doc);
+  });
+
+  listEl.appendChild(card);
+}
+
 // ── INFINITE SCROLL ENGINE ────────────────────────────────────────────────
 function setupInfiniteScroll(listId, observerRef, screenKey, loadNextPage) {
   // Disconnect any previous observer stored in observerRef
@@ -491,112 +685,23 @@ function loadAdminQueue(page) {
 
     if (!data.items.length) {
       listEl.innerHTML = queueEmptyState('Очередь пуста — все заявки обработаны');
-      renderPager('adminQueuePager', { total: 0 }, function () {}, { label: 'документов' });
+      renderPager('adminQueuePager', { total: 0 }, function () {}, { label: 'пользователей' });
       return;
     }
 
     listEl.innerHTML = '';
-    data.items.forEach(function (item) {
-      var initials = (item.full_name || item.user_email || '?')
-        .split(' ')
-        .map(function (segment) { return segment[0] || ''; })
-        .join('')
-        .slice(0, 2)
-        .toUpperCase();
-
-      var card = document.createElement('div');
-      card.className = 'adminCard';
-      card.id = 'acard_' + item.id;
-      var reviewLevel = Number(item.review_level || 0);
-      var reviewLevelHtml = reviewLevel
-        ? '<span class="reviewLevelBadge l' + reviewLevel + '">L' + reviewLevel + '</span>'
-        : '';
-      var signalLinks = [
-        safeAdminExternalUrl(item.linkedin_url) ? { label: 'LinkedIn', url: safeAdminExternalUrl(item.linkedin_url) } : null,
-        safeAdminExternalUrl(item.hh_url) ? { label: 'HH.ru', url: safeAdminExternalUrl(item.hh_url) } : null,
-        safeAdminExternalUrl(item.course_verification_url) ? { label: 'Сертификат', url: safeAdminExternalUrl(item.course_verification_url) } : null,
-      ].filter(Boolean);
-      var signalLinksHtml = signalLinks.length
-        ? '<div class="adminSignalLinks">' + signalLinks.map(function (link) {
-            return '<a href="' + escapeHtml(link.url) + '" target="_blank" rel="noopener noreferrer">' + escapeHtml(link.label) + '</a>';
-          }).join('') + '</div>'
-        : '';
-      card.innerHTML =
-        '<div class="adminCardHead">' +
-          '<div class="adminAvatar">' + escapeHtml(initials || '?') + '</div>' +
-          '<div class="adminCardInfo">' +
-            '<div class="adminCardName">' + escapeHtml(item.full_name || item.user_email || '—') + '</div>' +
-            '<div class="adminCardDoc">' +
-              escapeHtml(DOC_TYPE_LABELS[item.ach_type] || item.ach_type || 'Документ') +
-              ' · ' +
-              escapeHtml(item.ach_title || item.org || '') +
-              (item.file_name ? ' · ' + escapeHtml(item.file_name) : '') +
-            '</div>' +
-            signalLinksHtml +
-          '</div>' +
-          reviewLevelHtml +
-          '<span class="statusBadge warn">На рассмотрении</span>' +
-        '</div>' +
-        '<div class="adminActions">' +
-          '<input class="rejectInput" id="rInput_' + item.id + '" placeholder="Причина отказа"/>' +
-        '</div>';
-
-      var actions = card.querySelector('.adminActions');
-      if (item.id) {
-        var btnView = document.createElement('button');
-        btnView.className = 'adminBtn view';
-        btnView.textContent = 'Просмотреть';
-        btnView.addEventListener('click', function () {
-          openSecureDocument(item.id, item.file_name).catch(function (err) {
-            showToast(safeErrorText(err), 'error');
-          });
-        });
-        actions.appendChild(btnView);
-      }
-
-      var btnApprove = document.createElement('button');
-      btnApprove.className = 'adminBtn ok';
-      btnApprove.textContent = 'Подтвердить';
-      btnApprove.addEventListener('click', function () {
-        apiAdminApprove(item.id).then(function () {
-          showToast('Документ подтверждён', 'success');
-          loadAdminQueue(adminQueueState.page);
-        }).catch(function (err) {
-          showToast(safeErrorText(err), 'error');
-        });
-      });
-
-      var btnReject = document.createElement('button');
-      btnReject.className = 'adminBtn danger';
-      btnReject.textContent = 'Отклонить';
-      btnReject.addEventListener('click', function () {
-        var reason = document.getElementById('rInput_' + item.id);
-        var value = reason ? reason.value.trim() : '';
-        if (!value) {
-          showToast('Укажите причину отказа', 'info');
-          return;
-        }
-        apiAdminReject(item.id, value).then(function () {
-          showToast('Документ отклонён', 'success');
-          loadAdminQueue(adminQueueState.page);
-        }).catch(function (err) {
-          showToast(safeErrorText(err), 'error');
-        });
-      });
-
-      actions.insertBefore(btnApprove, actions.firstChild);
-      actions.appendChild(btnReject);
-      listEl.appendChild(card);
+    normalizeAdminQueueUsers(data.items).forEach(function (group) {
+      appendAdminQueueUserCard(listEl, group);
     });
 
-    renderPager('adminQueuePager', adminQueueState, loadAdminQueue, { label: 'документов' });
+    renderPager('adminQueuePager', adminQueueState, loadAdminQueue, { label: 'пользователей' });
   }).catch(function (err) {
     var listEl = document.getElementById('adminQueueList');
     var totalEl = document.getElementById('adminQueueTotalCount');
     showToast(safeErrorText(err), 'error');
     if (listEl) listEl.innerHTML = queueEmptyState('Не удалось загрузить очередь');
     if (totalEl) totalEl.textContent = '0';
-    renderPager('adminQueuePager', { total: 0 }, function () {}, { label: 'документов' });
+    renderPager('adminQueuePager', { total: 0 }, function () {}, { label: 'пользователей' });
   });
 }
 
