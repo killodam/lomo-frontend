@@ -272,6 +272,178 @@
   color: #f87171;
 }
 
+/* ═══════════════════════════════════════════════════
+   WORK EXPERIENCE — LinkedIn-style section
+   ═══════════════════════════════════════════════════ */
+
+.profile-experience-section {
+  margin-top: 24px;
+}
+
+.profile-experience-section h3 {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: #111;
+}
+
+.exp-block {
+  display: flex;
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.exp-logo {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+}
+
+.exp-logo img {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  border: 1px solid #eee;
+  object-fit: contain;
+}
+
+.exp-logo-initials {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  background: rgba(42, 122, 138, 0.12);
+  color: #2a7a8a;
+  font-size: 13px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.exp-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.exp-position {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111;
+  line-height: 1.3;
+}
+
+.exp-meta {
+  font-size: 13px;
+  color: #444;
+  margin-top: 2px;
+}
+
+.exp-dates {
+  font-size: 13px;
+  color: #666;
+  margin-top: 2px;
+}
+
+.exp-location {
+  font-size: 13px;
+  color: #666;
+  margin-top: 1px;
+}
+
+.exp-desc {
+  font-size: 14px;
+  color: #333;
+  margin-top: 8px;
+  line-height: 1.5;
+}
+
+.exp-desc-toggle {
+  font-size: 13px;
+  color: #2a7a8a;
+  cursor: pointer;
+  margin-left: 2px;
+  text-decoration: none;
+}
+
+.exp-skills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.exp-skill-chip {
+  background: #f0f7f8;
+  color: #2a7a8a;
+  border-radius: 99px;
+  padding: 3px 10px;
+  font-size: 12px;
+}
+
+.exp-company-header {
+  font-size: 15px;
+  font-weight: 600;
+  color: #111;
+  margin-bottom: 12px;
+}
+
+.exp-group-items {
+  border-left: 2px solid #e0e0e0;
+  padding-left: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.exp-group-item .exp-position {
+  font-size: 14px;
+}
+
+/* ── Dark theme ── */
+[data-theme="dark"] .profile-experience-section h3 {
+  color: rgba(239, 246, 248, 0.94);
+}
+
+[data-theme="dark"] .exp-position,
+[data-theme="dark"] .exp-company-header {
+  color: rgba(239, 246, 248, 0.94);
+}
+
+[data-theme="dark"] .exp-meta {
+  color: rgba(225, 235, 239, 0.72);
+}
+
+[data-theme="dark"] .exp-dates,
+[data-theme="dark"] .exp-location {
+  color: rgba(225, 235, 239, 0.55);
+}
+
+[data-theme="dark"] .exp-desc {
+  color: rgba(225, 235, 239, 0.80);
+}
+
+[data-theme="dark"] .exp-logo-initials {
+  background: rgba(78, 205, 196, 0.14);
+  color: #66ddd4;
+}
+
+[data-theme="dark"] .exp-logo img {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .exp-skill-chip {
+  background: rgba(78, 205, 196, 0.10);
+  color: #66ddd4;
+}
+
+[data-theme="dark"] .exp-group-items {
+  border-left-color: rgba(255, 255, 255, 0.12);
+}
+
+[data-theme="dark"] .exp-desc-toggle {
+  color: #66ddd4;
+}
+
 /* Critical transition and auth fixes */
 html,
 body,

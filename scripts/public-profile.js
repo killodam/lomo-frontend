@@ -135,17 +135,7 @@
         if (u.vacancies) {
           candidateSections += '<div class="pubProfileSection"><div class="pubProfileSTitle">Ищет работу</div><div class="pubProfileText pubProfileTextAccent">'+escHtml(u.vacancies)+'</div></div>';
         }
-        var workExpArr = Array.isArray(u.work_exp) ? u.work_exp : [];
-        if (workExpArr.length) {
-          var workExpLines = workExpArr.map(function(e) {
-            return [e.company, e.role, e.period].filter(Boolean).join(' · ');
-          }).filter(Boolean).join('\n');
-          if (workExpLines) {
-            candidateSections += '<div class="pubProfileSection"><div class="pubProfileSTitle">Опыт работы</div><div class="pubProfileText" style="white-space:pre-line">'+escHtml(workExpLines)+'</div></div>';
-          }
-        } else if (typeof u.work_exp === 'string' && u.work_exp) {
-          candidateSections += '<div class="pubProfileSection"><div class="pubProfileSTitle">Опыт работы</div><div class="pubProfileText">'+escHtml(u.work_exp)+'</div></div>';
-        }
+        candidateSections += '<div id="profileExperience" class="profile-experience-section" style="display:none"></div>';
       }
 
       // ── EMPLOYER SECTIONS ─────────────────────────────────────────────
@@ -234,6 +224,10 @@
           + '</div>'
         + '</div>';
 
+      if (!isEmployer) {
+        renderExperience(u.experience || _adaptWorkExp(u.work_exp || []));
+      }
+
       _userCache[String(u.id)] = Object.assign({}, _userCache[String(u.id)] || {}, {
         id: u.id, role: u.role, public_id: u.public_id,
         full_name: u.full_name, company: u.company, avatar_url: u.avatar_url,
@@ -299,6 +293,197 @@
         }).join('');
       }).catch(function(e){ el.innerHTML='<div class="pubProfileFilesState error">'+escHtml(safeErrorText(e))+'</div>'; });
     }
+
+// ── Work experience: LinkedIn-style rendering ─────────────────────────────
+
+function formatExperienceDates(start_date, end_date) {
+  var monthNames = ['янв','фев','мар','апр','май','июн','июл','авг','сен','окт','ноя','дек'];
+  var startLabel = '', endLabel = '', duration = '';
+  var startYear = 0, startMonth = 0;
+  if (start_date) {
+    var sp = start_date.split('-');
+    startYear = parseInt(sp[0], 10);
+    startMonth = parseInt(sp[1], 10) - 1;
+    startLabel = monthNames[startMonth] + ' ' + startYear;
+  }
+  var endYear = 0, endMonth = 0;
+  if (end_date) {
+    var ep = end_date.split('-');
+    endYear = parseInt(ep[0], 10);
+    endMonth = parseInt(ep[1], 10) - 1;
+    endLabel = monthNames[endMonth] + ' ' + endYear;
+  } else {
+    endLabel = 'по наст. вр.';
+    var now = new Date();
+    endYear = now.getFullYear();
+    endMonth = now.getMonth();
+  }
+  if (startYear > 0) {
+    var totalMonths = (endYear - startYear) * 12 + (endMonth - startMonth);
+    if (totalMonths > 0) {
+      var years = Math.floor(totalMonths / 12);
+      var rem = totalMonths % 12;
+      var parts = [];
+      if (years > 0) parts.push(years + ' л.');
+      if (rem > 0) parts.push(rem + ' мес.');
+      duration = parts.join(' ');
+    }
+  }
+  return { startLabel: startLabel, endLabel: endLabel, duration: duration };
+}
+
+function renderCompanyLogo(company, logo_url) {
+  if (logo_url) {
+    return '<img src="' + escHtml(logo_url) + '" alt="' + escHtml(company || '') + '">';
+  }
+  var initials = String(company || '').slice(0, 2).toUpperCase() || '??';
+  return '<div class="exp-logo-initials">' + escHtml(initials) + '</div>';
+}
+
+function _buildExpDescHtml(description) {
+  if (!description) return '';
+  if (description.length <= 160) {
+    return '<div class="exp-desc">' + escHtml(description) + '</div>';
+  }
+  return '<div class="exp-desc">'
+    + escHtml(description.slice(0, 160))
+    + '<span class="exp-desc-hidden" style="display:none">' + escHtml(description.slice(160)) + '</span>'
+    + '<a class="exp-desc-toggle" href="#">...ещё</a>'
+    + '</div>';
+}
+
+function _adaptWorkExp(workExp) {
+  if (!Array.isArray(workExp)) return [];
+  return workExp.filter(function(e) { return e.company || e.role; }).map(function(e) {
+    return {
+      company: e.company || '',
+      logo_url: null,
+      position: e.role || '',
+      employment_type: null,
+      start_date: null,
+      end_date: null,
+      location: null,
+      format: null,
+      description: e.desc || '',
+      skills: [],
+      _period: e.period || ''
+    };
+  });
+}
+
+function _groupExpItems(items) {
+  var groups = [];
+  var current = null;
+  for (var i = 0; i < items.length; i++) {
+    var item = items[i];
+    var co = item.company || '';
+    if (current && current.company === co) {
+      current.items.push(item);
+    } else {
+      current = { company: co, items: [item] };
+      groups.push(current);
+    }
+  }
+  return groups;
+}
+
+function _renderExpSkills(skills) {
+  if (!Array.isArray(skills) || !skills.length) return '';
+  return '<div class="exp-skills">' + skills.map(function(s) {
+    return '<span class="exp-skill-chip">' + escHtml(String(s)) + '</span>';
+  }).join('') + '</div>';
+}
+
+function _renderSingleExpBlock(item) {
+  var datesStr = '';
+  if (item.start_date) {
+    var d = formatExperienceDates(item.start_date, item.end_date);
+    datesStr = d.startLabel + ' — ' + d.endLabel + (d.duration ? ' \xb7 ' + d.duration : '');
+  } else if (item._period) {
+    datesStr = escHtml(item._period);
+  }
+  var metaParts = [];
+  if (item.company) metaParts.push(escHtml(item.company));
+  if (item.employment_type) metaParts.push(escHtml(item.employment_type));
+  var locParts = [];
+  if (item.location) locParts.push(escHtml(item.location));
+  if (item.format) locParts.push(escHtml(item.format));
+  return '<div class="exp-block">'
+    + '<div class="exp-logo">' + renderCompanyLogo(item.company, item.logo_url) + '</div>'
+    + '<div class="exp-content">'
+    + (item.position ? '<div class="exp-position">' + escHtml(item.position) + '</div>' : '')
+    + (metaParts.length ? '<div class="exp-meta">' + metaParts.join(' \xb7 ') + '</div>' : '')
+    + (datesStr ? '<div class="exp-dates">' + datesStr + '</div>' : '')
+    + (locParts.length ? '<div class="exp-location">' + locParts.join(' \xb7 ') + '</div>' : '')
+    + _buildExpDescHtml(item.description)
+    + _renderExpSkills(item.skills)
+    + '</div>'
+    + '</div>';
+}
+
+function _renderGroupedExpBlock(company, items) {
+  var firstItem = items[0];
+  var groupItemsHtml = items.map(function(item) {
+    var datesStr = '';
+    if (item.start_date) {
+      var d = formatExperienceDates(item.start_date, item.end_date);
+      datesStr = d.startLabel + ' — ' + d.endLabel + (d.duration ? ' \xb7 ' + d.duration : '');
+    } else if (item._period) {
+      datesStr = escHtml(item._period);
+    }
+    var locParts = [];
+    if (item.location) locParts.push(escHtml(item.location));
+    if (item.format) locParts.push(escHtml(item.format));
+    return '<div class="exp-group-item">'
+      + (item.position ? '<div class="exp-position">' + escHtml(item.position) + '</div>' : '')
+      + (item.employment_type ? '<div class="exp-meta">' + escHtml(item.employment_type) + '</div>' : '')
+      + (datesStr ? '<div class="exp-dates">' + datesStr + '</div>' : '')
+      + (locParts.length ? '<div class="exp-location">' + locParts.join(' \xb7 ') + '</div>' : '')
+      + _buildExpDescHtml(item.description)
+      + _renderExpSkills(item.skills)
+      + '</div>';
+  }).join('');
+  return '<div class="exp-block exp-block-grouped">'
+    + '<div class="exp-logo">' + renderCompanyLogo(company, firstItem.logo_url) + '</div>'
+    + '<div class="exp-content">'
+    + '<div class="exp-company-header">' + escHtml(company) + '</div>'
+    + '<div class="exp-group-items">' + groupItemsHtml + '</div>'
+    + '</div>'
+    + '</div>';
+}
+
+function renderExperience(experience) {
+  var el = document.getElementById('profileExperience');
+  if (!el) return;
+  var items = Array.isArray(experience)
+    ? experience.filter(function(e) { return e.company || e.position; })
+    : [];
+  if (!items.length) {
+    el.style.display = 'none';
+    return;
+  }
+  var html = '<h3>Опыт работы</h3>';
+  var groups = _groupExpItems(items);
+  for (var i = 0; i < groups.length; i++) {
+    var g = groups[i];
+    html += g.items.length === 1
+      ? _renderSingleExpBlock(g.items[0])
+      : _renderGroupedExpBlock(g.company, g.items);
+  }
+  el.innerHTML = html;
+  el.style.display = 'block';
+  var toggles = el.querySelectorAll('.exp-desc-toggle');
+  for (var j = 0; j < toggles.length; j++) {
+    (function(toggle) {
+      toggle.addEventListener('click', function(e) {
+        e.preventDefault();
+        var hidden = toggle.parentNode.querySelector('.exp-desc-hidden');
+        if (hidden) hidden.style.display = '';
+        toggle.style.display = 'none';
+      });
+    })(toggles[j]);
+  }
+}
 
 function openPublicProfileByPublicId(publicId) {
   var fromScreenKey = _getActiveScreenKey();
