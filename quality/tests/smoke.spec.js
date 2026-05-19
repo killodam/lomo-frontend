@@ -226,6 +226,109 @@ test('public profile path opens SPA profile screen', async ({ page }) => {
   await expect(page.locator('#pubProfileContent')).toContainText('Публичный Профиль');
 });
 
+test('public profile renders saved work_exp as LinkedIn-style experience', async ({ page }) => {
+  await page.route('**/p/LOMO-EXP00001', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'text/html',
+      path: path.resolve(__dirname, '../../index.html'),
+    });
+  });
+
+  await page.route('**/api/**', async (route) => {
+    var url = new URL(route.request().url());
+
+    if (url.pathname.endsWith('/auth/me')) {
+      return route.fulfill({
+        status: 401,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'Authentication required' }),
+      });
+    }
+
+    if (url.pathname.endsWith('/public/profile/LOMO-EXP00001')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          id: 'public-exp-1',
+          public_id: 'LOMO-EXP00001',
+          role: 'candidate',
+          full_name: 'Опытный Кандидат',
+          experience: [],
+          work_exp: [{ company: 'LOMO Labs', role: 'Product Manager', period: '2021–2024', desc: 'Запускал профиль опыта.' }],
+        }),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await page.goto('/p/LOMO-EXP00001');
+
+  await expect(page.locator('#screenPublicProfile')).toHaveClass(/active/);
+  await expect(page.locator('#profileExperience')).toBeVisible();
+  await expect(page.locator('#profileExperience')).toContainText('Опыт работы');
+  await expect(page.locator('#profileExperience')).toContainText('LOMO Labs');
+  await expect(page.locator('#profileExperience')).toContainText('Product Manager');
+  await expect(page.locator('#profileExperience')).toContainText('2021–2024');
+});
+
+test('file upload retries one transient gateway error', async ({ page }) => {
+  let uploadCalls = 0;
+
+  await page.route('**/api/**', async (route) => {
+    var request = route.request();
+    var url = new URL(request.url());
+
+    if (url.pathname.endsWith('/upload')) {
+      uploadCalls += 1;
+      if (uploadCalls === 1) {
+        return route.fulfill({
+          status: 503,
+          contentType: 'application/json',
+          body: JSON.stringify({ error: 'Service Unavailable' }),
+        });
+      }
+
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ fileUrl: '/files/retry.pdf', fileName: 'retry.pdf' }),
+      });
+    }
+
+    if (url.pathname.endsWith('/auth/me')) {
+      return route.fulfill({
+        status: 401,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'Authentication required' }),
+      });
+    }
+
+    return route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify([]),
+    });
+  });
+
+  await page.goto('/');
+  await page.evaluate(() => { document.cookie = 'lomo_csrf=test-suite; path=/'; });
+
+  var result = await page.evaluate(async () => {
+    var file = new File(['%PDF-1.4 retry'], 'retry.pdf', { type: 'application/pdf' });
+    return apiUploadFile(file);
+  });
+
+  expect(result.fileUrl).toBe('/files/retry.pdf');
+  expect(uploadCalls).toBe(2);
+});
+
 test('subscriptions screen opens from drawer and loads public plans', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await page.route('**/api/**', async (route) => {

@@ -260,9 +260,25 @@ async function apiSaveProfile(fields) {
 }
 
 async function apiUploadFile(file) {
-  const formData = new FormData();
-  formData.append('file', file);
-  return apiFetch('/upload', { method: 'POST', body: formData });
+  async function sendOnce() {
+    var formData = new FormData();
+    formData.append('file', file);
+    return apiFetch('/upload', { method: 'POST', body: formData });
+  }
+
+  try {
+    return await sendOnce();
+  } catch (error) {
+    var message = typeof safeErrorText === 'function'
+      ? safeErrorText(error)
+      : String(error && error.message ? error.message : error || '');
+    var isTransient = /API error (502|503|504)|Bad Gateway|Service Unavailable|Gateway Timeout/i.test(message);
+
+    if (!isTransient) throw error;
+
+    await new Promise(function (resolve) { setTimeout(resolve, 1800); });
+    return sendOnce();
+  }
 }
 
 async function apiCreateAchievement(type, title, org) {

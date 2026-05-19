@@ -115,6 +115,9 @@
       // ── SKILLS ────────────────────────────────────────────────────────
       var skills = _parseSkills(u.skills);
       var skillsHtml = '';
+      var profileExperienceItems = (!isEmployer && Array.isArray(u.experience) && u.experience.length)
+        ? u.experience
+        : (!isEmployer ? _adaptWorkExp(u.work_exp || []) : []);
       if (skills.length) {
         skillsHtml = '<div class="pubProfileSection">'
           + '<div class="pubProfileSTitle">Навыки</div>'
@@ -189,7 +192,7 @@
       }
 
       // ── EMPTY STATE HINT ──────────────────────────────────────────────
-      var hasContent = subtitle || skills.length || u.about || u.vacancies || u.work_exp || u.needed || u.active_projects;
+      var hasContent = subtitle || skills.length || u.about || u.vacancies || profileExperienceItems.length || u.needed || u.active_projects;
       var emptyHint = !hasContent
         ? '<div class="pubProfileEmptyHint">Пользователь пока не заполнил профиль полностью</div>'
         : '';
@@ -225,7 +228,7 @@
         + '</div>';
 
       if (!isEmployer) {
-        renderExperience(u.experience || _adaptWorkExp(u.work_exp || []));
+        renderExperience(profileExperienceItems);
       }
 
       _userCache[String(u.id)] = Object.assign({}, _userCache[String(u.id)] || {}, {

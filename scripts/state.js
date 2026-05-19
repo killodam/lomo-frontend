@@ -464,11 +464,24 @@ function addWorkExp() {
   element.className = 'workExpEntry';
   element.dataset.expId = id;
   element.innerHTML = '<button type="button" class="removeExpBtn" title="Удалить">×</button>'
-    + '<div class="sqInput"><input type="text" class="expCompany" placeholder="Компания" autocomplete="off"></div>'
-    + '<div class="sqInput"><input type="text" class="expRole" placeholder="Должность" autocomplete="off"></div>'
-    + '<div class="sqInput"><input type="text" class="expPeriod" placeholder="Период (2021–2023)" autocomplete="off"></div>'
-    + '<div class="sqInput"><input type="text" class="expDesc" placeholder="Обязанности (необязательно)" autocomplete="off"></div>';
+    + '<div class="workExpVisual">'
+    + '<div class="workExpLogo" aria-hidden="true"><span class="workExpLogoText">LO</span></div>'
+    + '<div class="workExpFormGrid">'
+    + '<label class="workExpField"><span>Компания</span><div class="sqInput"><input type="text" class="expCompany" placeholder="Например: LOMO" autocomplete="off"></div></label>'
+    + '<label class="workExpField"><span>Должность</span><div class="sqInput"><input type="text" class="expRole" placeholder="Например: Product Manager" autocomplete="off"></div></label>'
+    + '<label class="workExpField"><span>Период</span><div class="sqInput"><input type="text" class="expPeriod" placeholder="2021–2024" autocomplete="off"></div></label>'
+    + '<label class="workExpField wide"><span>Что делали</span><div class="sqInput"><input type="text" class="expDesc" placeholder="Коротко: обязанности, проекты, стек" autocomplete="off"></div></label>'
+    + '</div>'
+    + '</div>';
   element.querySelector('.removeExpBtn').addEventListener('click', function () { removeWorkExp(id); });
+  var companyInput = element.querySelector('.expCompany');
+  var logoText = element.querySelector('.workExpLogoText');
+  if (companyInput && logoText) {
+    companyInput.addEventListener('input', function () {
+      var value = (companyInput.value || '').trim();
+      logoText.textContent = value ? value.slice(0, 2).toUpperCase() : 'LO';
+    });
+  }
   list.appendChild(element);
 }
 
@@ -499,7 +512,10 @@ function loadWorkExpData(items) {
     addWorkExp();
     var last = list.lastElementChild;
     if (!last) return;
-    if (last.querySelector('.expCompany')) last.querySelector('.expCompany').value = item.company || '';
+    if (last.querySelector('.expCompany')) {
+      last.querySelector('.expCompany').value = item.company || '';
+      last.querySelector('.expCompany').dispatchEvent(new Event('input', { bubbles: true }));
+    }
     if (last.querySelector('.expRole')) last.querySelector('.expRole').value = item.role || '';
     if (last.querySelector('.expPeriod')) last.querySelector('.expPeriod').value = item.period || '';
     if (last.querySelector('.expDesc')) last.querySelector('.expDesc').value = item.desc || '';

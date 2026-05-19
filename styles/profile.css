@@ -1238,3 +1238,98 @@
       background: rgba(38,110,120,.08) !important;
       border-color: rgba(38,110,120,.35) !important;
     }
+
+    /* LINKEDIN-STYLE EDITABLE EXPERIENCE CARDS */
+    #screenMyEmployeeProfile .workExpVisual {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+
+    #screenMyEmployeeProfile .workExpLogo {
+      width: 48px;
+      height: 48px;
+      flex: 0 0 48px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, rgba(38,112,122,.16), rgba(38,112,122,.04));
+      border: 1px solid rgba(38,112,122,.15);
+      color: #145562;
+      font-size: 14px;
+      font-weight: 900;
+      letter-spacing: .08em;
+      box-shadow: 0 10px 22px rgba(38,112,122,.08);
+    }
+
+    #screenMyEmployeeProfile .workExpFormGrid {
+      flex: 1;
+      min-width: 0;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px 12px;
+    }
+
+    #screenMyEmployeeProfile .workExpField {
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      color: #5f6b77;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+    }
+
+    #screenMyEmployeeProfile .workExpField.wide {
+      grid-column: 1 / -1;
+    }
+
+    #screenMyEmployeeProfile .workExpEntry .sqInput {
+      width: 100%;
+      height: 52px;
+      margin: 0;
+      border-radius: 18px;
+      background: rgba(255,255,255,.78);
+      border-color: rgba(38,112,122,.12);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.70);
+    }
+
+    #screenMyEmployeeProfile .workExpEntry .sqInput input {
+      font-size: 15px;
+      font-weight: 650;
+    }
+
+    [data-theme="dark"] #screenMyEmployeeProfile .workExpLogo {
+      background: linear-gradient(135deg, rgba(78,205,196,.22), rgba(38,112,122,.08));
+      border-color: rgba(78,205,196,.22);
+      color: #75eee7;
+      box-shadow: 0 12px 26px rgba(0,0,0,.20);
+    }
+
+    [data-theme="dark"] #screenMyEmployeeProfile .workExpField {
+      color: rgba(225,235,239,.68);
+    }
+
+    [data-theme="dark"] #screenMyEmployeeProfile .workExpEntry .sqInput {
+      background: rgba(255,255,255,.06);
+      border-color: rgba(255,255,255,.10);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.04);
+    }
+
+    @media (max-width: 700px) {
+      #screenMyEmployeeProfile .workExpVisual {
+        flex-direction: column;
+      }
+
+      #screenMyEmployeeProfile .workExpFormGrid {
+        width: 100%;
+        grid-template-columns: 1fr;
+      }
+
+      #screenMyEmployeeProfile .workExpEntry {
+        padding-right: 44px;
+      }
+    }
