@@ -1,4 +1,4 @@
-const STATIC_CACHE = 'lomo-static-v19';
+const STATIC_CACHE = 'lomo-static-v20';
 const OFFLINE_URL = '/offline.html';
 const PRECACHE_URLS = [
   '/',
@@ -66,7 +66,7 @@ self.addEventListener('fetch', (event) => {
         })
         .catch(async () => {
           const cache = await caches.open(STATIC_CACHE);
-          return (await cache.match(OFFLINE_URL)) || (await cache.match('/index.html'));
+          return (await cache.match('/index.html')) || (await cache.match(OFFLINE_URL));
         })
     );
     return;
