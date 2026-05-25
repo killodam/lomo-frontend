@@ -435,16 +435,14 @@ function filterJobList(query) {
   if (search.length < 1) { dropdown.classList.remove('open'); dropdown.innerHTML = ''; return; }
   var matches = CIS_COMPANIES.filter(function (company) { return company.toLowerCase().indexOf(search) >= 0; }).slice(0, 8);
   if (!matches.length) { dropdown.classList.remove('open'); dropdown.innerHTML = ''; return; }
-  dropdown.innerHTML = matches.map(function (company) {
+  dropdown.innerHTML = '';
+  matches.forEach(function (company) {
     var item = document.createElement('li');
     item.textContent = company;
     item.addEventListener('click', function () { selectJob(company); });
-    return item.outerHTML;
-  }).join('');
-  dropdown.classList.add('open');
-  dropdown.querySelectorAll('li').forEach(function (item) {
-    item.addEventListener('click', function () { selectJob(item.textContent); });
+    dropdown.appendChild(item);
   });
+  dropdown.classList.add('open');
 }
 
 function selectJob(name) {
