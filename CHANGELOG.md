@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- landing: added "Безопасность и доверие" trust band and a closing call-to-action section (light + dark + mobile)
+- performance: deferred all page scripts and added decoding/lazy hints to non-critical logos
+- security: moved clickjacking protection to real HTTP headers (`X-Frame-Options`, CSP `frame-ancestors`) via `vercel.json` and removed the ineffective meta `frame-ancestors`
+- bumped static asset and service worker cache versions (`v26` / `lomo-static-v22`)
 - cleaned repository naming by removing `legacy-*.js` filenames
 - renamed frontend runtime modules to `auth-ui.js`, `profile-runtime.js`, `ui-shell.js`
 - kept PWA shell, smoke tests and Vercel runtime wiring intact

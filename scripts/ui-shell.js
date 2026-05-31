@@ -282,6 +282,8 @@ function bindStaticUiActions() {
   bindUiAction('landingRegBtn2', 'click', function () { show('roleReg'); });
   bindUiAction('landingRegCandidate', 'click', function () { state.roleReg = 'EMPLOYEE'; show('regForm'); });
   bindUiAction('landingRegEmployer', 'click', function () { state.roleReg = 'EMPLOYER'; show('regForm'); });
+  bindUiAction('ctaRegCandidate', 'click', function () { state.roleReg = 'EMPLOYEE'; show('regForm'); });
+  bindUiAction('ctaRegEmployer', 'click', function () { state.roleReg = 'EMPLOYER'; show('regForm'); });
 
   // Landing footer info modals → fullscreen info screens
   document.querySelectorAll('.js-ld-modal').forEach(function (btn) {

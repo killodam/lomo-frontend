@@ -931,6 +931,126 @@
   color: #1a5c68;
 }
 
+/* ══════════════════════════════════════
+   Trust / Security band
+   ══════════════════════════════════════ */
+.ldTrust {
+  max-width: 1040px;
+  margin: 0 auto;
+  padding: 0 48px 72px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.ldTrustGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.ldTrustNote {
+  margin-top: 18px;
+  font-size: 13px;
+  color: #616161;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.ldTrustLink {
+  font: inherit;
+  font-size: 13px;
+  font-weight: 650;
+  color: #1a5c68;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.ldTrustLink:hover {
+  color: #26707a;
+  text-decoration: underline;
+}
+
+/* ══════════════════════════════════════
+   Closing CTA band
+   ══════════════════════════════════════ */
+.ldCta {
+  max-width: 1040px;
+  margin: 0 auto 8px;
+  padding: 0 48px 72px;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.ldCtaInner {
+  border-radius: 28px;
+  padding: 56px 40px;
+  text-align: center;
+  background: linear-gradient(135deg, #1a5c68 0%, #0e3a42 100%);
+  box-shadow: 0 24px 60px rgba(14,58,66,.22);
+}
+
+.ldCtaH {
+  font-size: 34px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  color: #fff;
+  margin: 0 0 12px;
+}
+
+.ldCtaSub {
+  font-size: 16px;
+  line-height: 1.55;
+  color: rgba(255,255,255,.82);
+  margin: 0 auto 28px;
+  max-width: 540px;
+}
+
+.ldCtaBtns {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.ldCtaPrimary,
+.ldCtaGhost {
+  font: inherit;
+  font-size: 15px;
+  font-weight: 700;
+  padding: 14px 28px;
+  border-radius: 99px;
+  cursor: pointer;
+  transition: transform .18s ease, background .18s ease, box-shadow .18s ease;
+}
+
+.ldCtaPrimary {
+  background: #fff;
+  color: #0e3a42;
+  border: none;
+  box-shadow: 0 8px 22px rgba(0,0,0,.18);
+}
+
+.ldCtaPrimary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(0,0,0,.24);
+}
+
+.ldCtaGhost {
+  background: rgba(255,255,255,.08);
+  color: #fff;
+  border: 1.5px solid rgba(255,255,255,.45);
+}
+
+.ldCtaGhost:hover {
+  background: rgba(255,255,255,.16);
+  transform: translateY(-2px);
+}
+
 /* ── Animations ── */
 @keyframes ldFadeUp {
   from { opacity: 0; transform: translateY(18px); }
@@ -1021,9 +1141,45 @@
     padding: 22px 18px;
   }
 
+  .ldTrust {
+    padding: 0 20px 52px;
+  }
+
+  .ldTrustGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .ldCta {
+    padding: 0 20px 56px;
+  }
+
+  .ldCtaInner {
+    padding: 40px 24px;
+    border-radius: 22px;
+  }
+
+  .ldCtaH {
+    font-size: 26px;
+  }
+
+  .ldCtaSub {
+    font-size: 15px;
+  }
+
+  .ldCtaBtns {
+    flex-direction: column;
+  }
+
   .ldH1 {
     font-size: 40px;
     letter-spacing: -1.8px;
+  }
+}
+
+@media (max-width: 460px) {
+  .ldTrustGrid {
+    grid-template-columns: 1fr;
   }
 }
 

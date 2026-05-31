@@ -1311,6 +1311,17 @@ body { transition: background .22s ease; }
 [data-theme="dark"] .ldFooterLink { color: rgba(225,229,235,.38); }
 [data-theme="dark"] .ldFooterLink:hover { color: #4ecdc4; }
 
+/* Trust band */
+[data-theme="dark"] .ldTrustNote { color: rgba(225,229,235,.52); }
+[data-theme="dark"] .ldTrustLink { color: #4ecdc4; }
+[data-theme="dark"] .ldTrustLink:hover { color: #6fe3da; }
+
+/* Closing CTA band */
+[data-theme="dark"] .ldCtaInner {
+  background: linear-gradient(135deg, #18505a 0%, #0c2f36 100%);
+  box-shadow: 0 24px 60px rgba(0,0,0,.45);
+}
+
 /* ════════════════════════════════════════════════════════
    DARK THEME — FEED SCREENS
    ════════════════════════════════════════════════════════ */

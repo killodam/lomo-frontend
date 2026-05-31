@@ -7,7 +7,7 @@
 <meta name="theme-color" content="#eef5f8"/>
 <meta name="apple-mobile-web-app-capable" content="yes"/>
 <meta name="mobile-web-app-capable" content="yes"/>
-<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; frame-ancestors 'none'; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https://lomo-backend-hergg.amvera.io https://lomo-backend-hergg.amvera.io/api wss://lomo-backend-hergg.amvera.io; font-src 'self' data:; form-action 'self'"/>
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; base-uri 'self'; object-src 'none'; img-src 'self' data: blob: https:; style-src 'self' 'unsafe-inline'; script-src 'self'; connect-src 'self' https://lomo-backend-hergg.amvera.io https://lomo-backend-hergg.amvera.io/api wss://lomo-backend-hergg.amvera.io; font-src 'self' data:; form-action 'self'"/>
 <title>LOMO — Верификация документов для HR</title>
 <meta name="description" content="LOMO — платформа верификации карьерных данных. Работодатели находят кандидатов с подтверждёнными документами. Кандидаты создают защищённое портфолио."/>
 <meta property="og:site_name" content="LOMO"/>
@@ -23,15 +23,15 @@
 <link rel="manifest" href="./manifest.webmanifest"/>
 <link rel="icon" href="./icons/app-icon.svg" type="image/svg+xml"/>
 <link rel="apple-touch-icon" href="./icons/icon-192.png"/>
-<link rel="stylesheet" href="./styles/core.css?v=25"/>
-<link rel="stylesheet" href="./styles/profile.css?v=25"/>
-<link rel="stylesheet" href="./styles/theme.css?v=25"/>
-<link rel="stylesheet" href="./styles/responsive.css?v=25"/>
-<link rel="stylesheet" href="./styles/chat.css?v=25"/>
-<link rel="stylesheet" href="./styles/landing.css?v=25"/>
-<link rel="stylesheet" href="./styles/feed.css?v=25"/>
-<link rel="stylesheet" href="./styles/info-screens.css?v=25"/>
-<link rel="stylesheet" href="./styles/main.css?v=25"/>
+<link rel="stylesheet" href="./styles/core.css?v=26"/>
+<link rel="stylesheet" href="./styles/profile.css?v=26"/>
+<link rel="stylesheet" href="./styles/theme.css?v=26"/>
+<link rel="stylesheet" href="./styles/responsive.css?v=26"/>
+<link rel="stylesheet" href="./styles/chat.css?v=26"/>
+<link rel="stylesheet" href="./styles/landing.css?v=26"/>
+<link rel="stylesheet" href="./styles/feed.css?v=26"/>
+<link rel="stylesheet" href="./styles/info-screens.css?v=26"/>
+<link rel="stylesheet" href="./styles/main.css?v=26"/>
 </head>
 <body>
 <div class="stage">
@@ -81,7 +81,7 @@
     <!-- Nav -->
     <nav class="ldNav">
       <div class="ldNavLogo">
-        <img id="ldNavLogoImg" class="ldNavLogoImg" alt="LOMO" src="./icons/app-icon.svg" width="28" height="28">
+        <img id="ldNavLogoImg" class="ldNavLogoImg" alt="LOMO" src="./icons/app-icon.svg" width="28" height="28" decoding="async">
         <span class="ldNavWord">LOMO</span>
       </div>
       <div class="ldNavActions">
@@ -259,6 +259,37 @@
       </div>
     </div>
 
+    <!-- Trust / Security -->
+    <div class="ldTrust">
+      <div class="ldSectionLabel">Безопасность и доверие</div>
+      <div class="ldTrustGrid">
+        <div class="ldNiche">
+          <div class="ldNicheIcon">🔒</div>
+          <div class="ldNicheH">Документы под защитой</div>
+          <div class="ldNicheP">Файлы хранятся в закрытом хранилище и недоступны по прямым ссылкам. Доступ выдаётся только с вашего явного согласия.</div>
+        </div>
+        <div class="ldNiche">
+          <div class="ldNicheIcon">🎛️</div>
+          <div class="ldNicheH">Вы решаете, кто видит</div>
+          <div class="ldNicheP">Работодатель видит только статус проверки. Доступ к самим файлам — по запросу, и отозвать его можно в любой момент.</div>
+        </div>
+        <div class="ldNiche">
+          <div class="ldNicheIcon">👤</div>
+          <div class="ldNicheH">Проверяют люди</div>
+          <div class="ldNicheP">Каждый документ и профиль проверяет модератор LOMO вручную — под персональной учётной записью с журналом действий.</div>
+        </div>
+        <div class="ldNiche">
+          <div class="ldNicheIcon">🛡️</div>
+          <div class="ldNicheH">Шифрование и контроль</div>
+          <div class="ldNicheP">HTTPS/TLS на всех соединениях, HttpOnly-cookie, CSRF-защита и rate-limiting. Аккаунт и все данные удаляются по запросу.</div>
+        </div>
+      </div>
+      <div class="ldTrustNote">
+        Соответствие ФЗ-152 «О персональных данных» ·
+        <button type="button" class="ldTrustLink js-ld-modal" data-modal-key="security">Подробнее о безопасности →</button>
+      </div>
+    </div>
+
     <!-- Paths -->
     <div class="ldPaths">
       <div class="ldPathsGrid">
@@ -285,6 +316,18 @@
             <li class="ldPathItem"><span class="ldPathCheck">✓</span>Прямой чат с кандидатом</li>
           </ul>
           <div class="ldPathCta"><button id="landingRegEmployer">Найти кандидатов</button></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Closing CTA -->
+    <div class="ldCta">
+      <div class="ldCtaInner">
+        <h2 class="ldCtaH">Готовы начать?</h2>
+        <p class="ldCtaSub">Создайте профиль бесплатно за 5 минут. Подтверждённые данные начнут работать на вас уже сегодня.</p>
+        <div class="ldCtaBtns">
+          <button id="ctaRegCandidate" class="ldCtaPrimary">Я ищу работу</button>
+          <button id="ctaRegEmployer" class="ldCtaGhost">Я ищу сотрудников</button>
         </div>
       </div>
     </div>
@@ -1151,7 +1194,7 @@
           <span></span><span></span><span></span>
         </button>
         <div class="feedHeaderBrand">
-          <img id="feedHeaderLogoImg" class="feedHeaderLogoImg" alt="LOMO" src="./icons/app-icon.svg">
+          <img id="feedHeaderLogoImg" class="feedHeaderLogoImg" alt="LOMO" src="./icons/app-icon.svg" width="28" height="28" loading="lazy" decoding="async">
           <span class="feedHeaderWord">LOMO</span>
         </div>
         <nav class="feedHeaderNav">
@@ -1259,7 +1302,7 @@
           <span></span><span></span><span></span>
         </button>
         <div class="feedHeaderBrand">
-          <img id="empSearchLogoImg" class="feedHeaderLogoImg" alt="LOMO" src="./icons/app-icon.svg">
+          <img id="empSearchLogoImg" class="feedHeaderLogoImg" alt="LOMO" src="./icons/app-icon.svg" width="28" height="28" loading="lazy" decoding="async">
           <span class="feedHeaderWord">LOMO</span>
         </div>
         <nav class="feedHeaderNav">
@@ -1336,7 +1379,7 @@
           <span>Назад</span>
         </button>
         <div class="chatHeaderBrand">
-          <img id="chatScreenLogoImg" class="feedHeaderLogoImg" alt="LOMO" src="./icons/app-icon.svg">
+          <img id="chatScreenLogoImg" class="feedHeaderLogoImg" alt="LOMO" src="./icons/app-icon.svg" width="28" height="28" loading="lazy" decoding="async">
           <span class="chatHeaderWord">LOMO</span>
         </div>
         <span id="chatAutoBadge" class="chatAutoBadge"></span>
@@ -2556,30 +2599,30 @@
   </div>
 </section>
 
-<script src="./config.js"></script>
-<script src="./capacitor.js"></script>
-<script src="./scripts/runtime.js?v=25"></script>
-<script src="./scripts/api.js?v=25"></script>
-<script src="./scripts/state.js?v=25"></script>
-<script src="./scripts/social-card.js?v=25"></script>
-<script src="./scripts/screens.js?v=25"></script>
-<script src="./scripts/push-notifications.js?v=25"></script>
-<script src="./scripts/auth.js?v=25"></script>
-<script src="./scripts/bookmarks-store.js?v=25"></script>
-<script src="./scripts/admin.js?v=25"></script>
-<script src="./scripts/feed-refresh.js?v=25"></script>
-<script src="./scripts/public-profile.js?v=25"></script>
-<script src="./scripts/chat.js?v=25"></script>
-<script src="./scripts/auth-ui.js?v=25"></script>
-<script src="./scripts/profile-runtime.js?v=25"></script>
-<script src="./scripts/ui-shell.js?v=25"></script>
-<script src="./scripts/admin-ui-bindings.js?v=25"></script>
-<script src="./scripts/info-screens.js?v=25"></script>
-<script src="./scripts/ai-matching.js?v=25"></script>
-<script src="./scripts/feed-extra.js?v=25"></script>
-<script src="./scripts/jobs.js?v=25"></script>
-<script src="./scripts/company-docs.js?v=25"></script>
-<script src="./scripts/subscriptions.js?v=25"></script>
+<script defer src="./config.js"></script>
+<script defer src="./capacitor.js"></script>
+<script defer src="./scripts/runtime.js?v=26"></script>
+<script defer src="./scripts/api.js?v=26"></script>
+<script defer src="./scripts/state.js?v=26"></script>
+<script defer src="./scripts/social-card.js?v=26"></script>
+<script defer src="./scripts/screens.js?v=26"></script>
+<script defer src="./scripts/push-notifications.js?v=26"></script>
+<script defer src="./scripts/auth.js?v=26"></script>
+<script defer src="./scripts/bookmarks-store.js?v=26"></script>
+<script defer src="./scripts/admin.js?v=26"></script>
+<script defer src="./scripts/feed-refresh.js?v=26"></script>
+<script defer src="./scripts/public-profile.js?v=26"></script>
+<script defer src="./scripts/chat.js?v=26"></script>
+<script defer src="./scripts/auth-ui.js?v=26"></script>
+<script defer src="./scripts/profile-runtime.js?v=26"></script>
+<script defer src="./scripts/ui-shell.js?v=26"></script>
+<script defer src="./scripts/admin-ui-bindings.js?v=26"></script>
+<script defer src="./scripts/info-screens.js?v=26"></script>
+<script defer src="./scripts/ai-matching.js?v=26"></script>
+<script defer src="./scripts/feed-extra.js?v=26"></script>
+<script defer src="./scripts/jobs.js?v=26"></script>
+<script defer src="./scripts/company-docs.js?v=26"></script>
+<script defer src="./scripts/subscriptions.js?v=26"></script>
 
 
 </body>
