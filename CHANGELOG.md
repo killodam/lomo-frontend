@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- legal: replaced the Terms of Use and Privacy Policy screens with the final published copy (sole-proprietor operator details, ФЗ-152 wording, Resend cross-border disclosure, updated 2026-07-04)
 - landing: added "Безопасность и доверие" trust band and a closing call-to-action section (light + dark + mobile)
 - performance: deferred all page scripts and added decoding/lazy hints to non-critical logos
 - security: moved clickjacking protection to real HTTP headers (`X-Frame-Options`, CSP `frame-ancestors`) via `vercel.json` and removed the ineffective meta `frame-ancestors`
