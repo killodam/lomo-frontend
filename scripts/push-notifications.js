@@ -7,8 +7,6 @@
   var TRUSTED_LINK_HOSTS = {
     'localhost': true,
     '127.0.0.1': true,
-    'lomo.work': true,
-    'www.lomo.work': true,
     'lomo.website': true,
     'www.lomo.website': true,
     'lomo-frontend.vercel.app': true,
