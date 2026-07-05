@@ -2,6 +2,10 @@ function emptyProof() {
   return { fileName: '', status: 'не загружено', url: '', docId: '', achievementId: '', rejectReason: '' };
 }
 
+function emptyOnboarding() {
+  return { step: 0, checklistHiddenUntil: null, checklistDismissCount: 0, bannerHiddenUntil: null };
+}
+
 const state = {
   roleReg: null,
   prevFromDone: 'landing',
@@ -10,6 +14,7 @@ const state = {
   userId: '',
   publicId: '',
   emailVerified: false,
+  onboarding: emptyOnboarding(),
   connections: {
     accepted: [],
     incoming: [],
@@ -55,6 +60,9 @@ const state = {
     eduPlace: '',
     eduYear: '',
     vacancies: '',
+    skills: '',
+    grade: '',
+    workFormat: '',
     courseVerificationUrl: '',
     linkedinUrl: '',
     hhUrl: '',
@@ -133,6 +141,9 @@ function saveToStorage() {
       eduPlace: state.employee.eduPlace,
       eduYear: state.employee.eduYear,
       vacancies: state.employee.vacancies,
+      skills: state.employee.skills,
+      grade: state.employee.grade,
+      workFormat: state.employee.workFormat,
       courseVerificationUrl: state.employee.courseVerificationUrl,
       linkedinUrl: state.employee.linkedinUrl,
       hhUrl: state.employee.hhUrl,
@@ -260,7 +271,7 @@ function clearUserStorage(userId) {
 function mergeLocalState(userId) {
   const saved = loadUserStorage(userId);
   const employerFields = ['fullName', 'title', 'company', 'foundedYear', 'location', 'industry', 'products', 'activeProjects', 'neededSpecialists', 'about', 'email', 'corpEmail', 'phone', 'website', 'telegram', 'avatarDataUrl'];
-  const employeeFields = ['fullName', 'city', 'phone', 'about', 'email', 'telegram', 'corpEmail', 'eduPlace', 'eduYear', 'vacancies', 'courseVerificationUrl', 'linkedinUrl', 'hhUrl', 'current_job', 'job_title', 'avatarDataUrl'];
+  const employeeFields = ['fullName', 'city', 'phone', 'about', 'email', 'telegram', 'corpEmail', 'eduPlace', 'eduYear', 'vacancies', 'skills', 'grade', 'workFormat', 'courseVerificationUrl', 'linkedinUrl', 'hhUrl', 'current_job', 'job_title', 'avatarDataUrl'];
 
   if (saved.employer) {
     employerFields.forEach(function (key) {
@@ -319,6 +330,7 @@ function resetState() {
   state.roleReg = null;
   state.publicId = '';
   state.emailVerified = false;
+  state.onboarding = emptyOnboarding();
   state.connections = {
     accepted: [],
     incoming: [],
@@ -362,6 +374,9 @@ function resetState() {
     eduPlace: '',
     eduYear: '',
     vacancies: '',
+    skills: '',
+    grade: '',
+    workFormat: '',
     courseVerificationUrl: '',
     linkedinUrl: '',
     hhUrl: '',

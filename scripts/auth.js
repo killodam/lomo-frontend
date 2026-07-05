@@ -1,9 +1,16 @@
+/* Очистка localStorage. Белый список, который переживает логаут:
+   - lomo_theme                       — тема оформления (не привязана к аккаунту)
+   - lomo_push_token:<platform>:<uid> — push-токен текущего пользователя
+   - lomo_favs_<uid>                  — избранное текущего пользователя
+   Всё остальное с префиксом lomo_ удаляется. keepUserId=null → чистим и
+   пользовательские ключи (удаление аккаунта). */
 function pruneStaleLocalStorage(keepUserId) {
   try {
     var toRemove = [];
     for (var i = 0; i < window.localStorage.length; i++) {
       var k = window.localStorage.key(i);
       if (!k || !k.startsWith('lomo_')) continue;
+      if (k === 'lomo_theme') continue;
       var isOwnFav = keepUserId && k === 'lomo_favs_' + keepUserId;
       var isOwnPush = keepUserId && k.startsWith('lomo_push_token:') && k.endsWith(':' + keepUserId);
       if (!isOwnFav && !isOwnPush) toRemove.push(k);
@@ -15,6 +22,14 @@ function pruneStaleLocalStorage(keepUserId) {
 function showOnboardingScreen(role) {
   var candidateView = document.getElementById('doneViewCandidate');
   var employerView = document.getElementById('doneViewEmployer');
+  var messageView = document.getElementById('doneViewMessage');
+  if (messageView) messageView.classList.add('hidden');
+
+  if (role !== 'employer' && typeof startCandidateOnboarding === 'function') {
+    startCandidateOnboarding({ step: 1 });
+    return;
+  }
+
   if (candidateView && employerView) {
     if (role === 'employer') {
       candidateView.classList.add('hidden');
@@ -38,7 +53,7 @@ function logout() {
   }
   apiLogout().catch(function () {});
   clearUserStorage(userId);
-  pruneStaleLocalStorage(null);
+  pruneStaleLocalStorage(userId);
   if (typeof clearLastScreen === 'function') clearLastScreen();
   clearToken();
   resetState();
@@ -56,7 +71,7 @@ function logoutAllSessions() {
   }
   apiLogoutAll().catch(function () {});
   clearUserStorage(userId);
-  pruneStaleLocalStorage(null);
+  pruneStaleLocalStorage(userId);
   if (typeof clearLastScreen === 'function') clearLastScreen();
   clearToken();
   resetState();
@@ -68,6 +83,7 @@ function deleteOwnAccount(password) {
   const userId = state.userId;
   return apiDeleteAccount(password).then(function (result) {
     clearUserStorage(userId);
+    pruneStaleLocalStorage(null);
     if (window.LOMO_PUSH && typeof window.LOMO_PUSH.clearSession === 'function') {
       window.LOMO_PUSH.clearSession();
     }
@@ -501,6 +517,11 @@ document.addEventListener('input', function (e) {
 
       // ── Skip email verification ──────────────────────────────
       document.getElementById('verifySkipBtn')?.addEventListener('click', () => {
+        if(state.isNewReg) {
+          state.isNewReg = false;
+          showOnboardingScreen(state.roleReg === 'EMPLOYER' ? 'employer' : 'candidate');
+          return;
+        }
         if(state.roleReg === 'EMPLOYER') showEmployerDashboard();
         else showEmployeeDashboard();
       });
@@ -557,9 +578,13 @@ document.addEventListener('input', function (e) {
         try {
           await apiResetPassword(flowState.email, flowState.code, np);
           flowState.code = '';
-          if(doneTextEl) doneTextEl.textContent = 'Пароль успешно изменён';
-          state.prevFromDone = 'loginForm';
-          show('done');
+          if (typeof showDoneMessage === 'function') {
+            showDoneMessage('Пароль успешно изменён', 'loginForm');
+          } else {
+            if(doneTextEl) doneTextEl.textContent = 'Пароль успешно изменён';
+            state.prevFromDone = 'loginForm';
+            show('done');
+          }
         } catch(err) {
           const msg = safeErrorText(err);
           const isCodeError = /Too many invalid code attempts|Code expired|Invalid or expired code|Code must be 6 digits/i.test(msg);
@@ -1026,6 +1051,7 @@ document.addEventListener('input', function (e) {
               }
               const { user, profile, achievements } = await apiLogin(loginEmail, loginPwd);
               applyProfileToState(user, profile, achievements || []);
+              pruneStaleLocalStorage(state.userId);
               saveToStorage();
               pruneStaleLocalStorage(user.id);
               registerPushAfterAuth({ prompt: true });
@@ -1129,6 +1155,12 @@ document.addEventListener('input', function (e) {
           p.eduPlace  = (document.getElementById('mpCEduPlace')?.value  || '').trim();
           p.eduYear   = (document.getElementById('mpCEduYear')?.value   || '').trim();
           p.vacancies = (document.getElementById('mpCVacancies')?.value || '').trim();
+          p.skills    = (document.getElementById('mpCSkills')?.value || '').trim();
+          p.grade     = (document.getElementById('mpCGrade')?.value || '');
+          p.workFormat = [['mpCFormatRemote','remote'],['mpCFormatOffice','office'],['mpCFormatHybrid','hybrid']]
+            .filter(function (pair) { return !!document.getElementById(pair[0])?.checked; })
+            .map(function (pair) { return pair[1]; })
+            .join(',');
           p.courseVerificationUrl = (document.getElementById('mpCCourseVerificationUrl')?.value || '').trim();
           p.linkedinUrl = (document.getElementById('mpCLinkedinUrl')?.value || '').trim();
           p.hhUrl = (document.getElementById('mpCHhUrl')?.value || '').trim();
@@ -1152,6 +1184,7 @@ document.addEventListener('input', function (e) {
             full_name: p.fullName, location: p.city, phone: p.phone,
             about: p.about, edu_place: p.eduPlace, edu_year: p.eduYear,
             vacancies: p.vacancies, salary_expectations: p.salaryExpectations,
+            skills: p.skills, grade: p.grade, work_format: p.workFormat,
             course_verification_url: p.courseVerificationUrl,
             linkedin_url: p.linkedinUrl,
             hh_url: p.hhUrl,

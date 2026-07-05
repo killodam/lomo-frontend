@@ -192,10 +192,18 @@ function show(key, options) {
     if (loginPasswordError) loginPasswordError.classList.add('hidden');
     if (loginPasswordInputWrap) loginPasswordInputWrap.classList.remove('inputError');
   }
-  if (targetKey === 'employeePublic') { updateProfileProgress(); loadIncomingRequests(); loadOwnConnections(); }
+  if (targetKey === 'employeePublic') {
+    updateProfileProgress();
+    loadIncomingRequests();
+    loadOwnConnections();
+    if (typeof renderOnboardingChecklist === 'function') renderOnboardingChecklist();
+  }
   if (targetKey === 'recruiterPublic') loadOwnConnections();
   if (targetKey === 'adminQueue') { loadAdminQueue(); loadAdminUsers(); switchAdminTab('docs'); }
-  if (targetKey === 'candidateFeed') loadCandidateFeed();
+  if (targetKey === 'candidateFeed') {
+    loadCandidateFeed();
+    if (typeof renderFeedCompletenessBanner === 'function') renderFeedCompletenessBanner();
+  }
   if (targetKey === 'employerSearch') loadEmployerSearch();
   if (targetKey === 'myEmployeeProfile') hydrateCvPrivacy();
   if (window.LOMO_CHAT_UI && typeof window.LOMO_CHAT_UI.handleScreenChange === 'function') {

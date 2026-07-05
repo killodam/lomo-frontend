@@ -328,8 +328,24 @@ function appendAdminQueueDocument(parent, doc) {
       '<span class="statusBadge warn">На рассмотрении</span>' +
     '</div>' +
     '<div class="adminActions">' +
-      '<input class="rejectInput" id="rInput_' + escapeHtml(doc.id) + '" placeholder="Причина отказа"/>' +
+      '<select class="rejectSelect" id="rSel_' + escapeHtml(doc.id) + '">' +
+        '<option value="">Причина отказа…</option>' +
+        '<option value="Нечитаемый скан">Нечитаемый скан</option>' +
+        '<option value="Документ не на ваше имя">Документ не на ваше имя</option>' +
+        '<option value="Не хватает страниц">Не хватает страниц</option>' +
+        '<option value="__other">Другое</option>' +
+      '</select>' +
+      '<input class="rejectInput hidden" id="rInput_' + escapeHtml(doc.id) + '" placeholder="Опишите причину"/>' +
     '</div>';
+
+  var rejectSelect = docCard.querySelector('#rSel_' + doc.id);
+  var rejectInput = docCard.querySelector('#rInput_' + doc.id);
+  if (rejectSelect && rejectInput) {
+    rejectSelect.addEventListener('change', function () {
+      rejectInput.classList.toggle('hidden', rejectSelect.value !== '__other');
+      if (rejectSelect.value === '__other') rejectInput.focus();
+    });
+  }
 
   var actions = docCard.querySelector('.adminActions');
   if (doc.id) {
@@ -360,10 +376,14 @@ function appendAdminQueueDocument(parent, doc) {
   btnReject.className = 'adminBtn danger';
   btnReject.textContent = 'Отклонить';
   btnReject.addEventListener('click', function () {
-    var reason = document.getElementById('rInput_' + doc.id);
-    var value = reason ? reason.value.trim() : '';
+    var reasonSelect = document.getElementById('rSel_' + doc.id);
+    var reasonInput = document.getElementById('rInput_' + doc.id);
+    var selected = reasonSelect ? reasonSelect.value : '';
+    var value = selected === '__other'
+      ? (reasonInput ? reasonInput.value.trim() : '')
+      : selected;
     if (!value) {
-      showToast('Укажите причину отказа', 'info');
+      showToast(selected === '__other' ? 'Опишите причину отказа' : 'Выберите причину отказа', 'info');
       return;
     }
     apiAdminReject(doc.id, value).then(function () {
@@ -971,49 +991,61 @@ function loadEmployerAccessPanel(candidateId) {
 }
 
 function updateProfileProgress() {
-  var p = state.employee;
-  var score = 0;
-  var total = 6;
-  var hints = [];
+  if (typeof computeProfileCompletenessFromState !== 'function') return;
+  var result = computeProfileCompletenessFromState();
+  var pct = result.percent;
+  var undone = result.items.filter(function (item) { return !item.done; });
 
-  if (p.fullName) score += 1; else hints.push({ text: 'Добавьте имя' });
-  if (p.eduPlace) score += 1; else hints.push({ text: 'Укажите место обучения' });
-  if (p.vacancies) score += 1; else hints.push({ text: 'Укажите желаемые вакансии' });
-
-  var anyProof = Object.values(p.proofs).some(function (proof) { return proof.fileName; });
-  if (anyProof) score += 1; else hints.push({ text: 'Загрузите хотя бы один документ' });
-
-  var anyVerified = Object.values(p.proofs).some(function (proof) {
-    var status = String(proof && proof.status || '').toLowerCase();
-    return status === 'verified' || status.includes('подтверж') || status.includes('одобр');
-  });
-  if (anyVerified) score += 1; else hints.push({ text: 'Получите первое подтверждение' });
-
-  if (p.proofs.cv.fileName) score += 1; else hints.push({ text: 'Загрузите резюме (CV)' });
-
-  var pct = Math.round((score / total) * 100);
   var fill = document.getElementById('epProgressFill');
   var label = document.getElementById('epProgressLabel');
   var hintsEl = document.getElementById('epProgressHints');
   var banner = document.getElementById('epOnboardBanner');
   var bannerText = document.getElementById('epOnboardText');
+  var progressBox = document.getElementById('epProgress');
 
   if (fill) {
     if (typeof setProgressWidth === 'function') setProgressWidth(fill, pct);
     else fill.style.setProperty('--progress-width', pct + '%');
   }
-  if (label) label.textContent = 'Профиль ' + pct + '%' + (pct < 50 ? ' — заполните для видимости' : pct < 100 ? ' — почти готово!' : ' — профиль полный');
+  if (label) {
+    label.textContent = 'Профиль заполнен на ' + pct + '%' + (pct < 100 && undone.length ? ' · показать, что добавить' : '');
+  }
   if (hintsEl) {
-    hintsEl.innerHTML = hints.slice(0, 3).map(function (hint) {
-      return '<div class="progressHint">' + escapeHtml(hint.text) + '</div>';
+    hintsEl.innerHTML = undone.map(function (item) {
+      if (item.pending) {
+        return '<div class="progressHint progressHintPending">' + escapeHtml(item.hint) + ' <span class="progressHintTag">на проверке</span></div>';
+      }
+      return '<button type="button" class="progressHint progressHintLink" data-goto-profile-tab="' + escapeHtml(item.tab) + '">' + escapeHtml(item.hint) + '</button>';
     }).join('');
   }
+  if (progressBox) progressBox.classList.toggle('expandable', pct < 100 && undone.length > 0);
 
   if (banner) banner.classList.toggle('hidden', pct >= 100);
-  if (pct > 0 && pct < 100 && bannerText && hints[0]) {
-    bannerText.textContent = 'Следующий шаг: ' + hints[0].text;
+  var firstActionable = undone.filter(function (item) { return !item.pending; })[0] || undone[0];
+  if (pct > 0 && pct < 100 && bannerText && firstActionable) {
+    bannerText.textContent = 'Следующий шаг: ' + firstActionable.short;
   }
+
+  if (typeof maybeNotifyCompleteness === 'function') maybeNotifyCompleteness(pct);
 }
+
+(function wireProfileProgressExpand() {
+  var progressBox = document.getElementById('epProgress');
+  if (!progressBox) return;
+  progressBox.addEventListener('click', function (event) {
+    var link = event.target && event.target.closest ? event.target.closest('[data-goto-profile-tab]') : null;
+    if (link) {
+      var tab = link.getAttribute('data-goto-profile-tab');
+      if (typeof hydrateEmployeeForm === 'function') hydrateEmployeeForm();
+      show('myEmployeeProfile');
+      if (typeof activateProfileTab === 'function') activateProfileTab('screenMyEmployeeProfile', tab);
+      return;
+    }
+    if (progressBox.classList.contains('expandable')) {
+      progressBox.classList.toggle('open');
+    }
+  });
+})();
 
 function hydrateCvPrivacy() {
   var toggle = document.getElementById('cvPublicToggle');

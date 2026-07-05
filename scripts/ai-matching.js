@@ -411,7 +411,7 @@
     // Hard filters
     if (opts.verifiedOnly && !c.is_verified) return null;
     if (opts.activeOnly && !c.looking_for_work) return null;
-    if (jobFormat && c.work_format && c.work_format.toLowerCase() !== jobFormat) return null;
+    if (jobFormat && c.work_format && String(c.work_format).toLowerCase().split(',').indexOf(jobFormat) === -1) return null;
 
     // Salary hard-filter: candidate wants ≥20% more than budget
     if (salaryBudget > 0 && c.salary_expectations > 0) {

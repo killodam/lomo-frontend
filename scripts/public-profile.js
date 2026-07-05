@@ -1,6 +1,7 @@
     // Track where we came from to go back
     var _profileFromScreen = 'landing';
     var _activePublicProfileUserId = '';
+    var _activePublicProfilePublicId = '';
 
     function escHtml(s){ if(!s) return ''; return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
 
@@ -67,6 +68,7 @@
     function openUserProfile(u, fromScreenKey){
       _rememberProfileFromScreen(fromScreenKey);
       _activePublicProfileUserId = u.id || '';
+      _activePublicProfilePublicId = u.public_id || '';
 
       var isEmployer = u.role === 'employer';
       var displayName = u.full_name || (isEmployer ? u.company : '') || u.email || 'Пользователь LOMO';
@@ -93,17 +95,39 @@
       if (!isEmployer && u.grade && GRADE_LABELS[u.grade.toLowerCase()]) {
         badges += '<span class="pubBadge grade">'+escHtml(GRADE_LABELS[u.grade.toLowerCase()] || u.grade)+'</span>';
       }
-      if (u.work_format && FORMAT_LABELS[u.work_format.toLowerCase()]) {
-        badges += '<span class="pubBadge format">'+escHtml(FORMAT_LABELS[u.work_format.toLowerCase()] || u.work_format)+'</span>';
+      if (u.work_format) {
+        String(u.work_format).toLowerCase().split(',').forEach(function (formatCode) {
+          formatCode = formatCode.trim();
+          if (FORMAT_LABELS[formatCode]) badges += '<span class="pubBadge format">'+escHtml(FORMAT_LABELS[formatCode])+'</span>';
+        });
       }
       if (!isEmployer && u.looking_for_work) {
         badges += '<span class="pubBadge active">🟢 В поиске работы</span>';
       }
-      // Verification
+      // Verification: LOMO level = highest verified tier
+      // (L1 образование/курсы, L2 опыт, L3 паспорт) + дата проверки.
       var verCount = [u.edu_status,u.work_status,u.course_status,u.pass_status,u.cv_status].filter(function(s){return s==='verified';}).length;
-      if (verCount > 0) {
-        badges += '<span class="pubBadge verified">✓ LOMO Верификация</span>';
+      var verLevel = Number(u.verification_level || 0);
+      if (!verLevel && verCount > 0) {
+        verLevel = u.pass_status === 'verified' ? 3 : u.work_status === 'verified' ? 2 : 1;
       }
+      var verDateLabel = '';
+      if (u.verified_at) {
+        var verDate = new Date(u.verified_at);
+        if (isFinite(verDate.getTime())) {
+          verDateLabel = ('0' + verDate.getDate()).slice(-2) + '.' + ('0' + (verDate.getMonth() + 1)).slice(-2) + '.' + verDate.getFullYear();
+        }
+      }
+      if (verLevel > 0) {
+        badges += '<span class="pubBadge verified pubVerBadgeBtn" data-ver-badge role="button" tabindex="0" title="Что значит LOMO ' + verLevel + '?">✓ LOMO ' + verLevel
+          + (verDateLabel ? ' · проверено ' + escHtml(verDateLabel) : '') + '</span>';
+      }
+      var verTooltipHtml = verLevel > 0
+        ? '<div class="pubVerTooltip hidden" id="pubVerTooltip">'
+          + '<div class="pubVerTooltipTitle">Что значит LOMO ' + verLevel + '</div>'
+          + 'LOMO 1 — подтверждены образование или курсы. LOMO 2 — подтверждён опыт работы. LOMO 3 — личность подтверждена по паспорту (строгая проверка).'
+          + '</div>'
+        : '';
 
       // ── META PILLS (location, education, connections) ─────────────────
       var metaPills = '';
@@ -181,6 +205,34 @@
         ? '<div id="pubAccessPanel" class="pubProfileSection"><div class="miniHint">Загрузка…</div></div>'
         : '';
 
+      // ── ANONYMOUS VISITOR: locked contacts + sticky CTA bar ──────────
+      var isAnonVisitor = !(typeof getToken === 'function' && getToken() && state.userId);
+      var anonLockedHtml = '';
+      var stickyBarHtml = '';
+      if (!isEmployer && isAnonVisitor) {
+        anonLockedHtml =
+          '<div class="pubProfileSection pubLockedSection">' +
+            '<div class="pubLockedBlur" aria-hidden="true">' +
+              '<div class="pubLockedRow">📞 +7 9•• ••• ••-••</div>' +
+              '<div class="pubLockedRow">✉️ ••••••@••••••.ru</div>' +
+              '<div class="pubLockedRow">💰 Зарплатные ожидания</div>' +
+            '</div>' +
+            '<div class="pubLockedOverlay">🔒 Контакты и отклик доступны зарегистрированным работодателям</div>' +
+          '</div>';
+
+        var stickyTitle = verLevel > 0
+          ? 'Опыт ' + name + ' подтверждён документами — уровень LOMO ' + verLevel
+          : name + ' — кандидат на LOMO, платформе проверенных карьерных данных';
+        stickyBarHtml =
+          '<div class="pubStickyBar" id="pubStickyBar">' +
+            '<div class="pubStickyTitle">' + stickyTitle + '</div>' +
+            '<div class="pubStickyActions">' +
+              '<button type="button" class="accentBtn pubStickyPrimary" data-pub-reg="employer">Я работодатель — связаться с кандидатом</button>' +
+              '<button type="button" class="pubStickySecondary" data-pub-reg="candidate">Я специалист — подтвердить свой опыт</button>' +
+            '</div>' +
+          '</div>';
+      }
+
       // ── ADMIN FILES ───────────────────────────────────────────────────
       var adminFilesHtml = '';
       if (state.roleReg === 'ADMIN') {
@@ -212,6 +264,7 @@
               + '<div class="pubProfileName">'+name+'</div>'
               + (subtitle ? '<div class="pubProfileSubtitle">'+subtitle+'</div>' : '')
               + '<div class="pubProfileBadges">'+badges+'</div>'
+              + verTooltipHtml
             + '</div>'
             + (metaPills ? '<div class="pubProfileMetaRow">'+metaPills+'</div>' : '')
             + emptyHint
@@ -220,12 +273,14 @@
             + candidateSections
             + employerSections
             + verSection
+            + anonLockedHtml
             + publicCvHtml
             + connectionPanelHtml
             + employerAccessHtml
             + adminFilesHtml
           + '</div>'
-        + '</div>';
+        + '</div>'
+        + stickyBarHtml;
 
       if (!isEmployer) {
         renderExperience(profileExperienceItems);
@@ -527,4 +582,45 @@ if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initPublicProfileLocationRoute);
 } else {
   initPublicProfileLocationRoute();
+}
+
+// ── Public-profile funnel: badge tooltip + registration CTAs ─────────────
+document.addEventListener('click', function (event) {
+  var target = event.target;
+  if (!target || !target.closest) return;
+
+  var verBadge = target.closest('[data-ver-badge]');
+  if (verBadge) {
+    var tooltip = document.getElementById('pubVerTooltip');
+    if (tooltip) tooltip.classList.toggle('hidden');
+    return;
+  }
+
+  var regBtn = target.closest('[data-pub-reg]');
+  if (!regBtn) return;
+
+  var chosenRole = regBtn.getAttribute('data-pub-reg');
+  if (chosenRole === 'employer') {
+    // Come back to this candidate right after the employer signs up.
+    try {
+      if (_activePublicProfilePublicId) sessionStorage.setItem('lomo_reg_redirect', _activePublicProfilePublicId);
+    } catch (e) {}
+    state.roleReg = 'EMPLOYER';
+  } else {
+    state.roleReg = 'EMPLOYEE';
+  }
+  if (typeof pickInGroup === 'function') pickInGroup('roleChoices', state.roleReg);
+  show('regForm');
+});
+
+// Employer registered/logged in from a public profile → reopen that candidate.
+function consumePublicProfileRedirect() {
+  var publicId = '';
+  try {
+    publicId = sessionStorage.getItem('lomo_reg_redirect') || '';
+    if (publicId) sessionStorage.removeItem('lomo_reg_redirect');
+  } catch (e) {}
+  if (!publicId) return false;
+  openPublicProfileByPublicId(publicId);
+  return true;
 }

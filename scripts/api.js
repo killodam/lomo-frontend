@@ -343,6 +343,21 @@ async function apiSavePushToken(token, platform) {
   });
 }
 
+function apiSetOnboardingStep(step) {
+  return apiFetch('/auth/onboarding-step', {
+    method: 'POST',
+    body: JSON.stringify({ step: step }),
+  });
+}
+
+function apiDismissOnboardingChecklist() {
+  return apiFetch('/auth/onboarding-checklist-dismiss', { method: 'POST' });
+}
+
+function apiDismissCompletenessBanner() {
+  return apiFetch('/auth/completeness-banner-dismiss', { method: 'POST' });
+}
+
 async function apiForgotPassword(email) {
   return apiFetch('/auth/forgot-password', {
     method: 'POST',
@@ -458,6 +473,14 @@ function applyProfileToState(user, profile, achievements) {
   state.login = user.login || '';
   state.roleReg = user.role === 'employer' ? 'EMPLOYER' : user.role === 'admin' ? 'ADMIN' : 'EMPLOYEE';
   state.emailVerified = !!(user.emailVerified !== undefined ? user.emailVerified : user.email_verified);
+  if (user.onboarding_step !== undefined) {
+    state.onboarding = {
+      step: Number(user.onboarding_step) || 0,
+      checklistHiddenUntil: user.onboarding_checklist_hidden_until || null,
+      checklistDismissCount: Number(user.onboarding_checklist_dismiss_count) || 0,
+      bannerHiddenUntil: user.completeness_banner_hidden_until || null,
+    };
+  }
   if (profile && profile.public_id) state.publicId = profile.public_id;
   if (!profile) return;
 
@@ -493,6 +516,9 @@ function applyProfileToState(user, profile, achievements) {
       eduPlace: profile.edu_place || '',
       eduYear: profile.edu_year || '',
       vacancies: profile.vacancies || '',
+      skills: profile.skills || '',
+      grade: profile.grade || '',
+      workFormat: profile.work_format || '',
       courseVerificationUrl: profile.course_verification_url || '',
       linkedinUrl: profile.linkedin_url || '',
       hhUrl: profile.hh_url || '',
@@ -558,6 +584,7 @@ async function tryAutoLogin() {
   try {
     const { user, profile, achievements } = await apiMe();
     applyProfileToState(user, profile, achievements);
+    if (typeof pruneStaleLocalStorage === 'function') pruneStaleLocalStorage(state.userId);
     saveToStorage();
     return user;
   } catch {

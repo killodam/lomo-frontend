@@ -204,6 +204,7 @@ function renderEmployeePublic() {
     return isProofVerified(epProofs[k]);
   });
   if (typeof showVerifBannerIfNeeded === 'function') showVerifBannerIfNeeded('epVerifBanner', epIsVerified);
+  if (typeof renderLomoBadgeSection === 'function') renderLomoBadgeSection();
 }
 
 function escapeHtml(value) {
@@ -400,6 +401,14 @@ function hydrateEmployeeForm() {
   setVal('mpCEduPlace', p.eduPlace);
   setVal('mpCEduYear', p.eduYear);
   setVal('mpCVacancies', p.vacancies);
+  setVal('mpCSkills', p.skills);
+  const gradeSelect = document.getElementById('mpCGrade');
+  if (gradeSelect) gradeSelect.value = String(p.grade || '').toLowerCase();
+  const savedFormats = String(p.workFormat || '').toLowerCase().split(',');
+  [['mpCFormatRemote', 'remote'], ['mpCFormatOffice', 'office'], ['mpCFormatHybrid', 'hybrid']].forEach(function (pair) {
+    const box = document.getElementById(pair[0]);
+    if (box) box.checked = savedFormats.indexOf(pair[1]) !== -1;
+  });
   setVal('mpCCourseVerificationUrl', p.courseVerificationUrl);
   setVal('mpCLinkedinUrl', p.linkedinUrl);
   setVal('mpCHhUrl', p.hhUrl);

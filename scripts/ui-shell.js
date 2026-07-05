@@ -300,6 +300,7 @@ function bindStaticUiActions() {
 }
 
 function showEmployerDashboard(options) {
+  if (typeof consumePublicProfileRedirect === 'function' && consumePublicProfileRedirect()) return;
   show('employerSearch', options || {});
 }
 
@@ -363,5 +364,6 @@ if (verifyLevelModalEl) {
 
 bindStaticUiActions();
 
-// Sweep stale storage left from previous sessions (no keepUserId = clean all lomo_ localStorage keys now)
-if (typeof pruneStaleLocalStorage === 'function') pruneStaleLocalStorage(null);
+// Startup sweep is intentionally gone: an unconditional prune here wiped the
+// theme and the favourites of the user about to log in. Stale keys of other
+// users are removed on logout (pruneStaleLocalStorage) and after login below.

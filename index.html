@@ -849,6 +849,21 @@
           <div class="sqInput"><input id="mpCEduYear" type="text" placeholder="Год окончания (2026)" autocomplete="off"></div>
           <div class="sqInput"><input id="mpCVacancies" type="text" placeholder="Какие вакансии ищу (Data Analyst, Product)" autocomplete="off"></div>
           <div class="sqInput"><input id="mpCSalary" type="text" placeholder="Зарплатные ожидания (от 120 000 ₽)" autocomplete="off"></div>
+          <div class="sqInput"><input id="mpCSkills" type="text" placeholder="Навыки через запятую (Python, SQL, Figma)" autocomplete="off"></div>
+          <div class="sqInput">
+            <select id="mpCGrade">
+              <option value="">Грейд — не выбран</option>
+              <option value="junior">Junior</option>
+              <option value="middle">Middle</option>
+              <option value="senior">Senior</option>
+              <option value="lead">Lead</option>
+            </select>
+          </div>
+          <div class="formatCheckRow" id="mpCFormatRow">
+            <label class="formatCheck"><input type="checkbox" id="mpCFormatRemote"> Удалённо</label>
+            <label class="formatCheck"><input type="checkbox" id="mpCFormatOffice"> Офис</label>
+            <label class="formatCheck"><input type="checkbox" id="mpCFormatHybrid"> Гибрид</label>
+          </div>
         </div>
         <label class="lookingToggleRow" id="lookingToggleRowC">
           <span class="lookingToggleText">
@@ -1108,6 +1123,7 @@
         <span class="badge lookingBadge hidden" id="epLookingBadge">🟢 Активно ищет работу</span>
       </div>
     </div>
+    <div class="onbChecklist hidden" id="onbChecklist"></div>
     <div class="profileSection profileProgress" id="epProgress">
       <div class="progressBar"><div class="progressFill" id="epProgressFill"></div></div>
       <div class="progressLabel" id="epProgressLabel">Профиль 10% — начните с себя</div>
@@ -1160,6 +1176,11 @@
         <span class="miniHint" id="epCvHint">—</span>
       </div>
     </div>
+    <div class="profileSection hidden" id="epBadgeSection">
+      <div class="profileSectionHead">Ваш значок LOMO</div>
+      <div class="epBadgeIntro">Вставьте значок в резюме, профиль LinkedIn или подпись почты. Рекрутер перейдёт по ссылке и увидит, что ваш опыт проверен — это выделяет отклик среди сотен неподтверждённых.</div>
+      <div class="epBadgeFormats" id="epBadgeFormats"></div>
+    </div>
     <div class="profileSection">
       <div class="profileSectionHead">Запросы работодателей</div>
       <div class="achList" id="epRequestsList"><div class="miniHint">Запросов пока нет</div></div>
@@ -1199,6 +1220,7 @@
         </div>
         <nav class="feedHeaderNav">
           <button type="button" class="feedNavBtn adminBackBtn hidden" id="feedAdminBackBtn">← Админ</button>
+          <button type="button" class="feedNavBtn bellBtn js-bell" aria-label="Уведомления">🔔<span class="bellBadge hidden"></span></button>
           <button type="button" class="feedNavBtn" data-next="toChatHub">Чаты</button>
           <button type="button" class="feedNavBtn accent" id="feedMyProfileBtn">Мой профиль</button>
           <button type="button" class="feedNavBtn ghost" data-next="toAuthFromProfile">Выйти</button>
@@ -1241,6 +1263,11 @@
             <option value="verified">verified</option>
           </select>
         </div>
+      </div>
+      <div class="completenessBanner hidden" id="feedCompletenessBanner">
+        <span class="completenessBannerText" id="feedCompletenessText"></span>
+        <button type="button" class="completenessBannerBtn" id="feedCompletenessFill">Дозаполнить</button>
+        <button type="button" class="completenessBannerClose" id="feedCompletenessClose" aria-label="Закрыть">×</button>
       </div>
       <div class="feedContent">
         <div id="candidateFeedList" class="feedListWrap"></div>
@@ -1307,6 +1334,7 @@
         </div>
         <nav class="feedHeaderNav">
           <button type="button" class="feedNavBtn adminBackBtn hidden" id="empAdminBackBtn">← Админ</button>
+          <button type="button" class="feedNavBtn bellBtn js-bell" aria-label="Уведомления">🔔<span class="bellBadge hidden"></span></button>
           <button type="button" class="feedNavBtn" data-next="toChatHub">Чаты</button>
           <button type="button" class="feedNavBtn accent" id="searchCompanyProfileBtn">Профиль компании</button>
           <button type="button" class="feedNavBtn ghost" data-next="toAuthFromProfile">Выйти</button>
@@ -1680,16 +1708,88 @@
 <button aria-label="Back" class="backBtn" data-back="toPrevFromDone">← Назад</button>
 <div class="doneWrap doneWrapNew">
 
-  <!-- Candidate welcome (default) -->
+  <!-- Candidate onboarding wizard (3 steps) -->
   <div class="doneView" id="doneViewCandidate">
-    <div class="doneIconBig">✓</div>
-    <div class="doneTitle" id="doneText">Добро пожаловать в LOMO!</div>
-    <div class="doneSub">Ваш аккаунт создан. Заполните профиль и загрузите документы для верификации.</div>
-    <div class="doneOnboard hidden" id="doneOnboard">
-      <div class="doneOnboardTitle" id="doneOnboardTitle"></div>
-      <ol class="doneOnboardSteps" id="doneOnboardSteps"></ol>
+    <div class="onbProgress" id="onbProgress">
+      <span class="onbDot" data-onb-dot="1"></span>
+      <span class="onbDot" data-onb-dot="2"></span>
+      <span class="onbDot" data-onb-dot="3"></span>
+      <span class="onbStepLabel" id="onbStepLabel">Шаг 1 из 3</span>
     </div>
-    <button class="accentBtn doneCtaBtn" data-next="toDashboard" id="doneCta">Перейти в профиль →</button>
+
+    <div class="onbStep" id="onbStep1">
+      <div class="doneIconBig">✓</div>
+      <div class="doneTitle" id="onbWelcomeTitle">Добро пожаловать в LOMO</div>
+      <div class="doneSub">Здесь работодатели видят только проверенных кандидатов. Три коротких шага — и ваш профиль начнёт работать на вас.</div>
+      <button type="button" class="accentBtn doneCtaBtn" id="onbStep1Next">Начать →</button>
+      <button type="button" class="onbGhostLink" id="onbSkipAll">Пропустить, настрою позже</button>
+    </div>
+
+    <div class="onbStep hidden" id="onbStep2">
+      <div class="doneTitle">Пара слов о вас</div>
+      <div class="doneSub">Эти данные попадут в профиль и в AI-подбор работодателей. Всё можно изменить позже.</div>
+      <div class="onbForm">
+        <label class="onbFieldLabel" for="onbJobInput">Желаемая должность</label>
+        <div class="sqInput"><input id="onbJobInput" type="text" placeholder="Например: Frontend-разработчик" autocomplete="off"></div>
+        <div class="onbInlineError hidden" id="onbJobError">Укажите должность — без неё AI-подбор не сможет вас порекомендовать</div>
+        <div class="onbFieldLabel">Грейд</div>
+        <div class="onbChipRow" id="onbGradeChips">
+          <button type="button" class="onbChip" data-onb-grade="junior">Junior</button>
+          <button type="button" class="onbChip" data-onb-grade="middle">Middle</button>
+          <button type="button" class="onbChip" data-onb-grade="senior">Senior</button>
+          <button type="button" class="onbChip" data-onb-grade="lead">Lead</button>
+        </div>
+        <div class="onbFieldLabel">Формат работы</div>
+        <div class="onbChipRow" id="onbFormatChips">
+          <button type="button" class="onbChip" data-onb-format="remote">Удалённо</button>
+          <button type="button" class="onbChip" data-onb-format="office">Офис</button>
+          <button type="button" class="onbChip" data-onb-format="hybrid">Гибрид</button>
+        </div>
+        <label class="lookingToggleRow onbLookingRow">
+          <span class="lookingToggleText">
+            <span class="lookingToggleTitle">Активно ищу работу</span>
+            <span class="lookingToggleSub">Работодатели увидят зелёную метку и найдут вас быстрее</span>
+          </span>
+          <span class="lookingToggleControl">
+            <input type="checkbox" id="onbLookingToggle" class="lookingToggleInput">
+            <span class="lookingToggleTrack"><span class="lookingToggleThumb"></span></span>
+          </span>
+        </label>
+      </div>
+      <button type="button" class="accentBtn doneCtaBtn" id="onbStep2Next">Дальше →</button>
+    </div>
+
+    <div class="onbStep hidden" id="onbStep3">
+      <div class="doneTitle">Загрузите первый документ на проверку</div>
+      <div class="doneSub">Диплом, трудовая книжка или сертификат — подойдёт фото или скан. Модератор проверит его и поставит отметку ✓ LOMO. Верифицированные профили работодатели видят в первую очередь.</div>
+      <div class="onbChipRow onbDocTypeRow" id="onbDocTypeChips">
+        <button type="button" class="onbChip selected" data-onb-doctype="education">Диплом</button>
+        <button type="button" class="onbChip" data-onb-doctype="work">Трудовая книжка</button>
+        <button type="button" class="onbChip" data-onb-doctype="courses">Сертификат</button>
+      </div>
+      <div class="dropZone onbDropZone" id="onbDropZone">Перетащите файл сюда</div>
+      <input class="fileInput" id="onbFileInput" type="file" accept=".pdf,.jpg,.jpeg,.png,image/jpeg,image/png,application/pdf"/>
+      <button type="button" class="sqBtn onbPickBtn" id="onbPickFileBtn">Выбрать файл</button>
+      <div class="miniHint onbFineprint">PDF, JPG или PNG до 10 МБ. Документы видны только модератору — работодатель получает доступ лишь с вашего разрешения.</div>
+      <div class="onbUploading hidden" id="onbUploading">Загружаем файл…</div>
+      <div class="onbInlineError hidden" id="onbUploadError">Не удалось загрузить файл. Проверьте, что он меньше 10 МБ, и попробуйте ещё раз.</div>
+      <button type="button" class="sqBtn hidden" id="onbRetryBtn">Повторить</button>
+      <button type="button" class="onbGhostLink" id="onbSkipDoc">Загружу позже</button>
+    </div>
+
+    <div class="onbStep hidden" id="onbStepSuccess">
+      <div class="doneIconBig">✓</div>
+      <div class="doneTitle">Документ отправлен на проверку</div>
+      <div class="doneSub">Обычно проверка занимает до 2 рабочих дней. Мы пришлём письмо, когда модератор закончит.</div>
+      <button type="button" class="accentBtn doneCtaBtn" id="onbGoProfile">Перейти в профиль →</button>
+    </div>
+  </div>
+
+  <!-- Plain message view (password reset success etc.) -->
+  <div class="doneView hidden" id="doneViewMessage">
+    <div class="doneIconBig">✓</div>
+    <div class="doneTitle" id="doneText">Готово</div>
+    <button type="button" class="accentBtn doneCtaBtn" id="doneMsgCta">Продолжить →</button>
   </div>
 
   <!-- Employer welcome (shown via JS) -->
@@ -1928,6 +2028,12 @@
 
 <!-- TOAST -->
 <div id="toast" class="toast"></div>
+
+<!-- Notifications bell dropdown (shared by all headers) -->
+<div id="bellDropdown" class="bellDropdown hidden" aria-label="Уведомления">
+  <div class="bellDropdownHead">Уведомления</div>
+  <div id="bellDropdownList" class="bellDropdownList"></div>
+</div>
 
 <!-- ═══════════════════════════════════════════════════
      INFO SCREENS — fullscreen pages for burger menu
@@ -2667,6 +2773,7 @@
 <script defer src="./scripts/runtime.js?v=26"></script>
 <script defer src="./scripts/api.js?v=26"></script>
 <script defer src="./scripts/state.js?v=26"></script>
+<script defer src="./scripts/profile-completeness.js?v=26"></script>
 <script defer src="./scripts/social-card.js?v=26"></script>
 <script defer src="./scripts/screens.js?v=26"></script>
 <script defer src="./scripts/push-notifications.js?v=26"></script>
@@ -2678,6 +2785,9 @@
 <script defer src="./scripts/chat.js?v=26"></script>
 <script defer src="./scripts/auth-ui.js?v=26"></script>
 <script defer src="./scripts/profile-runtime.js?v=26"></script>
+<script defer src="./scripts/onboarding.js?v=26"></script>
+<script defer src="./scripts/notifications-ui.js?v=26"></script>
+<script defer src="./scripts/lomo-badge.js?v=26"></script>
 <script defer src="./scripts/ui-shell.js?v=26"></script>
 <script defer src="./scripts/admin-ui-bindings.js?v=26"></script>
 <script defer src="./scripts/info-screens.js?v=26"></script>

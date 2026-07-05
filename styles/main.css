@@ -677,3 +677,146 @@ body,
     width: 100%;
   }
 }
+
+/* ===== CANDIDATE ONBOARDING WIZARD (screenDone) ===== */
+.onbProgress{ display:flex; align-items:center; justify-content:center; gap:8px; margin-bottom:18px; }
+.onbProgress.hidden{ display:none; }
+.onbDot{ width:8px; height:8px; border-radius:50%; background:rgba(38,110,120,.18); transition:background .2s ease; }
+.onbDot.active{ background:#2a7a8a; }
+.onbStepLabel{ font-size:12px; font-weight:700; color:#2a7a8a; margin-left:6px; }
+.onbStep{ display:flex; flex-direction:column; align-items:center; gap:14px; }
+.onbStep.hidden{ display:none; }
+.onbForm{ width:100%; max-width:420px; display:flex; flex-direction:column; gap:10px; text-align:left; }
+.onbFieldLabel{ font-size:12px; font-weight:700; color:#2a7a8a; margin-top:4px; }
+.onbChipRow{ display:flex; flex-wrap:wrap; gap:8px; }
+.onbChip{ font-size:13px; font-weight:600; padding:8px 16px; border-radius:999px; border:1px solid rgba(38,110,120,.18); background:rgba(235,248,250,.6); color:#1a5c68; cursor:pointer; transition:all .15s ease; }
+.onbChip:hover{ border-color:rgba(38,110,120,.42); }
+.onbChip.selected{ background:rgba(38,110,120,.16); border-color:#2a7a8a; box-shadow:0 0 0 1px #2a7a8a inset; }
+.onbInlineError{ font-size:12px; color:#b91c1c; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.25); border-radius:10px; padding:8px 12px; line-height:1.4; }
+.onbInlineError.hidden{ display:none; }
+.onbGhostLink{ background:none; border:none; font-size:13px; color:#2a7a8a; text-decoration:underline; cursor:pointer; padding:6px; }
+.onbGhostLink:hover{ opacity:.75; }
+.onbLookingRow{ margin-top:6px; }
+.onbDocTypeRow{ justify-content:center; }
+.onbDropZone{ width:100%; max-width:420px; padding:28px 16px; text-align:center; border:2px dashed rgba(38,110,120,.28); border-radius:14px; cursor:pointer; font-size:13px; }
+.onbPickBtn{ min-width:160px; }
+.onbFineprint{ max-width:420px; text-align:center; line-height:1.4; }
+.onbUploading{ font-size:13px; font-weight:700; color:#2a7a8a; }
+.onbUploading.hidden{ display:none; }
+
+/* ===== ONBOARDING RETURN CHECKLIST (candidate profile) ===== */
+.onbChecklist{ margin:12px 0 16px; padding:14px 16px; border:1px solid rgba(38,110,120,.18); border-radius:14px; background:rgba(235,248,250,.55); }
+.onbChecklist.hidden{ display:none; }
+.onbChecklistHead{ display:flex; align-items:center; justify-content:space-between; margin-bottom:8px; }
+.onbChecklistTitle{ font-size:14px; font-weight:800; color:#1a5c68; }
+.onbChecklistClose{ background:none; border:none; font-size:18px; line-height:1; color:#2a7a8a; cursor:pointer; padding:2px 6px; }
+.onbChecklistItem{ font-size:13px; color:#333; padding:4px 0; }
+.onbChecklistItem.done{ color:#2a7a8a; }
+.onbChecklistLink{ background:none; border:none; font-size:13px; font-weight:700; color:#1a5c68; text-decoration:underline; cursor:pointer; padding:0; }
+.onbChecklistLink:hover{ opacity:.75; }
+
+:root[data-theme="dark"] .onbChip{ background:rgba(56,178,172,.10); color:#9ee8e0; border-color:rgba(78,205,196,.28); }
+:root[data-theme="dark"] .onbChip.selected{ background:rgba(56,178,172,.22); border-color:#4ecdc4; box-shadow:0 0 0 1px #4ecdc4 inset; }
+:root[data-theme="dark"] .onbFieldLabel,
+:root[data-theme="dark"] .onbStepLabel,
+:root[data-theme="dark"] .onbUploading,
+:root[data-theme="dark"] .onbGhostLink{ color:#66ddd4; }
+:root[data-theme="dark"] .onbChecklist{ background:rgba(56,178,172,.08); border-color:rgba(78,205,196,.25); }
+:root[data-theme="dark"] .onbChecklistTitle,
+:root[data-theme="dark"] .onbChecklistLink{ color:#9ee8e0; }
+:root[data-theme="dark"] .onbChecklistItem{ color:#c9d4d6; }
+:root[data-theme="dark"] .onbChecklistItem.done{ color:#66ddd4; }
+:root[data-theme="dark"] .onbChecklistClose{ color:#66ddd4; }
+
+/* Candidate profile edit: work format checkboxes */
+.formatCheckRow{ display:flex; flex-wrap:wrap; gap:10px; padding:2px 4px; }
+.formatCheck{ display:flex; align-items:center; gap:6px; font-size:13px; font-weight:600; color:#1a5c68; cursor:pointer; padding:8px 14px; border:1px solid rgba(38,110,120,.18); border-radius:999px; background:rgba(235,248,250,.6); }
+.formatCheck input[type="checkbox"]{ accent-color:#2a7a8a; }
+:root[data-theme="dark"] .formatCheck{ background:rgba(56,178,172,.10); color:#9ee8e0; border-color:rgba(78,205,196,.28); }
+
+/* ===== PROFILE COMPLETENESS (Feature 2) ===== */
+.profileProgress.expandable .progressLabel{ cursor:pointer; text-decoration:underline dotted; text-underline-offset:3px; }
+.profileProgress.expandable .progressHints{ display:none; }
+.profileProgress.expandable.open .progressHints{ display:flex; }
+.progressHintLink{ background:none; border:none; text-align:left; cursor:pointer; padding:2px 0; color:#1a5c68; font-size:11px; text-decoration:underline; text-underline-offset:2px; display:flex; align-items:center; gap:6px; }
+.progressHintLink:hover{ opacity:.75; }
+.progressHintPending{ color:#8a8f98 !important; }
+.progressHintTag{ font-size:10px; font-weight:700; color:#92400e; background:rgba(245,158,11,.12); border:1px solid rgba(245,158,11,.28); border-radius:999px; padding:1px 8px; }
+
+.completenessBanner{ display:flex; align-items:center; gap:10px; margin:0 auto 12px; max-width:960px; padding:10px 14px; border:1px solid rgba(245,158,11,.28); border-radius:12px; background:rgba(245,158,11,.10); }
+.completenessBanner.hidden{ display:none; }
+.completenessBannerText{ flex:1; font-size:13px; color:#92400e; line-height:1.4; }
+.completenessBannerBtn{ flex-shrink:0; font-size:12px; font-weight:700; padding:7px 14px; border-radius:999px; border:1px solid rgba(245,158,11,.4); background:rgba(245,158,11,.16); color:#92400e; cursor:pointer; }
+.completenessBannerBtn:hover{ background:rgba(245,158,11,.26); }
+.completenessBannerClose{ flex-shrink:0; background:none; border:none; font-size:18px; line-height:1; color:#92400e; cursor:pointer; padding:2px 6px; }
+:root[data-theme="dark"] .completenessBanner{ background:rgba(245,158,11,.10); border-color:rgba(245,158,11,.30); }
+:root[data-theme="dark"] .completenessBannerText,
+:root[data-theme="dark"] .completenessBannerBtn,
+:root[data-theme="dark"] .completenessBannerClose{ color:#fbbf24; }
+:root[data-theme="dark"] .progressHintLink{ color:#9ee8e0; }
+
+/* ===== NOTIFICATIONS BELL (Feature 3) ===== */
+.bellBtn{ position:relative; }
+.bellBadge{ position:absolute; top:-4px; right:-4px; min-width:16px; height:16px; padding:0 4px; border-radius:999px; background:#ef4444; color:#fff; font-size:10px; font-weight:800; line-height:16px; text-align:center; }
+.bellBadge.hidden{ display:none; }
+.bellDropdown{ position:fixed; z-index:1200; background:#fff; border:1px solid rgba(38,110,120,.18); border-radius:14px; box-shadow:0 20px 60px rgba(38,110,120,.18); overflow:hidden; }
+.bellDropdown.hidden{ display:none; }
+.bellDropdownHead{ font-size:13px; font-weight:800; color:#1a5c68; padding:12px 14px; border-bottom:1px solid rgba(38,110,120,.10); }
+.bellDropdownList{ max-height:380px; overflow-y:auto; }
+.bellEmpty{ padding:24px 14px; text-align:center; font-size:13px; color:#8a8f98; }
+.bellItem{ padding:10px 14px; border-bottom:1px solid rgba(38,110,120,.08); }
+.bellItem:last-child{ border-bottom:none; }
+.bellItem.unread{ background:rgba(38,110,120,.05); }
+.bellItemLink{ cursor:pointer; }
+.bellItemLink:hover{ background:rgba(38,110,120,.08); }
+.bellItemText{ font-size:13px; color:#222; line-height:1.4; }
+.bellItemTime{ display:block; margin-top:4px; font-size:11px; color:#8a8f98; }
+.bellItemActions{ display:flex; gap:8px; margin-top:8px; }
+.bellItemBtn{ font-size:12px; font-weight:700; padding:6px 12px; border-radius:999px; border:1px solid rgba(38,110,120,.22); background:rgba(235,248,250,.7); color:#1a5c68; cursor:pointer; }
+.bellItemBtn.ok{ background:rgba(38,110,120,.14); border-color:#2a7a8a; }
+.bellItemBtn:hover{ opacity:.85; }
+:root[data-theme="dark"] .bellDropdown{ background:#101b1e; border-color:rgba(78,205,196,.25); }
+:root[data-theme="dark"] .bellDropdownHead{ color:#9ee8e0; border-color:rgba(78,205,196,.15); }
+:root[data-theme="dark"] .bellItem{ border-color:rgba(78,205,196,.10); }
+:root[data-theme="dark"] .bellItem.unread{ background:rgba(56,178,172,.10); }
+:root[data-theme="dark"] .bellItemText{ color:#d6e4e6; }
+:root[data-theme="dark"] .bellItemBtn{ background:rgba(56,178,172,.12); color:#9ee8e0; border-color:rgba(78,205,196,.3); }
+
+/* Admin reject reason select */
+.rejectSelect{ font-size:13px; padding:8px 10px; border-radius:10px; border:1px solid rgba(38,110,120,.22); background:#fff; color:#222; max-width:220px; }
+:root[data-theme="dark"] .rejectSelect{ background:#101b1e; color:#d6e4e6; border-color:rgba(78,205,196,.3); }
+.rejectInput.hidden{ display:none; }
+
+/* ===== PUBLIC PROFILE FUNNEL (Feature 4) ===== */
+.pubVerBadgeBtn{ cursor:pointer; }
+.pubVerTooltip{ margin-top:8px; font-size:12px; line-height:1.5; color:#1a5c68; background:rgba(38,110,120,.08); border:1px solid rgba(38,110,120,.18); border-radius:10px; padding:10px 12px; max-width:480px; }
+.pubVerTooltip.hidden{ display:none; }
+.pubVerTooltipTitle{ font-weight:800; margin-bottom:4px; }
+
+.pubLockedSection{ position:relative; overflow:hidden; }
+.pubLockedBlur{ filter:blur(5px); user-select:none; pointer-events:none; display:flex; flex-direction:column; gap:8px; padding:6px 0; }
+.pubLockedRow{ font-size:14px; color:#555; }
+.pubLockedOverlay{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; text-align:center; padding:12px; font-size:13px; font-weight:700; color:#1a5c68; background:rgba(255,255,255,.55); border-radius:inherit; }
+:root[data-theme="dark"] .pubLockedOverlay{ background:rgba(10,20,22,.55); color:#9ee8e0; }
+
+.pubStickyBar{ position:fixed; left:0; right:0; bottom:0; z-index:1100; display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:10px 16px; padding:12px 16px calc(12px + env(safe-area-inset-bottom, 0px)); background:rgba(255,255,255,.96); border-top:1px solid rgba(38,110,120,.18); box-shadow:0 -12px 40px rgba(38,110,120,.12); backdrop-filter:blur(10px); }
+.pubStickyTitle{ font-size:14px; font-weight:800; color:#134050; text-align:center; }
+.pubStickyActions{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; }
+.pubStickyPrimary{ font-size:13px; padding:10px 18px; }
+.pubStickySecondary{ background:none; border:none; font-size:13px; font-weight:600; color:#2a7a8a; text-decoration:underline; text-underline-offset:2px; cursor:pointer; padding:8px 6px; }
+.pubStickySecondary:hover{ opacity:.75; }
+:root[data-theme="dark"] .pubStickyBar{ background:rgba(10,20,22,.94); border-color:rgba(78,205,196,.25); }
+:root[data-theme="dark"] .pubStickyTitle{ color:#d6e4e6; }
+:root[data-theme="dark"] .pubStickySecondary{ color:#66ddd4; }
+/* keep the sticky bar from covering the last section */
+#screenPublicProfile .pubProfileCard{ margin-bottom:120px; }
+
+/* ===== LOMO BADGE BLOCK (own candidate profile) ===== */
+.epBadgeIntro{ font-size:13px; color:#555; line-height:1.5; margin-bottom:12px; }
+:root[data-theme="dark"] .epBadgeIntro{ color:#c9d4d6; }
+.epBadgeFormats{ display:flex; flex-direction:column; gap:14px; }
+.epBadgeFormat{ display:flex; flex-direction:column; gap:6px; align-items:flex-start; }
+.epBadgeFormatLabel{ font-size:12px; font-weight:700; color:#2a7a8a; }
+.epBadgePreview{ font-size:13px; line-height:1.5; color:#222; background:rgba(38,110,120,.06); border:1px solid rgba(38,110,120,.14); border-radius:10px; padding:10px 12px; width:100%; word-break:break-all; }
+.epBadgePreviewSvg{ word-break:normal; }
+:root[data-theme="dark"] .epBadgePreview{ color:#d6e4e6; background:rgba(56,178,172,.08); border-color:rgba(78,205,196,.2); }
