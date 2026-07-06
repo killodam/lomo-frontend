@@ -315,7 +315,7 @@ function appendAdminQueueDocument(parent, doc) {
   docCard.id = 'acard_' + doc.id;
   var reviewLevel = Number(doc.review_level || 0);
   var reviewLevelHtml = reviewLevel
-    ? '<span class="reviewLevelBadge l' + reviewLevel + '">L' + reviewLevel + '</span>'
+    ? '<span class="reviewLevelBadge l' + reviewLevel + '">P' + reviewLevel + '</span>'
     : '';
 
   docCard.innerHTML =
@@ -405,7 +405,7 @@ function appendAdminQueueUserCard(listEl, group) {
   var displayName = group.full_name || group.user_email || 'Пользователь LOMO';
   var reviewLevel = Number(group.review_level || 0);
   var reviewLevelHtml = reviewLevel
-    ? '<span class="reviewLevelBadge l' + reviewLevel + '">L' + reviewLevel + '</span>'
+    ? '<span class="reviewLevelBadge l' + reviewLevel + '">P' + reviewLevel + '</span>'
     : '';
   var docs = Array.isArray(group.documents) ? group.documents : [];
   var docsCount = Number(group.documents_count || docs.length || 0);
@@ -1019,6 +1019,14 @@ function updateProfileProgress() {
     }).join('');
   }
   if (progressBox) progressBox.classList.toggle('expandable', pct < 100 && undone.length > 0);
+
+  // Подсказка следующего шага к уровню LOMO (email → личность → опыт/образование)
+  var lomoHintEl = document.getElementById('epLomoHint');
+  if (lomoHintEl && typeof lomoNextStepHint === 'function') {
+    var lomoHint = lomoNextStepHint();
+    lomoHintEl.textContent = lomoHint;
+    lomoHintEl.classList.toggle('hidden', !lomoHint);
+  }
 
   if (banner) banner.classList.toggle('hidden', pct >= 100);
   var firstActionable = undone.filter(function (item) { return !item.pending; })[0] || undone[0];

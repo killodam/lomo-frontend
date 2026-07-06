@@ -104,13 +104,12 @@
       if (!isEmployer && u.looking_for_work) {
         badges += '<span class="pubBadge active">🟢 В поиске работы</span>';
       }
-      // Verification: LOMO level = highest verified tier
-      // (L1 образование/курсы, L2 опыт, L3 паспорт) + дата проверки.
+      // Verification: кумулятивный уровень LOMO (1 — email, 2 — личность,
+      // 3 — опыт/образование). Источник истины — сервер (verification_level
+      // из /api/public/profile или lomo_level из ленты); клиентского
+      // фолбэка по статусам документов нет намеренно.
       var verCount = [u.edu_status,u.work_status,u.course_status,u.pass_status,u.cv_status].filter(function(s){return s==='verified';}).length;
-      var verLevel = Number(u.verification_level || 0);
-      if (!verLevel && verCount > 0) {
-        verLevel = u.pass_status === 'verified' ? 3 : u.work_status === 'verified' ? 2 : 1;
-      }
+      var verLevel = Number(u.verification_level !== undefined ? u.verification_level : u.lomo_level) || 0;
       var verDateLabel = '';
       if (u.verified_at) {
         var verDate = new Date(u.verified_at);
@@ -125,7 +124,7 @@
       var verTooltipHtml = verLevel > 0
         ? '<div class="pubVerTooltip hidden" id="pubVerTooltip">'
           + '<div class="pubVerTooltipTitle">Что значит LOMO ' + verLevel + '</div>'
-          + 'LOMO 1 — подтверждены образование или курсы. LOMO 2 — подтверждён опыт работы. LOMO 3 — личность подтверждена по паспорту (строгая проверка).'
+          + 'LOMO 1 — подтверждена электронная почта. LOMO 2 — подтверждена личность. LOMO 3 — подтверждены опыт работы и образование.'
           + '</div>'
         : '';
 

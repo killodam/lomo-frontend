@@ -51,10 +51,12 @@
 
   function buildVerificationBadge(user) {
     var verificationStatuses = [user.edu_status, user.work_status, user.course_status, user.pass_status, user.cv_status];
-    var verifiedCount = verificationStatuses.filter(function (status) { return status === 'verified'; }).length;
     var pendingCount = verificationStatuses.filter(function (status) { return status === 'pending'; }).length;
+    // Кумулятивный уровень (LOMO 1 email → 2 личность → 3 опыт/образование)
+    // считает сервер; бейдж показываем только кандидатам.
+    var lomoLevel = user.role === 'employer' ? 0 : Number(user.lomo_level || 0);
 
-    if (verifiedCount > 0) return createElement('span', 'scVerBadge', '✓ LOMO ' + verifiedCount);
+    if (lomoLevel > 0) return createElement('span', 'scVerBadge', '✓ LOMO ' + lomoLevel);
     if (pendingCount > 0) return createElement('span', 'scVerBadge pending', 'Проверяется');
     return null;
   }
@@ -122,12 +124,18 @@
 
   function appendCandidateDetails(parent, user) {
     var vacancies;
+    var skills;
 
     appendVerifiedItems(parent, user);
 
     if (user.vacancies) {
       vacancies = user.vacancies.split(',').map(function (item) { return item.trim(); }).filter(Boolean).slice(0, 3);
       appendChipRow(parent, 'compact', 'Ищу:', vacancies, 'scProject');
+    }
+
+    if (user.skills) {
+      skills = String(user.skills).split(/[,;]+/).map(function (item) { return item.trim(); }).filter(Boolean).slice(0, 4);
+      appendChipRow(parent, 'compact', 'Навыки:', skills, 'scProject');
     }
   }
 

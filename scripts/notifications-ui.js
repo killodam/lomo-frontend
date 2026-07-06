@@ -65,8 +65,11 @@ function bellItemHtml(item) {
     '</div>';
   }
   if (item.type === 'doc_verified') {
+    var levelText = Number(payload.level) > 0
+      ? ' Ваш уровень: LOMO ' + escapeHtml(String(payload.level))
+      : (payload.hint ? ' ' + escapeHtml(payload.hint) : '');
     return '<div class="bellItem' + unreadClass + ' bellItemLink" data-bell-goto="profile">' +
-      '<div class="bellItemText">Документ „' + escapeHtml(payload.label || 'документ') + '“ проверен ✓ Ваш уровень: LOMO ' + escapeHtml(String(payload.level || 1)) + '</div>' + time +
+      '<div class="bellItemText">Документ „' + escapeHtml(payload.label || 'документ') + '“ проверен ✓' + levelText + '</div>' + time +
     '</div>';
   }
   if (item.type === 'doc_rejected') {

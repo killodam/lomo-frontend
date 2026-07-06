@@ -80,8 +80,8 @@ function computeProfileCompleteness(input) {
   add('verify', 15, src.hasVerifiedDoc ? 15 : 0,
     verifyPending
       ? '+15% — пройдите верификацию: документ уже на проверке'
-      : '+15% — получите бейдж ✓ LOMO (нужен проверенный документ)',
-    'получите бейдж ✓ LOMO', 'tabCDocs', verifyPending);
+      : '+15% — пройдите проверку: загрузите документ и дождитесь модерации',
+    'пройдите проверку документа', 'tabCDocs', verifyPending);
 
   var total = 0;
   var earnedTotal = 0;

@@ -820,3 +820,130 @@ body,
 .epBadgePreview{ font-size:13px; line-height:1.5; color:#222; background:rgba(38,110,120,.06); border:1px solid rgba(38,110,120,.14); border-radius:10px; padding:10px 12px; width:100%; word-break:break-all; }
 .epBadgePreviewSvg{ word-break:normal; }
 :root[data-theme="dark"] .epBadgePreview{ color:#d6e4e6; background:rgba(56,178,172,.08); border-color:rgba(78,205,196,.2); }
+
+/* ===== LOMO LEVELS (cumulative) ===== */
+.lomoLevelHint{ margin-top:8px; font-size:12px; line-height:1.5; color:#92400e; background:rgba(245,158,11,.10); border:1px solid rgba(245,158,11,.26); border-radius:10px; padding:8px 12px; }
+.lomoLevelHint.hidden{ display:none; }
+:root[data-theme="dark"] .lomoLevelHint{ color:#fbbf24; background:rgba(245,158,11,.10); border-color:rgba(245,158,11,.28); }
+.verifyEmailBtn{ margin-top:6px; }
+.verifyEmailBtn.hidden{ display:none; }
+
+/* ═══════════════════════════════════════════════════════════
+   VISUAL POLISH — лента и профили (main.css грузится последним,
+   поэтому оверрайды равной специфичности выигрывают)
+   ═══════════════════════════════════════════════════════════ */
+
+/* 1. Карточки ленты: мягкая тень по умолчанию + подъём на hover (150ms) */
+.feedListWrap .socialCard{
+  box-shadow:0 2px 10px rgba(16,42,48,.06), 0 1px 3px rgba(16,42,48,.04);
+  transition:transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+}
+.feedListWrap .socialCard:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 32px rgba(38,110,120,.14), 0 3px 10px rgba(16,42,48,.06);
+}
+[data-theme="dark"] .feedListWrap .socialCard{
+  box-shadow:0 2px 10px rgba(0,0,0,.30);
+}
+[data-theme="dark"] .feedListWrap .socialCard:hover{
+  box-shadow:0 12px 34px rgba(0,0,0,.50);
+}
+
+/* 2. Бейдж верификации на карточке: teal-чип, заметнее остального текста */
+.feedListWrap .scVerBadge{
+  background:rgba(42,122,138,.12);
+  color:#1a5c68;
+  border:1px solid rgba(42,122,138,.28);
+  font-weight:750;
+  font-size:11.5px;
+  padding:3px 11px;
+  letter-spacing:.01em;
+}
+[data-theme="dark"] .feedListWrap .scVerBadge{
+  background:rgba(78,205,196,.14);
+  color:#66ddd4;
+  border-color:rgba(78,205,196,.32);
+}
+
+/* 3. Аватары: единый размер уже есть; добавляем светлую обводку-кольцо */
+.scAvatar{
+  border:1.5px solid rgba(15,63,74,.10);
+  background:#fff;
+}
+[data-theme="dark"] .scAvatar{
+  border-color:rgba(255,255,255,.10);
+  background:#141c1e;
+}
+.pubProfileAvatarImg,
+.pubProfileAvatarFallback{
+  box-shadow:0 0 0 1.5px rgba(15,63,74,.10), 0 4px 16px rgba(0,0,0,.14);
+}
+[data-theme="dark"] .pubProfileAvatarImg,
+[data-theme="dark"] .pubProfileAvatarFallback{
+  box-shadow:0 0 0 1.5px rgba(255,255,255,.12), 0 4px 16px rgba(0,0,0,.40);
+}
+.avatarCircle{
+  border:1.5px solid rgba(15,63,74,.12);
+}
+[data-theme="dark"] .avatarCircle{ border-color:rgba(255,255,255,.12); }
+
+/* 4. Пустые состояния: подложка вместо «висящей» иконки */
+.feedEmptyState{
+  max-width:520px;
+  margin:24px auto;
+  padding:44px 24px;
+  background:rgba(38,110,120,.045);
+  border:1px dashed rgba(38,110,120,.20);
+  border-radius:16px;
+}
+.feedEmptyIco{
+  width:64px;
+  height:64px;
+  line-height:64px;
+  margin:0 auto 14px;
+  background:rgba(38,110,120,.10);
+  border-radius:50%;
+  font-size:28px;
+  opacity:1;
+  text-align:center;
+}
+.feedEmptyText{ color:#5a6b6e; }
+[data-theme="dark"] .feedEmptyState{
+  background:rgba(56,178,172,.06);
+  border-color:rgba(78,205,196,.22);
+}
+[data-theme="dark"] .feedEmptyIco{ background:rgba(56,178,172,.14); }
+[data-theme="dark"] .feedEmptyText{ color:rgba(225,229,235,.55); }
+
+/* 5. Профиль: воздух между секциями + чуть заметнее заголовки */
+.profilePageBody{ gap:24px; }
+.profileSection{ gap:14px; }
+.profileSectionHead{
+  font-size:12.5px;
+  letter-spacing:.08em;
+}
+.pubProfileSection{ padding:24px 0 12px; }
+.pubProfileSTitle{
+  font-size:12px;
+  color:#26707a;
+  letter-spacing:.07em;
+  margin-bottom:12px;
+}
+[data-theme="dark"] .pubProfileSTitle{ color:#66ddd4; }
+
+/* 7. Микро-интерактивность на кликабельных элементах карточек */
+.scBookmarkBtn{
+  cursor:pointer;
+  transition:transform .15s ease, color .15s ease;
+}
+.scBookmarkBtn:hover{ transform:scale(1.18); }
+.feedListWrap .scProject,
+.feedListWrap .scVerItem{
+  transition:background .15s ease, border-color .15s ease;
+}
+.feedListWrap .socialCard:hover .scProject{ border-color:rgba(38,110,120,.32); }
+.feedListWrap .socialCard:hover .scVerItem{ border-color:rgba(42,122,138,.34); }
+.pubCvBtn,
+.pubProfileAdminLoadBtn{
+  transition:background .15s ease, border-color .15s ease;
+}

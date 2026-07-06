@@ -566,6 +566,7 @@
       <div class="profileSub">HR: <span id="rpName">—</span> · <span id="rpTitle">—</span></div>
       <div class="profileSub" id="rpCorpEmail">—</div>
       <div class="badgeRow hidden" id="rpCorpEmailBadgeRow"><span class="badge ok">✓ Корп. почта подтверждена</span></div>
+      <button type="button" class="pillBtn soft hidden verifyEmailBtn" id="rpVerifyEmailBtn">Подтвердить email</button>
     </div>
     <div class="profileSection">
       <div class="profileSectionHead">Основные данные</div>
@@ -891,7 +892,7 @@
             <span class="statusTag" id="corpEmailVerifiedStatusC">не подтверждена</span>
             <button type="button" class="pillBtn soft" id="btnSendCorpVerifyC">Подтвердить место работы</button>
           </div>
-          <div class="verifyTooltip">Для L2 после email-кода приложите ниже приказ о приёме или первую страницу трудового договора.</div>
+          <div class="verifyTooltip">Для L3 после email-кода приложите ниже приказ о приёме или первую страницу трудового договора.</div>
         </div>
       </div>
       <div class="profileEditSection">
@@ -905,9 +906,9 @@
           <div class="candidateVerifyGroupHead">
             <div>
               <div class="candidateVerifyGroupTitle">Опыт и текущее место работы</div>
-              <div class="candidateVerifyGroupSub">Для L2 приложите официальный источник стажа и отдельно подтвердите текущую компанию.</div>
+              <div class="candidateVerifyGroupSub">Официальный источник стажа засчитывается в L3 — при уже подтверждённых почте и личности.</div>
             </div>
-            <span class="verifyLevelPill l2">L2</span>
+            <span class="verifyLevelPill l3">L3</span>
           </div>
           <div class="verifyGrid candidateVerifyGrid">
             <div class="miniCard primary">
@@ -956,11 +957,11 @@
         <div class="profileSectionHead">Подтверждения</div>
         <div class="candidateVerifyIntro">
           <div class="candidateVerifyIntroTitle">Что именно проверяет LOMO</div>
-          <div class="candidateVerifyIntroText">L1 подтверждает базовые факты, L3 усиливает антифрод. Документы опыта и текущего места работы теперь лежат во вкладке «Опыт», рядом с самими данными. Чувствительные файлы остаются защищёнными: публично виден только CV, если вы сами это разрешите.</div>
+          <div class="candidateVerifyIntroText">Уровни кумулятивные — каждый следующий включает предыдущий: L1 — подтверждённая электронная почта, L2 — подтверждённая личность (паспорт), L3 — принятый документ об опыте работы или образовании. Документы опыта и текущего места работы лежат во вкладке «Опыт», рядом с самими данными. Чувствительные файлы остаются защищёнными: публично виден только CV, если вы сами это разрешите.</div>
           <div class="candidateVerifyLevelRow">
-            <span class="verifyLevelPill l1">L1 · база</span>
-            <span class="verifyLevelPill l2">L2 · опыт</span>
-            <span class="verifyLevelPill l3">L3 · строгая проверка</span>
+            <span class="verifyLevelPill l1">L1 · email</span>
+            <span class="verifyLevelPill l2">L2 · личность</span>
+            <span class="verifyLevelPill l3">L3 · опыт и образование</span>
           </div>
         </div>
 
@@ -968,9 +969,9 @@
           <div class="candidateVerifyGroupHead">
             <div>
               <div class="candidateVerifyGroupTitle">Образование</div>
-              <div class="candidateVerifyGroupSub">Диплом обязателен для базовой проверки; справка нужна только если обучение ещё продолжается.</div>
+              <div class="candidateVerifyGroupSub">Диплом или справка засчитываются в L3 — при уже подтверждённых почте и личности.</div>
             </div>
-            <span class="verifyLevelPill l1">L1</span>
+            <span class="verifyLevelPill l3">L3</span>
           </div>
           <div class="verifyGrid candidateVerifyGrid">
             <div class="miniCard primary">
@@ -998,9 +999,9 @@
           <div class="candidateVerifyGroupHead">
             <div>
               <div class="candidateVerifyGroupTitle">Курсы и внешние сигналы</div>
-              <div class="candidateVerifyGroupSub">Полезное дополнение, но не важнее диплома, опыта и паспорта.</div>
+              <div class="candidateVerifyGroupSub">Сертификаты о курсах засчитываются в L3 наравне с дипломом и опытом.</div>
             </div>
-            <span class="verifyLevelPill l1">L1</span>
+            <span class="verifyLevelPill l3">L3</span>
           </div>
           <div class="verifyGrid candidateVerifyGrid compactGrid">
             <div class="miniCard">
@@ -1024,9 +1025,9 @@
           <div class="candidateVerifyGroupHead">
             <div>
               <div class="candidateVerifyGroupTitle">Паспорт и антифрод</div>
-              <div class="candidateVerifyGroupSub">Чувствительные файлы нужны для L3 и проверяются особенно строго.</div>
+              <div class="candidateVerifyGroupSub">Документ, удостоверяющий личность, даёт L2 и проверяется особенно строго.</div>
             </div>
-            <span class="verifyLevelPill l3">L3</span>
+            <span class="verifyLevelPill l2">L2</span>
           </div>
           <div class="verifyGrid candidateVerifyGrid">
             <div class="miniCard primary sensitive">
@@ -1116,6 +1117,7 @@
       <div class="profileMeta" id="epCity"></div>
       <div class="profileSub"><span id="epEduPlace">ВУЗ</span> · <span id="epEduYear">Год</span></div>
       <div class="profileSub" id="epEmail">email@example.com</div>
+      <button type="button" class="pillBtn soft hidden verifyEmailBtn" id="epVerifyEmailBtn">Подтвердить email</button>
       <div class="profileSub hidden" id="epPhone"></div>
       <div class="profileSub" id="epTg">@telegram</div>
       <div class="badgeRow">
@@ -1127,6 +1129,7 @@
     <div class="profileSection profileProgress" id="epProgress">
       <div class="progressBar"><div class="progressFill" id="epProgressFill"></div></div>
       <div class="progressLabel" id="epProgressLabel">Профиль 10% — начните с себя</div>
+      <div class="lomoLevelHint hidden" id="epLomoHint"></div>
       <div class="progressHints" id="epProgressHints"></div>
     </div>
     <div class="onboardingBanner" id="epOnboardBanner">
@@ -1143,6 +1146,10 @@
     <div class="profileSection" id="epAboutSection">
       <div class="profileSectionHead">О себе</div>
       <div class="profileAbout" id="epAbout">—</div>
+    </div>
+    <div class="profileSection" id="epSkillsSection" style="display:none">
+      <div class="profileSectionHead">Навыки</div>
+      <div class="pubSkillsList" id="epSkillsList"></div>
     </div>
     <div class="profileSection">
       <div class="profileSectionHead">Ищу вакансии</div>
@@ -1531,9 +1538,9 @@
             <span class="adminReviewMetricLabel">людей в очереди</span>
           </div>
           <div class="adminReviewLegend">
-            <span class="reviewLevelBadge l3">L3</span><span>паспорт и антифрод</span>
-            <span class="reviewLevelBadge l2">L2</span><span>опыт и текущее место</span>
-            <span class="reviewLevelBadge l1">L1</span><span>база и сертификаты</span>
+            <span class="reviewLevelBadge l3">P3</span><span>паспорт и антифрод — проверяются первыми</span>
+            <span class="reviewLevelBadge l2">P2</span><span>опыт и текущее место</span>
+            <span class="reviewLevelBadge l1">P1</span><span>база и сертификаты</span>
           </div>
         </div>
         <div class="adminSectionHead">
@@ -1836,18 +1843,19 @@
       <p>LOMO подтверждает <strong>факт</strong> предоставленной информации — но не гарантирует качество работы кандидата.</p>
       <div class="verifyLevelList">
         <div class="verifyLevelCard l1">
-          <span class="levelBadge l1">L1 — Базовый</span>
-          <p class="verifyLevelText">Документ загружен и проверен вручную модератором. Формат, дата, название организации соответствуют заявленным данным.</p>
+          <span class="levelBadge l1">LOMO 1 — Почта</span>
+          <p class="verifyLevelText">Подтверждена электронная почта: пользователь ввёл код из письма и владеет указанным адресом.</p>
         </div>
         <div class="verifyLevelCard l2">
-          <span class="levelBadge l2">L2 — Стандартный</span>
-          <p class="verifyLevelText">Дополнительно — проверка через открытые источники (сайт ВУЗа, реестры компаний) или запрос в организацию.</p>
+          <span class="levelBadge l2">LOMO 2 — Личность</span>
+          <p class="verifyLevelText">Подтверждена личность: модератор принял паспорт РФ, загранпаспорт или аналогичный документ, удостоверяющий личность.</p>
         </div>
         <div class="verifyLevelCard l3">
-          <span class="levelBadge l3">L3 — Строгий</span>
-          <p class="verifyLevelText">Подтверждение от организации-источника (официальный ответ / API). Высший уровень доверия.</p>
+          <span class="levelBadge l3">LOMO 3 — Опыт и образование</span>
+          <p class="verifyLevelText">Принят документ об опыте работы или образовании: трудовая книжка, справка с места работы, диплом или сертификат — достаточно одного.</p>
         </div>
       </div>
+      <p class="verifyLevelNote">Уровни кумулятивные: нельзя получить LOMO 2 без подтверждённой почты и LOMO 3 без подтверждённой личности.</p>
       <p class="verifyLevelNote">LOMO не несёт ответственности за профессиональные качества кандидата. Верификация подтверждает только достоверность представленных документов.</p>
     </div>
   </div>
@@ -2145,7 +2153,7 @@
         <div class="infoCard">
           <div class="infoCardIcon">📜</div>
           <div class="infoCardTitle">Соответствие законодательству</div>
-          <div class="infoCardText">Платформа разработана с учётом требований ФЗ-152 «О персональных данных». Обработка специальных категорий данных (паспорт) осуществляется исключительно с явного согласия пользователя и только в целях строгой верификации (L3).</div>
+          <div class="infoCardText">Платформа разработана с учётом требований ФЗ-152 «О персональных данных». Обработка специальных категорий данных (паспорт) осуществляется исключительно с явного согласия пользователя и только в целях подтверждения личности (уровень LOMO 2).</div>
         </div>
       </div>
 
@@ -2251,9 +2259,9 @@
                 <li><strong>Верификация</strong> — процедура проверки модератором Платформы документов, загруженных Кандидатом.</li>
                 <li><strong>Уровень верификации (№ LOMO 1/2/3)</strong> — отметка, присваиваемая профилю Кандидата по результатам проверки:
                   <ul style="padding-left:1.2em;line-height:1.8">
-                    <li><strong>L1 — Базовый:</strong> документ загружен и проверен вручную модератором; формат, дата, наименование организации соответствуют заявленным данным.</li>
-                    <li><strong>L2 — Стандартный:</strong> дополнительно проведена проверка через открытые источники (сайт вуза, реестры компаний) или запрос в организацию.</li>
-                    <li><strong>L3 — Строгий:</strong> получено подтверждение от организации-источника (официальный ответ / API).</li>
+                    <li><strong>LOMO 1 — Почта:</strong> подтверждена электронная почта Пользователя (введён код из письма).</li>
+                    <li><strong>LOMO 2 — Личность:</strong> при наличии уровня LOMO 1 принят документ, удостоверяющий личность (паспорт РФ, загранпаспорт или аналогичный).</li>
+                    <li><strong>LOMO 3 — Опыт и образование:</strong> при наличии уровня LOMO 2 принят хотя бы один документ об опыте работы или образовании (трудовая книжка, справка с места работы, диплом, сертификат).</li>
                   </ul>
                 </li>
               </ul>
@@ -2293,7 +2301,7 @@
           <div class="accordionBody">
             <div class="accordionBodyInner">
               <p>5.1. Загружая документы для верификации, Кандидат подтверждает, что является их законным обладателем и что содержащиеся в них сведения достоверны.</p>
-              <p>5.2. <strong>LOMO подтверждает факт предоставления и проверки документа, но не гарантирует профессиональные качества, деловую репутацию или пригодность Кандидата для конкретной вакансии.</strong> Отметка о верификации означает только то, что документ был проверен на соответствие заявленным в нём данным согласно уровню верификации (L1/L2/L3), указанному в п. 2.</p>
+              <p>5.2. <strong>LOMO подтверждает факт предоставления и проверки документа, но не гарантирует профессиональные качества, деловую репутацию или пригодность Кандидата для конкретной вакансии.</strong> Отметка о верификации означает только то, что документ был проверен на соответствие заявленным в нём данным согласно уровню верификации (LOMO 1/2/3), указанному в п. 2.</p>
               <p>5.3. Оператор оставляет за собой право отказать в верификации, запросить дополнительные документы или отозвать ранее присвоенный статус верификации при обнаружении недостоверных сведений.</p>
               <p>5.4. Загрузка заведомо поддельных документов является основанием для блокировки учётной записи без возврата уплаченных средств (при наличии).</p>
             </div>

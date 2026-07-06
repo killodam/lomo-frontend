@@ -379,10 +379,14 @@
         return [e.role, e.company, e.desc].filter(Boolean).join(' ');
       }).join(' ');
     }
+    // «Только верифицированные» = кумулятивный LOMO ≥ 1 с сервера;
+    // verification_level (количество проверенных категорий) остаётся бонусом к скору.
+    var lomoLevel = c.lomo_level !== undefined ? (Number(c.lomo_level) || 0) : (verCount > 0 ? 1 : 0);
     return Object.assign({}, c, {
       skills:             parseSkillsField(c.skills),
-      is_verified:        verCount > 0,
+      is_verified:        lomoLevel >= 1,
       verification_level: verCount,
+      lomo_level:         lomoLevel,
       user_id:            c.id,
       // field name aliases for buildCandidateText
       _work_exp_text:     workExpText,

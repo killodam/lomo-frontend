@@ -1,23 +1,52 @@
 /* «Значок LOMO»: three copy-paste formats of the verified-profile badge,
    shown in the candidate's own profile once they have LOMO ≥ 1. */
 
-var LOMO_BADGE_TIERS = {
-  passport: 3, passportRegistration: 3, passportSelfie: 3,
-  work: 2, workSfr: 2, workReference: 2, currentWork: 2,
-  education: 1, educationSupplement: 1, educationTranscript: 1, courses: 1,
-};
+/* Кумулятивные уровни: LOMO 1 — email, LOMO 2 — личность, LOMO 3 — опыт/образование.
+   Категории документов по ключам proofs. */
+var LOMO_IDENTITY_PROOFS = ['passport', 'passportRegistration', 'passportSelfie'];
+var LOMO_EXP_EDU_PROOFS = ['work', 'workSfr', 'workReference', 'currentWork', 'education', 'educationSupplement', 'educationTranscript', 'courses'];
+
+function lomoProofVerified(key) {
+  var proofs = state.employee && state.employee.proofs || {};
+  var proof = proofs[key];
+  if (!proof) return false;
+  var status = String(proof.status || '').toLowerCase();
+  return status === 'verified' || status.indexOf('подтверж') !== -1;
+}
+
+function lomoHasVerifiedIdentity() {
+  return LOMO_IDENTITY_PROOFS.some(lomoProofVerified);
+}
+
+function lomoHasVerifiedExpEdu() {
+  return LOMO_EXP_EDU_PROOFS.some(lomoProofVerified);
+}
 
 function lomoOwnVerificationLevel() {
-  var proofs = state.employee && state.employee.proofs || {};
-  var level = 0;
-  Object.keys(proofs).forEach(function (key) {
-    var proof = proofs[key];
-    if (!proof || !LOMO_BADGE_TIERS[key]) return;
-    var status = String(proof.status || '').toLowerCase();
-    var verified = status === 'verified' || status.indexOf('подтверж') !== -1;
-    if (verified && LOMO_BADGE_TIERS[key] > level) level = LOMO_BADGE_TIERS[key];
-  });
-  return level;
+  if (!state.emailVerified) return 0;
+  if (!lomoHasVerifiedIdentity()) return 1;
+  if (!lomoHasVerifiedExpEdu()) return 2;
+  return 3;
+}
+
+/* Подсказка «что сделать для следующего уровня» — показывается в баннере
+   прогресса собственного профиля. */
+function lomoNextStepHint() {
+  var hasAnyDoc = lomoHasVerifiedIdentity() || lomoHasVerifiedExpEdu();
+  if (!state.emailVerified) {
+    return hasAnyDoc
+      ? 'Документ принят. Для получения уровня подтвердите электронную почту.'
+      : 'Подтвердите электронную почту, чтобы получить LOMO 1.';
+  }
+  if (!lomoHasVerifiedIdentity()) {
+    return lomoHasVerifiedExpEdu()
+      ? 'Документ принят. Для повышения уровня подтвердите личность — загрузите паспорт'
+      : 'Подтвердите личность — загрузите паспорт, чтобы получить LOMO 2.';
+  }
+  if (!lomoHasVerifiedExpEdu()) {
+    return 'Загрузите документ об опыте работы или образовании, чтобы получить LOMO 3.';
+  }
+  return '';
 }
 
 function lomoBadgeProfileUrl() {
@@ -90,3 +119,22 @@ function renderLomoBadgeSection() {
     if (typeof copyToClipboard === 'function') copyToClipboard(text);
   };
 }
+
+/* «Подтвердить email» из собственного профиля (кандидат и работодатель):
+   переиспользует экран ввода кода из регистрационного флоу. */
+(function initVerifyEmailButtons() {
+  function startVerify() {
+    if (!state.email) {
+      if (typeof showToast === 'function') showToast('Почта не указана', 'error');
+      return;
+    }
+    if (typeof window.lomoStartEmailVerify === 'function') {
+      window.lomoStartEmailVerify(state.email);
+    }
+  }
+  document.addEventListener('click', function (event) {
+    var target = event.target;
+    if (!target) return;
+    if (target.id === 'epVerifyEmailBtn' || target.id === 'rpVerifyEmailBtn') startVerify();
+  });
+})();

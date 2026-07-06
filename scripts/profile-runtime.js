@@ -116,6 +116,7 @@ function renderRecruiterPublic() {
   // Corp email verified badge
   const badgeRow = document.getElementById('rpCorpEmailBadgeRow');
   if (badgeRow) setHidden(badgeRow, !p.corpEmailVerified);
+  setHidden('rpVerifyEmailBtn', !!state.emailVerified);
 
   var rpIsVerified = isProofVerified(p.proofs?.companyDoc);
   if (typeof showVerifBannerIfNeeded === 'function') showVerifBannerIfNeeded('rpVerifBanner', rpIsVerified);
@@ -129,6 +130,7 @@ function renderEmployeePublic() {
   setText('epEduYear', (p.eduYear || '—').trim() || '—');
   setText('epVacancies', (p.vacancies || '—').trim() || '—');
   setText('epEmail', (state.email || p.email || 'email@example.com').trim());
+  setHidden('epVerifyEmailBtn', !!state.emailVerified);
   setText('epTg', p.telegram ? (p.telegram.startsWith('@') ? p.telegram : '@' + p.telegram) : '—');
 
   const phoneEl = document.getElementById('epPhone');
@@ -149,6 +151,18 @@ function renderEmployeePublic() {
   setHidden(aboutSec, !p.about);
   const aboutEl = document.getElementById('epAbout');
   if (aboutEl) aboutEl.textContent = p.about || '—';
+
+  const skillsSection = document.getElementById('epSkillsSection');
+  const skillsListEl = document.getElementById('epSkillsList');
+  if (skillsSection && skillsListEl) {
+    const skillItems = String(p.skills || '').split(/[,;]+/).map(function (item) {
+      return item.trim();
+    }).filter(Boolean);
+    skillsListEl.innerHTML = skillItems.map(function (skill) {
+      return '<span class="pubSkillChip">' + escapeHtml(skill) + '</span>';
+    }).join('');
+    skillsSection.style.display = skillItems.length ? '' : 'none';
+  }
 
   applyChip('epEduStatusChip', p.proofs?.education?.status);
   applyChip('epWorkStatusChip', p.proofs?.work?.status);
