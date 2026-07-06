@@ -10,6 +10,13 @@ Candidates upload documents (diploma, employment record, certificates) → moder
 Live site: https://www.lomo.website
 Backend API: https://lomo-backend-hergg.amvera.io/api
 
+LOMO level logic (cumulative, single source of truth in backend/src/services/lomoLevel.js):
+- LOMO 1 = email verified (users.email_verified = true)
+- LOMO 2 = LOMO 1 + accepted identity document (achievements.type IN passport, passport_registration, passport_selfie)
+- LOMO 3 = LOMO 2 + accepted experience/education document (work*, current_work, education*, courses)
+Levels cannot be skipped — an accepted diploma with unverified email still shows LOMO 0.
+"✓ Verified" filter in feed/search = lomo_level >= 1 (not "has any accepted document").
+
 ---
 
 ### Stack
@@ -54,8 +61,13 @@ chat.js                   ← Telegram-style chat UI
 ai-matching.js            ← standalone AI matching (TF-IDF, no external APIs)
 info-screens.js           ← FAQ, About, Terms, Privacy, etc.
 push-notifications.js     ← Capacitor FCM push
+onboarding.js              ← 3-step candidate onboarding wizard
+profile-completeness.js   ← pure completeness % calculation
+notifications-ui.js       ← bell dropdown, last 30 notifications
+lomo-badge.js              ← "Ваш значок LOMO" block (resume line, email sig, HTML badge)
+social-card.js             ← feed card rendering (avatar ring, verification chip, skill pills)
 styles/
-main.css                  ← all styles (~2500+ lines)
+main.css                  ← all styles (~2500+ lines), includes VISUAL POLISH block at end
 
 ### Backend File Structure
 src/
@@ -78,6 +90,7 @@ rateLimit.js            ← per-route rate limiting
 services/
 sessions.js             ← HMAC session tokens, CSRF
 audit.js                ← audit log writer
+lomoLevel.js             ← single source of truth for LOMO level calc (lomoLevelSql, loadLomoLevel)
 utils/
 logger.js, validation.js, pagination.js
 publicId.js, storage.js, cookies.js
@@ -89,13 +102,16 @@ migrations/
 002_platform_hardening.sql
 003_user_connections.sql
 004_observability_chat_search.sql
+...
+015_onboarding_progress_notifications.sql
+016_unsubscribe_token_default.sql
 
 ---
 
 ### What Already Works
 
 - Landing page with hero "Ваш профиль. Подтверждённый." + AI-Matching block (dark section with mock results 94%/87%/81%)
-- Candidate feed with filters: All / ★ Favourites / ✓ Verified
+- Candidate feed with filters: All / ★ Favourites / ✓ Verified / 🟢 Ищут работу
 - Full-text search via pg_trgm
 - Employer search with filters: grade (Junior/Middle/Senior/Lead), format (remote/office/hybrid), budget (to 80k/120k/200k), status (Actively looking)
 - AI-Matching modal: employer types job description → algorithm ranks verified candidates with match %
@@ -105,12 +121,19 @@ migrations/
 - 7 info screens: FAQ with search+accordion, About with timeline, Contacts, Security, Terms, Privacy, How it works
 - Current workplace + work experience in profile and feed cards
 - PWA (manifest, sw.js, offline.html, icons)
-- Public profiles (/p/LOMO-XXXXXXXX)
+- Public profiles (/p/LOMO-XXXXXXXX) with sticky CTA bar, blurred contact info for anonymous visitors
 - Forgot/reset password via Resend
 - Self-delete account
 - Audit log, rate limiting, structured logging
 - Admin panel: document queue, candidates, companies, users tabs
 - Capacitor integrated for mobile app
+- 3-step candidate onboarding wizard (welcome → mini-questionnaire → first document upload) with DB-persisted step + return checklist
+- Profile completeness % (formula in profile-completeness.js), shown in profile header + feed banner, threshold notifications at 40/70/100%
+- In-app notification bell + email notifications (document access request, verified, rejected, reactivation D+2)
+- "Ваш значок LOMO" block: resume line, email signature, inline-SVG HTML badge, all with ?src=badge tracking
+- Cumulative LOMO level logic (email → identity → experience/education), single source of truth, applied everywhere (badge, filter, matching, emails)
+- Visual polish pass on feed cards (shadows, hover lift, verification chip, avatar rings, skill pill chips, improved empty states) and profile pages (section spacing, section headers)
+- localStorage cleanup on logout (whitelist: lomo_theme, lomo_push_token, lomo_favs_<uid>)
 
 ---
 
@@ -151,6 +174,8 @@ Button variants: dark pill, ghost/grey, teal next, outlined, yellow AI highlight
 
 Design System (Claude Design): https://claude.ai/design/p/ee06e570-3a5c-43f0-8a1c-62f59984da4d
 
+Note: this link requires human browser auth — Claude Code sessions cannot fetch it directly (confirmed: returns an auth wall). Rely on the design tokens listed above directly instead of trying to re-fetch that link.
+
 ---
 
 ### Auth Flow
@@ -160,6 +185,26 @@ POST /api/auth/login
 All mutating requests must include:
 X-CSRF-Token: <value from lomo_csrf cookie>
 Sessions stored in user_sessions table (30-day TTL)
+
+Email verification: separate screen right after registration, with a "Пропустить" (skip) button intentionally kept for easy testing. Skipping does NOT set `email_verified` — it stays false, same state as "not yet verified." There is a "Подтвердить email" button in the candidate/employer's own profile that re-triggers verification via `window.lomoStartEmailVerify(email)` (existing code-based flow through Resend). Do not remove or change the skip button's behavior.
+
+---
+
+### Deploy Workflow
+
+- backend has TWO remotes: `origin` (GitHub, source of truth) and `amvera` (production — pushing triggers `npm run deploy`, which runs migrations + seed automatically)
+- Default behavior: after tests are green, push to BOTH `origin` and `amvera` without asking for separate permission each time — this is the approved default going forward.
+- Exception: if a migration is unusually large/irreversible, or you're mid-way through a schema change across sessions, flag it and ask before pushing to `amvera` specifically — don't silently deploy something you're not confident about.
+- frontend pushes to `origin main` only — Vercel auto-deploys from GitHub, no separate prod remote.
+- `SESSION_SECRET` and `RESET_CODE_SECRET` must be set manually in Amvera's "Переменные" (environment variables) panel — they are NOT in `.env` in the repo and never should be committed there. If login/reset breaks after a fresh deploy, check these first.
+
+---
+
+### Security Audit Skills
+
+`.claude/skills/` contains 11 curated skill playbooks from an external open-source set (web app + API security, OWASP Top 10 focus) — used as audit checklists only.
+
+RULE: never execute active attacks/exploitation/scanning against the live production site (lomo.website / lomo-backend-hergg.amvera.io). Use these skills for static code and configuration review only. If a skill references a tool we don't have installed (nikto, 42crunch, ModSecurity), extract the methodology/checklist from it — don't try to install or run the tool itself.
 
 ---
 
@@ -189,12 +234,16 @@ Have connections to Higher School of Economics. Plan:
 
 ### Known Issues / TODO
 
-**Tech:**
+**Tech (open):**
 - Site blocked in Russia without VPN (Vercel's IPs blocked by Roskomnadzor) → fix: Cloudflare Proxy in 20 min
-- screenDone (post-registration screen) is empty — no onboarding flow
-- localStorage not cleaned on logout (29 keys accumulate)
-- No email notifications on document requests (Resend connected, not implemented)
-- No "Actively looking" filter in main candidate feed (exists in employer search only)
+
+**Tech (resolved — do not re-implement, these are done):**
+- Onboarding wizard (screenDone replaced with 3-step flow)
+- localStorage cleanup on logout (whitelist-based)
+- Email notifications on document requests/verification (A/B/C/E/I implemented via Resend)
+- "Actively looking" filter now exists in main candidate feed (not just employer search)
+- Profile completeness % implemented
+- LOMO level logic made cumulative and consistent everywhere
 
 **Product:**
 - Register 25 real users + manually verify their documents
@@ -204,7 +253,7 @@ Have connections to Higher School of Economics. Plan:
 
 **Legal (nothing done yet):**
 - Open sole proprietorship (ИП, УСН 6%, ОКВЭД 63.11)
-- Register as personal data operator in Roskomnadzor (ФЗ-152, free online)
+- Register as personal data operator in Roskomnadzor (ФЗ-152, free online) — HIGH PRIORITY, platform collects passports and diplomas (special-category personal data)
 - Real Terms of Service + Privacy Policy on site
 - Has a co-founder → need LLC (ООО) or option agreement with 4-year vesting
 
@@ -230,3 +279,4 @@ Have connections to Higher School of Economics. Plan:
 - Before running repo-wide greps, long test suites, or fetching large logs, prefer a narrower, targeted command (specific file, specific test name, `--tail` on logs) when it answers the question just as well.
 - If a single prompt asks for multiple features/tasks at once, treat each one as its own checkpoint: implement → verify → `/compact` → move to the next. Do not run the whole multi-feature batch in one uncompacted block.
 - Target: keep sessions under ~150k tokens of context whenever possible. If you notice context growing past that without a natural stopping point, proactively suggest compacting rather than continuing to accumulate.
+- Cloning large external repos (e.g. skill libraries) into context is expensive — copy only the specific subfolders actually needed, never read a full external repo tree into context.
