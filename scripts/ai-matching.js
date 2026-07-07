@@ -510,6 +510,169 @@
     return nonZero.length ? nonZero : results;
   }
 
+  // ── EXPLAINABILITY ───────────────────────────────────────────────────────
+  // Client-side, template strings only — no LLM. Built in renderCard from the
+  // job context (required skills / grade / budget, parsed once per search) plus
+  // candidate fields, so it works identically for server- and client-ranked
+  // results. Verification uses the cumulative lomo_level from the backend.
+
+  var SCORE_TOOLTIP = 'Процент — это близость текста вашей вакансии к профилю кандидата плюс бонусы за верификацию и совпадение грейда';
+  var EXPL_GRADE_LABELS = { intern: 'Intern', junior: 'Junior', middle: 'Middle', senior: 'Senior', lead: 'Lead' };
+
+  function explGradeLabel(g) {
+    var k = String(g || '').toLowerCase();
+    return EXPL_GRADE_LABELS[k] || g || '';
+  }
+
+  function explFormatRub(n) {
+    return Number(n).toLocaleString('ru-RU') + ' ₽';
+  }
+
+  function explPluralYears(n) {
+    var m10 = n % 10, m100 = n % 100;
+    if (m10 === 1 && m100 !== 11) return 'год';
+    if (m10 >= 2 && m10 <= 4 && (m100 < 12 || m100 > 14)) return 'года';
+    return 'лет';
+  }
+
+  function explParseSalary(v) {
+    if (typeof v === 'number') return v > 0 ? v : 0;
+    var s = String(v || '').toLowerCase().replace(/\s/g, '');
+    var m = s.match(/(\d{2,7})(к|k)?/);
+    if (!m) return 0;
+    var n = parseInt(m[1], 10);
+    if (m[2]) n *= 1000;
+    else if (n > 0 && n < 1000) n *= 1000;
+    return n;
+  }
+
+  function explParseYears(period) {
+    if (!period) return 0;
+    var years = String(period).match(/\d{4}/g);
+    if (!years) return 0;
+    var start = parseInt(years[0], 10);
+    var end;
+    if (years[1]) end = parseInt(years[1], 10);
+    else if (/наст|сейчас|present|now|н\.?\s?в/i.test(period)) end = new Date().getFullYear();
+    else return 0;
+    var d = end - start;
+    return d > 0 ? d : 0;
+  }
+
+  function extractRequiredSkills(text) {
+    var seen = {}, out = [];
+    tokenize(text || '').forEach(function (t) {
+      if (ALL_SKILLS.has(t) && !seen[t]) { seen[t] = 1; out.push(t); }
+    });
+    return out;
+  }
+
+  function explainSkills(r, ctx) {
+    var required = ctx.requiredSkills || [];
+    if (!required.length) return '';
+    var overlap = Array.isArray(r.overlap) ? r.overlap : [];
+    var matched = required.filter(function (t) { return overlap.indexOf(t) !== -1; });
+    var missing = required.filter(function (t) { return overlap.indexOf(t) === -1; });
+    var matchedChips = matched.map(function (t) {
+      return '<span class="aiExplChip aiExplChip--match">' + esc(displayToken(t)) + '</span>';
+    }).join('');
+    var missingHtml = missing.length
+      ? '<div class="aiExplSub">Нет в профиле: ' + missing.map(function (t) {
+          return '<span class="aiExplChip aiExplChip--miss">' + esc(displayToken(t)) + '</span>';
+        }).join('') + '</div>'
+      : '';
+    return '<div class="aiExplLine aiExplSkills">' +
+      '<span class="aiExplText">Совпадение по навыкам: ' + matched.length + ' из ' + required.length + ' требуемых</span>' +
+      (matchedChips ? '<span class="aiExplChips">' + matchedChips + '</span>' : '') +
+      missingHtml +
+      '</div>';
+  }
+
+  function explainVerification(r) {
+    var lvl = Number((r.candidate && r.candidate.lomo_level) || 0);
+    if (lvl < 1) return '';
+    var desc = lvl >= 3 ? 'подтверждены опыт работы и образование'
+      : lvl === 2 ? 'подтверждена личность'
+      : 'подтверждена электронная почта';
+    return '<div class="aiExplLine aiExplVerif">✓ LOMO ' + lvl + ' — ' + desc + '</div>';
+  }
+
+  function explainExperience(r) {
+    var c = r.candidate || {};
+    var workExp = Array.isArray(c.work_exp) ? c.work_exp : [];
+    var currentCompany = (c.current_job && c.current_job !== 'Не работаю') ? String(c.current_job).trim() : '';
+    var role = String(c.job_title || '').trim();
+    var company = currentCompany;
+    if (!role && workExp[0]) role = String(workExp[0].role || '').trim();
+    if (!company && workExp[0]) company = String(workExp[0].company || '').trim();
+
+    var entry = null;
+    for (var i = 0; i < workExp.length; i++) {
+      if (company && workExp[i].company && String(workExp[i].company).trim() === company) { entry = workExp[i]; break; }
+    }
+    if (!entry && workExp[0]) entry = workExp[0];
+    var years = entry ? explParseYears(entry.period) : 0;
+    var yearsStr = years > 0 ? (years + ' ' + explPluralYears(years) + ' ') : '';
+    var currentNote = (currentCompany && company === currentCompany) ? ' — сейчас работает там' : '';
+
+    if (role && company) {
+      return '<div class="aiExplLine">' + esc(yearsStr) + 'на позиции „' + esc(role) + '“ в ' + esc(company) + esc(currentNote) + '</div>';
+    }
+    if (role) {
+      return '<div class="aiExplLine">' + esc(yearsStr) + 'на позиции „' + esc(role) + '“</div>';
+    }
+    if (company) {
+      return '<div class="aiExplLine">Работает в ' + esc(company) + esc(currentNote) + '</div>';
+    }
+    return '';
+  }
+
+  function explainSalary(r, ctx) {
+    var sal = explParseSalary(r.candidate && r.candidate.salary_expectations);
+    var budget = Number(ctx.salaryBudget || 0);
+    if (!sal || !budget) return '';
+    if (sal <= budget) {
+      return '<div class="aiExplLine">Ожидания по зарплате в рамках бюджета: ' + explFormatRub(sal) + ' при бюджете до ' + explFormatRub(budget) + '</div>';
+    }
+    return '<div class="aiExplLine aiExplOver">Ожидания выше бюджета на ' + explFormatRub(sal - budget) + '</div>';
+  }
+
+  function explainGrade(r, ctx) {
+    var cg = String((r.candidate && r.candidate.grade) || '').toLowerCase();
+    var jg = String(ctx.jobGrade || '').toLowerCase();
+    if (!cg || !jg) return '';
+    var ci = GRADES.indexOf(cg), ji = GRADES.indexOf(jg);
+    if (ci < 0 || ji < 0) return '';
+    var d = Math.abs(ci - ji);
+    if (d === 0) return '<div class="aiExplLine">Грейд совпадает: ' + esc(explGradeLabel(cg)) + '</div>';
+    if (d === 1) return '<div class="aiExplLine">Грейд близкий: у кандидата ' + esc(explGradeLabel(cg)) + ', вы ищете ' + esc(explGradeLabel(jg)) + '</div>';
+    return ''; // 2+ ступеней — не выделяем
+  }
+
+  // Priority order: skills -> verification -> experience -> salary -> grade.
+  // Grade is a filler (variant B): appears only when one of the first four is
+  // empty. Max 4 lines total.
+  function buildExplainBlock(r, ctx) {
+    ctx = ctx || {};
+    var lines = [
+      explainSkills(r, ctx),
+      explainVerification(r),
+      explainExperience(r),
+      explainSalary(r, ctx),
+      explainGrade(r, ctx),
+    ].filter(Boolean).slice(0, 4);
+    return lines.length ? '<div class="aiExplBlock">' + lines.join('') + '</div>' : '';
+  }
+
+  function buildJobContext(jobText, opts) {
+    opts = opts || {};
+    return {
+      requiredSkills: extractRequiredSkills(jobText),
+      jobGrade: opts.grade || detectGradeFromText(jobText || ''),
+      salaryBudget: extractMaxSalary(jobText || ''),
+    };
+  }
+
   // ── RENDER ───────────────────────────────────────────────────────────────
 
   function esc(s) {
@@ -519,7 +682,7 @@
       .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 
-  function renderCard(r) {
+  function renderCard(r, ctx) {
     var c = r.candidate;
     var scoreClass = r.score >= 75 ? 'aiScore--high' : r.score >= 45 ? 'aiScore--mid' : 'aiScore--low';
     var skills = Array.isArray(c.skills) ? c.skills
@@ -538,31 +701,22 @@
     var skillTags = skills.slice(0, 5).map(function (s) {
       return '<span class="aiResultSkillTag">' + esc(s) + '</span>';
     }).join('');
-    var overlapHtml = r.overlap.length
-      ? '<div class="aiResultOverlap">' + r.overlap.map(function (t) {
-          return '<span class="aiResultOverlapTag">' + esc(displayToken(t)) + '</span>';
-        }).join('') + '</div>'
-      : '';
-    var reasons = Array.isArray(r.reasons) ? r.reasons : [];
-    var reasonsHtml = reasons.length
-      ? '<div class="aiResultReasons">' + reasons.slice(0, 3).map(function (reason) {
-          return '<span class="aiResultReason">' + esc(reason) + '</span>';
-        }).join('') + '</div>'
-      : '';
+    // The explainability block's matched/missing chips supersede the old
+    // overlap chips, so the standalone overlap row is no longer rendered.
+    var explainHtml = buildExplainBlock(r, ctx || {});
     var salaryHtml = c.salary_expectations
-      ? '<div class="aiResultSalary">от ' + Number(c.salary_expectations).toLocaleString('ru-RU') + ' ₽</div>'
+      ? '<div class="aiResultSalary">от ' + Number(explParseSalary(c.salary_expectations)).toLocaleString('ru-RU') + ' ₽</div>'
       : '';
 
     return '<div class="aiResultCard" data-user-id="' + uid + '">' +
-      '<div class="aiResultScore ' + scoreClass + '">' + r.score + '</div>' +
+      '<div class="aiResultScore ' + scoreClass + '" title="' + esc(SCORE_TOOLTIP) + '">' + r.score + '</div>' +
       '<div class="aiResultAvatarWrap">' + avatar + verified + '</div>' +
       '<div class="aiResultInfo">' +
         '<div class="aiResultName">' + esc(c.full_name || 'Кандидат') + '</div>' +
         '<div class="aiResultMeta">' + esc(c.title || '') + salaryHtml + '</div>' +
         (tags ? '<div class="aiResultTags">' + tags + '</div>' : '') +
         (skillTags ? '<div class="aiResultSkills">' + skillTags + '</div>' : '') +
-        overlapHtml +
-        reasonsHtml +
+        explainHtml +
       '</div>' +
     '</div>';
   }
@@ -660,6 +814,9 @@
     var t2 = setTimeout(function () { setStep(3, 'Ранжирование кандидатов...'); }, 800);
 
     var matchOptions = { grade: grade, format: format, verifiedOnly: verifiedOnly, activeOnly: activeOnly, maxResults: 20 };
+    // Parse the vacancy once — the explainability block is derived from this,
+    // independent of whether results came from the server or the client engine.
+    var jobContext = buildJobContext(text, matchOptions);
 
     fetchMatches(text, matchOptions).then(function (results) {
       setTimeout(function () {
@@ -679,7 +836,7 @@
           return;
         }
 
-        container.innerHTML = results.map(renderCard).join('');
+        container.innerHTML = results.map(function (r) { return renderCard(r, jobContext); }).join('');
         container.querySelectorAll('.aiResultCard[data-user-id]').forEach(function (card) {
           card.addEventListener('click', function () {
             var uid = card.getAttribute('data-user-id');

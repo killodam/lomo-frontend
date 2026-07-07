@@ -963,3 +963,22 @@ body,
 /* Employer onboarding step 2 — prefilled AI-match textarea */
 .onbEmployerTextarea{ width:100%; min-height:96px; resize:vertical; border:none; background:transparent; font:inherit; color:inherit; line-height:1.5; outline:none; }
 #doneViewEmployerStep2 .onbForm{ max-width:460px; }
+
+/* AI-match explainability block (under the score) */
+.aiExplBlock{ display:flex; flex-direction:column; gap:5px; margin-top:8px; }
+.aiExplLine{ font-size:12px; line-height:1.45; color:#3d5c63; }
+.aiExplSkills{ display:flex; flex-wrap:wrap; align-items:center; gap:5px; }
+.aiExplText{ font-weight:600; }
+.aiExplChips{ display:inline-flex; flex-wrap:wrap; gap:4px; }
+.aiExplChip{ font-size:11px; padding:2px 8px; border-radius:999px; white-space:nowrap; }
+.aiExplChip--match{ background:rgba(22,163,74,.12); color:#15803d; border:1px solid rgba(22,163,74,.24); }
+.aiExplChip--miss{ background:rgba(120,120,120,.10); color:#6b7280; border:1px solid rgba(120,120,120,.22); }
+.aiExplSub{ flex-basis:100%; display:flex; flex-wrap:wrap; align-items:center; gap:4px; margin-top:2px; font-size:11px; color:#777; }
+.aiExplVerif{ color:#1a5c68; font-weight:600; }
+.aiExplOver{ color:#c2681a; font-weight:600; }
+[data-theme="dark"] .aiExplLine{ color:#9fb6bb; }
+[data-theme="dark"] .aiExplChip--match{ background:rgba(34,197,94,.14); color:#4ade80; border-color:rgba(34,197,94,.26); }
+[data-theme="dark"] .aiExplChip--miss{ background:rgba(200,200,200,.08); color:#9aa5aa; border-color:rgba(200,200,200,.16); }
+[data-theme="dark"] .aiExplSub{ color:#8a979b; }
+[data-theme="dark"] .aiExplVerif{ color:#66ddd4; }
+[data-theme="dark"] .aiExplOver{ color:#f0a860; }

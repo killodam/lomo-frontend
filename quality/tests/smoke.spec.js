@@ -1447,7 +1447,8 @@ test('AI matching uses backend-ranked candidates before local fallback', async (
   await page.click('#btnRunAiMatch');
 
   await expect(page.locator('#aiMatchResults')).toContainText('Анна React');
-  await expect(page.locator('#aiMatchResults')).toContainText('Совпали навыки');
+  // The structured explainability block replaces the old free-text reasons.
+  await expect(page.locator('#aiMatchResults')).toContainText('Совпадение по навыкам');
   await expect.poll(() => matchPayload && matchPayload.jobText).toContain('React TypeScript');
 });
 
