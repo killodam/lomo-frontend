@@ -1824,7 +1824,18 @@
         <div class="doneStepP">Никаких фейков — только реальные данные</div>
       </div>
     </div>
-    <button class="accentBtn doneCtaBtn" data-next="toDashboard" id="doneCtaEmployer">Найти кандидатов →</button>
+    <button type="button" class="accentBtn doneCtaBtn" id="doneCtaEmployer">Попробовать AI-подбор →</button>
+  </div>
+
+  <!-- Employer onboarding step 2: prefilled AI matching -->
+  <div class="doneView hidden" id="doneViewEmployerStep2">
+    <div class="doneIconBig">✨</div>
+    <div class="doneTitle">Опишите, кого ищете — AI подберёт кандидатов</div>
+    <div class="onbForm">
+      <div class="sqInput"><textarea id="onbEmployerJobInput" class="onbEmployerTextarea" rows="4" placeholder="Опишите роль, навыки, опыт, формат и бюджет"></textarea></div>
+    </div>
+    <button type="button" class="accentBtn doneCtaBtn onbPickBtn" id="onbEmployerMatchBtn">Подобрать кандидатов</button>
+    <button type="button" class="onbGhostLink" id="onbEmployerSkip">Пропустить</button>
   </div>
 
 </div>

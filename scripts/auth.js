@@ -22,8 +22,10 @@ function pruneStaleLocalStorage(keepUserId) {
 function showOnboardingScreen(role) {
   var candidateView = document.getElementById('doneViewCandidate');
   var employerView = document.getElementById('doneViewEmployer');
+  var employerStep2 = document.getElementById('doneViewEmployerStep2');
   var messageView = document.getElementById('doneViewMessage');
   if (messageView) messageView.classList.add('hidden');
+  if (employerStep2) employerStep2.classList.add('hidden');
 
   if (role !== 'employer' && typeof startCandidateOnboarding === 'function') {
     startCandidateOnboarding({ step: 1 });

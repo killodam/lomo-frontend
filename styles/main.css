@@ -959,3 +959,7 @@ body,
 .pubProfileAdminLoadBtn{
   transition:background .15s ease, border-color .15s ease;
 }
+
+/* Employer onboarding step 2 — prefilled AI-match textarea */
+.onbEmployerTextarea{ width:100%; min-height:96px; resize:vertical; border:none; background:transparent; font:inherit; color:inherit; line-height:1.5; outline:none; }
+#doneViewEmployerStep2 .onbForm{ max-width:460px; }

@@ -300,6 +300,48 @@ function onbDismissChecklist() {
   }).catch(function () {});
 }
 
+/* ── Employer onboarding: welcome cards → prefilled AI matching ──────── */
+
+var ONB_EMPLOYER_EXAMPLE = 'Ищем middle frontend-разработчика: React, TypeScript, опыт от 2 лет, удалённо, до 250 000 ₽';
+
+function showEmployerOnboardingStep2() {
+  var step1 = onbEl('doneViewEmployer');
+  var step2 = onbEl('doneViewEmployerStep2');
+  var input = onbEl('onbEmployerJobInput');
+  if (step1) step1.classList.add('hidden');
+  if (step2) step2.classList.remove('hidden');
+  // Prefill as a real value (editable, kept on focus) — only when empty, so a
+  // returning user's own text is never overwritten. One click then yields results.
+  if (input && !input.value.trim()) input.value = ONB_EMPLOYER_EXAMPLE;
+}
+
+function onbEmployerGoDashboard() {
+  if (typeof showEmployerDashboard === 'function') showEmployerDashboard();
+  else show('employerSearch');
+}
+
+function onbEmployerRunMatch() {
+  var input = onbEl('onbEmployerJobInput');
+  var text = input ? input.value.trim() : '';
+
+  onbEmployerGoDashboard();
+
+  // Reuse the shared AI-match modal + engine (no duplicated result rendering):
+  // open it, hand over the text, and trigger the existing run in one click.
+  var openBtn = document.getElementById('btnOpenAiMatch');
+  if (openBtn) openBtn.click();
+
+  var ta = document.getElementById('aiMatchTextarea');
+  if (ta && text) {
+    ta.value = text;
+    ta.dispatchEvent(new Event('input'));
+  }
+  if (text) {
+    var runBtn = document.getElementById('btnRunAiMatch');
+    if (runBtn) runBtn.click();
+  }
+}
+
 /* ── Wiring ──────────────────────────────────────────────────────────── */
 
 (function initOnboardingUi() {
@@ -307,6 +349,10 @@ function onbDismissChecklist() {
     var el = onbEl(id);
     if (el) el.addEventListener('click', handler);
   }
+
+  bind('doneCtaEmployer', function () { showEmployerOnboardingStep2(); });
+  bind('onbEmployerMatchBtn', function () { onbEmployerRunMatch(); });
+  bind('onbEmployerSkip', function () { onbEmployerGoDashboard(); });
 
   bind('onbStep1Next', function () { onbShowStep(2); });
   bind('onbSkipAll', function () { onbGoDashboard(); });
