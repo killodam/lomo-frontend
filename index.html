@@ -1774,13 +1774,16 @@
         <button type="button" class="onbChip" data-onb-doctype="work">Трудовая книжка</button>
         <button type="button" class="onbChip" data-onb-doctype="courses">Сертификат</button>
       </div>
-      <div class="dropZone onbDropZone" id="onbDropZone">Перетащите файл сюда</div>
+      <div class="dropZone onbDropZone" id="onbDropZone">
+        <svg class="onbDropIcon" width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        <span class="onbDropText">Перетащите файл сюда</span>
+      </div>
       <input class="fileInput" id="onbFileInput" type="file" accept=".pdf,.jpg,.jpeg,.png,image/jpeg,image/png,application/pdf"/>
-      <button type="button" class="sqBtn onbPickBtn" id="onbPickFileBtn">Выбрать файл</button>
+      <button type="button" class="accentBtn onbPickBtn" id="onbPickFileBtn">Выбрать файл</button>
       <div class="miniHint onbFineprint">PDF, JPG или PNG до 10 МБ. Документы видны только модератору — работодатель получает доступ лишь с вашего разрешения.</div>
       <div class="onbUploading hidden" id="onbUploading">Загружаем файл…</div>
       <div class="onbInlineError hidden" id="onbUploadError">Не удалось загрузить файл. Проверьте, что он меньше 10 МБ, и попробуйте ещё раз.</div>
-      <button type="button" class="sqBtn hidden" id="onbRetryBtn">Повторить</button>
+      <button type="button" class="accentBtn ghostBtn onbRetryBtn hidden" id="onbRetryBtn">Повторить</button>
       <button type="button" class="onbGhostLink" id="onbSkipDoc">Загружу позже</button>
     </div>
 

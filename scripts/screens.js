@@ -205,7 +205,19 @@ function show(key, options) {
     if (typeof renderFeedCompletenessBanner === 'function') renderFeedCompletenessBanner();
   }
   if (targetKey === 'employerSearch') loadEmployerSearch();
-  if (targetKey === 'myEmployeeProfile') hydrateCvPrivacy();
+  // Wire upload inputs/dropzones/avatar on every open of a profile-edit screen,
+  // so the zones work regardless of the entry point (feed banner, progress
+  // hints, notification deep-links — not only the toEmployee/EmployerProfile
+  // routes). The wiring is idempotent, so repeated show() calls are safe.
+  if (targetKey === 'myEmployeeProfile') {
+    hydrateCvPrivacy();
+    if (typeof wireProfileEditScreen === 'function') {
+      setTimeout(function () { wireProfileEditScreen('employee'); }, 0);
+    }
+  }
+  if (targetKey === 'myEmployerProfile' && typeof wireProfileEditScreen === 'function') {
+    setTimeout(function () { wireProfileEditScreen('employer'); }, 0);
+  }
   if (window.LOMO_CHAT_UI && typeof window.LOMO_CHAT_UI.handleScreenChange === 'function') {
     window.LOMO_CHAT_UI.handleScreenChange(targetKey);
   }

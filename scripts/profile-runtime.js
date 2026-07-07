@@ -839,6 +839,10 @@ function wireDropZones() {
     const zone = document.getElementById(zoneId);
     const inp = document.getElementById(inputId);
     if (!zone || !inp) return;
+    // Idempotent: show() can call this on every profile-edit open, so guard
+    // against binding the listeners twice (mirrors wireProofs' proofBound flag).
+    if (zone.dataset.dropZoneBound) return;
+    zone.dataset.dropZoneBound = '1';
     zone.addEventListener('click', function () {
       openPickerForInput(inp, getPickerOptionsFromInput(inp), inp._lomoHandleFiles);
     });
@@ -877,9 +881,23 @@ function wireAvatar(inputId, hintId, imgId, target) {
     handleAvatarSelection(files && files[0] ? files[0] : null, input, hintId, imgId, target);
   };
   bindNativeInputPicker(input, input._lomoHandleFiles);
+  // Idempotent: show() may re-wire the profile screen on every open.
+  if (input.dataset.avatarBound) return;
+  input.dataset.avatarBound = '1';
   input.addEventListener('change', function () {
     handleAvatarSelection(input.files && input.files[0] ? input.files[0] : null, input, hintId, imgId, target);
   });
+}
+
+// Wires all upload inputs/dropzones/avatar for a profile-edit screen. Safe to
+// call on every show() of the screen — every underlying wiring is idempotent.
+function wireProfileEditScreen(role) {
+  if (typeof wireProofs === 'function') wireProofs();
+  if (typeof wireDropZones === 'function') wireDropZones();
+  if (typeof wireAvatar === 'function') {
+    if (role === 'employer') wireAvatar('mpEAvatar', 'mpEAvatarHint', 'mpEAvatarImg', 'employer');
+    else wireAvatar('mpCAvatar', 'mpCAvatarHint', 'mpCAvatarImg', 'employee');
+  }
 }
 
 function buildAvatarDataUrl(file, done) {

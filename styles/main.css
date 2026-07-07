@@ -689,17 +689,23 @@ body,
 .onbForm{ width:100%; max-width:420px; display:flex; flex-direction:column; gap:10px; text-align:left; }
 .onbFieldLabel{ font-size:12px; font-weight:700; color:#2a7a8a; margin-top:4px; }
 .onbChipRow{ display:flex; flex-wrap:wrap; gap:8px; }
-.onbChip{ font-size:13px; font-weight:600; padding:8px 16px; border-radius:999px; border:1px solid rgba(38,110,120,.18); background:rgba(235,248,250,.6); color:#1a5c68; cursor:pointer; transition:all .15s ease; }
-.onbChip:hover{ border-color:rgba(38,110,120,.42); }
-.onbChip.selected{ background:rgba(38,110,120,.16); border-color:#2a7a8a; box-shadow:0 0 0 1px #2a7a8a inset; }
-.onbInlineError{ font-size:12px; color:#b91c1c; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.25); border-radius:10px; padding:8px 12px; line-height:1.4; }
+.onbChip{ font-size:13px; font-weight:600; padding:8px 16px; border-radius:999px; border:1px solid rgba(38,110,120,.18); background:rgba(235,248,250,.6); color:#1a5c68; cursor:pointer; transition:transform .15s ease, background .15s ease, border-color .15s ease, box-shadow .15s ease; }
+.onbChip:hover{ background:rgba(38,110,120,.10); border-color:rgba(38,110,120,.42); transform:translateY(-1px); }
+.onbChip.selected{ background:#2a7a8a; border-color:#2a7a8a; color:#fff; font-weight:700; box-shadow:0 4px 12px rgba(38,110,120,.28); }
+.onbChip.selected:hover{ background:#256b78; transform:translateY(-1px); }
+.onbInlineError{ font-size:12px; color:#b91c1c; background:rgba(239,68,68,.08); border:1px solid rgba(239,68,68,.25); border-radius:16px; padding:12px 16px; line-height:1.45; max-width:420px; }
 .onbInlineError.hidden{ display:none; }
 .onbGhostLink{ background:none; border:none; font-size:13px; color:#2a7a8a; text-decoration:underline; cursor:pointer; padding:6px; }
 .onbGhostLink:hover{ opacity:.75; }
 .onbLookingRow{ margin-top:6px; }
 .onbDocTypeRow{ justify-content:center; }
-.onbDropZone{ width:100%; max-width:420px; padding:28px 16px; text-align:center; border:2px dashed rgba(38,110,120,.28); border-radius:14px; cursor:pointer; font-size:13px; }
-.onbPickBtn{ min-width:160px; }
+.onbDropZone{ display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; width:100%; max-width:420px; padding:26px 16px; text-align:center; border:2px dashed rgba(38,110,120,.30); border-radius:16px; background:rgba(38,110,120,.035); cursor:pointer; font-size:13px; transition:background .15s ease, border-color .15s ease; }
+.onbDropZone:hover{ background:rgba(38,110,120,.08); border-color:rgba(38,110,120,.48); }
+.onbDropZone.dropZone--over{ background:rgba(38,110,120,.12); border-color:#2a7a8a; }
+.onbDropIcon{ color:#2a7a8a; }
+.onbDropText{ color:#2a7a8a; font-weight:600; }
+.onbPickBtn{ min-width:180px; padding:12px 24px; font-size:13px; text-transform:none; }
+.onbRetryBtn{ min-width:160px; padding:11px 22px; font-size:13px; text-transform:none; margin-top:2px; }
 .onbFineprint{ max-width:420px; text-align:center; line-height:1.4; }
 .onbUploading{ font-size:13px; font-weight:700; color:#2a7a8a; }
 .onbUploading.hidden{ display:none; }
@@ -716,7 +722,13 @@ body,
 .onbChecklistLink:hover{ opacity:.75; }
 
 :root[data-theme="dark"] .onbChip{ background:rgba(56,178,172,.10); color:#9ee8e0; border-color:rgba(78,205,196,.28); }
-:root[data-theme="dark"] .onbChip.selected{ background:rgba(56,178,172,.22); border-color:#4ecdc4; box-shadow:0 0 0 1px #4ecdc4 inset; }
+:root[data-theme="dark"] .onbChip:hover{ background:rgba(56,178,172,.18); border-color:rgba(78,205,196,.5); }
+:root[data-theme="dark"] .onbChip.selected{ background:#38b2ac; border-color:#4ecdc4; color:#04242a; box-shadow:0 4px 12px rgba(56,178,172,.32); }
+:root[data-theme="dark"] .onbChip.selected:hover{ background:#4ecdc4; }
+:root[data-theme="dark"] .onbDropZone{ background:rgba(56,178,172,.06); border-color:rgba(78,205,196,.3); }
+:root[data-theme="dark"] .onbDropZone:hover{ background:rgba(56,178,172,.12); border-color:rgba(78,205,196,.5); }
+:root[data-theme="dark"] .onbDropIcon,
+:root[data-theme="dark"] .onbDropText{ color:#66ddd4; }
 :root[data-theme="dark"] .onbFieldLabel,
 :root[data-theme="dark"] .onbStepLabel,
 :root[data-theme="dark"] .onbUploading,

@@ -1070,13 +1070,8 @@ document.addEventListener('input', function (e) {
           const gotoTab = next.getAttribute('data-goto-tab') || '';
           if (typeof resetDisplay === 'function') resetDisplay();
           hydrateEmployerForm();
-          show('myEmployerProfile');
+          show('myEmployerProfile'); // show() wires uploads/dropzones/avatar
           if (gotoTab && typeof activateProfileTab === 'function') activateProfileTab('screenMyEmployerProfile', gotoTab);
-          setTimeout(() => {
-            wireProofs();
-            wireDropZones();
-            wireAvatar('mpEAvatar', 'mpEAvatarHint', 'mpEAvatarImg', 'employer');
-          }, 0);
           return;
         }
 
@@ -1084,13 +1079,8 @@ document.addEventListener('input', function (e) {
           const gotoTab = next.getAttribute('data-goto-tab') || '';
           if (typeof resetDisplay === 'function') resetDisplay();
           hydrateEmployeeForm();
-          show('myEmployeeProfile');
+          show('myEmployeeProfile'); // show() wires uploads/dropzones/avatar
           if (gotoTab && typeof activateProfileTab === 'function') activateProfileTab('screenMyEmployeeProfile', gotoTab);
-          setTimeout(() => {
-            wireProofs();
-            wireDropZones();
-            wireAvatar('mpCAvatar', 'mpCAvatarHint', 'mpCAvatarImg', 'employee');
-          }, 0);
           return;
         }
 
