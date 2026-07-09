@@ -517,11 +517,8 @@
   // results. Verification uses the cumulative lomo_level from the backend.
 
   var SCORE_TOOLTIP = 'Процент — это близость текста вашей вакансии к профилю кандидата плюс бонусы за верификацию и совпадение грейда';
-  var EXPL_GRADE_LABELS = { intern: 'Intern', junior: 'Junior', middle: 'Middle', senior: 'Senior', lead: 'Lead' };
-
   function explGradeLabel(g) {
-    var k = String(g || '').toLowerCase();
-    return EXPL_GRADE_LABELS[k] || g || '';
+    return typeof gradeLabel === 'function' ? gradeLabel(g) : (g || '');
   }
 
   function explFormatRub(n) {
@@ -694,7 +691,7 @@
       : '<div class="aiResultAvatarFallback">' + esc((c.full_name || 'U').charAt(0).toUpperCase()) + '</div>';
     var verified = c.is_verified ? '<span class="aiResultVerifiedBadge">✓</span>' : '';
     var tags = [
-      c.grade ? '<span class="aiResultTag">' + esc(c.grade) + '</span>' : '',
+      c.grade ? '<span class="aiResultTag">' + esc(explGradeLabel(c.grade)) + '</span>' : '',
       c.work_format ? '<span class="aiResultTag">' + esc(c.work_format) + '</span>' : '',
       c.looking_for_work ? '<span class="aiResultTagActive">В поиске</span>' : '',
     ].filter(Boolean).join('');

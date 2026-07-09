@@ -855,10 +855,10 @@
           <div class="sqInput">
             <select id="mpCGrade">
               <option value="">Грейд — не выбран</option>
-              <option value="junior">Junior</option>
-              <option value="middle">Middle</option>
-              <option value="senior">Senior</option>
-              <option value="lead">Lead</option>
+              <option value="junior">Начальный</option>
+              <option value="middle">Средний</option>
+              <option value="senior">Продвинутый</option>
+              <option value="lead">Эксперт</option>
             </select>
           </div>
           <div class="formatCheckRow" id="mpCFormatRow">
@@ -1324,7 +1324,7 @@
             </select>
             <select id="jobFilterGrade" class="feedFilterSelect">
               <option value="">Любой грейд</option>
-              <option>Junior</option><option>Middle</option><option>Senior</option><option>Lead</option>
+              <option value="Junior">Начальный</option><option value="Middle">Средний</option><option value="Senior">Продвинутый</option><option value="Lead">Эксперт</option>
             </select>
           </div>
         </div>
@@ -1703,7 +1703,7 @@
         <div class="sqInput">
           <select id="jobSelectGrade" class="sqSelect">
             <option value="">— Грейд (необязательно) —</option>
-            <option>Junior</option><option>Middle</option><option>Senior</option><option>Lead</option>
+            <option value="Junior">Начальный</option><option value="Middle">Средний</option><option value="Senior">Продвинутый</option><option value="Lead">Эксперт</option>
           </select>
         </div>
       </div>
@@ -1783,10 +1783,10 @@
         <div class="onbInlineError hidden" id="onbJobError">Укажите должность — без неё AI-подбор не сможет вас порекомендовать</div>
         <div class="onbFieldLabel">Грейд</div>
         <div class="onbChipRow" id="onbGradeChips">
-          <button type="button" class="onbChip" data-onb-grade="junior">Junior</button>
-          <button type="button" class="onbChip" data-onb-grade="middle">Middle</button>
-          <button type="button" class="onbChip" data-onb-grade="senior">Senior</button>
-          <button type="button" class="onbChip" data-onb-grade="lead">Lead</button>
+          <button type="button" class="onbChip" data-onb-grade="junior">Начальный</button>
+          <button type="button" class="onbChip" data-onb-grade="middle">Средний</button>
+          <button type="button" class="onbChip" data-onb-grade="senior">Продвинутый</button>
+          <button type="button" class="onbChip" data-onb-grade="lead">Эксперт</button>
         </div>
         <div class="onbFieldLabel">Формат работы</div>
         <div class="onbChipRow" id="onbFormatChips">
@@ -2012,10 +2012,10 @@
                 <div class="aiMatchFilterMini">Уровень опыта</div>
                 <div class="aiMatchChipRow">
                   <button type="button" class="aiMatchChip active" data-grade="">Любой</button>
-                  <button type="button" class="aiMatchChip" data-grade="junior">Начинающий</button>
-                  <button type="button" class="aiMatchChip" data-grade="middle">Специалист</button>
-                  <button type="button" class="aiMatchChip" data-grade="senior">Старший</button>
-                  <button type="button" class="aiMatchChip" data-grade="lead">Руководитель</button>
+                  <button type="button" class="aiMatchChip" data-grade="junior">Начальный</button>
+                  <button type="button" class="aiMatchChip" data-grade="middle">Средний</button>
+                  <button type="button" class="aiMatchChip" data-grade="senior">Продвинутый</button>
+                  <button type="button" class="aiMatchChip" data-grade="lead">Эксперт</button>
                 </div>
               </div>
             </div>
@@ -2834,6 +2834,7 @@
 
 <script defer src="./config.js"></script>
 <script defer src="./capacitor.js"></script>
+<script defer src="./scripts/constants.js?v=26"></script>
 <script defer src="./scripts/runtime.js?v=26"></script>
 <script defer src="./scripts/api.js?v=26"></script>
 <script defer src="./scripts/state.js?v=26"></script>

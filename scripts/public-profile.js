@@ -62,7 +62,7 @@
       return [];
     }
 
-    var GRADE_LABELS = { intern:'Стажёр', junior:'Junior', middle:'Middle', senior:'Senior', lead:'Lead' };
+    // GRADE_LABELS / gradeLabel come from constants.js (shared dictionary).
     var FORMAT_LABELS = { remote:'Удалённо', office:'Офис', hybrid:'Гибрид' };
 
     function openUserProfile(u, fromScreenKey){
@@ -325,7 +325,7 @@
               + '<div class="pubJobMeta">'
                 + escHtml(j.direction)
                 + ' · ' + escHtml(j.format)
-                + (j.grade ? ' · ' + escHtml(j.grade) : '')
+                + (j.grade ? ' · ' + escHtml(gradeLabel(j.grade)) : '')
                 + (sal ? ' · ' + sal : '')
                 + (j.city ? ' · 📍 ' + escHtml(j.city) : '')
               + '</div>'

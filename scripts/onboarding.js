@@ -302,7 +302,7 @@ function onbDismissChecklist() {
 
 /* ── Employer onboarding: welcome cards → prefilled AI matching ──────── */
 
-var ONB_EMPLOYER_EXAMPLE = 'Ищем middle frontend-разработчика: React, TypeScript, опыт от 2 лет, удалённо, до 250 000 ₽';
+var ONB_EMPLOYER_EXAMPLE = 'Ищем мидл frontend-разработчика: React, TypeScript, опыт от 2 лет, удалённо, до 250 000 ₽';
 
 function showEmployerOnboardingStep2() {
   var step1 = onbEl('doneViewEmployer');

@@ -78,7 +78,7 @@ function submitSaveSearch() {
 
 function savedSearchCriteria(s) {
   var parts = [];
-  if (s.grade) parts.push(s.grade);
+  if (s.grade) parts.push(typeof gradeLabel === 'function' ? gradeLabel(s.grade) : s.grade);
   if (s.format) parts.push(s.format);
   if (s.verifiedOnly) parts.push('✓ верифиц.');
   if (s.activeOnly) parts.push('в поиске');

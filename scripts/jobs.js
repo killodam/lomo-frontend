@@ -13,7 +13,6 @@ var JOB_DIRECTIONS_IT = ['Frontend','Backend','Fullstack','DevOps','Data','Mobil
 var JOB_DIRECTIONS_FIN = ['Бухгалтерия','Аудит','Финансовый анализ','Банкинг','Инвестиции','Fintech'];
 var JOB_EXPERIENCES = ['Опыт не нужен','От 1 года','От 2 лет','От 3 лет','От 5 лет'];
 var JOB_FORMATS = ['Удалённо','Офис','Гибрид'];
-var JOB_GRADES = ['Junior','Middle','Senior','Lead'];
 
 function jobEsc(s) {
   return String(s||'').replace(/[&<>"']/g, function(c) {
@@ -97,7 +96,7 @@ function renderJobFeed(data, list, pager) {
         + (sal ? '<span class="jobMetaPill salary">💰 ' + sal + '</span>' : '')
         + '<span class="jobMetaPill">' + jobEsc(j.format) + '</span>'
         + '<span class="jobMetaPill">' + jobEsc(j.experience) + '</span>'
-        + (j.grade ? '<span class="jobMetaPill">' + jobEsc(j.grade) + '</span>' : '')
+        + (j.grade ? '<span class="jobMetaPill">' + jobEsc(gradeLabel(j.grade)) + '</span>' : '')
         + '<span class="jobMetaPill dir">' + jobEsc(j.direction) + '</span>'
         + (j.city ? '<span class="jobMetaPill">📍 ' + jobEsc(j.city) + '</span>' : '')
       + '</div>'
