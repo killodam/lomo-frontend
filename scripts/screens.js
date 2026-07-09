@@ -206,7 +206,10 @@ function show(key, options) {
     loadCandidateFeed();
     if (typeof renderFeedCompletenessBanner === 'function') renderFeedCompletenessBanner();
   }
-  if (targetKey === 'employerSearch') loadEmployerSearch();
+  if (targetKey === 'employerSearch') {
+    loadEmployerSearch();
+    if (typeof renderSavedSearches === 'function') renderSavedSearches();
+  }
   // Wire upload inputs/dropzones/avatar on every open of a profile-edit screen,
   // so the zones work regardless of the entry point (feed banner, progress
   // hints, notification deep-links — not only the toEmployee/EmployerProfile

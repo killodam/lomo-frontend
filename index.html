@@ -1407,6 +1407,11 @@
       </div>
     </div>
 
+    <div class="savedSearchPanel hidden" id="savedSearchPanel">
+      <div class="savedSearchPanelHead">Сохранённые поиски</div>
+      <div id="savedSearchList" class="savedSearchList"></div>
+    </div>
+
     <div class="feedContent">
       <div id="employerCandidateList" class="feedListWrap empListWrap"></div>
       <div id="employerCandidatePager" class="pager"></div>
@@ -1414,6 +1419,31 @@
 
   </div>
 </section>
+
+<!-- Save AI search modal -->
+<div class="modalOverlay" id="saveSearchModal" aria-hidden="true">
+  <div class="modalCard" role="dialog" aria-modal="true">
+    <div class="modalTop">
+      <div class="modalTitle">Сохранить поиск</div>
+      <button class="modalClose" type="button" id="saveSearchClose" aria-label="Закрыть">×</button>
+    </div>
+    <div class="modalBody">
+      <div class="onbFieldLabel">Название</div>
+      <div class="sqInput"><input id="saveSearchName" type="text" placeholder="Название поиска" autocomplete="off"></div>
+      <label class="lookingToggleRow saveSearchToggleRow">
+        <span class="lookingToggleText">
+          <span class="lookingToggleTitle">Сообщать о новых подходящих кандидатах на email</span>
+        </span>
+        <span class="lookingToggleControl">
+          <input type="checkbox" id="saveSearchNotify" class="lookingToggleInput" checked>
+          <span class="lookingToggleTrack"><span class="lookingToggleThumb"></span></span>
+        </span>
+      </label>
+      <div class="onbInlineError hidden" id="saveSearchError"></div>
+      <button type="button" class="accentBtn onbPickBtn" id="saveSearchSubmit">Сохранить</button>
+    </div>
+  </div>
+</div>
 
 <!-- CHAT -->
 <section id="screenChat" class="screen" aria-label="Чаты LOMO">
@@ -2052,6 +2082,7 @@
         <div class="aiMatchResultsToolbar">
           <button type="button" id="btnAiMatchBack" class="aiMatchBackBtn">← Изменить запрос</button>
           <span class="aiMatchResultCount" id="aiMatchResultCount"></span>
+          <button type="button" id="btnSaveSearch" class="pillBtn soft savedSearchSaveBtn">Сохранить этот поиск</button>
         </div>
         <div id="aiMatchResults" class="aiMatchResultsList"></div>
       </div>
@@ -2820,6 +2851,7 @@
 <script defer src="./scripts/profile-runtime.js?v=26"></script>
 <script defer src="./scripts/onboarding.js?v=26"></script>
 <script defer src="./scripts/referral.js?v=26"></script>
+<script defer src="./scripts/saved-searches.js?v=26"></script>
 <script defer src="./scripts/notifications-ui.js?v=26"></script>
 <script defer src="./scripts/lomo-badge.js?v=26"></script>
 <script defer src="./scripts/ui-shell.js?v=26"></script>

@@ -997,3 +997,19 @@ body,
 .referralBadge{ font-size:13px; font-weight:700; color:#92400e; background:rgba(245,158,11,.12); border:1px solid rgba(245,158,11,.28); border-radius:12px; padding:8px 12px; }
 .referralBadge.hidden{ display:none; }
 :root[data-theme="dark"] .referralBadge{ color:#fbbf24; }
+
+/* Saved searches */
+.savedSearchSaveBtn{ margin-left:auto; }
+.savedSearchPanel{ max-width:960px; margin:0 auto 12px; padding:12px 16px; border:1px solid rgba(38,110,120,.16); border-radius:16px; background:rgba(38,110,120,.04); }
+.savedSearchPanel.hidden{ display:none; }
+.savedSearchPanelHead{ font-size:13px; font-weight:800; color:#1a5c68; margin-bottom:10px; }
+.savedSearchList{ display:flex; flex-direction:column; gap:8px; }
+.savedSearchItem{ display:flex; align-items:center; justify-content:space-between; gap:10px; padding:10px 12px; border:1px solid rgba(38,110,120,.12); border-radius:12px; background:#fff; flex-wrap:wrap; }
+.savedSearchName{ font-size:14px; font-weight:700; color:#222; }
+.savedSearchMeta{ font-size:12px; color:#777; margin-top:2px; }
+.savedSearchActions{ display:flex; gap:6px; align-items:center; flex-wrap:wrap; }
+.saveSearchToggleRow{ margin-top:6px; }
+:root[data-theme="dark"] .savedSearchPanel{ background:rgba(56,178,172,.06); border-color:rgba(78,205,196,.22); }
+:root[data-theme="dark"] .savedSearchPanelHead{ color:#9ee8e0; }
+:root[data-theme="dark"] .savedSearchItem{ background:#141c1e; border-color:rgba(78,205,196,.14); }
+:root[data-theme="dark"] .savedSearchName{ color:#d6e4e6; }

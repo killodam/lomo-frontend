@@ -235,6 +235,25 @@ function apiGetReferralSummary() {
   return apiFetch('/profile/referral');
 }
 
+function apiGetSavedSearches() {
+  return apiFetch('/saved-searches');
+}
+
+function apiCreateSavedSearch(payload) {
+  return apiFetch('/saved-searches', { method: 'POST', body: JSON.stringify(payload) });
+}
+
+function apiDeleteSavedSearch(id) {
+  return apiFetch('/saved-searches/' + encodeURIComponent(id), { method: 'DELETE' });
+}
+
+function apiToggleSavedSearchNotify(id, notifyEmail) {
+  return apiFetch('/saved-searches/' + encodeURIComponent(id) + '/notify', {
+    method: 'PATCH',
+    body: JSON.stringify({ notifyEmail: notifyEmail }),
+  });
+}
+
 async function apiLogin(email, password) {
   const data = await apiFetch('/auth/login', {
     method: 'POST',
