@@ -1006,7 +1006,9 @@ document.addEventListener('input', function (e) {
                   return;
                 }
                 // --- End validation ---
-                const regResult = await apiRegister(email, password, role, fullName);
+                var referralCode = typeof getStoredReferralCode === 'function' ? getStoredReferralCode() : '';
+                const regResult = await apiRegister(email, password, role, fullName, referralCode);
+                if (referralCode && typeof clearStoredReferralCode === 'function') clearStoredReferralCode();
                 const user = regResult.user;
                 const profile = regResult.profile;
               state.email = user.email;

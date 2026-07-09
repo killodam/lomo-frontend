@@ -218,13 +218,21 @@ async function apiFetchBlob(path, opts = {}) {
   return response.blob();
 }
 
-async function apiRegister(email, password, role, name) {
+async function apiRegister(email, password, role, name, referralCode) {
   const data = await apiFetch('/auth/register', {
     method: 'POST',
-    body: JSON.stringify({ email, password, role, name }),
+    body: JSON.stringify({ email, password, role, name, referral_code: referralCode || undefined }),
   });
   setToken();
   return data;
+}
+
+function apiGetReferralInfo(code) {
+  return apiFetch('/auth/referral/' + encodeURIComponent(code));
+}
+
+function apiGetReferralSummary() {
+  return apiFetch('/profile/referral');
 }
 
 async function apiLogin(email, password) {

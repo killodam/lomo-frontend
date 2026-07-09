@@ -184,6 +184,7 @@ function show(key, options) {
     clearScreenInputs('regForm');
     updateConsentRoleText();
     resetConsents();
+    if (typeof renderReferralBanner === 'function') renderReferralBanner();
   }
   if (targetKey === 'loginForm') {
     clearScreenInputs('loginForm');
@@ -197,6 +198,7 @@ function show(key, options) {
     loadIncomingRequests();
     loadOwnConnections();
     if (typeof renderOnboardingChecklist === 'function') renderOnboardingChecklist();
+    if (typeof renderReferralBlock === 'function') renderReferralBlock();
   }
   if (targetKey === 'recruiterPublic') loadOwnConnections();
   if (targetKey === 'adminQueue') { loadAdminQueue(); loadAdminUsers(); switchAdminTab('docs'); }

@@ -388,6 +388,7 @@
 </div>
 <div class="centerBlock">
 <div class="regFormTitle">Создай аккаунт</div>
+<div class="referralBanner hidden" id="regReferralBanner"></div>
 <div class="formCol">
 <div class="sqInput"><input autocomplete="off" id="regFirstName" placeholder="Имя" type="text"/></div>
 <div class="sqInput"><input autocomplete="off" id="regLastName" placeholder="Фамилия" type="text"/></div>
@@ -1182,6 +1183,17 @@
         <button type="button" class="sqBtn sm hidden" id="btnDownloadCV">Скачать резюме (CV)</button>
         <span class="miniHint" id="epCvHint">—</span>
       </div>
+    </div>
+    <div class="profileSection" id="epReferralSection">
+      <div class="profileSectionHead">Пригласить коллегу</div>
+      <div class="referralIntro">Пригласите знакомых специалистов. Когда 3 приглашённых загрузят документы на проверку — вы получите бейдж «Ранний участник LOMO» и приоритетную верификацию всех ваших будущих документов (до 24 часов вместо 2 дней).</div>
+      <div class="referralLinkRow">
+        <input type="text" id="referralLinkInput" class="referralLinkInput" readonly>
+        <button type="button" class="pillBtn soft" id="referralCopyBtn">Скопировать ссылку</button>
+      </div>
+      <div class="referralProgress" id="referralProgress">Приглашено с загруженным документом: 0 из 3</div>
+      <div class="referralBadge hidden" id="referralBadge">🏅 Ранний участник LOMO — приоритетная верификация включена</div>
+      <button type="button" class="accentBtn onbPickBtn" id="referralShareBtn">Поделиться</button>
     </div>
     <div class="profileSection hidden" id="epBadgeSection">
       <div class="profileSectionHead">Ваш значок LOMO</div>
@@ -2807,6 +2819,7 @@
 <script defer src="./scripts/auth-ui.js?v=26"></script>
 <script defer src="./scripts/profile-runtime.js?v=26"></script>
 <script defer src="./scripts/onboarding.js?v=26"></script>
+<script defer src="./scripts/referral.js?v=26"></script>
 <script defer src="./scripts/notifications-ui.js?v=26"></script>
 <script defer src="./scripts/lomo-badge.js?v=26"></script>
 <script defer src="./scripts/ui-shell.js?v=26"></script>
