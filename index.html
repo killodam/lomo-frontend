@@ -196,13 +196,14 @@
               <span class="ldAiDemoStar">✨</span>
               <span class="ldAiDemoTitle">AI-Мэтчинг</span>
             </div>
-            <div class="ldAiDemoInput">Ищем финансового аналитика. Опыт с МСФО, 1С, Excel. Банковский сектор, Москва или удалённо...</div>
+            <textarea id="ldDemoInput" class="ldAiDemoInput ldAiDemoInputLive" rows="3" placeholder="Опишите, кого ищете — например: ищем финансового аналитика, опыт с МСФО, 1С, Excel, Москва или удалённо..."></textarea>
+            <button type="button" id="ldDemoRun" class="ldAiDemoRunBtn">Подобрать</button>
             <div class="ldAiDemoFilters">
               <span class="ldAiDemoChip active">💰 Финансы</span>
               <span class="ldAiDemoChip active">✓ Верифицированные</span>
               <span class="ldAiDemoChip">🌐 Удалённо</span>
             </div>
-            <div class="ldAiDemoResults">
+            <div class="ldAiDemoResults" id="ldDemoResults">
               <div class="ldAiDemoResult">
                 <div class="ldAiDemoAv" style="background:linear-gradient(135deg,#1a5c68,#0e3a42)">АС</div>
                 <div class="ldAiDemoInfo">
@@ -228,6 +229,7 @@
                 <div class="ldAiDemoScore" style="--pct:79">79%</div>
               </div>
             </div>
+            <button type="button" id="ldDemoCta" class="ldAiDemoCta">Зарегистрируйтесь, чтобы найти реальных кандидатов</button>
           </div>
           <div class="ldAiGlow"></div>
         </div>
@@ -2856,6 +2858,7 @@
 <script defer src="./scripts/referral.js?v=26"></script>
 <script defer src="./scripts/saved-searches.js?v=26"></script>
 <script defer src="./scripts/feed-sidebar.js?v=26"></script>
+<script defer src="./scripts/landing-demo.js?v=26"></script>
 <script defer src="./scripts/notifications-ui.js?v=26"></script>
 <script defer src="./scripts/lomo-badge.js?v=26"></script>
 <script defer src="./scripts/ui-shell.js?v=26"></script>
