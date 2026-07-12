@@ -189,7 +189,7 @@ function initLandingCounter() {
 
 /* ── Landing: scroll-triggered step animation ───────────────────── */
 function initLandingStepObserver() {
-  var steps = document.querySelectorAll('.ldStepAnim');
+  var steps = document.querySelectorAll('.ldStepAnim, .ldReveal');
   if (!steps.length) return;
   if (!('IntersectionObserver' in window)) {
     for (var i = 0; i < steps.length; i++) steps[i].classList.add('visible');

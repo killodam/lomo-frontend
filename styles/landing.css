@@ -1247,3 +1247,57 @@
   .ldCounter { align-items: flex-start; }
   .ldCounterLabel { text-align: left; }
 }
+
+/* ── 4a: Desktop scale pass — bigger hero type, more air between sections.
+   Scoped to >=761px so the existing mobile blocks stay untouched. ──────── */
+@media (min-width: 761px) {
+  .ldHero { margin-top: 44px; padding-bottom: 112px; gap: 64px; }
+  .ldH1 { font-size: 66px; letter-spacing: -2.8px; }
+  .ldSub { font-size: 18px; max-width: 440px; }
+  .ldPill { font-size: 13px; padding: 6px 15px; }
+  .ldBtnPrimary { padding: 15px 34px; font-size: 16px; }
+  .ldCounterNum { font-size: 44px; }
+  .ldCounterLabel { font-size: 13px; }
+
+  .ldNiches { padding-bottom: 112px; }
+  .ldSteps { padding-top: 96px; padding-bottom: 112px; }
+  .ldTrust { padding-bottom: 112px; }
+  .ldCta { padding-bottom: 96px; }
+  .ldAi { padding-top: 112px; padding-bottom: 112px; }
+
+  .ldSectionLabel { font-size: 14px; margin-bottom: 40px; }
+  .ldAiH { font-size: 42px; }
+  .ldAiSub { font-size: 17px; }
+  .ldCtaH { font-size: 42px; }
+
+  .ldNicheIcon { font-size: 38px; }
+  .ldNicheH { font-size: 19px; }
+  .ldStepNum { width: 40px; height: 40px; font-size: 17px; }
+  .ldStepH { font-size: 17px; }
+}
+
+/* ── 4b: scroll-reveal (same mechanism as .ldStepAnim) + hover accents ── */
+.ldReveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity .55s ease, transform .55s ease;
+}
+.ldReveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.ldNichesGrid .ldReveal:nth-child(2),
+.ldTrustGrid .ldReveal:nth-child(2) { transition-delay: .1s; }
+.ldTrustGrid .ldReveal:nth-child(3) { transition-delay: .2s; }
+.ldTrustGrid .ldReveal:nth-child(4) { transition-delay: .3s; }
+
+.ldAiDemoResult { transition: background .2s ease, transform .2s ease; }
+.ldAiDemoResult:hover { transform: translateX(4px); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ldReveal, .ldStepAnim {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
