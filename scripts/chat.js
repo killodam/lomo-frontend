@@ -386,7 +386,7 @@
       html +=
         '<div class="chatAttachmentBlock">' +
           '<span class="chatAttachment chatAttachmentMuted" title="Вложения в чате временно отключены">' +
-            '<span class="chatAttachmentIcon">📎</span>' +
+            '<span class="chatAttachmentIcon">' + (typeof lomoIcon === 'function' ? lomoIcon('clip') : '📎') + '</span>' +
             '<span class="chatAttachmentLabel"><span class="chatAttachmentTitle">' + escapedName + '</span><span class="chatAttachmentHint">Вложения временно отключены</span></span>' +
           '</span>' +
         '</div>';

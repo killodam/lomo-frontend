@@ -229,21 +229,24 @@
 
     if (!isEmployer && user.salary_expectations) {
       var badgeRow = body.querySelector('.scBadgeRow') || createElement('div', 'scBadgeRow');
-      salaryBadge = createElement('span', 'scSalaryBadge', '💰 ' + user.salary_expectations);
+      salaryBadge = createElement('span', 'scSalaryBadge', ' ' + user.salary_expectations);
+      salaryBadge.insertAdjacentHTML('afterbegin', lomoIcon('ruble'));
       badgeRow.appendChild(salaryBadge);
       if (!badgeRow.parentNode) body.insertBefore(badgeRow, body.firstChild);
     }
 
     if (!isEmployer && user.looking_for_work) {
       var lookingRow = body.querySelector('.scBadgeRow') || createElement('div', 'scBadgeRow');
-      lookingBadge = createElement('span', 'scLookingBadge', '🟢 Активно ищет');
+      lookingBadge = createElement('span', 'scLookingBadge', ' Активно ищет');
+      lookingBadge.insertAdjacentHTML('afterbegin', '<span class="dotOnline"></span>');
       lookingRow.insertBefore(lookingBadge, lookingRow.firstChild);
       if (!lookingRow.parentNode) body.insertBefore(lookingRow, body.firstChild);
     }
 
     if (isEmployer && user.salary_offer) {
       var offerRow = body.querySelector('.scBadgeRow') || createElement('div', 'scBadgeRow');
-      salaryOfferBadge = createElement('span', 'scSalaryOfferBadge', '💼 ' + user.salary_offer);
+      salaryOfferBadge = createElement('span', 'scSalaryOfferBadge', ' ' + user.salary_offer);
+      salaryOfferBadge.insertAdjacentHTML('afterbegin', lomoIcon('briefcase'));
       offerRow.appendChild(salaryOfferBadge);
       if (!offerRow.parentNode) body.insertBefore(offerRow, body.firstChild);
     }

@@ -1013,3 +1013,15 @@ body,
 :root[data-theme="dark"] .savedSearchPanelHead{ color:#9ee8e0; }
 :root[data-theme="dark"] .savedSearchItem{ background:#141c1e; border-color:rgba(78,205,196,.14); }
 :root[data-theme="dark"] .savedSearchName{ color:#d6e4e6; }
+
+/* ── Shared inline-SVG icons (scripts/icons.js) ───────────────────────── */
+.lomoIco{
+  width:1em; height:1em;
+  display:inline-block; vertical-align:-0.125em;
+  flex:none;
+}
+.dotOnline{
+  display:inline-block; width:8px; height:8px; border-radius:50%;
+  background:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,.16);
+  vertical-align:1px;
+}

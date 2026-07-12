@@ -4,7 +4,8 @@
   function applyTheme(t) {
     document.documentElement.setAttribute('data-theme', t);
     document.querySelectorAll('[data-theme-icon]').forEach(function (icon) {
-      icon.textContent = t === 'dark' ? '☀️' : '🌙';
+      if (typeof lomoIcon === 'function') icon.innerHTML = lomoIcon(t === 'dark' ? 'sun' : 'moon');
+      else icon.textContent = t === 'dark' ? '☀️' : '🌙';
     });
     document.querySelectorAll('[data-theme-label]').forEach(function (label) {
       label.textContent = t === 'dark' ? 'Светлая тема' : 'Тёмная тема';

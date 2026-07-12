@@ -98,7 +98,9 @@ function renderSavedSearches() {
     list.innerHTML = items.map(function (s) {
       var date = '';
       try { date = new Date(s.createdAt).toLocaleDateString('ru-RU'); } catch (e) {}
-      var bell = s.notifyEmail ? '🔔' : '🔕';
+      var bell = typeof lomoIcon === 'function'
+        ? lomoIcon(s.notifyEmail ? 'bell' : 'bell-off')
+        : (s.notifyEmail ? '🔔' : '🔕');
       return '<div class="savedSearchItem" data-ss-id="' + escHtml(s.id) + '">' +
         '<div class="savedSearchInfo">' +
           '<div class="savedSearchName">' + escHtml(s.name) + '</div>' +

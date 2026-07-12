@@ -93,12 +93,12 @@ function renderJobFeed(data, list, pager) {
         + '<div class="jobCardTitle">' + jobEsc(j.title) + '</div>'
       + '</div>'
       + '<div class="jobCardMeta">'
-        + (sal ? '<span class="jobMetaPill salary">💰 ' + sal + '</span>' : '')
+        + (sal ? '<span class="jobMetaPill salary">' + lomoIcon('ruble') + ' ' + sal + '</span>' : '')
         + '<span class="jobMetaPill">' + jobEsc(j.format) + '</span>'
         + '<span class="jobMetaPill">' + jobEsc(j.experience) + '</span>'
         + (j.grade ? '<span class="jobMetaPill">' + jobEsc(gradeLabel(j.grade)) + '</span>' : '')
         + '<span class="jobMetaPill dir">' + jobEsc(j.direction) + '</span>'
-        + (j.city ? '<span class="jobMetaPill">📍 ' + jobEsc(j.city) + '</span>' : '')
+        + (j.city ? '<span class="jobMetaPill">' + lomoIcon('pin') + ' ' + jobEsc(j.city) + '</span>' : '')
       + '</div>'
       + (skills ? '<div class="jobCardSkills">' + skills + '</div>' : '')
       + '<div class="jobCardFooter">'

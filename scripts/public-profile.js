@@ -91,7 +91,7 @@
 
       // ── BADGES ROW ────────────────────────────────────────────────────
       var badges = '';
-      badges += '<span class="pubBadgeRole '+(isEmployer?'employer':'candidate')+'">'+(isEmployer?'🏢 Работодатель':'👤 Кандидат')+'</span>';
+      badges += '<span class="pubBadgeRole '+(isEmployer?'employer':'candidate')+'">'+(isEmployer?lomoIcon('building')+' Работодатель':lomoIcon('user')+' Кандидат')+'</span>';
       if (!isEmployer && u.grade && GRADE_LABELS[u.grade.toLowerCase()]) {
         badges += '<span class="pubBadge grade">'+escHtml(GRADE_LABELS[u.grade.toLowerCase()] || u.grade)+'</span>';
       }
@@ -102,7 +102,7 @@
         });
       }
       if (!isEmployer && u.looking_for_work) {
-        badges += '<span class="pubBadge active">🟢 В поиске работы</span>';
+        badges += '<span class="pubBadge active"><span class="dotOnline"></span> В поиске работы</span>';
       }
       // Verification: кумулятивный уровень LOMO (1 — email, 2 — личность,
       // 3 — опыт/образование). Источник истины — сервер (verification_level
@@ -130,10 +130,10 @@
 
       // ── META PILLS (location, education, connections) ─────────────────
       var metaPills = '';
-      if (u.location) metaPills += '<span class="pubMetaPill">📍 '+escHtml(u.location)+'</span>';
-      if (!isEmployer && u.edu_place) metaPills += '<span class="pubMetaPill">🎓 '+escHtml(u.edu_place+(u.edu_year?' · '+u.edu_year:''))+'</span>';
-      if (u.industry && isEmployer) metaPills += '<span class="pubMetaPill">🏭 '+escHtml(u.industry)+'</span>';
-      if (Number(u.connections_count || 0) > 0) metaPills += '<span class="pubMetaPill">🤝 '+escHtml(String(u.connections_count))+' контактов</span>';
+      if (u.location) metaPills += '<span class="pubMetaPill">'+lomoIcon('pin')+' '+escHtml(u.location)+'</span>';
+      if (!isEmployer && u.edu_place) metaPills += '<span class="pubMetaPill">'+lomoIcon('cap')+' '+escHtml(u.edu_place+(u.edu_year?' · '+u.edu_year:''))+'</span>';
+      if (u.industry && isEmployer) metaPills += '<span class="pubMetaPill">'+lomoIcon('building')+' '+escHtml(u.industry)+'</span>';
+      if (Number(u.connections_count || 0) > 0) metaPills += '<span class="pubMetaPill">'+lomoIcon('users')+' '+escHtml(String(u.connections_count))+' контактов</span>';
 
       // ── SKILLS ────────────────────────────────────────────────────────
       var skills = _parseSkills(u.skills);
@@ -212,11 +212,11 @@
         anonLockedHtml =
           '<div class="pubProfileSection pubLockedSection">' +
             '<div class="pubLockedBlur" aria-hidden="true">' +
-              '<div class="pubLockedRow">📞 +7 9•• ••• ••-••</div>' +
-              '<div class="pubLockedRow">✉️ ••••••@••••••.ru</div>' +
-              '<div class="pubLockedRow">💰 Зарплатные ожидания</div>' +
+              '<div class="pubLockedRow">' + lomoIcon('phone') + ' +7 9•• ••• ••-••</div>' +
+              '<div class="pubLockedRow">' + lomoIcon('mail') + ' ••••••@••••••.ru</div>' +
+              '<div class="pubLockedRow">' + lomoIcon('ruble') + ' Зарплатные ожидания</div>' +
             '</div>' +
-            '<div class="pubLockedOverlay">🔒 Контакты и отклик доступны зарегистрированным работодателям</div>' +
+            '<div class="pubLockedOverlay">' + lomoIcon('lock') + ' Контакты и отклик доступны зарегистрированным работодателям</div>' +
           '</div>';
 
         var stickyTitle = verLevel > 0
@@ -327,7 +327,7 @@
                 + ' · ' + escHtml(j.format)
                 + (j.grade ? ' · ' + escHtml(gradeLabel(j.grade)) : '')
                 + (sal ? ' · ' + sal : '')
-                + (j.city ? ' · 📍 ' + escHtml(j.city) : '')
+                + (j.city ? ' · ' + lomoIcon('pin') + ' ' + escHtml(j.city) : '')
               + '</div>'
             + '</div>';
           }).join('');

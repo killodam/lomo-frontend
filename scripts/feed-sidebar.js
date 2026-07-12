@@ -74,7 +74,7 @@ function renderFeedSidebar() {
   html += '<button type="button" class="fsProfileBtn" id="fsProfileBtn">Мой профиль</button>';
 
   if (src.isCandidate) {
-    html += '<button type="button" class="fsReferralLink" id="fsReferralBtn">🤝 Пригласить коллегу</button>';
+    html += '<button type="button" class="fsReferralLink" id="fsReferralBtn">' + (typeof lomoIcon === 'function' ? lomoIcon('users') + ' ' : '') + 'Пригласить коллегу</button>';
   }
 
   aside.innerHTML = html;
