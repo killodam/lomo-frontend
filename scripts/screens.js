@@ -205,6 +205,7 @@ function show(key, options) {
   if (targetKey === 'candidateFeed') {
     loadCandidateFeed();
     if (typeof renderFeedCompletenessBanner === 'function') renderFeedCompletenessBanner();
+    if (typeof renderFeedSidebar === 'function') renderFeedSidebar();
   }
   if (targetKey === 'employerSearch') {
     loadEmployerSearch();
