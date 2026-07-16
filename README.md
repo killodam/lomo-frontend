@@ -1,6 +1,6 @@
 # LOMO Frontend
 
-SPA-фронтенд LOMO, развёрнутый на Vercel и работающий как installable PWA.
+SPA-фронтенд LOMO, работающий как installable PWA. Канонический продакшн отдаётся backend-приложением из синхронизированной `backend/public` копии; Vercel-домен используется только как permanent redirect на `https://www.lomo.website`.
 
 ## Что внутри
 
@@ -45,7 +45,7 @@ npm run lint
 npm run test:smoke
 ```
 
-Для ручной разработки фронтенд можно открывать напрямую или через локальный статический сервер. Боевой backend ожидается по `/api` через Vercel rewrites.
+Для ручной разработки фронтенд можно открывать напрямую или через локальный статический сервер. На локальном host `api.js` ходит в Amvera backend; на продакшн-доменах API ожидается под тем же origin по `/api`.
 
 ## Качество
 
@@ -55,9 +55,10 @@ npm run test:smoke
 
 ## Деплой
 
-- ветка: `main`
-- платформа: `Vercel`
+- ветка frontend-источника: `main`
+- основной продакшн: backend/Amvera отдаёт синхронизированный `backend/public`
+- Vercel: `lomo-frontend.vercel.app` должен отвечать `308` на `https://www.lomo.website`
 - runtime sanity:
-  - frontend root должен отвечать `200`
+  - canonical frontend root должен отвечать `200`
   - `manifest.webmanifest` должен быть доступен
   - service worker должен регистрироваться без ошибок
