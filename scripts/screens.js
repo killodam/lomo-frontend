@@ -1,10 +1,6 @@
 const drawer = document.getElementById('drawer');
 const drawerOverlay = document.getElementById('drawerOverlay');
 const drawerCloseBtn = document.getElementById('drawerCloseBtn');
-const infoModal = document.getElementById('infoModal');
-const modalTitle = document.getElementById('modalTitle');
-const modalBody = document.getElementById('modalBody');
-const modalCloseBtn = document.getElementById('modalCloseBtn');
 
 const screens = {
   landing: document.getElementById('screenLanding'),

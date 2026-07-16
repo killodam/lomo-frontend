@@ -5,7 +5,7 @@ SPA-фронтенд LOMO, развёрнутый на Vercel и работаю�
 ## Что внутри
 
 - `index.html` — основной экранный shell и HTML-разметка
-- `styles/main.css` — входная точка стилей, собирающая `core/profile/theme/responsive/chat`
+- `styles/*.css` — стили подключаются напрямую из `index.html`; `main.css` хранит дополнительные продуктовые блоки и совместимость
 - `config.js` — frontend-конфиг API и среды
 - `scripts/api.js` — HTTP-слой и работа с backend API
 - `scripts/state.js` — клиентское состояние приложения
@@ -18,18 +18,21 @@ SPA-фронтенд LOMO, развёрнутый на Vercel и работаю�
 - `scripts/ui-shell.js` — drawer, модалки, статические UI-связки
 - `scripts/chat.js` — клиентская подготовка под чат
 - `scripts/runtime.js` — PWA/install/runtime monitoring hooks
+- `scripts/info-screens.js` — полноэкранные legal/info-экраны из drawer/footer
+- `scripts/onboarding.js`, `scripts/referral.js`, `scripts/saved-searches.js`, `scripts/subscriptions.js` — текущие продуктовые модули
 - `sw.js`, `manifest.webmanifest`, `offline.html` — PWA-слой
 - `quality/` — lint и Playwright smoke-тесты
 
 ## Архитектура
 
-Фронтенд остаётся vanilla SPA без framework runtime, но уже разбит на независимые слои:
+Фронтенд остаётся vanilla SPA без framework runtime и build step, но уже разбит на независимые слои:
 
 1. `api.js` отвечает только за backend-коммуникацию.
 2. `state.js` хранит текущего пользователя, профили, ленты, контакты и чат.
 3. `screens.js` переключает экраны и связывает high-level переходы.
 4. `auth.js`, `admin.js`, `public-profile.js`, `profile-runtime.js`, `ui-shell.js` реализуют доменные куски UI.
-5. `runtime.js` добавляет service worker, install prompt и client error reporting.
+5. `info-screens.js` обслуживает полноэкранные информационные, legal и FAQ-экраны.
+6. `runtime.js` добавляет service worker, install prompt и client error reporting.
 
 Это позволяет развивать продукт дальше без возврата к монолитному `legacy-app.js`.
 
