@@ -120,6 +120,16 @@ function renderRecruiterPublic() {
 
   var rpIsVerified = isProofVerified(p.proofs?.companyDoc);
   if (typeof showVerifBannerIfNeeded === 'function') showVerifBannerIfNeeded('rpVerifBanner', rpIsVerified);
+
+  if (window.lomoPosts && state.userId) {
+    window.lomoPosts.render(document.getElementById('rpPosts'), {
+      authorId: state.userId,
+      canCompose: true,
+      authorRole: 'employer',
+      authorName: (p.company || p.fullName || '').trim(),
+      avatarUrl: p.avatarDataUrl || '',
+    });
+  }
 }
 
 function renderEmployeePublic() {
@@ -219,6 +229,16 @@ function renderEmployeePublic() {
   });
   if (typeof showVerifBannerIfNeeded === 'function') showVerifBannerIfNeeded('epVerifBanner', epIsVerified);
   if (typeof renderLomoBadgeSection === 'function') renderLomoBadgeSection();
+
+  if (window.lomoPosts && state.userId) {
+    window.lomoPosts.render(document.getElementById('epPosts'), {
+      authorId: state.userId,
+      canCompose: true,
+      authorRole: 'candidate',
+      authorName: (p.fullName || '').trim(),
+      avatarUrl: p.avatarDataUrl || '',
+    });
+  }
 }
 
 function escapeHtml(value) {

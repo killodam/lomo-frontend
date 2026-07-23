@@ -2949,3 +2949,180 @@ test('employer company verification form saves through apiFetch', async ({ page 
   expect(savedPayload.official_website).toBe('lomo.website');
   await expect(page.locator('#companyVerifyBanner')).toContainText('Документы на проверке');
 });
+
+test('candidate profile renders posts and like updates optimistically', async ({ page }) => {
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+    const method = request.method();
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'cand-77', email: 'candidate@example.com', role: 'candidate' },
+          profile: { full_name: 'Иван Кандидат', public_id: 'LOMO-CAND0077' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(paginated([], 1, 12, 0)) });
+    }
+
+    if (url.pathname.endsWith('/posts') && method === 'GET') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          { id: 'post-1', author_id: 'cand-77', author_role: 'candidate', full_name: 'Иван Кандидат', content: 'Мой первый пост о работе', image_url: null, likes_count: 2, liked_by_me: false, created_at: new Date().toISOString() },
+        ]),
+      });
+    }
+
+    if (url.pathname.endsWith('/posts/post-1/like') && method === 'POST') {
+      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true, liked: true, likes_count: 3 }) });
+    }
+
+    return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
+  });
+
+  await openLogin(page);
+  await page.evaluate(() => { document.cookie = 'lomo_csrf=test-suite; path=/'; });
+  await page.fill('#loginEmail', 'candidate@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await page.click('#feedMyProfileBtn');
+  await expect(page.locator('#screenEmployeePublic')).toHaveClass(/active/);
+
+  // Composer present on own profile; post card rendered.
+  await expect(page.locator('#epPosts .postComposer')).toBeVisible();
+  await expect(page.locator('#epPosts .postCard')).toContainText('Мой первый пост о работе');
+  await expect(page.locator('#epPosts .postLikeCount')).toHaveText('2');
+
+  // Optimistic like: count bumps to 3 and button gains liked state.
+  await page.click('#epPosts .postLikeBtn');
+  await expect(page.locator('#epPosts .postLikeBtn')).toHaveClass(/liked/);
+  await expect(page.locator('#epPosts .postLikeCount')).toHaveText('3');
+});
+
+test('candidate can publish a text post from the composer', async ({ page }) => {
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+    const method = request.method();
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'cand-88', email: 'candidate@example.com', role: 'candidate' },
+          profile: { full_name: 'Пётр Кандидат', public_id: 'LOMO-CAND0088' },
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/profile/feed')) {
+      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(paginated([], 1, 12, 0)) });
+    }
+
+    if (url.pathname.endsWith('/posts') && method === 'GET') {
+      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
+    }
+
+    if (url.pathname.endsWith('/posts') && method === 'POST') {
+      return route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify({ id: 'post-new', author_id: 'cand-88', author_role: 'candidate', full_name: 'Пётр Кандидат', content: 'Свежая публикация', image_url: null, likes_count: 0, liked_by_me: false, created_at: new Date().toISOString() }),
+      });
+    }
+
+    return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
+  });
+
+  await openLogin(page);
+  await page.evaluate(() => { document.cookie = 'lomo_csrf=test-suite; path=/'; });
+  await page.fill('#loginEmail', 'candidate@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await page.click('#feedMyProfileBtn');
+  await expect(page.locator('#screenEmployeePublic')).toHaveClass(/active/);
+  await expect(page.locator('#epPosts .postsEmpty')).toBeVisible();
+
+  await page.fill('#epPosts .postComposerInput', 'Свежая публикация');
+  await page.click('#epPosts .postComposerSubmit');
+
+  await expect(page.locator('#epPosts .postCard')).toContainText('Свежая публикация');
+});
+
+test('admin can moderate posts from the Публикации tab', async ({ page }) => {
+  let deleteReason = null;
+  let deleteHit = false;
+
+  await page.route('**/api/**', async (route) => {
+    const request = route.request();
+    const url = new URL(request.url());
+    const method = request.method();
+
+    if (url.pathname.endsWith('/auth/login')) {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          user: { id: 'admin-9', email: 'admin@example.com', login: 'admin', role: 'admin' },
+          profile: null,
+          achievements: [],
+        }),
+      });
+    }
+
+    if (url.pathname.endsWith('/admin/queue')) {
+      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(paginated([], 1, 20, 0)) });
+    }
+
+    if (url.pathname.endsWith('/admin/posts') && method === 'GET') {
+      return route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify([
+          { id: 'post-x', author_id: 'author-9', author_role: 'candidate', full_name: 'Спамер Иванов', author_email: 'spam@example.com', content: 'Купите курсы за 3 рубля', image_url: null, likes_count: 0, created_at: new Date().toISOString() },
+        ]),
+      });
+    }
+
+    if (url.pathname.includes('/admin/posts/post-x') && method === 'DELETE') {
+      deleteHit = true;
+      deleteReason = (request.postDataJSON() || {}).reason;
+      return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify({ ok: true }) });
+    }
+
+    return route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify([]) });
+  });
+
+  await openLogin(page);
+  await page.evaluate(() => { document.cookie = 'lomo_csrf=test-suite; path=/'; });
+  await page.fill('#loginEmail', 'admin@example.com');
+  await page.fill('#loginPassword', 'secret123');
+  await page.click('[data-next="fromLoginForm"]');
+
+  await expect(page.locator('#screenAdminQueue')).toHaveClass(/active/);
+
+  // Auto-accept the delete-reason prompt.
+  page.on('dialog', (dialog) => dialog.accept('Спам'));
+
+  await page.click('#adminTabPosts');
+  await expect(page.locator('#adminPostsList')).toContainText('Купите курсы за 3 рубля');
+  await expect(page.locator('#adminPostsList')).toContainText('Спамер Иванов');
+
+  await page.click('#adminPostsList .dangerBtn');
+  await expect.poll(() => deleteHit).toBe(true);
+  await expect.poll(() => deleteReason).toBe('Спам');
+  await expect(page.locator('#adminPostsList')).toContainText('Публикаций нет');
+});

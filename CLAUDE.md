@@ -137,6 +137,43 @@ migrations/
 
 ---
 
+### Posts Feed + Likes (migration 021)
+
+A LinkedIn-style post feed for candidates AND companies. Both author types share one
+`posts` table; author type is derived from `users.role` (never a separate column).
+
+**Placement — Variant A (locked for MVP):** posts appear ONLY in a "Публикации" section
+on the author's own profile and public profile (`/p/LOMO-...`). They are NOT mixed into the
+main candidate feed (`GET /api/profile/feed`). Rationale: the feed's SQL (JOIN + GROUP BY +
+pagination + sort + search) and the AI-matching/filters all operate strictly on profile
+cards; injecting posts would force every filter and pagination boundary to special-case a
+second row type. **Variant B (posts also in the shared feed) is the NEXT iteration if the
+feature catches on — do NOT build it now.**
+
+Key decisions:
+- `posts.likes_count` is denormalized and RECOMPUTED after each like/unlike inside a
+  transaction (`SET likes_count = (SELECT COUNT(*) ...)`), mirroring `jobs.applications_count`.
+  No DB triggers (the codebase has none), no increment/decrement races.
+- Soft-delete by admin only: `deleted_at` / `deleted_by` / `deleted_reason` (like
+  `documents.reject_reason`). Author-initiated delete is a hard delete of their own post.
+- Post images are PUBLIC content → stored UNENCRYPTED as plain static files in
+  `<uploadDir>/posts/`, served at `/post-images/<uuid>.<ext>` via `express.static` (long
+  cache, off the `/api` prefix). They deliberately do NOT go through the encrypted
+  `/api/upload` + `/api/files/:id` pipeline (that is for private documents / passports).
+  Validation is reused though: MIME allow-list (jpg/png/webp only) + magic bytes + size limit.
+- Text ≤ 3000 chars (CHECK in DB + `ensureString` on the route). Always `escapeHtml()` the
+  content and author name on render (open user input, real XSS risk).
+- Rate limiting is two-level: broad `/api/posts` prefix limit in `app.js` (120/min) guards
+  reads/likes; a tight per-user `posts-create` limit (5/hour) is applied INSIDE `routes/posts.js`
+  directly on `router.post('/')`. This is the first method-specific `rateLimit()` in the
+  codebase — necessary because prefix-level limits in `app.js` can't target a single method.
+- Like notifications: in-app only (`type: 'post_like'` via `createNotification`), fired every
+  time (not once), never for a self-like, never by email.
+
+Routes (`routes/posts.js`): `POST /api/posts` (create, multipart, candidate/company only),
+`GET /api/posts?author_id=` (public list), `DELETE /api/posts/:id` (author or admin),
+`POST|DELETE /api/posts/:id/like`. Admin moderation lives in `routes/admin.js`.
+
 ### AI-Matching Engine (ai-matching.js)
 
 Fully standalone — zero external APIs, no Claude/ChatGPT/OpenAI calls. Runs in browser only.

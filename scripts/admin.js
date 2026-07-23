@@ -1917,7 +1917,7 @@ function loadAdminEmployers(page) {
 }
 
 function switchAdminTab(tab) {
-  ['docs', 'candidates', 'employers', 'users'].forEach(function (key) {
+  ['docs', 'candidates', 'employers', 'users', 'posts'].forEach(function (key) {
     var panel = document.getElementById('adminTabPanel' + key.charAt(0).toUpperCase() + key.slice(1));
     var button = document.getElementById('adminTab' + key.charAt(0).toUpperCase() + key.slice(1));
     if (panel) panel.classList.toggle('hidden', key !== tab);
@@ -1928,6 +1928,102 @@ function switchAdminTab(tab) {
   if (tab === 'candidates') loadAdminCandidates();
   if (tab === 'employers') loadAdminEmployers();
   if (tab === 'users') loadAdminUsers();
+  if (tab === 'posts') loadAdminPosts();
+}
+
+// ── Posts moderation ──────────────────────────────────────────────────────
+function loadAdminPosts() {
+  var listEl = document.getElementById('adminPostsList');
+  if (!listEl) return;
+  var search = (document.getElementById('adminPostSearch')?.value || '').trim();
+  listEl.innerHTML = '<div class="adminListLoading">Загрузка...</div>';
+
+  apiAdminPosts(search ? { search: search } : {}).then(function (posts) {
+    renderAdminPosts(posts || []);
+  }).catch(function (error) {
+    listEl.innerHTML = '<div class="adminEmptyState">' + escapeHtml(safeErrorText(error)) + '</div>';
+  });
+}
+
+var debouncedLoadAdminPosts = typeof debounce === 'function' ? debounce(loadAdminPosts, 220) : loadAdminPosts;
+
+function adminPostAuthorLine(post) {
+  var name = post.full_name || post.company || 'Без имени';
+  var roleLabel = post.author_role === 'employer' ? 'Компания' : 'Кандидат';
+  return escapeHtml(name) + ' · ' + roleLabel
+    + (post.author_email ? ' · ' + escapeHtml(post.author_email) : '');
+}
+
+function renderAdminPosts(list) {
+  var listEl = document.getElementById('adminPostsList');
+  if (!listEl) return;
+  if (!list.length) {
+    listEl.innerHTML = '<div class="adminEmptyState">Публикаций нет</div>';
+    return;
+  }
+
+  listEl.innerHTML = '';
+  var fragment = document.createDocumentFragment();
+  list.forEach(function (post) {
+    var card = document.createElement('div');
+    card.className = 'adminPostRow';
+    card.setAttribute('data-admin-post-id', String(post.id));
+
+    var head = document.createElement('div');
+    head.className = 'adminPostHead';
+    var meta = document.createElement('div');
+    meta.className = 'adminPostMeta';
+    meta.innerHTML = adminPostAuthorLine(post);
+    head.appendChild(meta);
+    var likes = document.createElement('span');
+    likes.className = 'adminPostLikes';
+    likes.textContent = '♥ ' + (Number(post.likes_count) || 0);
+    head.appendChild(likes);
+    card.appendChild(head);
+
+    if (post.content) {
+      var body = document.createElement('div');
+      body.className = 'adminPostBody';
+      body.textContent = post.content;
+      card.appendChild(body);
+    }
+
+    if (post.image_url) {
+      var img = document.createElement('img');
+      img.className = 'adminPostImage';
+      img.loading = 'lazy';
+      img.alt = 'Изображение публикации';
+      img.src = (typeof resolveBackendUrl === 'function') ? resolveBackendUrl(post.image_url) : post.image_url;
+      card.appendChild(img);
+    }
+
+    var footer = document.createElement('div');
+    footer.className = 'adminPostFooter';
+    var delBtn = document.createElement('button');
+    delBtn.type = 'button';
+    delBtn.className = 'sqBtn sm dangerBtn';
+    delBtn.textContent = 'Удалить';
+    delBtn.addEventListener('click', function () { deleteAdminPost(post, card); });
+    footer.appendChild(delBtn);
+    card.appendChild(footer);
+
+    fragment.appendChild(card);
+  });
+  listEl.appendChild(fragment);
+}
+
+function deleteAdminPost(post, card) {
+  var reason = window.prompt('Причина удаления (необязательно):', '');
+  if (reason === null) return; // cancelled
+  apiAdminDeletePost(post.id, reason).then(function () {
+    if (card && card.parentNode) card.parentNode.removeChild(card);
+    var listEl = document.getElementById('adminPostsList');
+    if (listEl && !listEl.querySelector('.adminPostRow')) {
+      listEl.innerHTML = '<div class="adminEmptyState">Публикаций нет</div>';
+    }
+  }).catch(function (error) {
+    window.alert(safeErrorText(error));
+  });
 }
 
 function filterAdminCandidates() {

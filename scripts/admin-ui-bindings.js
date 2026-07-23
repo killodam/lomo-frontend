@@ -68,6 +68,9 @@
     bindInput('adminUserSearch', 'input', function () {
       if (typeof loadAdminUsers === 'function') loadAdminUsers(1);
     });
+    bindInput('adminPostSearch', 'input', function () {
+      if (typeof debouncedLoadAdminPosts === 'function') debouncedLoadAdminPosts();
+    });
 
     document.querySelectorAll('[data-admin-tab]').forEach(function (button) {
       if (button.dataset.adminBound === '1') return;

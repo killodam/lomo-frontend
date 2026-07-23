@@ -271,6 +271,7 @@
             + aboutHtml
             + candidateSections
             + employerSections
+            + '<div class="pubProfileSection" id="pubPostsSection"><div class="pubProfileSTitle">Публикации</div><div id="pubPosts" class="postsContainer"></div></div>'
             + verSection
             + anonLockedHtml
             + publicCvHtml
@@ -298,6 +299,17 @@
       if (canConnect) loadPublicConnectionPanel(u.id);
       if (canEmployerRequest) loadEmployerAccessPanel(u.id);
       if (isEmployer) loadPublicEmployerJobs(u.id);
+
+      if (window.lomoPosts && u.id) {
+        var viewingOwnProfile = !!(state.userId && String(u.id) === String(state.userId));
+        window.lomoPosts.render(document.getElementById('pubPosts'), {
+          authorId: u.id,
+          canCompose: viewingOwnProfile,
+          authorRole: u.role,
+          authorName: displayName,
+          avatarUrl: u.avatar_url,
+        });
+      }
     }
 
     function closeUserProfile(){

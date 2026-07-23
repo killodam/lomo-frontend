@@ -1025,3 +1025,126 @@ body,
   background:#22c55e; box-shadow:0 0 0 3px rgba(34,197,94,.16);
   vertical-align:1px;
 }
+
+/* ── Posts feed + likes (posts-ui.js) ─────────────────────────────────── */
+.postsContainer{ display:flex; flex-direction:column; gap:14px; }
+
+.postComposer{
+  border:1px solid rgba(38,110,120,.16); border-radius:16px;
+  background:rgba(38,110,120,.04); padding:12px 14px;
+  display:flex; flex-direction:column; gap:10px;
+}
+.postComposerInput{
+  width:100%; box-sizing:border-box; resize:vertical; min-height:64px;
+  border:1px solid rgba(38,110,120,.18); border-radius:12px;
+  padding:10px 12px; font:inherit; font-size:14px; color:#222; background:#fff;
+}
+.postComposerInput:focus{ outline:none; border-color:#2a7a8a; box-shadow:0 0 0 3px rgba(42,122,138,.14); }
+.postComposerBar{ display:flex; align-items:center; gap:10px; }
+.postComposerCounter{ font-size:12px; color:#8a9a9d; margin-left:auto; }
+.postComposerSubmit{ padding:9px 18px; }
+.postComposerSubmit:disabled{ opacity:.5; cursor:not-allowed; }
+.postComposerPreview{ position:relative; display:inline-block; max-width:220px; }
+.postComposerPreviewImg{ max-width:220px; max-height:160px; border-radius:12px; display:block; border:1px solid rgba(38,110,120,.14); }
+.postComposerRemoveImg{
+  margin-top:6px; border:none; background:transparent; color:#c0392b;
+  font-size:12px; font-weight:700; cursor:pointer; padding:0;
+}
+
+.postsList{ display:flex; flex-direction:column; gap:14px; }
+.postsEmpty, .postsLoading{ padding:6px 2px; }
+
+.postCard{
+  border:1px solid rgba(38,110,120,.12); border-radius:16px; background:#fff;
+  padding:14px 16px; box-shadow:0 1px 3px rgba(20,50,55,.05);
+  transition:box-shadow .18s ease, transform .18s ease;
+}
+.postCard:hover{ box-shadow:0 6px 18px rgba(20,50,55,.10); transform:translateY(-1px); }
+
+.postCardHead{ display:flex; align-items:center; gap:10px; }
+.postAvatar{
+  width:40px; height:40px; border-radius:50%; flex:none; overflow:hidden;
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 0 0 2px #fff, 0 0 0 4px rgba(42,122,138,.35);
+}
+.postAvatar.employer{ box-shadow:0 0 0 2px #fff, 0 0 0 4px rgba(245,158,11,.4); }
+.postAvatarImg{ width:100%; height:100%; object-fit:cover; }
+.postAvatarFallback{
+  width:100%; height:100%; display:flex; align-items:center; justify-content:center;
+  font-size:14px; font-weight:800; color:#2a7a8a; background:rgba(42,122,138,.12);
+}
+.postAvatar.employer .postAvatarFallback{ color:#b8770a; background:rgba(245,158,11,.14); }
+.postHeadText{ display:flex; flex-direction:column; min-width:0; flex:1; }
+.postAuthorName{ font-size:14px; font-weight:800; color:#1a2b2e; }
+.postHeadMeta{ display:flex; align-items:center; gap:8px; margin-top:2px; }
+.postRoleTag{
+  font-size:11px; font-weight:700; padding:2px 9px; border-radius:99px;
+  background:rgba(42,122,138,.12); color:#1a5c68;
+}
+.postRoleTag.employer{ background:rgba(245,158,11,.14); color:#b8770a; }
+.postDate{ font-size:12px; color:#8a9a9d; }
+.postDeleteBtn{
+  margin-left:auto; border:none; background:transparent; color:#b0bcbe;
+  font-size:20px; line-height:1; cursor:pointer; padding:0 4px; flex:none;
+}
+.postDeleteBtn:hover{ color:#c0392b; }
+
+.postContent{
+  margin-top:10px; font-size:14px; line-height:1.5; color:#2b3a3d;
+  white-space:pre-wrap; word-break:break-word;
+}
+.postImageWrap{ margin-top:10px; }
+.postImage{ max-width:100%; max-height:420px; border-radius:12px; display:block; border:1px solid rgba(38,110,120,.1); }
+
+.postCardFooter{ margin-top:12px; display:flex; align-items:center; gap:12px; }
+.postLikeBtn{
+  display:inline-flex; align-items:center; gap:6px;
+  border:1px solid rgba(38,110,120,.18); border-radius:99px;
+  background:#fff; color:#4a5c5f; padding:6px 14px; font-size:13px; font-weight:700;
+  cursor:pointer; transition:background .15s ease, color .15s ease, border-color .15s ease, transform .1s ease;
+}
+.postLikeBtn:hover{ border-color:rgba(224,49,74,.4); color:#e0314a; }
+.postLikeBtn:active{ transform:scale(.94); }
+.postLikeBtn.liked{ background:rgba(224,49,74,.10); border-color:rgba(224,49,74,.4); color:#e0314a; }
+.postLikeBtn.liked .postLikeIcon svg{ fill:#e0314a; }
+.postLikeBtn.readonly{ cursor:default; }
+.postLikeBtn.readonly:hover{ border-color:rgba(38,110,120,.18); color:#4a5c5f; }
+.postLikeIcon{ display:inline-flex; }
+.postLikeIcon svg{ width:16px; height:16px; }
+.postLikeCount{ min-width:8px; }
+
+:root[data-theme="dark"] .postComposer{ background:rgba(56,178,172,.06); border-color:rgba(78,205,196,.22); }
+:root[data-theme="dark"] .postComposerInput{ background:#141c1e; color:#d6e4e6; border-color:rgba(78,205,196,.2); }
+:root[data-theme="dark"] .postComposerInput:focus{ border-color:#4ecdc4; box-shadow:0 0 0 3px rgba(78,205,196,.16); }
+:root[data-theme="dark"] .postComposerCounter{ color:#7fa3a6; }
+:root[data-theme="dark"] .postCard{ background:#141c1e; border-color:rgba(78,205,196,.14); box-shadow:0 1px 3px rgba(0,0,0,.3); }
+:root[data-theme="dark"] .postCard:hover{ box-shadow:0 6px 18px rgba(0,0,0,.4); }
+:root[data-theme="dark"] .postAuthorName{ color:#e6f2f3; }
+:root[data-theme="dark"] .postRoleTag{ background:rgba(56,178,172,.14); color:#9ee8e0; }
+:root[data-theme="dark"] .postContent{ color:#c9d4d6; }
+:root[data-theme="dark"] .postLikeBtn{ background:#101b1e; color:#a9bdbf; border-color:rgba(78,205,196,.2); }
+:root[data-theme="dark"] .postLikeBtn.liked{ background:rgba(224,49,74,.16); border-color:rgba(224,49,74,.5); color:#ff6b81; }
+:root[data-theme="dark"] .postLikeBtn.liked .postLikeIcon svg{ fill:#ff6b81; }
+
+/* ── Admin posts moderation (admin.js) ────────────────────────────────── */
+.adminPostRow{
+  border:1px solid rgba(38,110,120,.14); border-radius:14px; background:#fff;
+  padding:12px 14px; margin-bottom:12px;
+}
+.adminPostHead{ display:flex; align-items:center; gap:10px; }
+.adminPostMeta{ font-size:13px; font-weight:700; color:#1a5c68; }
+.adminPostLikes{ margin-left:auto; font-size:12px; font-weight:700; color:#e0314a; white-space:nowrap; }
+.adminPostBody{
+  margin-top:8px; font-size:14px; line-height:1.5; color:#2b3a3d;
+  white-space:pre-wrap; word-break:break-word;
+}
+.adminPostImage{ margin-top:10px; max-width:240px; max-height:180px; border-radius:10px; display:block; border:1px solid rgba(38,110,120,.1); }
+.adminPostFooter{ margin-top:10px; display:flex; justify-content:flex-end; }
+.dangerBtn{ color:#c0392b; border-color:rgba(192,57,43,.4); }
+.dangerBtn:hover{ background:rgba(192,57,43,.08); border-color:#c0392b; }
+
+:root[data-theme="dark"] .adminPostRow{ background:#141c1e; border-color:rgba(78,205,196,.14); }
+:root[data-theme="dark"] .adminPostMeta{ color:#9ee8e0; }
+:root[data-theme="dark"] .adminPostBody{ color:#c9d4d6; }
+:root[data-theme="dark"] .dangerBtn{ color:#ff6b81; border-color:rgba(255,107,129,.4); }
+:root[data-theme="dark"] .dangerBtn:hover{ background:rgba(255,107,129,.12); border-color:#ff6b81; }

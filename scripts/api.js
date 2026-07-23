@@ -322,12 +322,55 @@ async function apiAttachDocument(achievement_id, file_url, file_name) {
   });
 }
 
+// ── Posts feed + likes ────────────────────────────────────────────────────
+// Post images live on the backend host under /post-images/... (not /api), so
+// build an absolute URL against BACKEND_BASE for <img src>.
+function resolveBackendUrl(path) {
+  if (!path) return '';
+  if (/^https?:\/\//i.test(path)) return path;
+  return BACKEND_BASE + (path.charAt(0) === '/' ? path : '/' + path);
+}
+
+function apiListPosts(authorId) {
+  return apiFetch('/posts?author_id=' + encodeURIComponent(authorId));
+}
+
+function apiCreatePost(content, imageFile) {
+  var formData = new FormData();
+  formData.append('content', content == null ? '' : content);
+  if (imageFile) formData.append('image', imageFile);
+  return apiFetch('/posts', { method: 'POST', body: formData });
+}
+
+function apiDeletePost(id) {
+  return apiFetch('/posts/' + encodeURIComponent(id), { method: 'DELETE' });
+}
+
+function apiLikePost(id) {
+  return apiFetch('/posts/' + encodeURIComponent(id) + '/like', { method: 'POST' });
+}
+
+function apiUnlikePost(id) {
+  return apiFetch('/posts/' + encodeURIComponent(id) + '/like', { method: 'DELETE' });
+}
+
 async function apiAdminQueue(params = {}) {
   return apiFetch('/admin/queue' + buildQuery(params));
 }
 
 async function apiAdminUsers(params = {}) {
   return apiFetch('/admin/users' + buildQuery(params));
+}
+
+async function apiAdminPosts(params = {}) {
+  return apiFetch('/admin/posts' + buildQuery(params));
+}
+
+async function apiAdminDeletePost(id, reason) {
+  return apiFetch('/admin/posts/' + encodeURIComponent(id), {
+    method: 'DELETE',
+    body: JSON.stringify({ reason: reason || '' }),
+  });
 }
 
 async function apiAdminApprove(docId) {

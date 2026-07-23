@@ -574,6 +574,10 @@
       <div class="blockTitle hidden" id="rpProductsTitle">Продукты</div>
       <div class="profileAbout hidden" id="rpProducts"></div>
     </div>
+    <div class="profileSection" id="rpPostsSection">
+      <div class="profileSectionHead">Публикации</div>
+      <div id="rpPosts" class="postsContainer"></div>
+    </div>
     <div class="profileSection cond">
       <div class="profileSectionHead hidden" id="rpProjectsTitle">Актуальные направления</div>
       <div class="achList" id="rpProjectsList"></div>
@@ -1139,6 +1143,10 @@
       <div class="profileSectionHead">О себе</div>
       <div class="profileAbout" id="epAbout">—</div>
     </div>
+    <div class="profileSection" id="epPostsSection">
+      <div class="profileSectionHead">Публикации</div>
+      <div id="epPosts" class="postsContainer"></div>
+    </div>
     <div class="profileSection" id="epSkillsSection" style="display:none">
       <div class="profileSectionHead">Навыки</div>
       <div class="pubSkillsList" id="epSkillsList"></div>
@@ -1545,6 +1553,7 @@
         <button class="adminTabBtn" id="adminTabCandidates" data-admin-tab="candidates"><svg class="lomoIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg> Кандидаты</button>
         <button class="adminTabBtn" id="adminTabEmployers" data-admin-tab="employers"><svg class="lomoIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 22h18"/><path d="M6 22V4a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v18"/><path d="M10 7h1"/><path d="M13 7h1"/><path d="M10 11h1"/><path d="M13 11h1"/><path d="M10 15h1"/><path d="M13 15h1"/></svg> Компании</button>
         <button class="adminTabBtn" id="adminTabUsers" data-admin-tab="users"><svg class="lomoIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg> Юзеры</button>
+        <button class="adminTabBtn" id="adminTabPosts" data-admin-tab="posts"><svg class="lomoIco" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg> Публикации</button>
       </nav>
     </div>
     <div class="centerBlock">
@@ -1645,6 +1654,18 @@
         </div>
         <div id="adminUsersList"><div class="adminListLoading compact">Загрузка...</div></div>
         <div id="adminUsersPager" class="pager"></div>
+      </div>
+
+      <!-- TAB: Posts moderation -->
+      <div id="adminTabPanelPosts" class="hidden">
+        <div class="adminSectionHead adminSectionHeadWrap">
+          <div class="adminSectionHeading">
+            <div class="adminSectionTitle">Публикации</div>
+            <div class="adminSectionSub">Посты кандидатов и компаний — можно удалить (мягкое удаление)</div>
+          </div>
+          <input id="adminPostSearch" type="text" placeholder="Поиск по тексту, автору или email..." class="sqInput adminSearchInput wide">
+        </div>
+        <div id="adminPostsList"><div class="adminListLoading">Загрузка...</div></div>
       </div>
 
     </div>
@@ -2834,6 +2855,7 @@
 <script defer src="./scripts/admin.js?v=26"></script>
 <script defer src="./scripts/feed-refresh.js?v=26"></script>
 <script defer src="./scripts/public-profile.js?v=26"></script>
+<script defer src="./scripts/posts-ui.js?v=26"></script>
 <script defer src="./scripts/chat.js?v=26"></script>
 <script defer src="./scripts/auth-ui.js?v=26"></script>
 <script defer src="./scripts/profile-runtime.js?v=26"></script>
