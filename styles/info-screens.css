@@ -9,7 +9,8 @@
 #screenHow.screen,
 #screenSecurity.screen,
 #screenTerms.screen,
-#screenPrivacy.screen {
+#screenPrivacy.screen,
+#screenEmployerServices.screen {
   align-items: flex-start;
   justify-content: flex-start;
   flex-direction: column;

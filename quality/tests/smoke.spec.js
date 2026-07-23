@@ -32,7 +32,7 @@ test('landing no longer renders legacy auth or logo screens', async ({ page }) =
   await expect(page.locator('#ldNavLogoImg')).toHaveAttribute('src', './icons/app-icon.svg');
 });
 
-test('service worker precaches landing, feed and subscription assets', async ({ page }) => {
+test('service worker precaches landing and feed assets without public subscription code', async ({ page }) => {
   await page.goto('/');
   await expect.poll(async () => page.evaluate(async () => {
     if (!('caches' in window)) return { hasLanding: false, hasFeed: false, hasSubscriptions: false };
@@ -53,7 +53,7 @@ test('service worker precaches landing, feed and subscription assets', async ({ 
       hasFeed: paths.includes('/styles/feed.css'),
       hasSubscriptions: paths.includes('/scripts/subscriptions.js'),
     };
-  })).toEqual({ hasLanding: true, hasFeed: true, hasSubscriptions: true });
+  })).toEqual({ hasLanding: true, hasFeed: true, hasSubscriptions: false });
 });
 
 test('manifest exposes png install icons for Android shells', async ({ page }) => {
@@ -329,28 +329,13 @@ test('file upload retries one transient gateway error', async ({ page }) => {
   expect(uploadCalls).toBe(2);
 });
 
-test('subscriptions screen opens from drawer and loads public plans', async ({ page }) => {
+test('employer services screen opens from drawer without exposing plans or prices', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
+  var subscriptionRequests = 0;
   await page.route('**/api/**', async (route) => {
     const url = new URL(route.request().url());
 
-    if (url.pathname.endsWith('/subscriptions/plans')) {
-      return route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({
-          candidate: [{
-            key: 'verification_fast_24h',
-            name: 'Быстрая верификация 24ч',
-            price: 490,
-            interval: 'one_time',
-            description: 'Проверка за сутки',
-            features: ['Приоритетная обработка'],
-          }],
-          employer: [],
-        }),
-      });
-    }
+    if (url.pathname.includes('/subscriptions')) subscriptionRequests += 1;
 
     return route.fulfill({
       status: 200,
@@ -361,10 +346,13 @@ test('subscriptions screen opens from drawer and loads public plans', async ({ p
 
   await page.goto('/');
   await page.click('.ldBurger');
-  await page.click('#drawerSubscriptionsBtn');
+  await expect(page.locator('#drawer')).not.toContainText(/Подписки|тариф/i);
+  await page.click('#drawerEmployerServicesBtn');
 
-  await expect(page.locator('#screenSubscriptions')).toHaveClass(/active/);
-  await expect(page.locator('#subscriptionsContent')).toContainText('Быстрая верификация 24ч');
+  await expect(page.locator('#screenEmployerServices')).toHaveClass(/active/);
+  await expect(page.locator('#screenEmployerServices')).toContainText('LOMO предлагает платные услуги продвижения для работодателей');
+  await expect(page.locator('#screenEmployerServices')).not.toContainText(/₽|руб|тариф/i);
+  expect(subscriptionRequests).toBe(0);
 });
 
 test('valid stored session bypasses landing and opens candidate feed', async ({ page }) => {

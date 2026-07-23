@@ -51,7 +51,7 @@
     <button type="button" class="drawerItem" data-drawer-open="contacts">Контакты</button>
     <button type="button" class="drawerItem" data-drawer-open="about">О проекте</button>
 <button type="button" class="drawerItem" data-drawer-open="faq">FAQ</button>
-<button type="button" class="drawerItem" id="drawerSubscriptionsBtn" data-drawer-open="subscriptions">💳 Подписки и тарифы</button>
+<button type="button" class="drawerItem" id="drawerEmployerServicesBtn" data-drawer-open="employerServices">Для работодателей</button>
   </nav>
   <div class="drawerFoot">
     <button type="button" class="drawerThemeBtn" id="themeToggleBtn" data-theme-toggle aria-label="Переключить тему">
@@ -2383,7 +2383,7 @@
           </button>
           <div class="accordionBody">
             <div class="accordionBodyInner">
-              <p>8.1. Часть функций Платформы может предоставляться на платной основе (подписки для Работодателей, ускоренная верификация, пакеты заявок на доступ к документам и др.). Актуальные тарифы публикуются на странице «Подписки и тарифы».</p>
+              <p>8.1. В дальнейшем часть функций Платформы может предоставляться на платной основе. Информация о таких возможностях и условиях их подключения будет опубликована отдельно.</p>
               <p>8.2. Оплата осуществляется через подключённого платёжного оператора. Оператор Платформы не хранит полные реквизиты банковских карт.</p>
               <p>8.3. [Условия возврата средств — уточнить перед запуском платных функций.]</p>
             </div>
@@ -2798,16 +2798,21 @@
   </div>
 </section>
 
-<!-- SCREEN: SUBSCRIPTIONS -->
-<section id="screenSubscriptions" class="screen" aria-label="Подписки и тарифы">
+<!-- SCREEN: EMPLOYER SERVICES -->
+<section id="screenEmployerServices" class="screen" aria-label="Для работодателей">
   <div class="infoScreenHeader">
     <button type="button" class="infoBackBtn" data-info-back>← Назад</button>
-    <span class="infoScreenHeaderTitle">Подписки и тарифы</span>
+    <span class="infoScreenHeaderTitle">Для работодателей</span>
   </div>
   <div class="infoScreenBody">
     <div class="pageContent">
-      <div id="subscriptionsContent">
-        <div class="subLoading">Загрузка тарифов…</div>
+      <div class="infoHero">
+        <div class="infoHeroIcon">🏢</div>
+        <div class="infoHeroTitle">Инструменты для работодателей</div>
+        <div class="infoHeroSub">Дополнительные возможности LOMO для поиска кандидатов и продвижения вакансий.</div>
+      </div>
+      <div class="infoCard">
+        <div class="infoCardText">LOMO предлагает платные услуги продвижения для работодателей — приоритетное размещение вакансий, расширенный доступ к базе кандидатов и другие инструменты. Подробности скоро.</div>
       </div>
     </div>
   </div>
@@ -2846,8 +2851,5 @@
 <script defer src="./scripts/feed-extra.js?v=26"></script>
 <script defer src="./scripts/jobs.js?v=26"></script>
 <script defer src="./scripts/company-docs.js?v=26"></script>
-<script defer src="./scripts/subscriptions.js?v=26"></script>
-
-
 </body>
 </html>
